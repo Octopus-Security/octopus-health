@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/theme.css">
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <h1>🏥 Health Tracker</h1>
+            <div class="nav-links">
+                <a href="/">Dashboard</a>
+                <a href="/weight">Weight</a>
+                <a href="/exercise">Exercise</a>
+                <a href="/meals">Meals</a>
+                <a href="/goals">Goals</a>
+                <a href="/planner">Planner</a>
+                <a href="/competitions">Competitions</a>
+                <a href="/accountability">Accountability</a>
+                <a href="/settings">Settings</a>
+                <a href="/logout">Logout (<%= user.username %>)</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <!-- ── Stats Row ── -->
+        <div class="dashboard-grid" style="margin-top: 20px;">
+            <div class="card">
+                <h2>🔥 Current Streak</h2>
+                <div class="stat"><%= streak %></div>
+                <div class="stat-label">consecutive days</div>
+            </div>
+            <div class="card">
+                <h2>📅 This Week</h2>
+                <div class="stat"><%= weekCompleted %><span style="font-size:20px; color:#666;">/<%= weekTotal %></span></div>
+                <div class="stat-label">sessions completed</div>
+                <% if (weekTotal > 0) { %>
+                <div style="margin-top: 8px; font-size: 13px; color: #666;">
+                    <%= Math.round(weekCompleted / weekTotal * 100) %>% completion rate
+                </div>
+                <% } %>
+            </div>
+            <div class="card">
+                <h2>📊 Last 30 Days</h2>
+                <% const done30 = heatmap.filter(d => d.status === 'completed' || d.status === 'partial').length; %>
+                <% const active30 = heatmap.filter(d => d.status !== 'empty' && d.status !== 'future').length; %>
+                <div class="stat"><%= done30 %></div>
+                <div class="stat-label">sessions completed</div>
+                <% if (active30 > 0) { %>
+                <div style="margin-top: 8px; font-size: 13px; color: #666;">
+                    <%= Math.round(done30 / active30 * 100) %>% of <%= active30 %> logged
+                </div>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- ── 30-Day Heatmap ── -->
+        <div class="card">
+            <h2>🗓 Activity — Last 30 Days</h2>
+            <div class="heatmap">
+                <% heatmap.forEach(day => { %>
+                <div class="heatmap-day heatmap-<%= day.status %>" title="<%= day.date %> · <%= day.count %> session<%= day.count !== 1 ? 's' : '' %> · <%= day.status %>">
+                    <span class="heatmap-label"><%= day.label %></span>
+                </div>
+                <% }) %>
+            </div>
+            <div class="heatmap-legend">
+                <span class="heatmap-day heatmap-completed" style="width:18px;height:18px;display:inline-block;border-radius:3px;vertical-align:middle;"></span> Completed &nbsp;
+                <span class="heatmap-day heatmap-partial"   style="width:18px;height:18px;display:inline-block;border-radius:3px;vertical-align:middle;"></span> Partial &nbsp;
+                <span class="heatmap-day heatmap-missed"    style="width:18px;height:18px;display:inline-block;border-radius:3px;vertical-align:middle;"></span> Missed &nbsp;
+                <span class="heatmap-day heatmap-planned"   style="width:18px;height:18px;display:inline-block;border-radius:3px;vertical-align:middle;"></span> Planned &nbsp;
+                <span class="heatmap-day heatmap-empty"     style="width:18px;height:18px;display:inline-block;border-radius:3px;vertical-align:middle;"></span> Empty
+            </div>
+        </div>
+
+        <!-- ── Session History ── -->
+        <div class="card">
+            <h2>📋 Session History</h2>
+            <% if (recentSessions.length > 0) { %>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Title</th>
+                            <th>Duration</th>
+                            <th>Effort</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% recentSessions.forEach(s => { %>
+                        <tr>
+                            <td><%= new Date(s.date + 'T12:00:00').toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short' }) %></td>
+                            <td><%= sessionTypes[s.type] || s.type %></td>
+                            <td style="color:#888;"><%= s.title || '—' %></td>
+                            <td><%= s.actualDuration || s.plannedDuration ? (s.actualDuration || s.plannedDuration) + 'min' : '—' %></td>
+                            <td>
+                                <% if (s.effort) { %>
+                                    <% for (let i = 1; i <= 5; i++) { %>
+                                        <span style="color: <%= i <= s.effort ? '#e67e22' : '#333' %>">●</span>
+                                    <% } %>
+                                <% } else { %>—<% } %>
+                            </td>
+                            <td><span class="status-badge status-<%= s.status %>"><%= s.status %></span></td>
+                        </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            <% } else { %>
+                <p class="empty-state">No sessions logged yet. Start planning in the <a href="/planner" style="color:#2ecc71;">Planner</a>.</p>
+            <% } %>
+        </div>
+
+    </div>
+</body>
+</html>

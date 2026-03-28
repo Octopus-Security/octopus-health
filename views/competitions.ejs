@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/theme.css">
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <h1>🏥 Health Tracker</h1>
+            <div class="nav-links">
+                <a href="/">Dashboard</a>
+                <a href="/weight">Weight</a>
+                <a href="/exercise">Exercise</a>
+                <a href="/meals">Meals</a>
+                <a href="/goals">Goals</a>
+                <a href="/planner">Planner</a>
+                <a href="/competitions">Competitions</a>
+                <a href="/accountability">Accountability</a>
+                <a href="/settings">Settings</a>
+                <a href="/logout">Logout (<%= user.username %>)</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <!-- ── Add Competition ── -->
+        <div class="card">
+            <h2>🏆 Add Competition</h2>
+            <form method="POST" action="/competitions">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Event Name</label>
+                        <input type="text" name="name" required placeholder="e.g. IMMAF Regionals">
+                    </div>
+                    <div class="form-group">
+                        <label>Sport</label>
+                        <select name="sport" required>
+                            <option value="muay_thai">🥊 Muay Thai</option>
+                            <option value="bjj">🥋 BJJ</option>
+                            <option value="other">🏆 Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" name="date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Location (optional)</label>
+                        <input type="text" name="location" placeholder="City, Venue">
+                    </div>
+                    <div class="form-group">
+                        <label>Weight Class (optional)</label>
+                        <input type="text" name="weightClass" placeholder="e.g. -70kg, Lightweight">
+                    </div>
+                    <div class="form-group">
+                        <label>Registration Deadline (optional)</label>
+                        <input type="date" name="registrationDeadline">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Notes</label>
+                    <textarea name="notes" rows="2" placeholder="Rules, opponent info, prep notes..."></textarea>
+                </div>
+                <button type="submit">Add Competition</button>
+            </form>
+        </div>
+
+        <!-- ── Competition Cards ── -->
+        <% const upcoming = competitions.filter(c => !c.isPast); %>
+        <% const past     = competitions.filter(c => c.isPast); %>
+
+        <% if (upcoming.length > 0) { %>
+        <h2 style="margin: 10px 0 15px;">Upcoming</h2>
+        <div class="comp-grid">
+            <% upcoming.forEach(c => { %>
+            <div class="comp-card">
+                <div class="comp-card-header">
+                    <div>
+                        <span class="sport-badge sport-<%= c.sport %>"><%= sportLabels[c.sport] || c.sport %></span>
+                        <h3 style="margin-top: 8px;"><%= c.name %></h3>
+                    </div>
+                    <span class="phase-badge" style="background: <%= c.phase.color %>22; color: <%= c.phase.color %>; border: 1px solid <%= c.phase.color %>44;">
+                        <%= c.phase.phase %>
+                    </span>
+                </div>
+
+                <div class="comp-meta">
+                    <span class="comp-countdown"><%= c.phase.weeksOut %> weeks out</span>
+                    <% if (c.location) { %><span class="comp-loc">📍 <%= c.location %></span><% } %>
+                    <% if (c.weightClass) { %><span class="comp-wc">⚖️ <%= c.weightClass %></span><% } %>
+                </div>
+
+                <% if (c.regWarning) { %>
+                <div class="reg-warning">⚠️ Registration closes in <%= c.regWarning %> day<%= c.regWarning !== 1 ? 's' : '' %></div>
+                <% } else if (c.registrationDeadline) { %>
+                <div class="comp-reg">Registration: <%= new Date(c.registrationDeadline + 'T12:00:00').toLocaleDateString('en-GB', { day:'numeric', month:'short' }) %></div>
+                <% } %>
+
+                <% if (c.notes) { %>
+                <div class="comp-notes"><%= c.notes %></div>
+                <% } %>
+
+                <div class="phase-timeline">
+                    <% const phases = ['Base','Build','Peak','Taper']; %>
+                    <% phases.forEach(p => { %>
+                    <span class="phase-step <%= c.phase.phase === p ? 'active' : '' %>"><%= p %></span>
+                    <% }) %>
+                </div>
+
+                <form method="POST" action="/competitions/delete/<%= c.id %>" style="margin-top:12px" onsubmit="return confirm('Delete this competition?')">
+                    <button class="delete-btn">Delete</button>
+                </form>
+            </div>
+            <% }) %>
+        </div>
+        <% } %>
+
+        <% if (past.length > 0) { %>
+        <h2 style="margin: 20px 0 15px; color: #555;">Past</h2>
+        <div class="comp-grid">
+            <% past.forEach(c => { %>
+            <div class="comp-card comp-card-past">
+                <div class="comp-card-header">
+                    <div>
+                        <span class="sport-badge sport-<%= c.sport %>"><%= sportLabels[c.sport] || c.sport %></span>
+                        <h3 style="margin-top: 8px; color: #666;"><%= c.name %></h3>
+                    </div>
+                    <span class="phase-badge" style="background: #1a1a1a; color: #555; border: 1px solid #2a2a2a;">Past</span>
+                </div>
+                <div class="comp-meta">
+                    <span class="comp-loc"><%= new Date(c.date + 'T12:00:00').toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' }) %></span>
+                    <% if (c.location) { %><span class="comp-loc">📍 <%= c.location %></span><% } %>
+                </div>
+                <% if (c.result) { %><div class="comp-result">Result: <%= c.result %></div><% } %>
+                <form method="POST" action="/competitions/delete/<%= c.id %>" style="margin-top:12px" onsubmit="return confirm('Delete this competition?')">
+                    <button class="delete-btn">Delete</button>
+                </form>
+            </div>
+            <% }) %>
+        </div>
+        <% } %>
+
+        <% if (competitions.length === 0) { %>
+            <p class="empty-state">No competitions added yet. Add your first event above.</p>
+        <% } %>
+
+    </div>
+</body>
+</html>
