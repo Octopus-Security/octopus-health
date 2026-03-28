@@ -189,6 +189,227 @@ tr:hover td { background: #141414; }
 }
 .btn-danger:hover { background: #3d1414; border-color: #ff7878; }
 
+/* ── Competition widget (dashboard) ───────────────────────── */
+.comp-widget {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    background: #111;
+    border: 1px solid #1e3d2a;
+    border-left: 3px solid #2ecc71;
+    border-radius: 10px;
+    padding: 18px 22px;
+    margin-bottom: 24px;
+}
+.comp-widget-name { font-size: 18px; font-weight: 700; color: #e8e8e8; margin: 4px 0; }
+.comp-widget-sub  { font-size: 13px; color: #666; }
+.comp-widget-phase { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+
+/* ── Training schedule (planner) ───────────────────────────── */
+.week-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    margin-bottom: 18px;
+}
+@media (max-width: 700px) { .week-grid { grid-template-columns: repeat(4, 1fr); } }
+.week-day {
+    background: #161616;
+    border: 1px solid #1e1e1e;
+    border-radius: 8px;
+    padding: 10px 6px;
+    text-align: center;
+    min-height: 72px;
+}
+.week-day-name {
+    font-size: 11px;
+    font-weight: 700;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+}
+.tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin: 2px 1px;
+}
+.tag-work { background: #152030; color: #6ab0d4; }
+.tag-bjj  { background: #16163a; color: #9090ff; }
+.tag-mt   { background: #3a1616; color: #ff9090; }
+.tag-mat  { background: #221a3a; color: #cc88ff; }
+
+.schedule-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 20px;
+    margin-bottom: 10px;
+}
+.schedule-col { display: flex; flex-direction: column; gap: 4px; }
+.schedule-col-label { margin-bottom: 8px; font-size: 11px; }
+.day-check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #aaa;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 3px 0;
+}
+.day-check input[type="checkbox"] { accent-color: #2ecc71; width: 15px; height: 15px; }
+
+details > summary { cursor: pointer; }
+.edit-schedule-toggle {
+    color: #2ecc71;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 6px 0;
+    list-style: none;
+    user-select: none;
+}
+.edit-schedule-toggle::-webkit-details-marker { display: none; }
+.edit-schedule-toggle::before { content: '▶ '; font-size: 10px; }
+details[open] .edit-schedule-toggle::before { content: '▼ '; }
+
+/* ── Session rows ──────────────────────────────────────────── */
+.session-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    background: #161616;
+    border-radius: 6px;
+    margin-bottom: 6px;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.session-info { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.session-date { color: #666; font-size: 13px; min-width: 90px; }
+.session-type { font-weight: 600; color: #d4d4d4; }
+.session-title { color: #888; font-size: 13px; }
+.session-dur  { color: #555; font-size: 12px; }
+.session-actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+
+.btn-sm {
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+    border: 1px solid;
+}
+.btn-done    { background: #0d2d1a; color: #2ecc71; border-color: #1e6e3e; }
+.btn-done:hover { background: #162d1e; }
+.btn-partial { background: #2d1e0d; color: #e67e22; border-color: #7a4010; }
+.btn-partial:hover { background: #3d2810; }
+.btn-miss    { background: #2d0d0d; color: #ff7878; border-color: #5c1a1a; }
+.btn-miss:hover { background: #3d1010; }
+
+/* ── Status badges ─────────────────────────────────────────── */
+.status-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+.status-planned   { background: #1e2d3d; color: #6ab0d4; }
+.status-completed { background: #0d2d1a; color: #2ecc71; }
+.status-partial   { background: #2d1e0d; color: #e67e22; }
+.status-missed    { background: #2d0d0d; color: #ff7878; }
+
+/* ── Competition cards ─────────────────────────────────────── */
+.comp-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+.comp-card {
+    background: #111;
+    border: 1px solid #1e1e1e;
+    border-radius: 10px;
+    padding: 20px;
+}
+.comp-card-past { opacity: 0.6; }
+.comp-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+.comp-card h3 { font-size: 16px; margin-bottom: 0; }
+.sport-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+.sport-muay_thai { background: #3a1616; color: #ff9090; }
+.sport-bjj       { background: #16163a; color: #9090ff; }
+.sport-other     { background: #1e2a1e; color: #90cc90; }
+.phase-badge {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 4px;
+    white-space: nowrap;
+}
+.comp-meta { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+.comp-countdown { font-size: 20px; font-weight: 700; color: #e8e8e8; }
+.comp-loc, .comp-wc, .comp-reg { font-size: 13px; color: #666; }
+.comp-notes { font-size: 13px; color: #666; margin: 8px 0; font-style: italic; }
+.comp-result { font-size: 13px; color: #2ecc71; }
+.reg-warning { font-size: 12px; color: #e67e22; font-weight: 600; }
+.phase-timeline {
+    display: flex;
+    gap: 4px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+}
+.phase-step {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 3px;
+    background: #1a1a1a;
+    color: #444;
+    border: 1px solid #222;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+.phase-step.active { background: #1e3d2a; color: #2ecc71; border-color: #2a5c3a; }
+
+/* ── Activity heatmap ──────────────────────────────────────── */
+.heatmap { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 14px; }
+.heatmap-day {
+    width: 36px;
+    height: 36px;
+    border-radius: 4px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 3px;
+    cursor: default;
+}
+.heatmap-label { font-size: 9px; color: rgba(255,255,255,0.3); }
+.heatmap-empty     { background: #1a1a1a; }
+.heatmap-future    { background: #151515; border: 1px dashed #222; }
+.heatmap-planned   { background: #152030; }
+.heatmap-completed { background: #0d3d1a; }
+.heatmap-partial   { background: #3d2810; }
+.heatmap-missed    { background: #2d0d0d; }
+.heatmap-legend { font-size: 12px; color: #666; margin-top: 4px; }
+
 /* ── Login page ────────────────────────────────────────────── */
 body.login-page {
     display: flex;

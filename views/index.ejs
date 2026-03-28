@@ -16,6 +16,9 @@
                 <a href="/exercise">Exercise</a>
                 <a href="/meals">Meals</a>
                 <a href="/goals">Goals</a>
+                <a href="/planner">Planner</a>
+                <a href="/competitions">Competitions</a>
+                <a href="/accountability">Accountability</a>
                 <a href="/settings">Settings</a>
                 <a href="/logout">Logout (<%= user.username %>)</a>
             </div>
@@ -24,6 +27,49 @@
 
     <div class="container">
         <h1 style="margin: 30px 0;">Welcome, <%= user.username %>!</h1>
+
+        <!-- ── Competition Widget ── -->
+        <% if (competitionWidget) { %>
+        <div class="comp-widget">
+            <div class="comp-widget-left">
+                <span class="sport-badge sport-<%= competitionWidget.sport %>" style="margin-bottom: 4px; display:inline-block;">
+                    <%= competitionWidget.sport === 'muay_thai' ? '🥊 Muay Thai' : competitionWidget.sport === 'bjj' ? '🥋 BJJ' : '🏆' %>
+                </span>
+                <div class="comp-widget-name"><%= competitionWidget.name %></div>
+                <div class="comp-widget-sub">
+                    <%= competitionWidget.phase.weeksOut %> weeks out
+                    <% if (competitionWidget.weightClass) { %>· <%= competitionWidget.weightClass %><% } %>
+                </div>
+                <% if (competitionWidget.regWarning) { %>
+                <div class="reg-warning" style="margin-top: 6px;">⚠️ Register within <%= competitionWidget.regWarning %> days</div>
+                <% } %>
+            </div>
+            <div class="comp-widget-phase">
+                <span class="phase-badge" style="background: <%= competitionWidget.phase.color %>22; color: <%= competitionWidget.phase.color %>; border: 1px solid <%= competitionWidget.phase.color %>44; font-size: 14px; padding: 6px 14px;">
+                    <%= competitionWidget.phase.phase %>
+                </span>
+                <a href="/competitions" class="btn" style="margin-top: 10px; display: block; text-align: center; padding: 6px 14px; font-size: 12px;">View all</a>
+            </div>
+        </div>
+        <% } %>
+
+        <!-- ── Today's Sessions ── -->
+        <% if (todaySessions && todaySessions.length > 0) { %>
+        <div class="card" style="margin-bottom: 20px;">
+            <h2>🗓 Today's Sessions</h2>
+            <% todaySessions.forEach(s => { %>
+                <div class="list-item" style="display:flex; justify-content:space-between; align-items:center;">
+                    <span>
+                        <strong><%= s.type.replace('_',' ') %></strong>
+                        <% if (s.title) { %> — <%= s.title %><% } %>
+                        <% if (s.plannedDuration) { %> · <%= s.plannedDuration %>min<% } %>
+                    </span>
+                    <span class="status-badge status-<%= s.status %>"><%= s.status %></span>
+                </div>
+            <% }) %>
+            <a href="/planner" class="btn" style="margin-top: 12px;">Go to Planner</a>
+        </div>
+        <% } %>
 
         <div class="dashboard-grid">
             <div class="card">

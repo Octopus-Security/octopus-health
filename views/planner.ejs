@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/theme.css">
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <h1>🏥 Health Tracker</h1>
+            <div class="nav-links">
+                <a href="/">Dashboard</a>
+                <a href="/weight">Weight</a>
+                <a href="/exercise">Exercise</a>
+                <a href="/meals">Meals</a>
+                <a href="/goals">Goals</a>
+                <a href="/planner">Planner</a>
+                <a href="/competitions">Competitions</a>
+                <a href="/accountability">Accountability</a>
+                <a href="/settings">Settings</a>
+                <a href="/logout">Logout (<%= user.username %>)</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <% if (success) { %>
+            <div class="success">Saved successfully.</div>
+        <% } %>
+
+        <!-- ── My Training Week ── -->
+        <div class="card">
+            <h2>📅 My Training Week</h2>
+            <% const DAY_NAMES = [{n:'Mon',v:1},{n:'Tue',v:2},{n:'Wed',v:3},{n:'Thu',v:4},{n:'Fri',v:5},{n:'Sat',v:6},{n:'Sun',v:0}]; %>
+            <div class="week-grid">
+                <% DAY_NAMES.forEach(day => { %>
+                    <div class="week-day">
+                        <div class="week-day-name"><%= day.n %></div>
+                        <% if (scheduleData.workDays.includes(day.v)) { %><span class="tag tag-work">Work</span><% } %>
+                        <% if (scheduleData.bjjDays.includes(day.v)) { %><span class="tag tag-bjj">BJJ</span><% } %>
+                        <% if (scheduleData.muayThaiDays.includes(day.v)) { %><span class="tag tag-mt">MT</span><% } %>
+                        <% if (scheduleData.openMatDays.includes(day.v)) { %><span class="tag tag-mat">Open Mat</span><% } %>
+                    </div>
+                <% }) %>
+            </div>
+
+            <details>
+                <summary class="edit-schedule-toggle">Edit Schedule</summary>
+                <form method="POST" action="/planner/schedule" style="margin-top: 20px;">
+                    <div class="schedule-grid">
+                        <div class="schedule-col">
+                            <div class="schedule-col-label tag tag-work">Work Days</div>
+                            <% DAY_NAMES.forEach(day => { %>
+                                <label class="day-check">
+                                    <input type="checkbox" name="workDays" value="<%= day.v %>"
+                                        <%= scheduleData.workDays.includes(day.v) ? 'checked' : '' %>>
+                                    <%= day.n %>
+                                </label>
+                            <% }) %>
+                            <div class="form-group" style="margin-top: 12px;">
+                                <label>Shift Start</label>
+                                <input type="time" name="workShiftStart" value="<%= scheduleData.workShiftStart %>">
+                            </div>
+                            <div class="form-group">
+                                <label>Shift End</label>
+                                <input type="time" name="workShiftEnd" value="<%= scheduleData.workShiftEnd %>">
+                            </div>
+                        </div>
+                        <div class="schedule-col">
+                            <div class="schedule-col-label tag tag-bjj">BJJ Days</div>
+                            <% DAY_NAMES.forEach(day => { %>
+                                <label class="day-check">
+                                    <input type="checkbox" name="bjjDays" value="<%= day.v %>"
+                                        <%= scheduleData.bjjDays.includes(day.v) ? 'checked' : '' %>>
+                                    <%= day.n %>
+                                </label>
+                            <% }) %>
+                        </div>
+                        <div class="schedule-col">
+                            <div class="schedule-col-label tag tag-mt">Muay Thai Days</div>
+                            <% DAY_NAMES.forEach(day => { %>
+                                <label class="day-check">
+                                    <input type="checkbox" name="muayThaiDays" value="<%= day.v %>"
+                                        <%= scheduleData.muayThaiDays.includes(day.v) ? 'checked' : '' %>>
+                                    <%= day.n %>
+                                </label>
+                            <% }) %>
+                        </div>
+                        <div class="schedule-col">
+                            <div class="schedule-col-label tag tag-mat">Open Mat Days</div>
+                            <% DAY_NAMES.forEach(day => { %>
+                                <label class="day-check">
+                                    <input type="checkbox" name="openMatDays" value="<%= day.v %>"
+                                        <%= scheduleData.openMatDays.includes(day.v) ? 'checked' : '' %>>
+                                    <%= day.n %>
+                                </label>
+                            <% }) %>
+                        </div>
+                    </div>
+                    <button type="submit" style="margin-top: 15px;">Save Schedule</button>
+                </form>
+            </details>
+        </div>
+
+        <!-- ── Log a Session ── -->
+        <div class="card">
+            <h2>➕ Log a Session</h2>
+            <form method="POST" action="/planner/session">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" name="date" value="<%= todayStr %>" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Type</label>
+                        <select name="type" required>
+                            <% Object.entries(sessionTypes).forEach(([val, label]) => { %>
+                                <option value="<%= val %>"><%= label %></option>
+                            <% }) %>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Title (optional)</label>
+                        <input type="text" name="title" placeholder="e.g. Upper body, Guard passing">
+                    </div>
+                    <div class="form-group">
+                        <label>Planned Duration (min)</label>
+                        <input type="number" name="plannedDuration" min="1" placeholder="60">
+                    </div>
+                    <% if (competitions.length > 0) { %>
+                    <div class="form-group">
+                        <label>Linked Competition (optional)</label>
+                        <select name="competitionId">
+                            <option value="">— none —</option>
+                            <% competitions.forEach(c => { %>
+                                <option value="<%= c.id %>"><%= c.name %></option>
+                            <% }) %>
+                        </select>
+                    </div>
+                    <% } %>
+                </div>
+                <div class="form-group">
+                    <label>Notes</label>
+                    <textarea name="notes" rows="2" placeholder="Focus areas, targets, anything relevant..."></textarea>
+                </div>
+                <button type="submit">Add to Plan</button>
+            </form>
+        </div>
+
+        <!-- ── Upcoming Sessions ── -->
+        <div class="card">
+            <h2>⏭ Upcoming (next 14 days)</h2>
+            <% if (upcomingSessions.length > 0) { %>
+                <% upcomingSessions.forEach(s => { %>
+                    <div class="session-row">
+                        <div class="session-info">
+                            <span class="session-date"><%= new Date(s.date + 'T12:00:00').toLocaleDateString('en-GB', { weekday:'short', month:'short', day:'numeric' }) %></span>
+                            <span class="session-type"><%= sessionTypes[s.type] || s.type %></span>
+                            <% if (s.title) { %><span class="session-title"><%= s.title %></span><% } %>
+                            <% if (s.plannedDuration) { %><span class="session-dur"><%= s.plannedDuration %>min</span><% } %>
+                            <span class="status-badge status-<%= s.status %>"><%= s.status %></span>
+                        </div>
+                        <div class="session-actions">
+                            <% if (s.status !== 'completed') { %>
+                            <form method="POST" action="/planner/session/update/<%= s.id %>" style="display:inline">
+                                <input type="hidden" name="status" value="completed">
+                                <button class="btn-sm btn-done" title="Mark complete">✓</button>
+                            </form>
+                            <% } %>
+                            <% if (s.status !== 'partial') { %>
+                            <form method="POST" action="/planner/session/update/<%= s.id %>" style="display:inline">
+                                <input type="hidden" name="status" value="partial">
+                                <button class="btn-sm btn-partial" title="Mark partial">~</button>
+                            </form>
+                            <% } %>
+                            <% if (s.status !== 'missed') { %>
+                            <form method="POST" action="/planner/session/update/<%= s.id %>" style="display:inline">
+                                <input type="hidden" name="status" value="missed">
+                                <button class="btn-sm btn-miss" title="Mark missed">✗</button>
+                            </form>
+                            <% } %>
+                            <form method="POST" action="/planner/session/delete/<%= s.id %>" style="display:inline">
+                                <button class="delete-btn" title="Delete">Del</button>
+                            </form>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <p class="empty-state">No sessions planned for the next two weeks. Add one above.</p>
+            <% } %>
+        </div>
+
+        <!-- ── Recent Sessions ── -->
+        <% if (recentSessions.length > 0) { %>
+        <div class="card">
+            <h2>🕐 Last 7 Days</h2>
+            <% recentSessions.forEach(s => { %>
+                <div class="session-row">
+                    <div class="session-info">
+                        <span class="session-date"><%= new Date(s.date + 'T12:00:00').toLocaleDateString('en-GB', { weekday:'short', month:'short', day:'numeric' }) %></span>
+                        <span class="session-type"><%= sessionTypes[s.type] || s.type %></span>
+                        <% if (s.title) { %><span class="session-title"><%= s.title %></span><% } %>
+                        <% if (s.actualDuration) { %><span class="session-dur"><%= s.actualDuration %>min</span><% } %>
+                        <span class="status-badge status-<%= s.status %>"><%= s.status %></span>
+                    </div>
+                    <div class="session-actions">
+                        <form method="POST" action="/planner/session/delete/<%= s.id %>" style="display:inline">
+                            <button class="delete-btn">Del</button>
+                        </form>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+        <% } %>
+
+    </div>
+</body>
+</html>

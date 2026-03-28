@@ -18,6 +18,18 @@ const JWT_SECRET = process.env.JWT_SECRET || 'octopus-shared-secret-change-in-pr
 const AUTH_INTERNAL_URL = process.env.AUTH_SERVICE_URL || 'http://octopus-auth:3002';
 const AUTH_EXTERNAL_URL = 'https://auth.octopustechnology.net';
 
+// ── Periodisation phase helper ────────────────────────────────────────────────
+function getPeriodisationPhase(competitionDate) {
+    const today = new Date();
+    const compDate = new Date(competitionDate);
+    const weeksOut = Math.ceil((compDate - today) / (7 * 24 * 60 * 60 * 1000));
+    if (weeksOut < 0)  return { phase: 'Past',   color: '#555',     weeksOut };
+    if (weeksOut <= 1) return { phase: 'Taper',  color: '#9b59b6',  weeksOut };
+    if (weeksOut <= 4) return { phase: 'Peak',   color: '#e74c3c',  weeksOut };
+    if (weeksOut <= 8) return { phase: 'Build',  color: '#e67e22',  weeksOut };
+    return                    { phase: 'Base',   color: '#2ecc71',  weeksOut };
+}
+
 // Helper to call auth service with fallback
 async function callAuthService(endpoint, data, headers = {}) {
     try {
@@ -253,30 +265,38 @@ app.post('/api/auth/login', async (req, res) => {
 
 // Dashboard
 app.get('/', requireLogin, async (req, res) => {
-    const { WeightEntry, Exercise, Meal, Goal } = getDatabase(req.session.user.username);
-    
-    try {
-        // Get recent data
-        const recentWeight = await WeightEntry.findOne({ 
-            order: [['date', 'DESC']] 
-        });
-        const todayExercises = await Exercise.findAll({
-            where: { 
-                date: new Date().toISOString().split('T')[0] 
-            }
-        });
-        const todayMeals = await Meal.findAll({
-            where: { 
-                date: new Date().toISOString().split('T')[0] 
-            }
-        });
-        const activeGoals = await Goal.findAll({
-            where: { completed: false }
-        });
+    const { WeightEntry, Exercise, Meal, Goal, Competition, TrainingSession, sequelize } = getDatabase(req.session.user.username);
+    await sequelize.sync();
 
-        // Calculate today's totals
+    try {
+        const todayStr = new Date().toISOString().split('T')[0];
+
+        const recentWeight = await WeightEntry.findOne({ order: [['date', 'DESC']] });
+        const todayExercises = await Exercise.findAll({ where: { date: todayStr } });
+        const todayMeals = await Meal.findAll({ where: { date: todayStr } });
+        const activeGoals = await Goal.findAll({ where: { completed: false } });
+
         const todayCalories = todayMeals.reduce((sum, meal) => sum + (meal.calories || 0), 0);
         const todayExerciseMinutes = todayExercises.reduce((sum, ex) => sum + ex.duration, 0);
+
+        // Upcoming competition widget
+        const nextComp = await Competition.findOne({
+            where: { isActive: true, date: { [Op.gte]: todayStr } },
+            order: [['date', 'ASC']],
+        });
+        let competitionWidget = null;
+        if (nextComp) {
+            const phase = getPeriodisationPhase(nextComp.date);
+            let regWarning = null;
+            if (nextComp.registrationDeadline) {
+                const regDays = Math.ceil((new Date(nextComp.registrationDeadline) - new Date()) / (24 * 60 * 60 * 1000));
+                if (regDays > 0 && regDays <= 14) regWarning = regDays;
+            }
+            competitionWidget = { ...nextComp.toJSON(), phase, regWarning };
+        }
+
+        // Today's planned sessions
+        const todaySessions = await TrainingSession.findAll({ where: { date: todayStr } });
 
         res.render('index', {
             title: 'Health Tracker Dashboard',
@@ -286,7 +306,9 @@ app.get('/', requireLogin, async (req, res) => {
             todayMeals,
             activeGoals,
             todayCalories,
-            todayExerciseMinutes
+            todayExerciseMinutes,
+            competitionWidget,
+            todaySessions,
         });
     } catch (error) {
         console.error(error);
@@ -496,6 +518,253 @@ app.post('/settings/delete-account', requireLogin, async (req, res) => {
             success: null 
         });
     }
+});
+
+// ── Planner ───────────────────────────────────────────────────────────────────
+
+const parseArr = (s) => { try { return JSON.parse(s || '[]'); } catch { return []; } };
+
+const SESSION_TYPES = {
+    strength:     '💪 Strength',
+    conditioning: '🏃 Conditioning',
+    technique:    '🎯 Technique',
+    recovery:     '🧘 Recovery',
+    bjj:          '🥋 BJJ',
+    muay_thai:    '🥊 Muay Thai',
+    open_mat:     '🤸 Open Mat',
+    gym_work:     '🏋️ Gym Work',
+};
+
+app.get('/planner', requireLogin, async (req, res) => {
+    const { ScheduleProfile, TrainingSession, Competition, sequelize } = getDatabase(req.session.user.username);
+    await sequelize.sync();
+
+    const schedule = await ScheduleProfile.findOne();
+    const scheduleData = schedule ? {
+        workDays:       parseArr(schedule.workDays),
+        workShiftStart: schedule.workShiftStart || '',
+        workShiftEnd:   schedule.workShiftEnd   || '',
+        bjjDays:        parseArr(schedule.bjjDays),
+        muayThaiDays:   parseArr(schedule.muayThaiDays),
+        openMatDays:    parseArr(schedule.openMatDays),
+    } : { workDays: [], workShiftStart: '', workShiftEnd: '', bjjDays: [], muayThaiDays: [], openMatDays: [] };
+
+    const todayStr = new Date().toISOString().split('T')[0];
+    const twoWeeksStr = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    const sevenDaysAgoStr = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+    const upcomingSessions = await TrainingSession.findAll({
+        where: { date: { [Op.between]: [todayStr, twoWeeksStr] } },
+        order: [['date', 'ASC']],
+    });
+    const recentSessions = await TrainingSession.findAll({
+        where: { date: { [Op.between]: [sevenDaysAgoStr, new Date(todayStr + 'T00:00:00').toISOString().split('T')[0]] } },
+        order: [['date', 'DESC']],
+    });
+    const competitions = await Competition.findAll({
+        where: { isActive: true, date: { [Op.gte]: todayStr } },
+        order: [['date', 'ASC']],
+    });
+
+    res.render('planner', {
+        title: 'Training Planner',
+        user: req.session.user,
+        scheduleData,
+        upcomingSessions,
+        recentSessions,
+        competitions,
+        sessionTypes: SESSION_TYPES,
+        todayStr,
+        success: req.query.success || null,
+    });
+});
+
+app.post('/planner/schedule', requireLogin, async (req, res) => {
+    const { ScheduleProfile, sequelize } = getDatabase(req.session.user.username);
+    await sequelize.sync();
+
+    const workDays    = [].concat(req.body.workDays    || []).map(Number);
+    const bjjDays     = [].concat(req.body.bjjDays     || []).map(Number);
+    const muayThaiDays= [].concat(req.body.muayThaiDays|| []).map(Number);
+    const openMatDays = [].concat(req.body.openMatDays || []).map(Number);
+    const data = {
+        workDays:       JSON.stringify(workDays),
+        workShiftStart: req.body.workShiftStart || null,
+        workShiftEnd:   req.body.workShiftEnd   || null,
+        bjjDays:        JSON.stringify(bjjDays),
+        muayThaiDays:   JSON.stringify(muayThaiDays),
+        openMatDays:    JSON.stringify(openMatDays),
+    };
+
+    const existing = await ScheduleProfile.findOne();
+    if (existing) await existing.update(data);
+    else await ScheduleProfile.create(data);
+
+    res.redirect('/planner?success=1');
+});
+
+app.post('/planner/session', requireLogin, async (req, res) => {
+    const { TrainingSession, sequelize } = getDatabase(req.session.user.username);
+    await sequelize.sync();
+
+    const { date, type, title, plannedDuration, notes, competitionId } = req.body;
+    await TrainingSession.create({
+        date,
+        type,
+        title:           title           || null,
+        plannedDuration: plannedDuration ? parseInt(plannedDuration) : null,
+        notes:           notes           || null,
+        competitionId:   competitionId   ? parseInt(competitionId)   : null,
+        status:          'planned',
+    });
+    res.redirect('/planner?success=1');
+});
+
+app.post('/planner/session/update/:id', requireLogin, async (req, res) => {
+    const { TrainingSession } = getDatabase(req.session.user.username);
+    const s = await TrainingSession.findByPk(req.params.id);
+    if (!s) return res.redirect('/planner');
+
+    const { status, actualDuration, effort, energy, notes, missedReason } = req.body;
+    await s.update({
+        status:         status         || s.status,
+        actualDuration: actualDuration ? parseInt(actualDuration) : s.actualDuration,
+        effort:         effort         ? parseInt(effort)         : s.effort,
+        energy:         energy         ? parseInt(energy)         : s.energy,
+        notes:          notes          !== undefined ? notes       : s.notes,
+        missedReason:   missedReason   || s.missedReason,
+    });
+    res.redirect('/planner');
+});
+
+app.post('/planner/session/delete/:id', requireLogin, async (req, res) => {
+    const { TrainingSession } = getDatabase(req.session.user.username);
+    await TrainingSession.destroy({ where: { id: req.params.id } });
+    res.redirect('/planner');
+});
+
+// ── Competitions ──────────────────────────────────────────────────────────────
+
+const SPORT_LABELS = { muay_thai: '🥊 Muay Thai', bjj: '🥋 BJJ', other: '🏆 Other' };
+
+app.get('/competitions', requireLogin, async (req, res) => {
+    const { Competition, sequelize } = getDatabase(req.session.user.username);
+    await sequelize.sync();
+
+    const all = await Competition.findAll({ order: [['date', 'ASC']] });
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    const enriched = all.map(c => {
+        const daysOut  = Math.ceil((new Date(c.date) - new Date()) / (24 * 60 * 60 * 1000));
+        const phase    = getPeriodisationPhase(c.date);
+        let regWarning = null;
+        if (c.registrationDeadline) {
+            const regDays = Math.ceil((new Date(c.registrationDeadline) - new Date()) / (24 * 60 * 60 * 1000));
+            if (regDays > 0 && regDays <= 14) regWarning = regDays;
+        }
+        return { ...c.toJSON(), daysOut, phase, regWarning, isPast: daysOut < 0 };
+    });
+
+    res.render('competitions', {
+        title: 'Competitions',
+        user: req.session.user,
+        competitions: enriched,
+        sportLabels: SPORT_LABELS,
+        todayStr,
+    });
+});
+
+app.post('/competitions', requireLogin, async (req, res) => {
+    const { Competition, sequelize } = getDatabase(req.session.user.username);
+    await sequelize.sync();
+
+    const { name, sport, date, location, weightClass, registrationDeadline, notes } = req.body;
+    await Competition.create({
+        name, sport, date,
+        location:             location             || null,
+        weightClass:          weightClass          || null,
+        registrationDeadline: registrationDeadline || null,
+        notes:                notes                || null,
+        isActive: true,
+    });
+    res.redirect('/competitions');
+});
+
+app.post('/competitions/delete/:id', requireLogin, async (req, res) => {
+    const { Competition } = getDatabase(req.session.user.username);
+    await Competition.destroy({ where: { id: req.params.id } });
+    res.redirect('/competitions');
+});
+
+// ── Accountability ────────────────────────────────────────────────────────────
+
+app.get('/accountability', requireLogin, async (req, res) => {
+    const { TrainingSession, sequelize } = getDatabase(req.session.user.username);
+    await sequelize.sync();
+
+    const today    = new Date();
+    const todayStr = today.toISOString().split('T')[0];
+
+    // 30-day heatmap
+    const thirtyStr = new Date(today.getTime() - 29 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    const heatmapSessions = await TrainingSession.findAll({
+        where: { date: { [Op.gte]: thirtyStr } },
+    });
+    const heatmap = [];
+    for (let i = 29; i >= 0; i--) {
+        const d = new Date(today.getTime() - i * 24 * 60 * 60 * 1000);
+        const ds = d.toISOString().split('T')[0];
+        const daySess = heatmapSessions.filter(s => s.date === ds);
+        let status = 'empty';
+        if (ds > todayStr)                                        status = 'future';
+        else if (daySess.some(s => s.status === 'completed'))     status = 'completed';
+        else if (daySess.some(s => s.status === 'partial'))       status = 'partial';
+        else if (daySess.some(s => s.status === 'missed'))        status = 'missed';
+        else if (daySess.some(s => s.status === 'planned'))       status = 'planned';
+        heatmap.push({ date: ds, label: `${d.getMonth()+1}/${d.getDate()}`, status, count: daySess.length });
+    }
+
+    // Streak (consecutive completed/partial days going back from today)
+    const allDone = await TrainingSession.findAll({
+        where: { status: { [Op.in]: ['completed', 'partial'] } },
+        attributes: ['date'],
+    });
+    const doneDates = new Set(allDone.map(s => s.date));
+    let streak = 0;
+    let check  = new Date(today);
+    if (!doneDates.has(todayStr)) check.setDate(check.getDate() - 1);
+    while (doneDates.has(check.toISOString().split('T')[0])) {
+        streak++;
+        check.setDate(check.getDate() - 1);
+    }
+
+    // This week stats
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay());
+    const weekStr = startOfWeek.toISOString().split('T')[0];
+    const weekSessions = await TrainingSession.findAll({
+        where: { date: { [Op.between]: [weekStr, todayStr] } },
+    });
+    const weekCompleted = weekSessions.filter(s => ['completed','partial'].includes(s.status)).length;
+    const weekTotal     = weekSessions.length;
+
+    // Recent history (last 30 sessions)
+    const recentSessions = await TrainingSession.findAll({
+        order: [['date', 'DESC']],
+        limit: 30,
+    });
+
+    res.render('accountability', {
+        title: 'Accountability',
+        user: req.session.user,
+        heatmap,
+        streak,
+        weekCompleted,
+        weekTotal,
+        recentSessions,
+        sessionTypes: SESSION_TYPES,
+        todayStr,
+    });
 });
 
 app.listen(port, () => {
