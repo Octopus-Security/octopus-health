@@ -131,6 +131,14 @@ const getDatabase = (username) => {
         }
     });
 
+    // Warmup / stretching routines
+    const Routine = sequelize.define('Routine', {
+        name:  { type: DataTypes.STRING, allowNull: false },
+        type:  { type: DataTypes.STRING, allowNull: false, defaultValue: 'warmup' }, // warmup, stretching, cooldown
+        notes: { type: DataTypes.TEXT,   allowNull: true },
+        items: { type: DataTypes.TEXT,   allowNull: true, defaultValue: '[]' }, // JSON array of { name, duration, reps, sets, notes }
+    });
+
     // Recurring weekly schedule profile (one record per user)
     const ScheduleProfile = sequelize.define('ScheduleProfile', {
         workDays:       { type: DataTypes.TEXT, allowNull: true }, // JSON "[1,2,3,4,5]"
@@ -175,6 +183,7 @@ const getDatabase = (username) => {
         Exercise,
         Meal,
         Goal,
+        Routine,
         ScheduleProfile,
         Competition,
         TrainingSession,

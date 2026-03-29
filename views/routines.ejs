@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/theme.css">
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <h1>🏥 Health Tracker</h1>
+            <div class="nav-links">
+                <a href="/">Dashboard</a>
+                <a href="/weight">Weight</a>
+                <a href="/exercise">Exercise</a>
+                <a href="/meals">Meals</a>
+                <a href="/goals">Goals</a>
+                <a href="/routines">Routines</a>
+                <a href="/planner">Planner</a>
+                <a href="/competitions">Competitions</a>
+                <a href="/accountability">Accountability</a>
+                <a href="/settings">Settings</a>
+                <a href="/logout">Logout (<%= user.username %>)</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <% if (success) { %>
+            <div class="success">Routine saved.</div>
+        <% } %>
+
+        <!-- ── Create Routine ── -->
+        <div class="card">
+            <h2>➕ New Routine</h2>
+            <form method="POST" action="/routines">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" name="name" required placeholder="e.g. Pre-training warmup">
+                    </div>
+                    <div class="form-group">
+                        <label>Type</label>
+                        <select name="type" required>
+                            <option value="warmup">🔥 Warmup</option>
+                            <option value="stretching">🧘 Stretching</option>
+                            <option value="cooldown">❄️ Cooldown</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Notes (optional)</label>
+                    <textarea name="notes" rows="2" placeholder="When to use this, context..."></textarea>
+                </div>
+                <button type="submit">Create Routine</button>
+            </form>
+        </div>
+
+        <!-- ── Routine Cards ── -->
+        <% const TYPE_ICONS = { warmup: '🔥', stretching: '🧘', cooldown: '❄️' }; %>
+
+        <% if (routines.length === 0) { %>
+            <p class="empty-state">No routines yet. Create your first one above.</p>
+        <% } %>
+
+        <% routines.forEach(r => { %>
+        <div class="card routine-card">
+
+            <!-- Routine header -->
+            <div class="routine-header">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <span class="routine-type-badge routine-type-<%= r.type %>">
+                        <%= TYPE_ICONS[r.type] || '' %> <%= r.type %>
+                    </span>
+                    <h2 style="margin:0;"><%= r.name %></h2>
+                </div>
+                <div style="display:flex; gap:8px;">
+                    <form method="POST" action="/routines/delete/<%= r.id %>" onsubmit="return confirm('Delete this routine?')">
+                        <button class="delete-btn">Delete Routine</button>
+                    </form>
+                </div>
+            </div>
+
+            <% if (r.notes) { %>
+                <p style="color:#666; font-size:13px; margin-bottom:16px;"><%= r.notes %></p>
+            <% } %>
+
+            <!-- Edit routine name/type/notes -->
+            <details style="margin-bottom:16px;">
+                <summary class="edit-schedule-toggle">Edit routine details</summary>
+                <form method="POST" action="/routines/update/<%= r.id %>" style="margin-top:14px;">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Name</label>
+                            <input type="text" name="name" value="<%= r.name %>" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Type</label>
+                            <select name="type">
+                                <option value="warmup"     <%= r.type === 'warmup'     ? 'selected' : '' %>>🔥 Warmup</option>
+                                <option value="stretching" <%= r.type === 'stretching' ? 'selected' : '' %>>🧘 Stretching</option>
+                                <option value="cooldown"   <%= r.type === 'cooldown'   ? 'selected' : '' %>>❄️ Cooldown</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Notes</label>
+                        <textarea name="notes" rows="2"><%= r.notes || '' %></textarea>
+                    </div>
+                    <button type="submit">Save Changes</button>
+                </form>
+            </details>
+
+            <!-- Items list -->
+            <% if (r.itemsList.length > 0) { %>
+            <table style="margin-bottom:16px;">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Exercise</th>
+                        <th>Duration</th>
+                        <th>Reps</th>
+                        <th>Sets</th>
+                        <th>Notes</th>
+                        <th>Edit</th>
+                        <th>Del</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% r.itemsList.forEach((item, idx) => { %>
+                    <tr>
+                        <td style="color:#555;"><%= idx + 1 %></td>
+                        <td><strong><%= item.name %></strong></td>
+                        <td><%= item.duration ? item.duration + 's' : '—' %></td>
+                        <td><%= item.reps || '—' %></td>
+                        <td><%= item.sets || '—' %></td>
+                        <td style="color:#666; font-size:13px;"><%= item.notes || '—' %></td>
+                        <td>
+                            <button class="btn-sm btn-partial" onclick="toggleEdit('<%= r.id %>-<%= idx %>')" type="button">✎</button>
+                        </td>
+                        <td>
+                            <form method="POST" action="/routines/<%= r.id %>/items/delete/<%= idx %>" style="display:inline">
+                                <button class="delete-btn">✗</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <!-- Inline edit row -->
+                    <tr id="edit-<%= r.id %>-<%= idx %>" style="display:none; background:#161616;">
+                        <td colspan="8" style="padding:12px;">
+                            <form method="POST" action="/routines/<%= r.id %>/items/update/<%= idx %>" style="display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end;">
+                                <div class="form-group" style="min-width:160px;">
+                                    <label>Exercise</label>
+                                    <input type="text" name="name" value="<%= item.name %>" required>
+                                </div>
+                                <div class="form-group" style="width:90px;">
+                                    <label>Dur (sec)</label>
+                                    <input type="number" name="duration" value="<%= item.duration || '' %>" min="1" placeholder="—">
+                                </div>
+                                <div class="form-group" style="width:80px;">
+                                    <label>Reps</label>
+                                    <input type="number" name="reps" value="<%= item.reps || '' %>" min="1" placeholder="—">
+                                </div>
+                                <div class="form-group" style="width:80px;">
+                                    <label>Sets</label>
+                                    <input type="number" name="sets" value="<%= item.sets || '' %>" min="1" placeholder="—">
+                                </div>
+                                <div class="form-group" style="flex:1; min-width:140px;">
+                                    <label>Notes</label>
+                                    <input type="text" name="notes" value="<%= item.notes || '' %>" placeholder="optional">
+                                </div>
+                                <button type="submit" class="btn-sm btn-done">Save</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+            <% } else { %>
+                <p style="color:#555; font-size:13px; margin-bottom:14px;">No exercises yet — add one below.</p>
+            <% } %>
+
+            <!-- Add item form -->
+            <details>
+                <summary class="edit-schedule-toggle">Add exercise</summary>
+                <form method="POST" action="/routines/<%= r.id %>/items" style="margin-top:14px;">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Exercise Name</label>
+                            <input type="text" name="name" required placeholder="e.g. Leg swings, Hip circles">
+                        </div>
+                        <div class="form-group">
+                            <label>Duration (seconds)</label>
+                            <input type="number" name="duration" min="1" placeholder="e.g. 30">
+                        </div>
+                        <div class="form-group">
+                            <label>Reps (optional)</label>
+                            <input type="number" name="reps" min="1" placeholder="e.g. 10">
+                        </div>
+                        <div class="form-group">
+                            <label>Sets (optional)</label>
+                            <input type="number" name="sets" min="1" placeholder="e.g. 2">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Notes (optional)</label>
+                        <input type="text" name="notes" placeholder="Each side, slow and controlled...">
+                    </div>
+                    <button type="submit">Add Exercise</button>
+                </form>
+            </details>
+
+        </div>
+        <% }) %>
+
+    </div>
+
+    <script>
+    function toggleEdit(id) {
+        const row = document.getElementById('edit-' + id);
+        if (row) row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
+    }
+    </script>
+</body>
+</html>
