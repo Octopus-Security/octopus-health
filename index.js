@@ -520,6 +520,86 @@ app.post('/settings/delete-account', requireLogin, async (req, res) => {
     }
 });
 
+// ── Routines (warmup / stretching / cooldown) ─────────────────────────────────
+
+app.get('/routines', requireLogin, async (req, res) => {
+    const { Routine, sequelize } = getDatabase(req.session.user.username);
+    await sequelize.sync();
+    const all = await Routine.findAll({ order: [['type', 'ASC'], ['name', 'ASC']] });
+    const routines = all.map(r => ({ ...r.toJSON(), itemsList: JSON.parse(r.items || '[]') }));
+    res.render('routines', { title: 'Routines', user: req.session.user, routines, success: req.query.success || null });
+});
+
+app.post('/routines', requireLogin, async (req, res) => {
+    const { Routine, sequelize } = getDatabase(req.session.user.username);
+    await sequelize.sync();
+    const { name, type, notes } = req.body;
+    await Routine.create({ name: name.trim(), type, notes: notes?.trim() || null, items: '[]' });
+    res.redirect('/routines?success=1');
+});
+
+app.post('/routines/update/:id', requireLogin, async (req, res) => {
+    const { Routine } = getDatabase(req.session.user.username);
+    const r = await Routine.findByPk(req.params.id);
+    if (!r) return res.redirect('/routines');
+    const { name, type, notes } = req.body;
+    await r.update({ name: name.trim(), type, notes: notes?.trim() || null });
+    res.redirect('/routines');
+});
+
+app.post('/routines/delete/:id', requireLogin, async (req, res) => {
+    const { Routine } = getDatabase(req.session.user.username);
+    await Routine.destroy({ where: { id: req.params.id } });
+    res.redirect('/routines');
+});
+
+app.post('/routines/:id/items', requireLogin, async (req, res) => {
+    const { Routine } = getDatabase(req.session.user.username);
+    const r = await Routine.findByPk(req.params.id);
+    if (!r) return res.redirect('/routines');
+    const items = JSON.parse(r.items || '[]');
+    const { name, duration, reps, sets, notes } = req.body;
+    items.push({
+        name:     name.trim(),
+        duration: duration ? parseInt(duration) : null,
+        reps:     reps     ? parseInt(reps)     : null,
+        sets:     sets     ? parseInt(sets)      : null,
+        notes:    notes?.trim() || null,
+    });
+    await r.update({ items: JSON.stringify(items) });
+    res.redirect('/routines');
+});
+
+app.post('/routines/:id/items/update/:idx', requireLogin, async (req, res) => {
+    const { Routine } = getDatabase(req.session.user.username);
+    const r = await Routine.findByPk(req.params.id);
+    if (!r) return res.redirect('/routines');
+    const items = JSON.parse(r.items || '[]');
+    const idx = parseInt(req.params.idx);
+    if (idx >= 0 && idx < items.length) {
+        const { name, duration, reps, sets, notes } = req.body;
+        items[idx] = {
+            name:     name.trim(),
+            duration: duration ? parseInt(duration) : null,
+            reps:     reps     ? parseInt(reps)     : null,
+            sets:     sets     ? parseInt(sets)      : null,
+            notes:    notes?.trim() || null,
+        };
+    }
+    await r.update({ items: JSON.stringify(items) });
+    res.redirect('/routines');
+});
+
+app.post('/routines/:id/items/delete/:idx', requireLogin, async (req, res) => {
+    const { Routine } = getDatabase(req.session.user.username);
+    const r = await Routine.findByPk(req.params.id);
+    if (!r) return res.redirect('/routines');
+    const items = JSON.parse(r.items || '[]');
+    items.splice(parseInt(req.params.idx), 1);
+    await r.update({ items: JSON.stringify(items) });
+    res.redirect('/routines');
+});
+
 // ── Planner ───────────────────────────────────────────────────────────────────
 
 const parseArr = (s) => { try { return JSON.parse(s || '[]'); } catch { return []; } };

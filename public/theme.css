@@ -410,6 +410,29 @@ details[open] .edit-schedule-toggle::before { content: '▼ '; }
 .heatmap-missed    { background: #2d0d0d; }
 .heatmap-legend { font-size: 12px; color: #666; margin-top: 4px; }
 
+/* ── Routines ──────────────────────────────────────────────── */
+.routine-card { border-left: 3px solid #2ecc71; }
+.routine-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.routine-type-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+.routine-type-warmup     { background: #3a1e0d; color: #ff9955; }
+.routine-type-stretching { background: #0d2233; color: #55bbff; }
+.routine-type-cooldown   { background: #0d1e33; color: #88aaff; }
+
 /* ── Login page ────────────────────────────────────────────── */
 body.login-page {
     display: flex;
