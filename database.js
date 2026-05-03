@@ -426,6 +426,16 @@ const getDatabase = (username) => {
         status:      { type: DataTypes.STRING,  allowNull: false, defaultValue: 'active' }, // active | completed | paused
     });
 
+    // Saved workout template (reusable workout card)
+    const WorkoutTemplate = sequelize.define('WorkoutTemplate', {
+        name:        { type: DataTypes.STRING, allowNull: false },
+        type:        { type: DataTypes.STRING, allowNull: false, defaultValue: 'strength' },
+        description: { type: DataTypes.TEXT,   allowNull: true },
+        // JSON array of { exerciseId, exerciseName, defaultSets, defaultReps, defaultDuration, notes }
+        exercises:   { type: DataTypes.TEXT,   allowNull: false, defaultValue: '[]' },
+        isCustom:    { type: DataTypes.BOOLEAN, defaultValue: true },
+    });
+
     // ── Seed function ──────────────────────────────────────────────────────────
 
     async function seedData() {
@@ -471,6 +481,7 @@ const getDatabase = (username) => {
         WorkoutSet,
         TrainingPlan,
         TrainingPlanAssignment,
+        WorkoutTemplate,
         seedData,
     };
 };

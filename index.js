@@ -741,7 +741,7 @@ app.get('/accountability', requireLogin, async (req, res) => {
 // ── Workout Logger ────────────────────────────────────────────────────────────
 
 app.get('/workout', requireLogin, async (req, res) => {
-    const { WorkoutSession, WorkoutSet, TrainingPlan, TrainingPlanAssignment, sequelize } = getDatabase(req.session.user.username);
+    const { WorkoutSession, WorkoutSet, TrainingPlan, TrainingPlanAssignment, WorkoutTemplate, sequelize } = getDatabase(req.session.user.username);
     await sequelize.sync();
     const recent = await WorkoutSession.findAll({ order: [['date','DESC'],['startedAt','DESC']], limit: 10 });
     const recentWithCounts = await Promise.all(recent.map(async s => {
@@ -766,7 +766,9 @@ app.get('/workout', requireLogin, async (req, res) => {
             todayPlan = { planName: plan.name, phase: phase?.name, session: phase?.weeklySchedule?.find(d => d.day === dayOfWeek) || null };
         }
     }
-    res.render('workout', { title: 'Workout Logger', user: req.session.user, recentWorkouts: recentWithCounts, todayPlan });
+    const rawTemplates = await WorkoutTemplate.findAll({ order: [['name','ASC']] });
+    const templates = rawTemplates.map(t => ({ ...t.toJSON(), exercises: JSON.parse(t.exercises || '[]') }));
+    res.render('workout', { title: 'Workout Logger', user: req.session.user, recentWorkouts: recentWithCounts, todayPlan, templates });
 });
 
 // Workout AJAX endpoints (session-protected, used by workout.ejs)
@@ -830,7 +832,30 @@ app.get('/workout/api/exercises', requireLogin, async (req, res) => {
     let all = await ExerciseDefinition.findAll({ order: [['name','ASC']] });
     if (category) all = all.filter(e => e.category === category);
     if (q) all = all.filter(e => e.name.toLowerCase().includes(q.toLowerCase()));
-    res.json({ success: true, data: all.map(e => ({ id: e.id, name: e.name, category: e.category, equipment: e.equipment, primaryMuscles: JSON.parse(e.primaryMuscles || '[]') })) });
+    res.json({ success: true, data: all.map(e => ({ id: e.id, name: e.name, category: e.category, equipment: e.equipment, primaryMuscles: JSON.parse(e.primaryMuscles || '[]'), defaultSets: e.defaultSets, defaultReps: e.defaultReps })) });
+});
+
+// Workout templates API
+app.get('/workout/api/templates', requireLogin, async (req, res) => {
+    const { WorkoutTemplate, sequelize } = getDatabase(req.session.user.username);
+    await sequelize.sync();
+    const templates = await WorkoutTemplate.findAll({ order: [['name','ASC']] });
+    res.json({ success: true, data: templates.map(t => ({ ...t.toJSON(), exercises: JSON.parse(t.exercises || '[]') })) });
+});
+
+app.post('/workout/api/templates', requireLogin, async (req, res) => {
+    const { WorkoutTemplate, sequelize } = getDatabase(req.session.user.username);
+    await sequelize.sync();
+    const { name, type, description, exercises } = req.body;
+    if (!name || !Array.isArray(exercises)) return res.status(400).json({ success: false, message: 'name and exercises required' });
+    const t = await WorkoutTemplate.create({ name: name.trim(), type: type || 'strength', description: description?.trim() || null, exercises: JSON.stringify(exercises) });
+    res.json({ success: true, data: { ...t.toJSON(), exercises } });
+});
+
+app.delete('/workout/api/templates/:id', requireLogin, async (req, res) => {
+    const { WorkoutTemplate } = getDatabase(req.session.user.username);
+    await WorkoutTemplate.destroy({ where: { id: req.params.id } });
+    res.json({ success: true });
 });
 
 // ── Exercise Library ──────────────────────────────────────────────────────────
