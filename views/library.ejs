@@ -6,7 +6,6 @@
   <title><%= title %></title>
   <link rel="stylesheet" href="/theme.css">
   <style>
-    /* ── Layout ─────────────────────────── */
     .filter-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; align-items:center; }
     .filter-bar input { flex:1; min-width:180px; background:#0d0d0d; border:1px solid #2a2a2a; border-radius:8px; padding:8px 14px; color:#e8e8e8; font-size:0.9rem; }
     .filter-bar input:focus { outline:none; border-color:#2ecc71; }
@@ -17,7 +16,6 @@
     .lib-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:16px; }
     .count-badge { font-size:0.8rem; color:#555; }
 
-    /* ── Category accent colours ─────────── */
     :root {
       --c-strength:    #5b9bd5;
       --c-conditioning:#2ecc71;
@@ -27,7 +25,6 @@
       --c-muay_thai:   #e74c3c;
       --c-recovery:    #95a5a6;
     }
-    /* ── Card ────────────────────────────── */
     .ex-card {
       background:#0d0d0d;
       border:1px solid #1e1e1e;
@@ -38,7 +35,6 @@
       transition:border-color 0.15s, transform 0.1s;
     }
     .ex-card:hover { border-color:#2a2a2a; transform:translateY(-1px); }
-    /* coloured top bar driven by data-cat */
     .ex-card[data-cat="strength"]    { border-top:3px solid var(--c-strength); }
     .ex-card[data-cat="conditioning"]{ border-top:3px solid var(--c-conditioning); }
     .ex-card[data-cat="cardio"]      { border-top:3px solid var(--c-cardio); }
@@ -47,7 +43,6 @@
     .ex-card[data-cat="muay_thai"]   { border-top:3px solid var(--c-muay_thai); }
     .ex-card[data-cat="recovery"]    { border-top:3px solid var(--c-recovery); }
 
-    /* ── Media placeholder / future animation area ── */
     .ex-media {
       position:relative;
       width:100%;
@@ -97,7 +92,6 @@
     }
     .ex-video-btn:hover .play-circle { transform:scale(1.1); }
 
-    /* ── Card body ───────────────────────── */
     .ex-card-body { padding:12px 14px 10px; flex:1; }
     .ex-card-name { font-weight:600; color:#e8e8e8; font-size:0.95rem; line-height:1.3; margin-bottom:6px; }
     .ex-equip-row { display:flex; align-items:center; gap:6px; margin-bottom:8px; }
@@ -112,7 +106,6 @@
     .tag-equip       { background:#161616; color:#555; border:1px solid #222; }
     .tag-custom      { background:#2a1a2a; color:#e91e8c; }
 
-    /* muscles */
     .muscle-row { display:flex; flex-wrap:wrap; gap:4px; margin-bottom:8px; }
     .muscle-chip {
       font-size:0.67rem; padding:2px 7px; border-radius:3px;
@@ -120,7 +113,6 @@
     }
     .muscle-chip.primary { color:#bbb; border-color:#333; background:#1a1a1a; }
 
-    /* schematic badges */
     .schema-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
     .schema-badge {
       display:flex; align-items:center; gap:4px;
@@ -129,7 +121,6 @@
     }
     .schema-badge .lbl { font-size:0.65rem; color:#555; text-transform:uppercase; letter-spacing:0.4px; }
 
-    /* instructions */
     .ex-instructions-wrap { overflow:hidden; max-height:0; transition:max-height 0.2s ease; }
     .ex-instructions-wrap.open { max-height:200px; }
     .ex-instructions { font-size:0.78rem; color:#777; line-height:1.55; padding-top:4px; border-top:1px solid #1a1a1a; }
@@ -140,7 +131,6 @@
     }
     .btn-details:hover { color:#2ecc71; }
 
-    /* ── Modal ───────────────────────────── */
     .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:100; align-items:center; justify-content:center; }
     .modal-overlay.open { display:flex; }
     .modal { background:#111; border:1px solid #222; border-radius:14px; padding:24px; width:min(480px,95vw); max-height:85vh; overflow-y:auto; }
@@ -153,31 +143,11 @@
   </style>
 </head>
 <body>
-<nav>
-  <div class="container">
-    <h1>🏥 Health Tracker</h1>
-    <div class="nav-links">
-      <a href="/">Dashboard</a>
-      <a href="/workout">Workout</a>
-      <a href="/library" style="color:#2ecc71">Library</a>
-      <a href="/timers">Timers</a>
-      <a href="/plans">Plans</a>
-      <a href="/weight">Weight</a>
-      <a href="/exercise">Exercise</a>
-      <a href="/meals">Meals</a>
-      <a href="/goals">Goals</a>
-      <a href="/planner">Planner</a>
-      <a href="/competitions">Competitions</a>
-      <a href="/accountability">Accountability</a>
-      <a href="/settings">Settings</a>
-      <a href="/logout">Logout</a>
-    </div>
-  </div>
-</nav>
+<%- include('partials/nav') %>
 
 <div class="container" style="padding-top:24px">
   <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px">
-    <h2 style="margin:0">📚 Exercise Library</h2>
+    <h2 style="margin:0">📚 <%= title %></h2>
     <button onclick="document.getElementById('add-modal').classList.add('open')" class="btn">+ Custom Exercise</button>
   </div>
 
@@ -230,7 +200,6 @@
   <div class="lib-grid" id="lib-grid"></div>
 </div>
 
-<!-- Add custom exercise modal -->
 <div class="modal-overlay" id="add-modal">
   <div class="modal">
     <h3>+ Custom Exercise</h3>
@@ -289,7 +258,6 @@
 const ALL_EXERCISES = <%- JSON.stringify(exercises) %>;
 let activeCat = '';
 
-// Category tabs
 document.querySelectorAll('.cat-tab').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.cat-tab').forEach(b => b.classList.remove('active'));
@@ -313,7 +281,6 @@ function filterExercises() {
   renderGrid(list);
 }
 
-// Category → emoji icon for the media placeholder
 const CAT_ICON = {
   strength:'🏋️', conditioning:'⚡', cardio:'🏃', mma:'🥊',
   bjj:'🥋', muay_thai:'🦵', recovery:'🧘', default:'💪'
@@ -330,30 +297,21 @@ function renderGrid(list) {
     const hasVideo   = e.videoUrl && e.videoUrl.trim();
     const isCustom   = e.isCustom;
 
-    // sets × reps / duration badges
     let schemaBadges = '';
-    if (e.defaultSets)    schemaBadges += `<div class="schema-badge"><span class="lbl">sets</span> ${e.defaultSets}</div>`;
-    if (e.defaultReps)    schemaBadges += `<div class="schema-badge"><span class="lbl">reps</span> ${e.defaultReps}</div>`;
+    if (e.defaultSets) schemaBadges += `<div class="schema-badge"><span class="lbl">sets</span> ${e.defaultSets}</div>`;
+    if (e.defaultReps) schemaBadges += `<div class="schema-badge"><span class="lbl">reps</span> ${e.defaultReps}</div>`;
     if (e.defaultDuration) {
       const d = e.defaultDuration;
       const fmt = d >= 60 ? `${Math.floor(d/60)}m${d%60?` ${d%60}s`:''}` : `${d}s`;
       schemaBadges += `<div class="schema-badge"><span class="lbl">duration</span> ${fmt}</div>`;
     }
 
-    // muscle chips
-    const primChips = (e.primaryMuscles||[]).map(m =>
-      `<span class="muscle-chip primary">${m.replace(/_/g,' ')}</span>`).join('');
-    const secChips  = (e.secondaryMuscles||[]).filter(m => !e.primaryMuscles.includes(m)).map(m =>
-      `<span class="muscle-chip">${m.replace(/_/g,' ')}</span>`).join('');
+    const primChips = (e.primaryMuscles||[]).map(m => `<span class="muscle-chip primary">${m.replace(/_/g,' ')}</span>`).join('');
+    const secChips  = (e.secondaryMuscles||[]).filter(m => !e.primaryMuscles.includes(m)).map(m => `<span class="muscle-chip">${m.replace(/_/g,' ')}</span>`).join('');
 
-    // media area — play button overlay if video, else placeholder
     const mediaInner = hasVideo
-      ? `<a href="${escHtml(e.videoUrl)}" target="_blank" rel="noopener" class="ex-video-btn" title="Watch on YouTube">
-           <div class="play-circle">▶</div>
-         </a>
-         <span class="ex-media-icon">${icon}</span>`
-      : `<span class="ex-media-icon">${icon}</span>
-         <span class="ex-media-label">animation coming soon</span>`;
+      ? `<a href="${escHtml(e.videoUrl)}" target="_blank" rel="noopener" class="ex-video-btn" title="Watch on YouTube"><div class="play-circle">▶</div></a><span class="ex-media-icon">${icon}</span>`
+      : `<span class="ex-media-icon">${icon}</span><span class="ex-media-label">animation coming soon</span>`;
 
     return `
 <div class="ex-card" data-id="${e.id}" data-cat="${e.category}">
@@ -367,12 +325,7 @@ function renderGrid(list) {
     </div>
     ${schemaBadges ? `<div class="schema-row">${schemaBadges}</div>` : ''}
     ${(primChips||secChips) ? `<div class="muscle-row">${primChips}${secChips}</div>` : ''}
-    ${hasInstr ? `
-      <div class="ex-instructions-wrap" id="instr-wrap-${e.id}">
-        <div class="ex-instructions">${escHtml(e.instructions)}</div>
-      </div>
-      <button class="btn-details" onclick="toggleInstructions(${e.id})" id="expand-${e.id}">▼ show instructions</button>
-    ` : ''}
+    ${hasInstr ? `<div class="ex-instructions-wrap" id="instr-wrap-${e.id}"><div class="ex-instructions">${escHtml(e.instructions)}</div></div><button class="btn-details" onclick="toggleInstructions(${e.id})" id="expand-${e.id}">▼ show instructions</button>` : ''}
   </div>
 </div>`;
   }).join('');
@@ -390,18 +343,17 @@ function escHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// Custom exercise form
 document.getElementById('add-form').addEventListener('submit', async e => {
   e.preventDefault();
   const fd = new FormData(e.target);
   const primaryMuscles = (fd.get('primaryMuscles') || '').split(',').map(s => s.trim()).filter(Boolean);
   const body = {
-    name:          fd.get('name'),
-    category:      fd.get('category'),
-    equipment:     fd.get('equipment'),
+    name: fd.get('name'),
+    category: fd.get('category'),
+    equipment: fd.get('equipment'),
     primaryMuscles,
-    instructions:  fd.get('instructions') || null,
-    videoUrl:      fd.get('videoUrl')     || null,
+    instructions: fd.get('instructions') || null,
+    videoUrl: fd.get('videoUrl') || null,
   };
   try {
     const token = localStorage.getItem('authToken');
@@ -419,12 +371,10 @@ document.getElementById('add-form').addEventListener('submit', async e => {
       alert('Error: ' + data.error);
     }
   } catch(err) {
-    // Fall back to session-based if JWT not available — just reload
     window.location.reload();
   }
 });
 
-// Initial render
 filterExercises();
 </script>
 </body>

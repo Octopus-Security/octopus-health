@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/theme.css">
+  <style>
+    .tools-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:18px; }
+    .tool-card { background:#111; border:1px solid #1e1e1e; border-radius:14px; padding:22px; display:flex; flex-direction:column; gap:12px; }
+    .tool-card h3 { margin:0; color:#e8e8e8; }
+    .tool-card p { color:#777; line-height:1.6; min-height:72px; }
+    .tool-meta { color:#555; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em; }
+  </style>
+</head>
+<body>
+<%- include('partials/nav') %>
+
+<div class="container" style="padding-top:24px">
+  <div style="max-width:760px;margin-bottom:24px">
+    <h2 style="margin-bottom:8px">Tools</h2>
+    <p>Operational tools and guided utilities live here. Timers are the first moved into this section, and the rest of the training helpers can expand here without cluttering the top nav.</p>
+  </div>
+
+  <div class="tools-grid">
+    <div class="tool-card">
+      <div class="tool-meta">Training Utility</div>
+      <h3>⏱ Timers</h3>
+      <p>Round timer, interval timer, EMOM, AMRAP, and stopwatch for striking rounds, lifting blocks, circuits, and conditioning work.</p>
+      <a class="btn" href="/timers">Open Timers</a>
+    </div>
+
+    <div class="tool-card">
+      <div class="tool-meta">Recovery Utility</div>
+      <h3>🧘 Stretch Builder</h3>
+      <p>Create warmup, cooldown, and mobility flows from exercise cards. Use it to build reusable prep and recovery routines just like saved workouts.</p>
+      <a class="btn" href="/stretch">Open Stretch</a>
+    </div>
+
+    <div class="tool-card">
+      <div class="tool-meta">Planning Utility</div>
+      <h3>📋 Training Plans</h3>
+      <p>View assigned plans, phase structure, and scheduled sessions. This stays available as a tool even while the top-level nav is simplified.</p>
+      <a class="btn" href="/plans">Open Plans</a>
+    </div>
+
+    <div class="tool-card">
+      <div class="tool-meta">Consistency Utility</div>
+      <h3>🔥 Accountability</h3>
+      <p>Review recent consistency, streaks, and session follow-through so the tools section also includes performance management, not just clocks.</p>
+      <a class="btn" href="/accountability">Open Accountability</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>
