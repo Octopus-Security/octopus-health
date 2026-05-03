@@ -15,6 +15,18 @@ const getDatabase = require('./database');
 const AUTH_INTERNAL_URL = process.env.AUTH_SERVICE_URL || 'http://octopus-auth:3002';
 const AUTH_EXTERNAL_URL = 'https://auth.octopustechnology.net';
 
+function getActiveTab(requestPath) {
+    if (requestPath === '/') return 'dashboard';
+    if (requestPath.startsWith('/tools') || requestPath.startsWith('/timers')) return 'tools';
+    if (requestPath.startsWith('/exercises') || requestPath.startsWith('/library') || requestPath.startsWith('/exercise') || requestPath.startsWith('/workout')) return 'exercises';
+    if (requestPath.startsWith('/stretch') || requestPath.startsWith('/routines')) return 'stretch';
+    if (requestPath.startsWith('/nutrition') || requestPath.startsWith('/meals')) return 'nutrition';
+    if (requestPath.startsWith('/weight')) return 'weight';
+    if (requestPath.startsWith('/goals') || requestPath.startsWith('/planner') || requestPath.startsWith('/plans') || requestPath.startsWith('/accountability')) return 'goals';
+    if (requestPath.startsWith('/competitions')) return 'competitions';
+    return '';
+}
+
 // ── Periodisation phase helper ────────────────────────────────────────────────
 function getPeriodisationPhase(competitionDate) {
     const today = new Date();
@@ -72,6 +84,12 @@ app.use(session({
         maxAge: 24 * 60 * 60 * 1000 // 24 hours
     }
 }));
+
+app.use((req, res, next) => {
+    res.locals.user = req.session?.user || null;
+    res.locals.activeTab = getActiveTab(req.path);
+    next();
+});
 
 // Mount API routes (before session-based routes)
 const apiRouter = require('./api');
@@ -251,6 +269,10 @@ app.get('/', requireLogin, async (req, res) => {
     }
 });
 
+app.get('/tools', requireLogin, (req, res) => {
+    res.render('tools', { title: 'Tools', user: req.session.user });
+});
+
 // Weight tracking routes
 app.get('/weight', requireLogin, async (req, res) => {
     const { WeightEntry } = getDatabase(req.session.user.username);
@@ -287,6 +309,15 @@ app.post('/exercise', requireLogin, async (req, res) => {
     const { Exercise } = getDatabase(req.session.user.username);
     await Exercise.create(req.body);
     res.redirect('/exercise');
+});
+
+app.get('/nutrition', requireLogin, async (req, res) => {
+    const { Meal } = getDatabase(req.session.user.username);
+    const meals = await Meal.findAll({
+        order: [['date', 'DESC'], ['time', 'DESC']],
+        limit: 30
+    });
+    res.render('meals', { title: 'Nutrition', meals, user: req.session.user });
 });
 
 app.post('/exercise/delete/:id', requireLogin, async (req, res) => {
@@ -380,15 +411,27 @@ app.post('/settings/delete-account', requireLogin, async (req, res) => {
 
 // ── Routines (warmup / stretching / cooldown) ─────────────────────────────────
 
-app.get('/routines', requireLogin, async (req, res) => {
+function parseRoutineItems(itemsText) {
+    try {
+        return JSON.parse(itemsText || '[]');
+    } catch {
+        return [];
+    }
+}
+
+function mapRoutineForClient(routine) {
+    return {
+        ...routine.toJSON(),
+        itemsList: parseRoutineItems(routine.items),
+    };
+}
+
+app.get('/stretch', requireLogin, async (req, res) => {
     const { Routine, ExerciseDefinition, sequelize } = getDatabase(req.session.user.username);
     await sequelize.sync();
+
     const all = await Routine.findAll({ order: [['type', 'ASC'], ['name', 'ASC']] });
-    const routines = all.map(r => {
-        let itemsList = [];
-        try { itemsList = JSON.parse(r.items || '[]'); } catch { itemsList = []; }
-        return { ...r.toJSON(), itemsList };
-    });
+    const routines = all.map(mapRoutineForClient);
     const allExercises = await ExerciseDefinition.findAll({ order: [['name', 'ASC']] });
     const exerciseLibrary = allExercises.map(e => ({
         id: e.id,
@@ -397,14 +440,53 @@ app.get('/routines', requireLogin, async (req, res) => {
         equipment: e.equipment,
         instructions: e.instructions || null,
         videoUrl: e.videoUrl || null,
+        defaultSets: e.defaultSets || null,
+        defaultReps: e.defaultReps || null,
+        defaultDuration: e.defaultDuration || null,
     }));
-    res.render('routines', {
-        title: 'Routines',
+
+    res.render('stretch', {
+        title: 'Stretch Builder',
         user: req.session.user,
         routines,
         exerciseLibrary,
-        success: req.query.success || null,
     });
+});
+
+app.get('/stretch/api/routines', requireLogin, async (req, res) => {
+    const { Routine, sequelize } = getDatabase(req.session.user.username);
+    await sequelize.sync();
+    const routines = await Routine.findAll({ order: [['type', 'ASC'], ['name', 'ASC']] });
+    res.json({ success: true, data: routines.map(mapRoutineForClient) });
+});
+
+app.post('/stretch/api/routines', requireLogin, async (req, res) => {
+    const { Routine, sequelize } = getDatabase(req.session.user.username);
+    await sequelize.sync();
+
+    const { name, type, notes, items } = req.body;
+    if (!name || !type || !Array.isArray(items)) {
+        return res.status(400).json({ success: false, message: 'name, type, and items are required' });
+    }
+
+    const routine = await Routine.create({
+        name: name.trim(),
+        type,
+        notes: notes?.trim() || null,
+        items: JSON.stringify(items),
+    });
+
+    res.json({ success: true, data: mapRoutineForClient(routine) });
+});
+
+app.delete('/stretch/api/routines/:id', requireLogin, async (req, res) => {
+    const { Routine } = getDatabase(req.session.user.username);
+    await Routine.destroy({ where: { id: req.params.id } });
+    res.json({ success: true });
+});
+
+app.get('/routines', requireLogin, async (req, res) => {
+    res.redirect('/stretch');
 });
 
 app.post('/routines', requireLogin, async (req, res) => {
@@ -859,6 +941,18 @@ app.delete('/workout/api/templates/:id', requireLogin, async (req, res) => {
 });
 
 // ── Exercise Library ──────────────────────────────────────────────────────────
+
+app.get('/exercises', requireLogin, async (req, res) => {
+    const { ExerciseDefinition, sequelize } = getDatabase(req.session.user.username);
+    await sequelize.sync();
+    const all = await ExerciseDefinition.findAll({ order: [['category','ASC'],['name','ASC']] });
+    const exercises = all.map(e => ({
+        ...e.toJSON(),
+        primaryMuscles:   JSON.parse(e.primaryMuscles   || '[]'),
+        secondaryMuscles: JSON.parse(e.secondaryMuscles || '[]'),
+    }));
+    res.render('library', { title: 'Exercises', user: req.session.user, exercises });
+});
 
 app.get('/library', requireLogin, async (req, res) => {
     const { ExerciseDefinition, sequelize } = getDatabase(req.session.user.username);
