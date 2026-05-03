@@ -503,10 +503,14 @@ const getDatabase = (username) => {
     // ── Seed function ──────────────────────────────────────────────────────────
 
     async function seedData() {
-        const exCount = await ExerciseDefinition.count();
-        if (exCount === 0) {
+        // Additive merge: insert any seed exercise whose name isn't in the DB yet
+        const existingNames = new Set(
+            (await ExerciseDefinition.findAll({ attributes: ['name'] })).map(e => e.name)
+        );
+        const toInsert = SEED_EXERCISES.filter(e => !existingNames.has(e.name));
+        if (toInsert.length > 0) {
             await ExerciseDefinition.bulkCreate(
-                SEED_EXERCISES.map(e => ({
+                toInsert.map(e => ({
                     ...e,
                     primaryMuscles:   JSON.stringify(e.primaryMuscles),
                     secondaryMuscles: JSON.stringify(e.secondaryMuscles),
