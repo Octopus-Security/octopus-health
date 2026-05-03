@@ -1,19 +1,19 @@
-FROM node:18-alpine
+FROM node:20-bookworm-slim
 
 # Set working directory
 WORKDIR /usr/src/app
 
-# Copy package files
+# Copy package files first to maximize Docker layer cache hits
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install --production
+# Install production dependencies
+RUN npm ci --omit=dev --no-audit --no-fund
 
 # Copy application code
-COPY . .
+COPY --chown=node:node . .
 
-# Create data directory
-RUN mkdir -p /usr/src/app/data && chown -R node:node /usr/src/app
+# Ensure runtime data dir exists and is writable
+RUN mkdir -p /usr/src/app/data && chown -R node:node /usr/src/app/data
 
 # Switch to non-root user
 USER node
