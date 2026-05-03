@@ -1,4 +1,4 @@
-FROM node:20-bookworm-slim
+FROM node:18-bookworm-slim
 
 # Set working directory
 WORKDIR /usr/src/app
@@ -6,8 +6,10 @@ WORKDIR /usr/src/app
 # Copy package files first to maximize Docker layer cache hits
 COPY package*.json ./
 
-# Install production dependencies
-RUN npm ci --omit=dev --no-audit --no-fund
+# Install production dependencies.
+# npm ci is strict about lockfile/package parity and can fail stack deploys;
+# npm install is more tolerant for deployment environments.
+RUN npm install --omit=dev --no-audit --no-fund
 
 # Copy application code
 COPY --chown=node:node . .
