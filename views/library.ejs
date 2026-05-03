@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/theme.css">
+  <style>
+    .filter-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px; align-items:center; }
+    .filter-bar input { flex:1; min-width:180px; background:#0d0d0d; border:1px solid #2a2a2a; border-radius:8px; padding:8px 14px; color:#e8e8e8; font-size:0.9rem; }
+    .filter-bar input:focus { outline:none; border-color:#2ecc71; }
+    .cat-tabs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px; }
+    .cat-tab  { padding:5px 14px; border-radius:20px; border:1px solid #2a2a2a; background:#0d0d0d; color:#888; font-size:0.8rem; cursor:pointer; transition:all 0.15s; }
+    .cat-tab.active { background:#1a2a1a; border-color:#2ecc71; color:#2ecc71; }
+    .lib-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:14px; }
+    .ex-card { background:#0d0d0d; border:1px solid #1e1e1e; border-radius:12px; overflow:hidden; transition:border-color 0.15s; }
+    .ex-card:hover { border-color:#2a2a2a; }
+    .ex-card-head { padding:14px 16px 10px; display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+    .ex-card-name { font-weight:600; color:#e8e8e8; font-size:0.95rem; line-height:1.3; }
+    .ex-card-body { padding:0 16px 14px; }
+    .ex-muscles { font-size:0.75rem; color:#888; margin-bottom:8px; }
+    .ex-muscles strong { color:#aaa; }
+    .ex-instructions { font-size:0.8rem; color:#666; line-height:1.5; display:none; }
+    .ex-instructions.open { display:block; }
+    .ex-card-foot { padding:8px 16px 12px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    .tag { display:inline-block; padding:2px 8px; border-radius:4px; font-size:0.68rem; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; }
+    .tag-strength    { background:#1a2a4a; color:#5b9bd5; }
+    .tag-mma         { background:#2a1a1a; color:#e07b54; }
+    .tag-bjj         { background:#1a1a2a; color:#9b59b6; }
+    .tag-muay_thai   { background:#2a1a1a; color:#e74c3c; }
+    .tag-conditioning{ background:#1a2a1a; color:#2ecc71; }
+    .tag-cardio      { background:#1a2520; color:#1abc9c; }
+    .tag-recovery    { background:#252020; color:#95a5a6; }
+    .tag-equip       { background:#1a1a1a; color:#555; border:1px solid #222; }
+    .tag-custom      { background:#2a1a2a; color:#e91e8c; }
+    .btn-expand { background:none; border:none; color:#555; cursor:pointer; font-size:0.75rem; padding:0; transition:color 0.1s; margin-left:auto; }
+    .btn-expand:hover { color:#2ecc71; }
+    .video-link { font-size:0.75rem; color:#e74c3c; text-decoration:none; }
+    .video-link:hover { color:#ff6b6b; }
+    .count-badge { font-size:0.8rem; color:#555; margin-left:auto; }
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:100; align-items:center; justify-content:center; }
+    .modal-overlay.open { display:flex; }
+    .modal { background:#111; border:1px solid #222; border-radius:14px; padding:24px; width:min(480px,95vw); max-height:85vh; overflow-y:auto; }
+    .modal h3 { color:#e8e8e8; margin-bottom:16px; }
+    .form-group { margin-bottom:12px; }
+    .form-group label { display:block; font-size:0.8rem; color:#888; margin-bottom:4px; }
+    .form-group input, .form-group select, .form-group textarea { width:100%; background:#0d0d0d; border:1px solid #2a2a2a; border-radius:8px; padding:8px 12px; color:#e8e8e8; font-size:0.9rem; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline:none; border-color:#2ecc71; }
+    .form-group textarea { resize:vertical; min-height:70px; }
+  </style>
+</head>
+<body>
+<nav>
+  <div class="container">
+    <h1>🏥 Health Tracker</h1>
+    <div class="nav-links">
+      <a href="/">Dashboard</a>
+      <a href="/workout">Workout</a>
+      <a href="/library" style="color:#2ecc71">Library</a>
+      <a href="/timers">Timers</a>
+      <a href="/plans">Plans</a>
+      <a href="/weight">Weight</a>
+      <a href="/exercise">Exercise</a>
+      <a href="/meals">Meals</a>
+      <a href="/goals">Goals</a>
+      <a href="/routines">Routines</a>
+      <a href="/planner">Planner</a>
+      <a href="/competitions">Competitions</a>
+      <a href="/accountability">Accountability</a>
+      <a href="/settings">Settings</a>
+      <a href="/logout">Logout</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container" style="padding-top:24px">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px">
+    <h2 style="margin:0">📚 Exercise Library</h2>
+    <button onclick="document.getElementById('add-modal').classList.add('open')" class="btn">+ Custom Exercise</button>
+  </div>
+
+  <div class="filter-bar">
+    <input type="text" id="search-input" placeholder="Search exercises..." oninput="filterExercises()">
+    <select id="equip-filter" onchange="filterExercises()" style="background:#0d0d0d;border:1px solid #2a2a2a;border-radius:8px;padding:8px 12px;color:#e8e8e8;font-size:0.9rem;">
+      <option value="">All Equipment</option>
+      <option value="barbell">Barbell</option>
+      <option value="dumbbell">Dumbbell</option>
+      <option value="cable_machine">Cable Machine</option>
+      <option value="machine">Machine</option>
+      <option value="bodyweight">Bodyweight</option>
+      <option value="bag">Bag</option>
+      <option value="pads">Pads</option>
+      <option value="cardio_machine">Cardio Machine</option>
+      <option value="none">None</option>
+    </select>
+    <select id="muscle-filter" onchange="filterExercises()" style="background:#0d0d0d;border:1px solid #2a2a2a;border-radius:8px;padding:8px 12px;color:#e8e8e8;font-size:0.9rem;">
+      <option value="">All Muscles</option>
+      <option value="chest">Chest</option>
+      <option value="back">Back</option>
+      <option value="shoulders">Shoulders</option>
+      <option value="biceps">Biceps</option>
+      <option value="triceps">Triceps</option>
+      <option value="forearms">Forearms</option>
+      <option value="core">Core</option>
+      <option value="quads">Quads</option>
+      <option value="hamstrings">Hamstrings</option>
+      <option value="glutes">Glutes</option>
+      <option value="calves">Calves</option>
+      <option value="full_body">Full Body</option>
+    </select>
+  </div>
+
+  <div class="cat-tabs" id="cat-tabs">
+    <button class="cat-tab active" data-cat="">All</button>
+    <button class="cat-tab" data-cat="strength">Strength</button>
+    <button class="cat-tab" data-cat="conditioning">Conditioning</button>
+    <button class="cat-tab" data-cat="cardio">Cardio</button>
+    <button class="cat-tab" data-cat="mma">MMA</button>
+    <button class="cat-tab" data-cat="bjj">BJJ</button>
+    <button class="cat-tab" data-cat="muay_thai">Muay Thai</button>
+    <button class="cat-tab" data-cat="recovery">Recovery</button>
+  </div>
+
+  <div style="margin-bottom:12px">
+    <span class="count-badge" id="count-label"></span>
+  </div>
+
+  <div class="lib-grid" id="lib-grid"></div>
+</div>
+
+<!-- Add custom exercise modal -->
+<div class="modal-overlay" id="add-modal">
+  <div class="modal">
+    <h3>+ Custom Exercise</h3>
+    <form id="add-form">
+      <div class="form-group">
+        <label>Name *</label>
+        <input type="text" name="name" required placeholder="e.g. Kettlebell Swing">
+      </div>
+      <div class="form-group">
+        <label>Category *</label>
+        <select name="category" required>
+          <option value="strength">Strength</option>
+          <option value="conditioning">Conditioning</option>
+          <option value="cardio">Cardio</option>
+          <option value="mma">MMA</option>
+          <option value="bjj">BJJ</option>
+          <option value="muay_thai">Muay Thai</option>
+          <option value="recovery">Recovery</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Equipment *</label>
+        <select name="equipment" required>
+          <option value="barbell">Barbell</option>
+          <option value="dumbbell">Dumbbell</option>
+          <option value="cable_machine">Cable Machine</option>
+          <option value="machine">Machine</option>
+          <option value="bodyweight">Bodyweight</option>
+          <option value="bag">Bag</option>
+          <option value="pads">Pads</option>
+          <option value="cardio_machine">Cardio Machine</option>
+          <option value="none">None</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Primary Muscles (comma separated)</label>
+        <input type="text" name="primaryMuscles" placeholder="e.g. glutes, hamstrings">
+      </div>
+      <div class="form-group">
+        <label>Instructions</label>
+        <textarea name="instructions" placeholder="How to perform the exercise..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Video URL (optional)</label>
+        <input type="text" name="videoUrl" placeholder="https://...">
+      </div>
+      <div style="display:flex;gap:10px;margin-top:16px">
+        <button type="submit" class="btn btn-green" style="flex:1">Save</button>
+        <button type="button" onclick="document.getElementById('add-modal').classList.remove('open')" class="btn" style="flex:1">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+const ALL_EXERCISES = <%- JSON.stringify(exercises) %>;
+let activeCat = '';
+
+// Category tabs
+document.querySelectorAll('.cat-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.cat-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeCat = btn.dataset.cat;
+    filterExercises();
+  });
+});
+
+function filterExercises() {
+  const q      = document.getElementById('search-input').value.toLowerCase();
+  const equip  = document.getElementById('equip-filter').value;
+  const muscle = document.getElementById('muscle-filter').value;
+
+  let list = ALL_EXERCISES;
+  if (activeCat) list = list.filter(e => e.category === activeCat);
+  if (equip)     list = list.filter(e => e.equipment === equip);
+  if (muscle)    list = list.filter(e => e.primaryMuscles.includes(muscle) || e.secondaryMuscles.includes(muscle));
+  if (q)         list = list.filter(e => e.name.toLowerCase().includes(q));
+
+  renderGrid(list);
+}
+
+function renderGrid(list) {
+  document.getElementById('count-label').textContent = `${list.length} exercise${list.length !== 1 ? 's' : ''}`;
+  const grid = document.getElementById('lib-grid');
+  grid.innerHTML = list.map(e => {
+    const catClass = 'tag-' + e.category;
+    const equipLabel = e.equipment.replace(/_/g,' ');
+    const primStr = e.primaryMuscles.join(', ');
+    const secStr  = e.secondaryMuscles.join(', ');
+    const hasInstructions = e.instructions && e.instructions.trim();
+    const hasVideo = e.videoUrl && e.videoUrl.trim();
+    const isCustom = e.isCustom;
+    return `
+      <div class="ex-card" data-id="${e.id}">
+        <div class="ex-card-head">
+          <div>
+            <div class="ex-card-name">${escHtml(e.name)}</div>
+          </div>
+          ${hasInstructions ? `<button class="btn-expand" onclick="toggleInstructions(${e.id})" id="expand-${e.id}">▼ details</button>` : ''}
+        </div>
+        <div class="ex-card-body">
+          ${primStr ? `<div class="ex-muscles"><strong>Primary:</strong> ${escHtml(primStr)}</div>` : ''}
+          ${secStr  ? `<div class="ex-muscles"><strong>Secondary:</strong> ${escHtml(secStr)}</div>` : ''}
+          ${hasInstructions ? `<div class="ex-instructions" id="instr-${e.id}">${escHtml(e.instructions)}</div>` : ''}
+        </div>
+        <div class="ex-card-foot">
+          <span class="tag ${catClass}">${e.category.replace('_',' ')}</span>
+          <span class="tag tag-equip">${equipLabel}</span>
+          ${isCustom ? '<span class="tag tag-custom">custom</span>' : ''}
+          ${hasVideo ? `<a href="${escHtml(e.videoUrl)}" target="_blank" rel="noopener" class="video-link">▶ video</a>` : ''}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function toggleInstructions(id) {
+  const el = document.getElementById('instr-' + id);
+  const btn = document.getElementById('expand-' + id);
+  if (!el) return;
+  el.classList.toggle('open');
+  btn.textContent = el.classList.contains('open') ? '▲ less' : '▼ details';
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Custom exercise form
+document.getElementById('add-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const primaryMuscles = (fd.get('primaryMuscles') || '').split(',').map(s => s.trim()).filter(Boolean);
+  const body = {
+    name:          fd.get('name'),
+    category:      fd.get('category'),
+    equipment:     fd.get('equipment'),
+    primaryMuscles,
+    instructions:  fd.get('instructions') || null,
+    videoUrl:      fd.get('videoUrl')     || null,
+  };
+  try {
+    const token = localStorage.getItem('authToken');
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+    const r = await fetch('/api/workout/exercises', { method:'POST', headers, body: JSON.stringify(body) });
+    const data = await r.json();
+    if (data.success) {
+      const newEx = { ...data.data, primaryMuscles: body.primaryMuscles, secondaryMuscles: [] };
+      ALL_EXERCISES.unshift(newEx);
+      document.getElementById('add-modal').classList.remove('open');
+      e.target.reset();
+      filterExercises();
+    } else {
+      alert('Error: ' + data.error);
+    }
+  } catch(err) {
+    // Fall back to session-based if JWT not available — just reload
+    window.location.reload();
+  }
+});
+
+// Initial render
+filterExercises();
+</script>
+</body>
+</html>
