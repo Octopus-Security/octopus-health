@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/theme.css">
+  <style>
+    .timer-tabs { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:24px; }
+    .timer-tab  { padding:8px 18px; border-radius:8px; border:1px solid #2a2a2a; background:#0d0d0d; color:#888; font-size:0.85rem; cursor:pointer; transition:all 0.15s; }
+    .timer-tab.active { background:#1a2a1a; border-color:#2ecc71; color:#2ecc71; font-weight:600; }
+    .timer-panel { display:none; }
+    .timer-panel.active { display:block; }
+    .timer-display { font-size:5rem; font-weight:700; font-variant-numeric:tabular-nums; color:#e8e8e8; text-align:center; letter-spacing:4px; line-height:1; padding:32px 0 24px; }
+    .timer-display.running { color:#2ecc71; }
+    .timer-display.resting { color:#3498db; }
+    .timer-display.warning { color:#e74c3c; }
+    .timer-controls { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:20px; }
+    .timer-card { background:#0d0d0d; border:1px solid #1e1e1e; border-radius:14px; padding:24px; max-width:560px; margin:0 auto; }
+    .config-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px; }
+    .config-grid-3 { grid-template-columns:1fr 1fr 1fr; }
+    .config-item label { display:block; font-size:0.75rem; color:#888; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.5px; }
+    .config-item input { width:100%; background:#141414; border:1px solid #2a2a2a; border-radius:8px; padding:10px 12px; color:#e8e8e8; font-size:1.1rem; text-align:center; font-variant-numeric:tabular-nums; }
+    .config-item input:focus { outline:none; border-color:#2ecc71; }
+    .round-info { text-align:center; font-size:0.9rem; color:#888; margin-bottom:8px; min-height:1.4em; }
+    .phase-label { text-align:center; font-size:1.1rem; font-weight:600; text-transform:uppercase; letter-spacing:2px; margin-bottom:4px; min-height:1.4em; }
+    .progress-bar-wrap { background:#1a1a1a; border-radius:4px; height:6px; overflow:hidden; margin-bottom:24px; }
+    .progress-bar { height:100%; background:#2ecc71; transition:width 1s linear; border-radius:4px; }
+    .progress-bar.rest { background:#3498db; }
+    .btn-big { padding:12px 32px; font-size:1rem; border-radius:10px; }
+    .stopwatch-laps { margin-top:16px; max-height:200px; overflow-y:auto; }
+    .lap-row { display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #1a1a1a; font-size:0.85rem; color:#888; font-variant-numeric:tabular-nums; }
+    .lap-row:last-child { border-bottom:none; }
+    .lap-row .lap-num { color:#555; }
+    .lap-row .lap-split { color:#aaa; }
+    .lap-row .lap-total { color:#2ecc71; }
+    .bell-flash { animation:flash 0.3s ease; }
+    @keyframes flash { 0%,100%{opacity:1} 50%{opacity:0.2} }
+  </style>
+</head>
+<body>
+<nav>
+  <div class="container">
+    <h1>🏥 Health Tracker</h1>
+    <div class="nav-links">
+      <a href="/">Dashboard</a>
+      <a href="/workout">Workout</a>
+      <a href="/library">Library</a>
+      <a href="/timers" style="color:#2ecc71">Timers</a>
+      <a href="/plans">Plans</a>
+      <a href="/weight">Weight</a>
+      <a href="/exercise">Exercise</a>
+      <a href="/meals">Meals</a>
+      <a href="/goals">Goals</a>
+      <a href="/routines">Routines</a>
+      <a href="/planner">Planner</a>
+      <a href="/competitions">Competitions</a>
+      <a href="/accountability">Accountability</a>
+      <a href="/settings">Settings</a>
+      <a href="/logout">Logout</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container" style="padding-top:24px">
+  <h2 style="margin-bottom:20px">⏱ Timers</h2>
+
+  <div class="timer-tabs">
+    <button class="timer-tab active" data-panel="round">Round Timer</button>
+    <button class="timer-tab" data-panel="interval">Interval</button>
+    <button class="timer-tab" data-panel="emom">EMOM</button>
+    <button class="timer-tab" data-panel="amrap">AMRAP</button>
+    <button class="timer-tab" data-panel="stopwatch">Stopwatch</button>
+  </div>
+
+  <!-- ── Round Timer ── -->
+  <div class="timer-panel active" id="panel-round">
+    <div class="timer-card">
+      <div class="config-grid config-grid-3">
+        <div class="config-item">
+          <label>Rounds</label>
+          <input type="number" id="rt-rounds" value="5" min="1" max="99">
+        </div>
+        <div class="config-item">
+          <label>Round (min)</label>
+          <input type="number" id="rt-work-min" value="3" min="0" max="60">
+        </div>
+        <div class="config-item">
+          <label>Round (sec)</label>
+          <input type="number" id="rt-work-sec" value="0" min="0" max="59">
+        </div>
+        <div class="config-item">
+          <label>Rest (min)</label>
+          <input type="number" id="rt-rest-min" value="1" min="0" max="60">
+        </div>
+        <div class="config-item">
+          <label>Rest (sec)</label>
+          <input type="number" id="rt-rest-sec" value="0" min="0" max="59">
+        </div>
+        <div class="config-item">
+          <label>Countdown</label>
+          <input type="number" id="rt-countdown" value="10" min="0" max="30">
+        </div>
+      </div>
+      <div class="phase-label" id="rt-phase">—</div>
+      <div class="round-info" id="rt-round-info"></div>
+      <div class="timer-display" id="rt-display">0:00</div>
+      <div class="progress-bar-wrap"><div class="progress-bar" id="rt-bar" style="width:100%"></div></div>
+      <div class="timer-controls">
+        <button class="btn btn-big" id="rt-start" onclick="rtStart()">▶ Start</button>
+        <button class="btn btn-big" id="rt-pause" onclick="rtPause()" style="display:none">⏸ Pause</button>
+        <button class="btn btn-big" onclick="rtReset()">↺ Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Interval Timer ── -->
+  <div class="timer-panel" id="panel-interval">
+    <div class="timer-card">
+      <div class="config-grid config-grid-3">
+        <div class="config-item">
+          <label>Rounds</label>
+          <input type="number" id="it-rounds" value="8" min="1" max="99">
+        </div>
+        <div class="config-item">
+          <label>Work (sec)</label>
+          <input type="number" id="it-work" value="20" min="1" max="3600">
+        </div>
+        <div class="config-item">
+          <label>Rest (sec)</label>
+          <input type="number" id="it-rest" value="10" min="0" max="3600">
+        </div>
+      </div>
+      <div class="phase-label" id="it-phase">—</div>
+      <div class="round-info" id="it-round-info"></div>
+      <div class="timer-display" id="it-display">0:00</div>
+      <div class="progress-bar-wrap"><div class="progress-bar" id="it-bar" style="width:100%"></div></div>
+      <div class="timer-controls">
+        <button class="btn btn-big" id="it-start" onclick="itStart()">▶ Start</button>
+        <button class="btn btn-big" id="it-pause" onclick="itPause()" style="display:none">⏸ Pause</button>
+        <button class="btn btn-big" onclick="itReset()">↺ Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── EMOM ── -->
+  <div class="timer-panel" id="panel-emom">
+    <div class="timer-card">
+      <div class="config-grid">
+        <div class="config-item">
+          <label>Minutes</label>
+          <input type="number" id="em-minutes" value="10" min="1" max="60">
+        </div>
+        <div class="config-item">
+          <label>Work (sec)</label>
+          <input type="number" id="em-work" value="40" min="1" max="59">
+        </div>
+      </div>
+      <div class="phase-label" id="em-phase">—</div>
+      <div class="round-info" id="em-round-info"></div>
+      <div class="timer-display" id="em-display">0:00</div>
+      <div class="progress-bar-wrap"><div class="progress-bar" id="em-bar" style="width:100%"></div></div>
+      <div class="timer-controls">
+        <button class="btn btn-big" id="em-start" onclick="emStart()">▶ Start</button>
+        <button class="btn btn-big" id="em-pause" onclick="emPause()" style="display:none">⏸ Pause</button>
+        <button class="btn btn-big" onclick="emReset()">↺ Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── AMRAP ── -->
+  <div class="timer-panel" id="panel-amrap">
+    <div class="timer-card">
+      <div class="config-grid">
+        <div class="config-item">
+          <label>Duration (min)</label>
+          <input type="number" id="am-minutes" value="10" min="1" max="120">
+        </div>
+        <div class="config-item">
+          <label>Duration (sec)</label>
+          <input type="number" id="am-seconds" value="0" min="0" max="59">
+        </div>
+      </div>
+      <div class="phase-label" id="am-phase">—</div>
+      <div class="round-info" id="am-round-info"></div>
+      <div class="timer-display" id="am-display">0:00</div>
+      <div class="progress-bar-wrap"><div class="progress-bar" id="am-bar" style="width:100%"></div></div>
+      <div class="timer-controls">
+        <button class="btn btn-big" id="am-start" onclick="amStart()">▶ Start</button>
+        <button class="btn btn-big" id="am-pause" onclick="amPause()" style="display:none">⏸ Pause</button>
+        <button class="btn btn-big" onclick="amReset()">↺ Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Stopwatch ── -->
+  <div class="timer-panel" id="panel-stopwatch">
+    <div class="timer-card">
+      <div class="timer-display" id="sw-display" style="font-size:4rem">0:00.0</div>
+      <div class="timer-controls">
+        <button class="btn btn-big" id="sw-start" onclick="swStart()">▶ Start</button>
+        <button class="btn btn-big" id="sw-pause" onclick="swPause()" style="display:none">⏸ Pause</button>
+        <button class="btn btn-big" id="sw-lap" onclick="swLap()" style="display:none">⊕ Lap</button>
+        <button class="btn btn-big" onclick="swReset()">↺ Reset</button>
+      </div>
+      <div class="stopwatch-laps" id="sw-laps"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── Tab switching ─────────────────────────────────────────────────────────────
+document.querySelectorAll('.timer-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.timer-tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.timer-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + btn.dataset.panel).classList.add('active');
+  });
+});
+
+// ── Audio bell (Web Audio API) ────────────────────────────────────────────────
+const ctx = new (window.AudioContext || window.webkitAudioContext)();
+function playBell(freq=880, dur=0.4) {
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain); gain.connect(ctx.destination);
+  osc.frequency.value = freq;
+  osc.type = 'sine';
+  gain.gain.setValueAtTime(0.4, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+  osc.start(); osc.stop(ctx.currentTime + dur);
+}
+function playStartBell() { playBell(880, 0.5); }
+function playEndBell()   { playBell(440, 0.8); setTimeout(() => playBell(440, 0.8), 400); }
+function playCountBell() { playBell(660, 0.15); }
+
+function fmt(s) {
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return `${m}:${sec.toString().padStart(2,'0')}`;
+}
+
+// ── Round Timer ───────────────────────────────────────────────────────────────
+let rtState = null;
+let rtTick = null;
+function rtGetConfig() {
+  return {
+    rounds:   parseInt(document.getElementById('rt-rounds').value)    || 5,
+    workSec:  (parseInt(document.getElementById('rt-work-min').value)  || 0) * 60 +
+              (parseInt(document.getElementById('rt-work-sec').value)  || 0),
+    restSec:  (parseInt(document.getElementById('rt-rest-min').value)  || 0) * 60 +
+              (parseInt(document.getElementById('rt-rest-sec').value)  || 0),
+    countdown: parseInt(document.getElementById('rt-countdown').value) || 0,
+  };
+}
+function rtStart() {
+  ctx.resume();
+  if (rtState && rtState.paused) { rtState.paused = false; rtTick = setInterval(rtTick_fn, 1000); document.getElementById('rt-start').style.display='none'; document.getElementById('rt-pause').style.display=''; return; }
+  const cfg = rtGetConfig();
+  rtState = { cfg, round:1, phase:'countdown', remaining: cfg.countdown || cfg.workSec, totalPhase: cfg.countdown || cfg.workSec, paused:false };
+  if (cfg.countdown === 0) { rtState.phase = 'work'; playStartBell(); }
+  rtRender();
+  clearInterval(rtTick);
+  rtTick = setInterval(rtTick_fn, 1000);
+  document.getElementById('rt-start').style.display='none';
+  document.getElementById('rt-pause').style.display='';
+}
+function rtTick_fn() {
+  if (!rtState || rtState.paused) return;
+  rtState.remaining--;
+  if (rtState.remaining <= 0) { rtNextPhase(); } else { rtRender(); }
+  if (rtState.remaining <= 3 && rtState.remaining > 0) playCountBell();
+}
+function rtNextPhase() {
+  const { cfg } = rtState;
+  if (rtState.phase === 'countdown') {
+    rtState.phase = 'work'; rtState.remaining = cfg.workSec; rtState.totalPhase = cfg.workSec;
+    playStartBell();
+  } else if (rtState.phase === 'work') {
+    playEndBell();
+    if (rtState.round >= cfg.rounds) { rtDone(); return; }
+    if (cfg.restSec > 0) { rtState.phase = 'rest'; rtState.remaining = cfg.restSec; rtState.totalPhase = cfg.restSec; }
+    else { rtState.round++; rtState.phase = 'work'; rtState.remaining = cfg.workSec; rtState.totalPhase = cfg.workSec; playStartBell(); }
+  } else if (rtState.phase === 'rest') {
+    rtState.round++;
+    rtState.phase = 'work'; rtState.remaining = cfg.workSec; rtState.totalPhase = cfg.workSec;
+    playStartBell();
+  }
+  rtRender();
+}
+function rtDone() {
+  clearInterval(rtTick);
+  document.getElementById('rt-display').textContent = 'Done!';
+  document.getElementById('rt-phase').textContent = '🏆 Workout Complete';
+  document.getElementById('rt-bar').style.width = '0%';
+  document.getElementById('rt-start').style.display='';
+  document.getElementById('rt-pause').style.display='none';
+  playEndBell(); setTimeout(playEndBell, 600);
+  rtState = null;
+}
+function rtRender() {
+  if (!rtState) return;
+  const d = document.getElementById('rt-display');
+  const b = document.getElementById('rt-bar');
+  d.textContent = fmt(rtState.remaining);
+  const pct = (rtState.remaining / rtState.totalPhase) * 100;
+  b.style.width = pct + '%';
+  if (rtState.phase === 'work') {
+    d.className = 'timer-display running';
+    b.className = 'progress-bar';
+    document.getElementById('rt-phase').textContent = '🥊 ROUND ' + rtState.round;
+    document.getElementById('rt-round-info').textContent = `Round ${rtState.round} of ${rtState.cfg.rounds}`;
+  } else if (rtState.phase === 'rest') {
+    d.className = 'timer-display resting';
+    b.className = 'progress-bar rest';
+    document.getElementById('rt-phase').textContent = '💤 REST';
+    document.getElementById('rt-round-info').textContent = `Next: Round ${rtState.round + 1}`;
+  } else {
+    d.className = 'timer-display warning';
+    document.getElementById('rt-phase').textContent = '⚡ GET READY';
+    document.getElementById('rt-round-info').textContent = 'Starting soon…';
+  }
+}
+function rtPause() {
+  if (!rtState) return;
+  rtState.paused = !rtState.paused;
+  if (rtState.paused) { clearInterval(rtTick); document.getElementById('rt-pause').textContent='▶ Resume'; }
+  else { rtTick = setInterval(rtTick_fn, 1000); document.getElementById('rt-pause').textContent='⏸ Pause'; }
+}
+function rtReset() {
+  clearInterval(rtTick); rtState = null;
+  document.getElementById('rt-display').textContent = '0:00';
+  document.getElementById('rt-display').className = 'timer-display';
+  document.getElementById('rt-phase').textContent = '—';
+  document.getElementById('rt-round-info').textContent = '';
+  document.getElementById('rt-bar').style.width = '100%';
+  document.getElementById('rt-bar').className = 'progress-bar';
+  document.getElementById('rt-start').style.display='';
+  document.getElementById('rt-pause').style.display='none';
+  document.getElementById('rt-pause').textContent='⏸ Pause';
+}
+
+// ── Interval Timer ────────────────────────────────────────────────────────────
+let itState = null; let itTick = null;
+function itStart() {
+  ctx.resume();
+  if (itState && itState.paused) { itState.paused=false; itTick=setInterval(itTick_fn,1000); document.getElementById('it-start').style.display='none'; document.getElementById('it-pause').style.display=''; return; }
+  const rounds = parseInt(document.getElementById('it-rounds').value)||8;
+  const work   = parseInt(document.getElementById('it-work').value)||20;
+  const rest   = parseInt(document.getElementById('it-rest').value)||10;
+  itState = { rounds, work, rest, round:1, phase:'work', remaining:work, totalPhase:work, paused:false };
+  playStartBell(); itRender();
+  clearInterval(itTick); itTick=setInterval(itTick_fn,1000);
+  document.getElementById('it-start').style.display='none'; document.getElementById('it-pause').style.display='';
+}
+function itTick_fn() {
+  if (!itState||itState.paused) return;
+  itState.remaining--;
+  if (itState.remaining<=0) { itNext(); } else { itRender(); }
+  if (itState.remaining<=3&&itState.remaining>0) playCountBell();
+}
+function itNext() {
+  if (itState.phase==='work') {
+    playEndBell();
+    if (itState.round>=itState.rounds) { itDone(); return; }
+    if (itState.rest>0) { itState.phase='rest'; itState.remaining=itState.rest; itState.totalPhase=itState.rest; }
+    else { itState.round++; itState.remaining=itState.work; itState.totalPhase=itState.work; playStartBell(); }
+  } else {
+    itState.round++; itState.phase='work'; itState.remaining=itState.work; itState.totalPhase=itState.work; playStartBell();
+  }
+  itRender();
+}
+function itDone() {
+  clearInterval(itTick); itState=null;
+  document.getElementById('it-display').textContent='Done!'; document.getElementById('it-phase').textContent='🏆 Complete';
+  document.getElementById('it-start').style.display=''; document.getElementById('it-pause').style.display='none';
+  playEndBell(); setTimeout(playEndBell,600);
+}
+function itRender() {
+  if (!itState) return;
+  const d=document.getElementById('it-display'), b=document.getElementById('it-bar');
+  d.textContent=fmt(itState.remaining);
+  b.style.width=(itState.remaining/itState.totalPhase*100)+'%';
+  if (itState.phase==='work') {
+    d.className='timer-display running'; b.className='progress-bar';
+    document.getElementById('it-phase').textContent='💪 WORK';
+    document.getElementById('it-round-info').textContent=`Round ${itState.round} of ${itState.rounds}`;
+  } else {
+    d.className='timer-display resting'; b.className='progress-bar rest';
+    document.getElementById('it-phase').textContent='💤 REST';
+    document.getElementById('it-round-info').textContent=`Next: Round ${itState.round+1}`;
+  }
+}
+function itPause() {
+  if (!itState) return;
+  itState.paused=!itState.paused;
+  if (itState.paused){clearInterval(itTick);document.getElementById('it-pause').textContent='▶ Resume';}
+  else{itTick=setInterval(itTick_fn,1000);document.getElementById('it-pause').textContent='⏸ Pause';}
+}
+function itReset() {
+  clearInterval(itTick); itState=null;
+  document.getElementById('it-display').textContent='0:00'; document.getElementById('it-display').className='timer-display';
+  document.getElementById('it-phase').textContent='—'; document.getElementById('it-round-info').textContent='';
+  document.getElementById('it-bar').style.width='100%'; document.getElementById('it-bar').className='progress-bar';
+  document.getElementById('it-start').style.display=''; document.getElementById('it-pause').style.display='none';
+  document.getElementById('it-pause').textContent='⏸ Pause';
+}
+
+// ── EMOM ──────────────────────────────────────────────────────────────────────
+let emState=null; let emTick=null;
+function emStart() {
+  ctx.resume();
+  if (emState&&emState.paused){emState.paused=false;emTick=setInterval(emTick_fn,1000);document.getElementById('em-start').style.display='none';document.getElementById('em-pause').style.display='';return;}
+  const totalMin=parseInt(document.getElementById('em-minutes').value)||10;
+  const workSec =parseInt(document.getElementById('em-work').value)||40;
+  emState={totalMin,workSec,minute:1,phase:'work',remaining:workSec,totalPhase:workSec,paused:false};
+  playStartBell(); emRender();
+  clearInterval(emTick); emTick=setInterval(emTick_fn,1000);
+  document.getElementById('em-start').style.display='none'; document.getElementById('em-pause').style.display='';
+}
+function emTick_fn() {
+  if (!emState||emState.paused) return;
+  emState.remaining--;
+  if (emState.remaining<=0){ emNext(); } else { emRender(); }
+  if (emState.remaining<=3&&emState.remaining>0) playCountBell();
+}
+function emNext() {
+  const restSec=60-emState.workSec;
+  if (emState.phase==='work') {
+    playEndBell();
+    if (restSec>0){ emState.phase='rest'; emState.remaining=restSec; emState.totalPhase=restSec; }
+    else{ if(emState.minute>=emState.totalMin){emDone();return;} emState.minute++; emState.phase='work'; emState.remaining=emState.workSec; emState.totalPhase=emState.workSec; playStartBell(); }
+  } else {
+    if (emState.minute>=emState.totalMin){ emDone(); return; }
+    emState.minute++; emState.phase='work'; emState.remaining=emState.workSec; emState.totalPhase=emState.workSec; playStartBell();
+  }
+  emRender();
+}
+function emDone() {
+  clearInterval(emTick); emState=null;
+  document.getElementById('em-display').textContent='Done!'; document.getElementById('em-phase').textContent='🏆 EMOM Complete';
+  document.getElementById('em-start').style.display=''; document.getElementById('em-pause').style.display='none';
+  playEndBell(); setTimeout(playEndBell,600);
+}
+function emRender() {
+  if (!emState) return;
+  const d=document.getElementById('em-display'), b=document.getElementById('em-bar');
+  d.textContent=fmt(emState.remaining);
+  b.style.width=(emState.remaining/emState.totalPhase*100)+'%';
+  if (emState.phase==='work'){
+    d.className='timer-display running'; b.className='progress-bar';
+    document.getElementById('em-phase').textContent='💪 WORK';
+    document.getElementById('em-round-info').textContent=`Minute ${emState.minute} of ${emState.totalMin}`;
+  } else {
+    d.className='timer-display resting'; b.className='progress-bar rest';
+    document.getElementById('em-phase').textContent='💤 REST';
+    document.getElementById('em-round-info').textContent=`Next: Minute ${emState.minute+1}`;
+  }
+}
+function emPause() {
+  if (!emState) return;
+  emState.paused=!emState.paused;
+  if (emState.paused){clearInterval(emTick);document.getElementById('em-pause').textContent='▶ Resume';}
+  else{emTick=setInterval(emTick_fn,1000);document.getElementById('em-pause').textContent='⏸ Pause';}
+}
+function emReset() {
+  clearInterval(emTick); emState=null;
+  document.getElementById('em-display').textContent='0:00'; document.getElementById('em-display').className='timer-display';
+  document.getElementById('em-phase').textContent='—'; document.getElementById('em-round-info').textContent='';
+  document.getElementById('em-bar').style.width='100%'; document.getElementById('em-bar').className='progress-bar';
+  document.getElementById('em-start').style.display=''; document.getElementById('em-pause').style.display='none';
+  document.getElementById('em-pause').textContent='⏸ Pause';
+}
+
+// ── AMRAP ─────────────────────────────────────────────────────────────────────
+let amState=null; let amTick=null;
+function amStart() {
+  ctx.resume();
+  if (amState&&amState.paused){amState.paused=false;amTick=setInterval(amTick_fn,1000);document.getElementById('am-start').style.display='none';document.getElementById('am-pause').style.display='';return;}
+  const totalSec=(parseInt(document.getElementById('am-minutes').value)||10)*60+(parseInt(document.getElementById('am-seconds').value)||0);
+  amState={totalSec,remaining:totalSec,paused:false};
+  playStartBell(); amRender();
+  clearInterval(amTick); amTick=setInterval(amTick_fn,1000);
+  document.getElementById('am-start').style.display='none'; document.getElementById('am-pause').style.display='';
+  document.getElementById('am-phase').textContent='⚡ GO!'; document.getElementById('am-round-info').textContent='As many rounds as possible';
+}
+function amTick_fn() {
+  if (!amState||amState.paused) return;
+  amState.remaining--;
+  if (amState.remaining<=0){ amDone(); return; }
+  if (amState.remaining<=10&&amState.remaining>0) playCountBell();
+  amRender();
+}
+function amDone() {
+  clearInterval(amTick); amState=null;
+  document.getElementById('am-display').textContent='Time!'; document.getElementById('am-display').className='timer-display warning';
+  document.getElementById('am-phase').textContent='🏆 Time\'s Up!';
+  document.getElementById('am-start').style.display=''; document.getElementById('am-pause').style.display='none';
+  playEndBell(); setTimeout(playEndBell,600);
+}
+function amRender() {
+  if (!amState) return;
+  const d=document.getElementById('am-display'), b=document.getElementById('am-bar');
+  d.textContent=fmt(amState.remaining);
+  d.className='timer-display running';
+  b.style.width=(amState.remaining/amState.totalSec*100)+'%';
+}
+function amPause() {
+  if (!amState) return;
+  amState.paused=!amState.paused;
+  if (amState.paused){clearInterval(amTick);document.getElementById('am-pause').textContent='▶ Resume';}
+  else{amTick=setInterval(amTick_fn,1000);document.getElementById('am-pause').textContent='⏸ Pause';}
+}
+function amReset() {
+  clearInterval(amTick); amState=null;
+  document.getElementById('am-display').textContent='0:00'; document.getElementById('am-display').className='timer-display';
+  document.getElementById('am-phase').textContent='—'; document.getElementById('am-round-info').textContent='';
+  document.getElementById('am-bar').style.width='100%';
+  document.getElementById('am-start').style.display=''; document.getElementById('am-pause').style.display='none';
+  document.getElementById('am-pause').textContent='⏸ Pause';
+}
+
+// ── Stopwatch ─────────────────────────────────────────────────────────────────
+let swRunning=false; let swStart=0; let swElapsed=0; let swTick=null; let swLapStart=0; let swLaps=[];
+function fmtMs(ms) {
+  const total=Math.floor(ms/100);
+  const h=Math.floor(ms/3600000);
+  const m=Math.floor((ms%3600000)/60000);
+  const s=Math.floor((ms%60000)/1000);
+  const t=Math.floor((ms%1000)/100);
+  return (h>0?h+':':'') + (h>0?m.toString().padStart(2,'0'):m) + ':' + s.toString().padStart(2,'0') + '.' + t;
+}
+function swStart_() { // named to avoid collision with let swStart
+  ctx.resume(); swRunning=true; swStart=Date.now()-swElapsed; swLapStart=swStart;
+  clearInterval(swTick); swTick=setInterval(()=>{ swElapsed=Date.now()-swStart; document.getElementById('sw-display').textContent=fmtMs(swElapsed); },100);
+  document.getElementById('sw-start').style.display='none'; document.getElementById('sw-pause').style.display=''; document.getElementById('sw-lap').style.display='';
+}
+function swPause() {
+  if (swRunning){ swRunning=false; clearInterval(swTick); swElapsed=Date.now()-swStart; document.getElementById('sw-pause').textContent='▶ Resume'; }
+  else { swStart_(); document.getElementById('sw-pause').textContent='⏸ Pause'; }
+}
+function swLap() {
+  const lapMs=Date.now()-swStart-(swLapStart-swStart);
+  swLaps.unshift({ n:swLaps.length+1, split:swElapsed, lap:lapMs });
+  swLapStart=Date.now()-swStart;
+  const el=document.getElementById('sw-laps');
+  el.innerHTML=swLaps.map(l=>`<div class="lap-row"><span class="lap-num">Lap ${l.n}</span><span class="lap-split">${fmtMs(l.lap)}</span><span class="lap-total">→ ${fmtMs(l.split)}</span></div>`).join('');
+}
+function swReset() {
+  clearInterval(swTick); swRunning=false; swElapsed=0; swLaps=[];
+  document.getElementById('sw-display').textContent='0:00.0';
+  document.getElementById('sw-laps').innerHTML='';
+  document.getElementById('sw-start').style.display=''; document.getElementById('sw-pause').style.display='none'; document.getElementById('sw-lap').style.display='none';
+  document.getElementById('sw-pause').textContent='⏸ Pause';
+}
+document.getElementById('sw-start').addEventListener('click', swStart_);
+</script>
+</body>
+</html>

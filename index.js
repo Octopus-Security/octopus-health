@@ -131,8 +131,9 @@ app.post('/login', async (req, res) => {
 
         if (authResponse.data.success) {
             req.session.user = { username };
-            const { sequelize } = getDatabase(username);
+            const { sequelize, seedData } = getDatabase(username);
             await sequelize.sync();
+            await seedData();
             res.redirect('/');
         } else {
             res.render('login', { title: 'Login', error: authResponse.data.error || 'Login failed', mode: 'login', siteKey: process.env.RECAPTCHA_SITE_KEY });
@@ -174,8 +175,9 @@ app.post('/register', async (req, res) => {
 
         if (authResponse.data.success) {
             req.session.user = { username };
-            const { sequelize } = getDatabase(username);
+            const { sequelize, seedData } = getDatabase(username);
             await sequelize.sync();
+            await seedData();
             res.redirect('/');
         } else {
             res.render('login', { title: 'Register', error: authResponse.data.error || 'Registration failed', mode: 'register', siteKey: process.env.RECAPTCHA_SITE_KEY });
@@ -846,6 +848,165 @@ app.get('/accountability', requireLogin, async (req, res) => {
         todayStr,
     });
 });
+
+// ── Workout Logger ────────────────────────────────────────────────────────────
+
+app.get('/workout', requireLogin, async (req, res) => {
+    const { WorkoutSession, WorkoutSet, TrainingPlan, TrainingPlanAssignment, sequelize } = getDatabase(req.session.user.username);
+    await sequelize.sync();
+    const recent = await WorkoutSession.findAll({ order: [['date','DESC'],['startedAt','DESC']], limit: 10 });
+    const recentWithCounts = await Promise.all(recent.map(async s => {
+        const sets = await WorkoutSet.findAll({ where: { sessionId: s.id } });
+        const exCount = new Set(sets.map(x => x.exerciseOrder)).size;
+        return { ...s.toJSON(), setCount: sets.length, exerciseCount: exCount };
+    }));
+    // Active plan today
+    const assignment = await TrainingPlanAssignment.findOne({ where: { status: 'active' } });
+    let todayPlan = null;
+    if (assignment) {
+        const plan = await TrainingPlan.findByPk(assignment.planId);
+        if (plan) {
+            const phases = JSON.parse(plan.phases || '[]');
+            const weekNumber = Math.floor((new Date() - new Date(assignment.startDate)) / (7*24*60*60*1000)) + 1;
+            const dayOfWeek  = new Date().getDay();
+            let phase = phases[0];
+            for (const p of phases) {
+                const [s, e] = p.weeks.split('–').map(Number);
+                if (weekNumber >= s && weekNumber <= e) { phase = p; break; }
+            }
+            todayPlan = { planName: plan.name, phase: phase?.name, session: phase?.weeklySchedule?.find(d => d.day === dayOfWeek) || null };
+        }
+    }
+    res.render('workout', { title: 'Workout Logger', user: req.session.user, recentWorkouts: recentWithCounts, todayPlan });
+});
+
+// Workout AJAX endpoints (session-protected, used by workout.ejs)
+app.post('/workout/api/session', requireLogin, async (req, res) => {
+    const { WorkoutSession, sequelize } = getDatabase(req.session.user.username);
+    await sequelize.sync();
+    const { type, title, date } = req.body;
+    const session = await WorkoutSession.create({ type, title: title || null, date: date || new Date().toISOString().split('T')[0], startedAt: new Date(), status: 'active' });
+    res.json({ success: true, data: session });
+});
+
+app.patch('/workout/api/session/:id', requireLogin, async (req, res) => {
+    const { WorkoutSession } = getDatabase(req.session.user.username);
+    const s = await WorkoutSession.findByPk(req.params.id);
+    if (!s) return res.status(404).json({ success: false });
+    if (req.body.status === 'finished') { s.finishedAt = new Date(); s.status = 'finished'; }
+    if (req.body.effort   !== undefined) s.effort   = req.body.effort;
+    if (req.body.duration !== undefined) s.duration = req.body.duration;
+    if (req.body.notes    !== undefined) s.notes    = req.body.notes;
+    await s.save();
+    res.json({ success: true, data: s });
+});
+
+app.delete('/workout/api/session/:id', requireLogin, async (req, res) => {
+    const { WorkoutSession, WorkoutSet } = getDatabase(req.session.user.username);
+    await WorkoutSet.destroy({ where: { sessionId: req.params.id } });
+    await WorkoutSession.destroy({ where: { id: req.params.id } });
+    res.json({ success: true });
+});
+
+app.get('/workout/api/session/:id', requireLogin, async (req, res) => {
+    const { WorkoutSession, WorkoutSet } = getDatabase(req.session.user.username);
+    const session = await WorkoutSession.findByPk(req.params.id);
+    if (!session) return res.status(404).json({ success: false });
+    const sets = await WorkoutSet.findAll({ where: { sessionId: req.params.id }, order: [['exerciseOrder','ASC'],['setNumber','ASC']] });
+    res.json({ success: true, data: { ...session.toJSON(), sets } });
+});
+
+app.post('/workout/api/session/:id/set', requireLogin, async (req, res) => {
+    const { WorkoutSet, sequelize } = getDatabase(req.session.user.username);
+    await sequelize.sync();
+    const { exerciseName, exerciseId, exerciseOrder, setNumber, reps, weight, weightUnit, duration, rpe, notes } = req.body;
+    const set = await WorkoutSet.create({
+        sessionId: req.params.id, exerciseName, exerciseId: exerciseId || null,
+        exerciseOrder: exerciseOrder || 0, setNumber: setNumber || 1,
+        reps: reps || null, weight: weight || null, weightUnit: weightUnit || 'lbs',
+        duration: duration || null, rpe: rpe || null, notes: notes || null,
+    });
+    res.json({ success: true, data: set });
+});
+
+app.delete('/workout/api/set/:id', requireLogin, async (req, res) => {
+    const { WorkoutSet } = getDatabase(req.session.user.username);
+    await WorkoutSet.destroy({ where: { id: req.params.id } });
+    res.json({ success: true });
+});
+
+app.get('/workout/api/exercises', requireLogin, async (req, res) => {
+    const { ExerciseDefinition } = getDatabase(req.session.user.username);
+    const { q, category } = req.query;
+    let all = await ExerciseDefinition.findAll({ order: [['name','ASC']] });
+    if (category) all = all.filter(e => e.category === category);
+    if (q) all = all.filter(e => e.name.toLowerCase().includes(q.toLowerCase()));
+    res.json({ success: true, data: all.map(e => ({ id: e.id, name: e.name, category: e.category, equipment: e.equipment, primaryMuscles: JSON.parse(e.primaryMuscles || '[]') })) });
+});
+
+// ── Exercise Library ──────────────────────────────────────────────────────────
+
+app.get('/library', requireLogin, async (req, res) => {
+    const { ExerciseDefinition, sequelize } = getDatabase(req.session.user.username);
+    await sequelize.sync();
+    const all = await ExerciseDefinition.findAll({ order: [['category','ASC'],['name','ASC']] });
+    const exercises = all.map(e => ({
+        ...e.toJSON(),
+        primaryMuscles:   JSON.parse(e.primaryMuscles   || '[]'),
+        secondaryMuscles: JSON.parse(e.secondaryMuscles || '[]'),
+    }));
+    res.render('library', { title: 'Exercise Library', user: req.session.user, exercises });
+});
+
+// ── Timers ────────────────────────────────────────────────────────────────────
+
+app.get('/timers', requireLogin, (req, res) => {
+    res.render('timers', { title: 'Timers', user: req.session.user });
+});
+
+// ── Training Plans ────────────────────────────────────────────────────────────
+
+app.get('/plans', requireLogin, async (req, res) => {
+    const { TrainingPlan, TrainingPlanAssignment, sequelize } = getDatabase(req.session.user.username);
+    await sequelize.sync();
+    const plans = await TrainingPlan.findAll({ order: [['sport','ASC'],['name','ASC']] });
+    const assignment = await TrainingPlanAssignment.findOne({ where: { status: 'active' } });
+    let activePlan = null;
+    let todaySession = null;
+    if (assignment) {
+        activePlan = plans.find(p => p.id === assignment.planId);
+        if (activePlan) {
+            const phases = JSON.parse(activePlan.phases || '[]');
+            const weekNumber = Math.floor((new Date() - new Date(assignment.startDate)) / (7*24*60*60*1000)) + 1;
+            const dayOfWeek = new Date().getDay();
+            let phase = phases[0];
+            for (const p of phases) {
+                const [s, e] = p.weeks.split('–').map(Number);
+                if (weekNumber >= s && weekNumber <= e) { phase = p; break; }
+            }
+            todaySession = { phase: phase?.name, weekNumber, session: phase?.weeklySchedule?.find(d => d.day === dayOfWeek) || null };
+        }
+    }
+    const parsedPlans = plans.map(p => ({ ...p.toJSON(), phases: JSON.parse(p.phases || '[]') }));
+    res.render('plans', { title: 'Training Plans', user: req.session.user, plans: parsedPlans, assignment, activePlan, todaySession });
+});
+
+app.post('/plans/assign', requireLogin, async (req, res) => {
+    const { TrainingPlanAssignment, sequelize } = getDatabase(req.session.user.username);
+    await sequelize.sync();
+    const { planId, startDate } = req.body;
+    await TrainingPlanAssignment.update({ status: 'paused' }, { where: { status: 'active' } });
+    await TrainingPlanAssignment.create({ planId, startDate: startDate || new Date().toISOString().split('T')[0], status: 'active' });
+    res.redirect('/plans');
+});
+
+app.post('/plans/unassign', requireLogin, async (req, res) => {
+    const { TrainingPlanAssignment } = getDatabase(req.session.user.username);
+    await TrainingPlanAssignment.update({ status: 'paused' }, { where: { status: 'active' } });
+    res.redirect('/plans');
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 app.listen(port, () => {
     console.log(`Health Tracker running on port ${port}`);
