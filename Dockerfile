@@ -1,14 +1,15 @@
-FROM node:18-bookworm-slim
+FROM node:18-alpine
 
 # Set working directory
 WORKDIR /usr/src/app
 
+# sqlite3 requires native compilation on alpine
+RUN apk add --no-cache python3 make g++
+
 # Copy package files first to maximize Docker layer cache hits
 COPY package*.json ./
 
-# Install production dependencies.
-# npm ci is strict about lockfile/package parity and can fail stack deploys;
-# npm install is more tolerant for deployment environments.
+# Install production dependencies (builds sqlite3 from source)
 RUN npm install --omit=dev --no-audit --no-fund
 
 # Copy application code
