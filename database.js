@@ -97,6 +97,51 @@ const SEED_EXERCISES = [
   { name: 'Skating — Endurance Laps',   category: 'cardio',       equipment: 'none', primaryMuscles: ['glutes','adductors','quads'], secondaryMuscles: ['calves','core'], instructions: 'Steady pace. Focus on long strides and edge work.',                   videoUrl: null },
   { name: 'Skating — Sprint Intervals', category: 'conditioning', equipment: 'none', primaryMuscles: ['quads','glutes','adductors'], secondaryMuscles: ['core'],          instructions: 'All-out sprint one length, coast back, repeat.',                      videoUrl: null },
   { name: 'Skating — Agility Drills',   category: 'conditioning', equipment: 'none', primaryMuscles: ['adductors','glutes'],         secondaryMuscles: ['core'],          instructions: 'Crossovers, quick stops, backward skating, transitions.',             videoUrl: null },
+  // RECOVERY / STRETCHING
+  { name: 'World\'s Greatest Stretch', category: 'recovery', equipment: 'none', primaryMuscles: ['hips','hamstrings','thoracic_spine'], secondaryMuscles: ['glutes','core'], instructions: 'Lunge forward, elbow to instep, rotate chest open, then switch sides.', videoUrl: 'https://www.youtube.com/results?search_query=worlds+greatest+stretch+demo' },
+  { name: 'Couch Stretch',              category: 'recovery', equipment: 'none', primaryMuscles: ['quads','hip_flexors'], secondaryMuscles: ['glutes'], instructions: 'Rear shin vertical against wall/bench. Tuck pelvis and squeeze glute to open hip flexor.', videoUrl: 'https://www.youtube.com/results?search_query=couch+stretch+demo' },
+  { name: '90/90 Hip Switch',           category: 'recovery', equipment: 'none', primaryMuscles: ['hips','glutes'], secondaryMuscles: ['core'], instructions: 'Sit in 90/90, rotate knees side to side without using hands if possible.', videoUrl: 'https://www.youtube.com/results?search_query=90+90+hip+switch+mobility' },
+  { name: 'Pigeon Stretch',             category: 'recovery', equipment: 'none', primaryMuscles: ['glutes','hips'], secondaryMuscles: ['lower_back'], instructions: 'Front shin across body, extend rear leg, fold forward slowly and breathe.', videoUrl: 'https://www.youtube.com/results?search_query=pigeon+stretch+tutorial' },
+  { name: 'Hamstring Floss',            category: 'recovery', equipment: 'none', primaryMuscles: ['hamstrings'], secondaryMuscles: ['calves'], instructions: 'From half-kneel, rock hips back while extending front knee and pulling toes up.', videoUrl: 'https://www.youtube.com/results?search_query=hamstring+floss+mobility' },
+  { name: 'Thoracic Open Book',         category: 'recovery', equipment: 'none', primaryMuscles: ['thoracic_spine'], secondaryMuscles: ['shoulders'], instructions: 'Lie side-on with knees bent, open top arm across body and rotate upper back.', videoUrl: 'https://www.youtube.com/results?search_query=thoracic+open+book+stretch' },
+  { name: 'Bretzel Stretch',            category: 'recovery', equipment: 'none', primaryMuscles: ['quads','hip_flexors','thoracic_spine'], secondaryMuscles: ['glutes'], instructions: 'Side-lying mobility drill for quad/hip plus thoracic rotation.', videoUrl: 'https://www.youtube.com/results?search_query=bretzel+stretch+demo' },
+  { name: 'Ankle Dorsiflexion Wall Drill', category: 'recovery', equipment: 'none', primaryMuscles: ['calves','ankles'], secondaryMuscles: [], instructions: 'Drive knee toward wall over toes while heel stays down; control both directions.', videoUrl: 'https://www.youtube.com/results?search_query=ankle+dorsiflexion+wall+drill' },
+];
+
+const SEED_ROUTINES = [
+  {
+    name: 'MMA Dynamic Warmup (12 min)',
+    type: 'warmup',
+    notes: 'Quick prep before pads, bag work, drilling, or lifting.',
+    items: [
+      { name: 'Jump Rope', duration: 120, reps: null, sets: 1, notes: 'Light bounce, nasal breathing', instructions: 'Build heat first, stay relaxed through shoulders.', mediaUrl: null },
+      { name: 'World\'s Greatest Stretch', duration: null, reps: 6, sets: 1, notes: 'Per side', instructions: 'Elbow to instep, then rotate chest open.', mediaUrl: 'https://www.youtube.com/results?search_query=worlds+greatest+stretch+demo' },
+      { name: 'Hip Escape (Shrimp)', duration: null, reps: 10, sets: 2, notes: 'Each side', instructions: 'Drive off foot and slide hips away.', mediaUrl: null },
+      { name: 'Shadow Boxing', duration: 180, reps: null, sets: 1, notes: 'Loose combos + footwork', instructions: 'Stay technical, do not throw max power in warmup.', mediaUrl: null },
+    ],
+  },
+  {
+    name: 'Lower Body Mobility (15 min)',
+    type: 'stretching',
+    notes: 'Use after training or on active recovery days.',
+    items: [
+      { name: 'Couch Stretch', duration: 60, reps: null, sets: 2, notes: 'Each side', instructions: 'Posterior pelvic tilt and glute squeeze.', mediaUrl: 'https://www.youtube.com/results?search_query=couch+stretch+demo' },
+      { name: '90/90 Hip Switch', duration: 90, reps: null, sets: 2, notes: 'Controlled', instructions: 'Rotate through hips without arching back.', mediaUrl: 'https://www.youtube.com/results?search_query=90+90+hip+switch+mobility' },
+      { name: 'Hamstring Floss', duration: null, reps: 10, sets: 2, notes: 'Each side', instructions: 'Rock in and out of end range, avoid pain.', mediaUrl: 'https://www.youtube.com/results?search_query=hamstring+floss+mobility' },
+      { name: 'Ankle Dorsiflexion Wall Drill', duration: null, reps: 12, sets: 2, notes: 'Each side', instructions: 'Knee tracks over middle toes; heel planted.', mediaUrl: 'https://www.youtube.com/results?search_query=ankle+dorsiflexion+wall+drill' },
+    ],
+  },
+  {
+    name: 'Post-Workout Cooldown (10 min)',
+    type: 'cooldown',
+    notes: 'Bring heart rate down and recover tissue quality.',
+    items: [
+      { name: 'Walk + Deep Breathing', duration: 180, reps: null, sets: 1, notes: 'Slow pace', instructions: 'Inhale 4 sec, exhale 6 sec.', mediaUrl: null },
+      { name: 'Pigeon Stretch', duration: 60, reps: null, sets: 2, notes: 'Each side', instructions: 'Relax and breathe into hip.', mediaUrl: 'https://www.youtube.com/results?search_query=pigeon+stretch+tutorial' },
+      { name: 'Thoracic Open Book', duration: null, reps: 8, sets: 2, notes: 'Each side', instructions: 'Keep knees stacked while opening chest.', mediaUrl: 'https://www.youtube.com/results?search_query=thoracic+open+book+stretch' },
+      { name: 'Bretzel Stretch', duration: 45, reps: null, sets: 2, notes: 'Each side', instructions: 'Move gently into end range.', mediaUrl: 'https://www.youtube.com/results?search_query=bretzel+stretch+demo' },
+    ],
+  },
 ];
 
 const SEED_PLANS = [
@@ -386,6 +431,17 @@ const getDatabase = (username) => {
                 }))
             );
         }
+            const routineCount = await Routine.count();
+            if (routineCount === 0) {
+              await Routine.bulkCreate(
+                SEED_ROUTINES.map(r => ({
+                  name: r.name,
+                  type: r.type,
+                  notes: r.notes,
+                  items: JSON.stringify(r.items),
+                }))
+              );
+            }
         const planCount = await TrainingPlan.count();
         if (planCount === 0) {
             await TrainingPlan.bulkCreate(SEED_PLANS);
