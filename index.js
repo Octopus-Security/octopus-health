@@ -2,8 +2,6 @@ const express = require('express');
 const session = require('express-session');
 const SQLiteStore = require('connect-sqlite3')(session);
 const bodyParser = require('body-parser');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const path = require('path');
 const { Op } = require('sequelize');
@@ -14,7 +12,6 @@ app.set('trust proxy', 1);
 const port = process.env.PORT || 3000;
 const getDatabase = require('./database');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'octopus-shared-secret-change-in-production';
 const AUTH_INTERNAL_URL = process.env.AUTH_SERVICE_URL || 'http://octopus-auth:3002';
 const AUTH_EXTERNAL_URL = 'https://auth.octopustechnology.net';
 
@@ -86,27 +83,6 @@ const requireLogin = (req, res, next) => {
         next();
     } else {
         res.redirect('/login');
-    }
-};
-
-// JWT middleware for API routes
-const requireApiAuth = (req, res, next) => {
-    const authHeader = req.headers.authorization;
-    if (!authHeader) {
-        return res.status(401).json({ success: false, message: 'No token provided' });
-    }
-    
-    const token = authHeader.split(' ')[1]; // Bearer <token>
-    if (!token) {
-        return res.status(401).json({ success: false, message: 'Invalid token format' });
-    }
-    
-    try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-        req.user = decoded;
-        next();
-    } catch (error) {
-        return res.status(401).json({ success: false, message: 'Invalid or expired token' });
     }
 };
 
@@ -197,71 +173,28 @@ app.get('/logout', (req, res) => {
 
 // REST API endpoints for mobile app
 app.post('/api/auth/register', async (req, res) => {
-    const { username, password } = req.body;
-    
     try {
-        if (!username || !password) {
-            return res.status(400).json({ success: false, message: 'Username and password required' });
-        }
-        
-        if (password.length < 6) {
-            return res.status(400).json({ success: false, message: 'Password must be at least 6 characters' });
-        }
-        
-        const existingUser = await User.findOne({ where: { username } });
-        if (existingUser) {
-            return res.status(400).json({ success: false, message: 'Username already exists' });
-        }
-        
-        const hashedPassword = await bcrypt.hash(password, 10);
-        await User.create({ username, password: hashedPassword });
-        
-        // Initialize user's database
-        const { sequelize } = getDatabase(username);
-        await sequelize.sync();
-        
-        // Generate token
-        const token = jwt.sign({ username }, JWT_SECRET, { expiresIn: '7d' });
-        
-        res.status(201).json({ success: true, token, message: 'User registered successfully' });
+        const authResponse = await callAuthService('/api/auth/register', req.body);
+        res.status(authResponse.status).json(authResponse.data);
     } catch (error) {
-        console.error('API registration error:', error);
-        res.status(500).json({ success: false, message: 'Registration failed' });
+        if (error.response) {
+            res.status(error.response.status).json(error.response.data);
+        } else {
+            res.status(503).json({ success: false, error: 'Auth service unavailable' });
+        }
     }
 });
 
 app.post('/api/auth/login', async (req, res) => {
-    const { username, password } = req.body;
-    
-    console.log('API login attempt for username:', username);
-    
     try {
-        const user = await User.findOne({ where: { username } });
-        
-        if (!user) {
-            console.log('User not found');
-            return res.status(401).json({ success: false, message: 'Invalid credentials' });
-        }
-        
-        const validPassword = await bcrypt.compare(password, user.password);
-        
-        if (!validPassword) {
-            console.log('Invalid password');
-            return res.status(401).json({ success: false, message: 'Invalid credentials' });
-        }
-        
-        // Ensure user's database is synced
-        const { sequelize } = getDatabase(username);
-        await sequelize.sync();
-        
-        // Generate token
-        const token = jwt.sign({ username }, JWT_SECRET, { expiresIn: '7d' });
-        
-        console.log('Login successful, token generated');
-        res.json({ success: true, token, message: null });
+        const authResponse = await callAuthService('/api/auth/login', req.body);
+        res.status(authResponse.status).json(authResponse.data);
     } catch (error) {
-        console.error('API login error:', error);
-        res.status(500).json({ success: false, message: 'Login failed' });
+        if (error.response) {
+            res.status(error.response.status).json(error.response.data);
+        } else {
+            res.status(503).json({ success: false, error: 'Auth service unavailable' });
+        }
     }
 });
 
@@ -427,109 +360,51 @@ app.get('/settings', requireLogin, (req, res) => {
 });
 
 app.post('/settings/change-password', requireLogin, async (req, res) => {
-    const { currentPassword, newPassword, confirmPassword } = req.body;
-    
-    try {
-        const user = await User.findOne({ where: { username: req.session.user.username } });
-        
-        const validPassword = await bcrypt.compare(currentPassword, user.password);
-        if (!validPassword) {
-            return res.render('settings', { 
-                title: 'Account Settings', 
-                user: req.session.user, 
-                error: 'Current password is incorrect', 
-                success: null 
-            });
-        }
-        
-        if (newPassword !== confirmPassword) {
-            return res.render('settings', { 
-                title: 'Account Settings', 
-                user: req.session.user, 
-                error: 'New passwords do not match', 
-                success: null 
-            });
-        }
-        
-        if (newPassword.length < 6) {
-            return res.render('settings', { 
-                title: 'Account Settings', 
-                user: req.session.user, 
-                error: 'Password must be at least 6 characters', 
-                success: null 
-            });
-        }
-        
-        const hashedPassword = await bcrypt.hash(newPassword, 10);
-        user.password = hashedPassword;
-        await user.save();
-        
-        res.render('settings', { 
-            title: 'Account Settings', 
-            user: req.session.user, 
-            error: null, 
-            success: 'Password changed successfully' 
-        });
-    } catch (error) {
-        console.error('Password change error:', error);
-        res.render('settings', { 
-            title: 'Account Settings', 
-            user: req.session.user, 
-            error: 'Failed to change password', 
-            success: null 
-        });
-    }
+    // Password updates are managed by the centralized auth service.
+    res.render('settings', {
+        title: 'Account Settings',
+        user: req.session.user,
+        error: 'Password changes are handled by octopus-auth and are not available from this app yet.',
+        success: null
+    });
 });
 
 app.post('/settings/delete-account', requireLogin, async (req, res) => {
-    const { password } = req.body;
-    const username = req.session.user.username;
-    
-    try {
-        const user = await User.findOne({ where: { username } });
-        
-        const validPassword = await bcrypt.compare(password, user.password);
-        if (!validPassword) {
-            return res.render('settings', { 
-                title: 'Account Settings', 
-                user: req.session.user, 
-                error: 'Incorrect password', 
-                success: null 
-            });
-        }
-        
-        // Delete user database
-        const dbPath = path.join(dataDir, `${username}_health.sqlite`);
-        if (fs.existsSync(dbPath)) {
-            fs.unlinkSync(dbPath);
-        }
-        
-        // Delete user from auth database
-        await user.destroy();
-        
-        // Destroy session and redirect to login
-        req.session.destroy(() => {
-            res.redirect('/login');
-        });
-    } catch (error) {
-        console.error('Account deletion error:', error);
-        res.render('settings', { 
-            title: 'Account Settings', 
-            user: req.session.user, 
-            error: 'Failed to delete account', 
-            success: null 
-        });
-    }
+    res.render('settings', {
+        title: 'Account Settings',
+        user: req.session.user,
+        error: 'Account deletion must be performed via octopus-auth and is not available from this app yet.',
+        success: null
+    });
 });
 
 // ── Routines (warmup / stretching / cooldown) ─────────────────────────────────
 
 app.get('/routines', requireLogin, async (req, res) => {
-    const { Routine, sequelize } = getDatabase(req.session.user.username);
+    const { Routine, ExerciseDefinition, sequelize } = getDatabase(req.session.user.username);
     await sequelize.sync();
     const all = await Routine.findAll({ order: [['type', 'ASC'], ['name', 'ASC']] });
-    const routines = all.map(r => ({ ...r.toJSON(), itemsList: JSON.parse(r.items || '[]') }));
-    res.render('routines', { title: 'Routines', user: req.session.user, routines, success: req.query.success || null });
+    const routines = all.map(r => {
+        let itemsList = [];
+        try { itemsList = JSON.parse(r.items || '[]'); } catch { itemsList = []; }
+        return { ...r.toJSON(), itemsList };
+    });
+    const allExercises = await ExerciseDefinition.findAll({ order: [['name', 'ASC']] });
+    const exerciseLibrary = allExercises.map(e => ({
+        id: e.id,
+        name: e.name,
+        category: e.category,
+        equipment: e.equipment,
+        instructions: e.instructions || null,
+        videoUrl: e.videoUrl || null,
+    }));
+    res.render('routines', {
+        title: 'Routines',
+        user: req.session.user,
+        routines,
+        exerciseLibrary,
+        success: req.query.success || null,
+    });
 });
 
 app.post('/routines', requireLogin, async (req, res) => {
@@ -556,36 +431,50 @@ app.post('/routines/delete/:id', requireLogin, async (req, res) => {
 });
 
 app.post('/routines/:id/items', requireLogin, async (req, res) => {
-    const { Routine } = getDatabase(req.session.user.username);
+    const { Routine, ExerciseDefinition } = getDatabase(req.session.user.username);
     const r = await Routine.findByPk(req.params.id);
     if (!r) return res.redirect('/routines');
     const items = JSON.parse(r.items || '[]');
-    const { name, duration, reps, sets, notes } = req.body;
+    const { name, duration, reps, sets, notes, exerciseId, instructions, mediaUrl } = req.body;
+    const exerciseIdNum = exerciseId ? parseInt(exerciseId) : null;
+    const fromLibrary = exerciseIdNum ? await ExerciseDefinition.findByPk(exerciseIdNum) : null;
+    const resolvedName = (name || '').trim() || fromLibrary?.name;
+    if (!resolvedName) return res.redirect('/routines');
     items.push({
-        name:     name.trim(),
+        name:     resolvedName,
         duration: duration ? parseInt(duration) : null,
         reps:     reps     ? parseInt(reps)     : null,
         sets:     sets     ? parseInt(sets)      : null,
         notes:    notes?.trim() || null,
+        exerciseId: exerciseIdNum || fromLibrary?.id || null,
+        instructions: (instructions || '').trim() || fromLibrary?.instructions || null,
+        mediaUrl: (mediaUrl || '').trim() || fromLibrary?.videoUrl || null,
     });
     await r.update({ items: JSON.stringify(items) });
     res.redirect('/routines');
 });
 
 app.post('/routines/:id/items/update/:idx', requireLogin, async (req, res) => {
-    const { Routine } = getDatabase(req.session.user.username);
+    const { Routine, ExerciseDefinition } = getDatabase(req.session.user.username);
     const r = await Routine.findByPk(req.params.id);
     if (!r) return res.redirect('/routines');
     const items = JSON.parse(r.items || '[]');
     const idx = parseInt(req.params.idx);
     if (idx >= 0 && idx < items.length) {
-        const { name, duration, reps, sets, notes } = req.body;
+        const existing = items[idx] || {};
+        const { name, duration, reps, sets, notes, exerciseId, instructions, mediaUrl } = req.body;
+        const exerciseIdNum = exerciseId ? parseInt(exerciseId) : existing.exerciseId || null;
+        const fromLibrary = exerciseIdNum ? await ExerciseDefinition.findByPk(exerciseIdNum) : null;
+        const resolvedName = (name || '').trim() || fromLibrary?.name || existing.name;
         items[idx] = {
-            name:     name.trim(),
+            name:     resolvedName,
             duration: duration ? parseInt(duration) : null,
             reps:     reps     ? parseInt(reps)     : null,
             sets:     sets     ? parseInt(sets)      : null,
             notes:    notes?.trim() || null,
+            exerciseId: exerciseIdNum || null,
+            instructions: (instructions || '').trim() || fromLibrary?.instructions || existing.instructions || null,
+            mediaUrl: (mediaUrl || '').trim() || fromLibrary?.videoUrl || existing.mediaUrl || null,
         };
     }
     await r.update({ items: JSON.stringify(items) });

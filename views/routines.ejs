@@ -128,6 +128,7 @@
                         <th>Reps</th>
                         <th>Sets</th>
                         <th>Notes</th>
+                        <th>Guide</th>
                         <th>Edit</th>
                         <th>Del</th>
                     </tr>
@@ -141,6 +142,19 @@
                         <td><%= item.reps || '—' %></td>
                         <td><%= item.sets || '—' %></td>
                         <td style="color:#666; font-size:13px;"><%= item.notes || '—' %></td>
+                        <td style="font-size:12px; color:#888; max-width:220px;">
+                            <% if (item.mediaUrl) { %>
+                                <a href="<%= item.mediaUrl %>" target="_blank" rel="noopener">Open visual guide</a>
+                            <% } else { %>
+                                —
+                            <% } %>
+                            <% if (item.instructions) { %>
+                                <details style="margin-top:6px;">
+                                    <summary style="cursor:pointer; color:#aaa;">How-to</summary>
+                                    <div style="margin-top:6px; color:#777;"><%= item.instructions %></div>
+                                </details>
+                            <% } %>
+                        </td>
                         <td>
                             <button class="btn-sm btn-partial" onclick="toggleEdit('<%= r.id %>-<%= idx %>')" type="button">✎</button>
                         </td>
@@ -152,7 +166,7 @@
                     </tr>
                     <!-- Inline edit row -->
                     <tr id="edit-<%= r.id %>-<%= idx %>" style="display:none; background:#161616;">
-                        <td colspan="8" style="padding:12px;">
+                        <td colspan="9" style="padding:12px;">
                             <form method="POST" action="/routines/<%= r.id %>/items/update/<%= idx %>" style="display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end;">
                                 <div class="form-group" style="min-width:160px;">
                                     <label>Exercise</label>
@@ -189,10 +203,19 @@
             <details>
                 <summary class="edit-schedule-toggle">Add exercise</summary>
                 <form method="POST" action="/routines/<%= r.id %>/items" style="margin-top:14px;">
+                    <div class="form-group">
+                        <label>Pick From Library (optional)</label>
+                        <select name="exerciseId" class="exercise-picker" data-routine-id="<%= r.id %>">
+                            <option value="">Manual entry</option>
+                            <% exerciseLibrary.forEach(ex => { %>
+                                <option value="<%= ex.id %>"><%= ex.name %> (<%= ex.category %>)</option>
+                            <% }) %>
+                        </select>
+                    </div>
                     <div class="form-grid">
                         <div class="form-group">
                             <label>Exercise Name</label>
-                            <input type="text" name="name" required placeholder="e.g. Leg swings, Hip circles">
+                            <input type="text" name="name" id="item-name-<%= r.id %>" list="exercise-name-list" required placeholder="e.g. Leg swings, Hip circles">
                         </div>
                         <div class="form-group">
                             <label>Duration (seconds)</label>
@@ -211,6 +234,9 @@
                         <label>Notes (optional)</label>
                         <input type="text" name="notes" placeholder="Each side, slow and controlled...">
                     </div>
+                    <input type="hidden" name="instructions" id="item-instructions-<%= r.id %>">
+                    <input type="hidden" name="mediaUrl" id="item-media-<%= r.id %>">
+                    <div id="item-preview-<%= r.id %>" style="display:none; margin-bottom:10px; font-size:13px; color:#888;"></div>
                     <button type="submit">Add Exercise</button>
                 </form>
             </details>
@@ -220,11 +246,57 @@
 
     </div>
 
+    <datalist id="exercise-name-list">
+        <% exerciseLibrary.forEach(ex => { %>
+            <option value="<%= ex.name %>"></option>
+        <% }) %>
+    </datalist>
+
     <script>
+    const EXERCISE_LIBRARY = <%- JSON.stringify(exerciseLibrary) %>;
+    const EXERCISE_BY_ID = Object.fromEntries(EXERCISE_LIBRARY.map(ex => [String(ex.id), ex]));
+
     function toggleEdit(id) {
         const row = document.getElementById('edit-' + id);
         if (row) row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
     }
+
+    function escHtml(s) {
+        return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    document.querySelectorAll('.exercise-picker').forEach(select => {
+        select.addEventListener('change', () => {
+            const routineId = select.dataset.routineId;
+            const exercise = EXERCISE_BY_ID[select.value];
+            const nameInput = document.getElementById('item-name-' + routineId);
+            const instructionsInput = document.getElementById('item-instructions-' + routineId);
+            const mediaInput = document.getElementById('item-media-' + routineId);
+            const preview = document.getElementById('item-preview-' + routineId);
+            if (!exercise) {
+                instructionsInput.value = '';
+                mediaInput.value = '';
+                preview.style.display = 'none';
+                preview.innerHTML = '';
+                return;
+            }
+
+            if (nameInput && !nameInput.value.trim()) nameInput.value = exercise.name;
+            instructionsInput.value = exercise.instructions || '';
+            mediaInput.value = exercise.videoUrl || '';
+
+            const instructionsText = exercise.instructions ? `<div><strong>How-to:</strong> ${escHtml(exercise.instructions)}</div>` : '';
+            const mediaText = exercise.videoUrl ? `<div><a href="${escHtml(exercise.videoUrl)}" target="_blank" rel="noopener">Open visual guide</a></div>` : '';
+            const content = `${instructionsText}${mediaText}`;
+            if (content) {
+                preview.style.display = 'block';
+                preview.innerHTML = content;
+            } else {
+                preview.style.display = 'none';
+                preview.innerHTML = '';
+            }
+        });
+    });
     </script>
 </body>
 </html>
