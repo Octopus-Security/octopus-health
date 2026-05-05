@@ -36,6 +36,23 @@
     .lap-row .lap-total { color:#2ecc71; }
     .bell-flash { animation:flash 0.3s ease; }
     @keyframes flash { 0%,100%{opacity:1} 50%{opacity:0.2} }
+    .combo-display { text-align:center; padding:28px 16px 12px; }
+    .combo-numbers { font-size:4.5rem; font-weight:800; color:#e8e8e8; letter-spacing:6px; line-height:1; min-height:5.5rem; transition:opacity 0.15s; }
+    .combo-numbers.flash-in { animation:comboFlash 0.25s ease; }
+    @keyframes comboFlash { 0%{opacity:0;transform:scale(0.92)} 100%{opacity:1;transform:scale(1)} }
+    .combo-labels { font-size:0.9rem; color:#555; margin-top:8px; min-height:1.4em; letter-spacing:1px; }
+    .combo-strike { display:inline-block; padding:2px 0; transition:color 0.1s; }
+    .combo-strike.active { color:#e74c3c; }
+    .strike-toggles { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-bottom:16px; }
+    .strike-toggle { display:flex; align-items:center; gap:6px; background:#0d0d0d; border:1px solid #2a2a2a; border-radius:8px; padding:6px 12px; cursor:pointer; font-size:0.82rem; color:#888; transition:all 0.15s; }
+    .strike-toggle input { accent-color:#e74c3c; width:14px; height:14px; }
+    .strike-toggle.on { border-color:#e74c3c44; color:#e07b54; }
+    .cb-history { margin-top:16px; max-height:160px; overflow-y:auto; }
+    .cb-history-row { padding:5px 0; border-bottom:1px solid #1a1a1a; font-size:0.82rem; color:#555; font-variant-numeric:tabular-nums; display:flex; gap:10px; }
+    .cb-history-row:last-child { border-bottom:none; }
+    .cb-history-row .cb-idx { color:#333; min-width:28px; }
+    .cb-history-row .cb-combo { color:#888; }
+    .cb-round-info { font-size:0.8rem; color:#3498db; text-align:center; min-height:1.2em; margin-bottom:4px; }
   </style>
 </head>
 <body>
@@ -71,6 +88,7 @@
     <button class="timer-tab" data-panel="emom">EMOM</button>
     <button class="timer-tab" data-panel="amrap">AMRAP</button>
     <button class="timer-tab" data-panel="stopwatch">Stopwatch</button>
+    <button class="timer-tab" data-panel="combos" style="border-color:#3a1a1a;color:#e07b54" id="tab-combos">🥊 Combo Caller</button>
   </div>
 
   <!-- ── Round Timer ── -->
@@ -190,6 +208,72 @@
         <button class="btn btn-big" id="am-pause" onclick="amPause()" style="display:none">⏸ Pause</button>
         <button class="btn btn-big" onclick="amReset()">↺ Reset</button>
       </div>
+    </div>
+  </div>
+
+  <!-- ── Combo Caller ── -->
+  <div class="timer-panel" id="panel-combos">
+    <div class="timer-card" style="max-width:640px">
+
+      <!-- Strike toggles -->
+      <div style="margin-bottom:16px">
+        <div style="font-size:0.72rem;color:#555;text-transform:uppercase;letter-spacing:1px;text-align:center;margin-bottom:10px">Include strikes</div>
+        <div class="strike-toggles">
+          <label class="strike-toggle on" id="tog-1"><input type="checkbox" id="cb-1" checked> 1 Jab</label>
+          <label class="strike-toggle on" id="tog-2"><input type="checkbox" id="cb-2" checked> 2 Cross</label>
+          <label class="strike-toggle on" id="tog-3"><input type="checkbox" id="cb-3" checked> 3 Lead Hook</label>
+          <label class="strike-toggle on" id="tog-4"><input type="checkbox" id="cb-4" checked> 4 Rear Hook</label>
+          <label class="strike-toggle on" id="tog-5"><input type="checkbox" id="cb-5" checked> 5 Lead Upper</label>
+          <label class="strike-toggle on" id="tog-6"><input type="checkbox" id="cb-6" checked> 6 Rear Upper</label>
+          <label class="strike-toggle" id="tog-E"><input type="checkbox" id="cb-E"> Elbow</label>
+          <label class="strike-toggle" id="tog-K"><input type="checkbox" id="cb-K"> Kick</label>
+          <label class="strike-toggle" id="tog-N"><input type="checkbox" id="cb-N"> Knee</label>
+        </div>
+      </div>
+
+      <!-- Config -->
+      <div class="config-grid config-grid-3" style="margin-bottom:16px">
+        <div class="config-item">
+          <label>Min strikes</label>
+          <input type="number" id="cb-min" value="2" min="1" max="6">
+        </div>
+        <div class="config-item">
+          <label>Max strikes</label>
+          <input type="number" id="cb-max" value="4" min="1" max="8">
+        </div>
+        <div class="config-item">
+          <label>Delay (sec)</label>
+          <input type="number" id="cb-delay" value="3" min="1" max="15">
+        </div>
+        <div class="config-item">
+          <label>Rounds</label>
+          <input type="number" id="cb-rounds" value="5" min="1" max="20">
+        </div>
+        <div class="config-item">
+          <label>Round (min)</label>
+          <input type="number" id="cb-rmin" value="3" min="1" max="10">
+        </div>
+        <div class="config-item">
+          <label>Rest (sec)</label>
+          <input type="number" id="cb-rest" value="60" min="0" max="180">
+        </div>
+      </div>
+
+      <!-- Display -->
+      <div class="cb-round-info" id="cb-round-info"></div>
+      <div class="combo-display">
+        <div class="combo-numbers" id="cb-numbers">—</div>
+        <div class="combo-labels" id="cb-labels"></div>
+      </div>
+
+      <div class="timer-controls" style="margin-top:16px">
+        <button class="btn btn-big" id="cb-start" onclick="cbStart()" style="background:#2a1a1a;border-color:#e74c3c;color:#e74c3c">▶ Start</button>
+        <button class="btn btn-big" id="cb-pause" onclick="cbPause()" style="display:none">⏸ Pause</button>
+        <button class="btn btn-big" onclick="cbReset()">↺ Reset</button>
+        <button class="btn btn-big" id="cb-skip" onclick="cbSkip()" style="display:none;font-size:0.85rem">⏭ Next</button>
+      </div>
+
+      <div class="cb-history" id="cb-history"></div>
     </div>
   </div>
 
@@ -556,6 +640,216 @@ function swReset() {
   document.getElementById('sw-pause').textContent='⏸ Pause';
 }
 document.getElementById('sw-start').addEventListener('click', swStart_);
+
+// ── Combo Caller ──────────────────────────────────────────────────────────────
+const STRIKES = {
+  '1': { label:'1', name:'Jab',           speak:'one'   },
+  '2': { label:'2', name:'Cross',         speak:'two'   },
+  '3': { label:'3', name:'Lead Hook',     speak:'three' },
+  '4': { label:'4', name:'Rear Hook',     speak:'four'  },
+  '5': { label:'5', name:'Lead Upper',    speak:'five'  },
+  '6': { label:'6', name:'Rear Upper',    speak:'six'   },
+  'E': { label:'E', name:'Elbow',         speak:'elbow' },
+  'K': { label:'K', name:'Kick',          speak:'kick'  },
+  'N': { label:'N', name:'Knee',          speak:'knee'  },
+};
+
+// Toggle styling on checkbox change
+['1','2','3','4','5','6','E','K','N'].forEach(k => {
+  const cb  = document.getElementById('cb-' + k);
+  const tog = document.getElementById('tog-' + k);
+  cb.addEventListener('change', () => tog.classList.toggle('on', cb.checked));
+});
+
+function cbGetPool() {
+  return Object.keys(STRIKES).filter(k => document.getElementById('cb-' + k)?.checked);
+}
+
+function cbGenCombo(pool) {
+  const min = parseInt(document.getElementById('cb-min').value) || 2;
+  const max = parseInt(document.getElementById('cb-max').value) || 4;
+  const len = min + Math.floor(Math.random() * (max - min + 1));
+  const combo = [];
+  for (let i = 0; i < len; i++) combo.push(pool[Math.floor(Math.random() * pool.length)]);
+  return combo;
+}
+
+function cbSpeak(text) {
+  if (!window.speechSynthesis) return;
+  const u = new SpeechSynthesisUtterance(text);
+  u.rate = 1.1; u.pitch = 1.0; u.volume = 1.0;
+  speechSynthesis.speak(u);
+}
+
+function cbSpeakCombo(keys, callback) {
+  // Speak each strike name with a short pause between them
+  let i = 0;
+  function next() {
+    if (i >= keys.length) { if (callback) setTimeout(callback, 200); return; }
+    const s = STRIKES[keys[i]];
+    cbSpeak(s.speak);
+    // Highlight active strike
+    document.querySelectorAll('.combo-strike').forEach((el, idx) => {
+      el.classList.toggle('active', idx === i);
+    });
+    i++;
+    setTimeout(next, 420);
+  }
+  next();
+}
+
+let cbState = null;
+let cbPhaseTimeout = null;
+let cbComboTimeout = null;
+
+function cbStart() {
+  ctx.resume();
+  if (cbState && cbState.paused) {
+    cbState.paused = false;
+    document.getElementById('cb-pause').textContent = '⏸ Pause';
+    document.getElementById('cb-start').style.display = 'none';
+    cbNextCombo();
+    return;
+  }
+  const pool = cbGetPool();
+  if (!pool.length) { alert('Enable at least one strike type.'); return; }
+  cbState = {
+    pool,
+    rounds:     parseInt(document.getElementById('cb-rounds').value) || 5,
+    roundSec:   (parseInt(document.getElementById('cb-rmin').value)  || 3) * 60,
+    restSec:    parseInt(document.getElementById('cb-rest').value)   || 60,
+    delaySec:   parseInt(document.getElementById('cb-delay').value)  || 3,
+    round:      1,
+    phase:      'work',
+    roundEnd:   Date.now() + (parseInt(document.getElementById('cb-rmin').value)||3) * 60000,
+    paused:     false,
+    history:    [],
+    comboCount: 0,
+  };
+  document.getElementById('cb-start').style.display = 'none';
+  document.getElementById('cb-pause').style.display = '';
+  document.getElementById('cb-skip').style.display  = '';
+  document.getElementById('cb-history').innerHTML   = '';
+  cbSpeak('Round ' + cbState.round);
+  setTimeout(cbNextCombo, 1200);
+}
+
+function cbNextCombo() {
+  if (!cbState || cbState.paused) return;
+
+  // Check if current round has expired
+  if (Date.now() >= cbState.roundEnd) {
+    cbEndRound(); return;
+  }
+
+  const combo = cbGenCombo(cbState.pool);
+  cbState.comboCount++;
+  const numStr   = combo.map(k => STRIKES[k].label).join(' - ');
+  const nameStr  = combo.map(k => STRIKES[k].name).join(' · ');
+
+  // Display
+  const numEl = document.getElementById('cb-numbers');
+  numEl.className = 'combo-numbers';
+  void numEl.offsetWidth; // reflow to restart animation
+  numEl.className = 'combo-numbers flash-in';
+  numEl.innerHTML = combo.map(k => `<span class="combo-strike">${STRIKES[k].label}</span>`).join('<span style="color:#333;margin:0 4px">—</span>');
+  document.getElementById('cb-labels').textContent = nameStr;
+
+  // Round info
+  const secLeft = Math.max(0, Math.round((cbState.roundEnd - Date.now()) / 1000));
+  document.getElementById('cb-round-info').textContent =
+    `Round ${cbState.round} / ${cbState.rounds}  ·  ${fmt(secLeft)} left`;
+
+  // History
+  cbState.history.unshift({ n: cbState.comboCount, text: numStr + '  (' + nameStr + ')' });
+  document.getElementById('cb-history').innerHTML = cbState.history.slice(0, 20).map(h =>
+    `<div class="cb-history-row"><span class="cb-idx">#${h.n}</span><span class="cb-combo">${h.text}</span></div>`
+  ).join('');
+
+  // Speak then schedule next
+  cbSpeakCombo(combo, () => {
+    if (!cbState || cbState.paused) return;
+    cbComboTimeout = setTimeout(cbNextCombo, cbState.delaySec * 1000);
+  });
+}
+
+function cbEndRound() {
+  if (!cbState) return;
+  clearTimeout(cbComboTimeout);
+  speechSynthesis.cancel();
+
+  if (cbState.round >= cbState.rounds) {
+    // Done
+    document.getElementById('cb-numbers').textContent = '🏆';
+    document.getElementById('cb-labels').textContent  = 'Workout complete!';
+    document.getElementById('cb-round-info').textContent = '';
+    cbSpeak('Workout complete. Great work.');
+    cbReset(true);
+    return;
+  }
+
+  // Rest phase
+  cbState.round++;
+  const restSec = cbState.restSec;
+  document.getElementById('cb-numbers').textContent = fmt(restSec);
+  document.getElementById('cb-numbers').className   = 'combo-numbers';
+  document.getElementById('cb-labels').textContent  = 'Rest';
+  document.getElementById('cb-round-info').textContent = `Round ${cbState.round} starts in…`;
+  cbSpeak('Rest');
+
+  let remaining = restSec;
+  function restTick() {
+    if (!cbState || cbState.paused) return;
+    remaining--;
+    document.getElementById('cb-numbers').textContent = fmt(remaining);
+    if (remaining <= 3 && remaining > 0) cbSpeak(String(remaining));
+    if (remaining <= 0) {
+      cbSpeak('Round ' + cbState.round);
+      cbState.roundEnd = Date.now() + cbState.roundSec * 1000;
+      setTimeout(cbNextCombo, 1200);
+    } else {
+      cbPhaseTimeout = setTimeout(restTick, 1000);
+    }
+  }
+  cbPhaseTimeout = setTimeout(restTick, 1000);
+}
+
+function cbPause() {
+  if (!cbState) return;
+  cbState.paused = !cbState.paused;
+  if (cbState.paused) {
+    clearTimeout(cbComboTimeout); clearTimeout(cbPhaseTimeout);
+    speechSynthesis.cancel();
+    document.getElementById('cb-pause').textContent = '▶ Resume';
+    document.getElementById('cb-start').style.display = '';
+  } else {
+    document.getElementById('cb-pause').textContent = '⏸ Pause';
+    document.getElementById('cb-start').style.display = 'none';
+    cbNextCombo();
+  }
+}
+
+function cbSkip() {
+  clearTimeout(cbComboTimeout); clearTimeout(cbPhaseTimeout);
+  speechSynthesis.cancel();
+  if (cbState) cbNextCombo();
+}
+
+function cbReset(keepHistory) {
+  clearTimeout(cbComboTimeout); clearTimeout(cbPhaseTimeout);
+  speechSynthesis.cancel();
+  cbState = null;
+  if (!keepHistory) {
+    document.getElementById('cb-numbers').textContent = '—';
+    document.getElementById('cb-labels').textContent  = '';
+    document.getElementById('cb-history').innerHTML   = '';
+  }
+  document.getElementById('cb-round-info').textContent = '';
+  document.getElementById('cb-start').style.display = '';
+  document.getElementById('cb-pause').style.display = 'none';
+  document.getElementById('cb-skip').style.display  = 'none';
+  document.getElementById('cb-pause').textContent   = '⏸ Pause';
+}
 </script>
 </body>
 </html>
