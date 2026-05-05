@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/theme.css">
+  <style>
+    .stretch-grid { display:grid; grid-template-columns: 1fr 360px; gap:20px; }
+    @media (max-width: 980px) { .stretch-grid { grid-template-columns: 1fr; } }
+    .builder-shell { background:#111; border:1px solid #1e1e1e; border-radius:14px; padding:24px; }
+    .builder-list { min-height:48px; margin:16px 0; }
+    .builder-item { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; background:#0d0d0d; border:1px solid #252525; border-radius:10px; padding:10px 12px; margin-bottom:8px; }
+    .builder-item-name { color:#e8e8e8; font-weight:600; font-size:0.92rem; }
+    .builder-item-meta { color:#666; font-size:0.74rem; margin-top:3px; }
+    .builder-chip { display:inline-block; background:#151515; border:1px solid #242424; border-radius:999px; padding:3px 8px; color:#888; font-size:0.7rem; margin:2px 4px 0 0; }
+    .template-card { background:#111; border:1px solid #1e1e1e; border-radius:12px; margin-bottom:12px; overflow:hidden; }
+    .template-header { display:flex; justify-content:space-between; gap:10px; align-items:flex-start; padding:14px 16px; background:#141414; }
+    .template-name { color:#e8e8e8; font-weight:700; }
+    .template-notes { color:#777; font-size:0.8rem; margin-top:4px; }
+    .template-body { padding:12px 16px 16px; }
+    .template-row { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; padding:8px 0; border-bottom:1px solid #181818; }
+    .template-row:last-child { border-bottom:none; }
+    .template-row-name { color:#ddd; font-size:0.86rem; font-weight:500; }
+    .template-row-meta { color:#666; font-size:0.72rem; margin-top:2px; }
+    .type-pill { display:inline-block; padding:3px 10px; border-radius:999px; font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; }
+    .type-warmup { background:#3a1e0d; color:#ff9c62; }
+    .type-stretching { background:#10283a; color:#7fcbff; }
+    .type-cooldown { background:#1f1d35; color:#b7a7ff; }
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.82); z-index:100; align-items:center; justify-content:center; }
+    .modal-overlay.open { display:flex; }
+    .modal { background:#111; border:1px solid #222; border-radius:14px; padding:24px; width:min(560px,95vw); max-height:85vh; overflow-y:auto; }
+    .search-input { width:100%; background:#0d0d0d; border:1px solid #2a2a2a; border-radius:8px; padding:10px 14px; color:#e8e8e8; font-size:0.95rem; margin-bottom:12px; }
+    .search-input:focus { outline:none; border-color:#2ecc71; }
+    .cat-tabs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px; }
+    .cat-tab { padding:4px 12px; border-radius:20px; border:1px solid #2a2a2a; background:#0d0d0d; color:#888; font-size:0.78rem; cursor:pointer; }
+    .cat-tab.active { background:#1a2a1a; border-color:#2ecc71; color:#2ecc71; }
+    .ex-list { list-style:none; }
+    .ex-list li { padding:10px 12px; border-radius:8px; cursor:pointer; border:1px solid transparent; margin-bottom:4px; }
+    .ex-list li:hover { background:#1a1a1a; border-color:#2a2a2a; }
+    .ex-name { font-weight:500; color:#e8e8e8; font-size:0.9rem; }
+    .ex-tags { font-size:0.72rem; color:#555; margin-top:2px; }
+  </style>
+</head>
+<body>
+<%- include('partials/nav') %>
+
+<div class="container" style="padding-top:24px">
+  <div class="stretch-grid">
+    <div>
+      <div class="builder-shell">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+          <div>
+            <h2 style="margin:0">🧘 Stretch Builder</h2>
+            <p style="margin-top:6px;color:#777">Build warmups, cooldowns, or standalone stretching flows with exercise cards.</p>
+          </div>
+          <button class="btn" onclick="resetBuilder()">New Routine</button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 180px;gap:12px;margin-top:16px">
+          <div>
+            <label style="display:block;font-size:0.78rem;color:#888;margin-bottom:5px">Routine Name</label>
+            <input type="text" id="routine-name" class="search-input" style="margin:0" placeholder="e.g. Fight Warmup, Evening Mobility">
+          </div>
+          <div>
+            <label style="display:block;font-size:0.78rem;color:#888;margin-bottom:5px">Routine Type</label>
+            <select id="routine-type" style="width:100%;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:8px;padding:10px 12px;color:#e8e8e8;font-size:0.9rem">
+              <option value="warmup">🔥 Warmup</option>
+              <option value="stretching">🧘 Stretching</option>
+              <option value="cooldown">❄️ Cooldown</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="margin-top:12px">
+          <label style="display:block;font-size:0.78rem;color:#888;margin-bottom:5px">Notes</label>
+          <textarea id="routine-notes" rows="2" style="width:100%;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:8px;padding:10px 12px;color:#e8e8e8;resize:vertical" placeholder="When to use this flow, pace, breathing cues..."></textarea>
+        </div>
+
+        <div class="builder-list" id="builder-list"></div>
+
+        <button class="btn" style="width:100%;border-style:dashed;padding:12px" onclick="openPicker()">+ Add Stretch / Warmup Card</button>
+
+        <div style="display:flex;gap:10px;margin-top:14px">
+          <button class="btn" style="flex:1;background:#1a1a1a;color:#aaa;border-color:#2a2a2a" onclick="resetBuilder()">Clear</button>
+          <button class="btn" style="flex:1" onclick="saveRoutine()">Save Routine</button>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h3 style="margin-bottom:14px;color:#e8e8e8">Saved Stretch Routines</h3>
+      <div id="saved-routines">
+        <% if (!routines.length) { %>
+          <div class="card"><p style="color:#555;font-size:0.9rem">No stretch routines yet. Build one on the left.</p></div>
+        <% } %>
+        <% routines.forEach(routine => { %>
+          <div class="template-card" id="routine-<%= routine.id %>">
+            <div class="template-header">
+              <div>
+                <span class="type-pill type-<%= routine.type %>"><%= routine.type %></span>
+                <div class="template-name" style="margin-top:8px"><%= routine.name %></div>
+                <% if (routine.notes) { %><div class="template-notes"><%= routine.notes %></div><% } %>
+              </div>
+              <button onclick="deleteRoutine(<%= routine.id %>)" style="background:none;border:none;color:#555;cursor:pointer;font-size:0.9rem">🗑</button>
+            </div>
+            <div class="template-body">
+              <% routine.itemsList.forEach(item => { %>
+                <div class="template-row">
+                  <div>
+                    <div class="template-row-name"><%= item.name %></div>
+                    <div class="template-row-meta">
+                      <% if (item.sets) { %><%= item.sets %> sets<% } %>
+                      <% if (item.reps) { %> · <%= item.reps %> reps<% } %>
+                      <% if (item.duration) { %> · <%= item.duration %> sec<% } %>
+                      <% if (item.notes) { %> · <%= item.notes %><% } %>
+                    </div>
+                  </div>
+                  <% if (item.mediaUrl) { %><a href="<%= item.mediaUrl %>" target="_blank" rel="noopener" style="font-size:0.72rem">Guide</a><% } %>
+                </div>
+              <% }) %>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="picker-modal">
+  <div class="modal">
+    <h3>Add Mobility Card</h3>
+    <input type="text" id="picker-search" class="search-input" placeholder="Search stretches, warmups, recovery drills..." oninput="renderPickerList()">
+    <div class="cat-tabs" id="picker-type-tabs">
+      <div class="cat-tab active" data-type="">All</div>
+      <div class="cat-tab" data-type="warmup">Warmup</div>
+      <div class="cat-tab" data-type="stretching">Stretching</div>
+      <div class="cat-tab" data-type="cooldown">Cooldown</div>
+      <div class="cat-tab" data-type="recovery">Recovery</div>
+    </div>
+    <ul class="ex-list" id="picker-list" style="max-height:320px;overflow-y:auto"></ul>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <input type="text" id="picker-custom" class="search-input" style="margin:0;flex:1" placeholder="Or type a custom drill name...">
+      <button class="btn" onclick="addCustomCard()">Add</button>
+    </div>
+    <button class="btn" style="width:100%;margin-top:10px;background:#1a1a1a;color:#aaa;border-color:#2a2a2a" onclick="closePicker()">Cancel</button>
+  </div>
+</div>
+
+<script>
+const EXERCISE_LIBRARY = <%- JSON.stringify(exerciseLibrary) %>;
+let routineItems = [];
+let pickerType = '';
+
+function resetBuilder() {
+  routineItems = [];
+  document.getElementById('routine-name').value = '';
+  document.getElementById('routine-type').value = 'warmup';
+  document.getElementById('routine-notes').value = '';
+  renderRoutineItems();
+}
+
+function renderRoutineItems() {
+  const container = document.getElementById('builder-list');
+  if (!routineItems.length) {
+    container.innerHTML = '<p style="color:#555;font-size:0.88rem;text-align:center;padding:18px 0">No cards yet. Add dynamic prep, cooldown, or mobility drills.</p>';
+    return;
+  }
+  container.innerHTML = routineItems.map((item, index) => `
+    <div class="builder-item">
+      <div style="flex:1">
+        <div class="builder-item-name">${item.name}</div>
+        <div class="builder-item-meta">${item.instructions || 'No setup notes yet.'}</div>
+        <div style="margin-top:6px">
+          <span class="builder-chip">${item.sets || 1} sets</span>
+          ${item.reps ? `<span class="builder-chip">${item.reps} reps</span>` : ''}
+          ${item.duration ? `<span class="builder-chip">${item.duration} sec</span>` : ''}
+          ${item.notes ? `<span class="builder-chip">${item.notes}</span>` : ''}
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <button onclick="editCard(${index})" style="background:none;border:none;color:#777;cursor:pointer">✎</button>
+        <button onclick="removeCard(${index})" style="background:none;border:none;color:#555;cursor:pointer">✕</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openPicker() {
+  pickerType = '';
+  document.getElementById('picker-search').value = '';
+  document.querySelectorAll('#picker-type-tabs .cat-tab').forEach((tab, index) => tab.classList.toggle('active', index === 0));
+  renderPickerList();
+  document.getElementById('picker-modal').classList.add('open');
+}
+
+function closePicker() {
+  document.getElementById('picker-modal').classList.remove('open');
+}
+
+document.getElementById('picker-type-tabs').addEventListener('click', event => {
+  const tab = event.target.closest('[data-type]');
+  if (!tab) return;
+  document.querySelectorAll('#picker-type-tabs .cat-tab').forEach(node => node.classList.remove('active'));
+  tab.classList.add('active');
+  pickerType = tab.dataset.type;
+  renderPickerList();
+});
+
+function renderPickerList() {
+  const query = document.getElementById('picker-search').value.trim().toLowerCase();
+  const list = document.getElementById('picker-list');
+  let filtered = EXERCISE_LIBRARY.filter(item => ['recovery', 'bodyweight', 'conditioning', 'mma', 'bjj', 'muay_thai', 'cardio', 'strength'].includes(item.category));
+  if (pickerType === 'stretching') filtered = filtered.filter(item => item.category === 'recovery');
+  if (pickerType === 'warmup') filtered = filtered.filter(item => ['conditioning', 'bodyweight', 'mma', 'bjj', 'muay_thai'].includes(item.category));
+  if (pickerType === 'cooldown') filtered = filtered.filter(item => item.category === 'recovery');
+  if (pickerType === 'recovery') filtered = filtered.filter(item => item.category === 'recovery');
+  if (query) filtered = filtered.filter(item => item.name.toLowerCase().includes(query));
+  list.innerHTML = filtered.slice(0, 40).map(item => `
+    <li onclick="addLibraryCard(${item.id})">
+      <div class="ex-name">${item.name}</div>
+      <div class="ex-tags">${item.category} · ${item.equipment} · ${item.defaultDuration ? item.defaultDuration + ' sec' : (item.defaultReps ? item.defaultReps + ' reps' : 'guided drill')}</div>
+    </li>
+  `).join('');
+}
+
+function addLibraryCard(id) {
+  const item = EXERCISE_LIBRARY.find(entry => entry.id === id);
+  if (!item) return;
+  routineItems.push({
+    name: item.name,
+    duration: item.defaultDuration || null,
+    reps: item.defaultReps || null,
+    sets: item.defaultSets || 1,
+    notes: null,
+    exerciseId: item.id,
+    instructions: item.instructions || null,
+    mediaUrl: item.videoUrl || null,
+  });
+  closePicker();
+  renderRoutineItems();
+}
+
+function addCustomCard() {
+  const input = document.getElementById('picker-custom');
+  const name = input.value.trim();
+  if (!name) return;
+  routineItems.push({ name, duration: null, reps: null, sets: 1, notes: null, exerciseId: null, instructions: null, mediaUrl: null });
+  input.value = '';
+  closePicker();
+  renderRoutineItems();
+}
+
+function editCard(index) {
+  const item = routineItems[index];
+  const sets = prompt('Sets', item.sets || 1);
+  if (sets === null) return;
+  const reps = prompt('Reps (leave blank for timed drills)', item.reps || '');
+  if (reps === null) return;
+  const duration = prompt('Duration in seconds (leave blank for rep-based drills)', item.duration || '');
+  if (duration === null) return;
+  const notes = prompt('Notes / cue', item.notes || '');
+  if (notes === null) return;
+  item.sets = parseInt(sets) || 1;
+  item.reps = reps ? parseInt(reps) || null : null;
+  item.duration = duration ? parseInt(duration) || null : null;
+  item.notes = notes.trim() || null;
+  renderRoutineItems();
+}
+
+function removeCard(index) {
+  routineItems.splice(index, 1);
+  renderRoutineItems();
+}
+
+async function saveRoutine() {
+  const name = document.getElementById('routine-name').value.trim();
+  const type = document.getElementById('routine-type').value;
+  const notes = document.getElementById('routine-notes').value.trim();
+  if (!name) return alert('Name the routine first.');
+  if (!routineItems.length) return alert('Add at least one card.');
+
+  const response = await fetch('/stretch/api/routines', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, type, notes, items: routineItems }),
+  });
+  const result = await response.json();
+  if (!result.success) return alert(result.message || 'Could not save routine.');
+  window.location.reload();
+}
+
+async function deleteRoutine(id) {
+  if (!confirm('Delete this stretch routine?')) return;
+  await fetch('/stretch/api/routines/' + id, { method: 'DELETE' });
+  const card = document.getElementById('routine-' + id);
+  if (card) card.remove();
+}
+
+resetBuilder();
+</script>
+</body>
+</html>

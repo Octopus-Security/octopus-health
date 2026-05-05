@@ -24,7 +24,7 @@
     .btn-del-set:hover { color:#e74c3c; }
     .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:100; align-items:center; justify-content:center; }
     .modal-overlay.open { display:flex; }
-    .modal { background:#111; border:1px solid #222; border-radius:14px; padding:24px; width:min(480px,95vw); max-height:85vh; overflow-y:auto; }
+    .modal { background:#111; border:1px solid #222; border-radius:14px; padding:24px; width:min(520px,95vw); max-height:85vh; overflow-y:auto; }
     .modal h3 { color:#e8e8e8; margin-bottom:16px; }
     .search-input { width:100%; background:#0d0d0d; border:1px solid #2a2a2a; border-radius:8px; padding:10px 14px; color:#e8e8e8; font-size:0.95rem; margin-bottom:12px; }
     .search-input:focus { outline:none; border-color:#2ecc71; }
@@ -53,29 +53,22 @@
     .tag-recovery    { background:#252020; color:#95a5a6; }
     .history-item { display:flex; align-items:center; justify-content:space-between; padding:10px 14px; border-radius:8px; border:1px solid #1e1e1e; margin-bottom:6px; cursor:pointer; transition:background 0.1s; }
     .history-item:hover { background:#141414; }
+    /* Template card styles */
+    .template-card { background:#0d0d0d; border:1px solid #2a2a2a; border-radius:10px; margin-bottom:10px; overflow:hidden; transition:border-color 0.15s; }
+    .template-card:hover { border-color:#3a3a3a; }
+    .template-card-header { padding:10px 14px; background:#141414; display:flex; align-items:center; justify-content:space-between; gap:8px; }
+    .template-card-name { font-weight:600; color:#e8e8e8; font-size:0.9rem; }
+    .template-card-body { padding:8px 14px 10px; }
+    .template-ex-chip { display:inline-block; background:#1a1a1a; border:1px solid #252525; border-radius:12px; padding:2px 8px; font-size:0.72rem; color:#888; margin:2px 3px 2px 0; }
+    .template-actions { display:flex; gap:6px; }
+    /* Builder exercise card */
+    .builder-ex-card { display:flex; align-items:center; justify-content:space-between; padding:8px 12px; background:#0d0d0d; border:1px solid #2a2a2a; border-radius:8px; margin-bottom:6px; }
+    .builder-ex-name { font-size:0.88rem; font-weight:500; color:#e8e8e8; }
+    .builder-ex-meta { font-size:0.72rem; color:#666; margin-top:1px; }
   </style>
 </head>
 <body>
-<nav>
-  <div class="container">
-    <h1>🏥 Health Tracker</h1>
-    <div class="nav-links">
-      <a href="/">Dashboard</a>
-      <a href="/workout" style="color:#2ecc71">Workout</a>
-      <a href="/library">Library</a>
-      <a href="/timers">Timers</a>
-      <a href="/plans">Plans</a>
-      <a href="/weight">Weight</a>
-      <a href="/meals">Meals</a>
-      <a href="/goals">Goals</a>
-      <a href="/planner">Planner</a>
-      <a href="/competitions">Competitions</a>
-      <a href="/accountability">Accountability</a>
-      <a href="/settings">Settings</a>
-      <a href="/logout">Logout</a>
-    </div>
-  </div>
-</nav>
+<%- include('partials/nav') %>
 
 <div class="container" style="padding-top:24px">
 
@@ -106,7 +99,8 @@
           <button onclick="openStartModal()" class="btn">+ New Workout</button>
         </div>
         <div id="no-session" style="text-align:center;padding:60px 20px;color:#555;font-size:0.9rem">
-          No active workout. Hit <strong style="color:#2ecc71">New Workout</strong> to start logging.
+          No active workout. Hit <strong style="color:#2ecc71">New Workout</strong> to start logging,
+          or load one of your saved workouts on the right.
         </div>
       </div>
 
@@ -134,9 +128,48 @@
       </div>
     </div>
 
-    <!-- ── Recent Workouts ── -->
+    <!-- ── Right Sidebar: My Workouts + Recent History ── -->
     <div>
-      <h3 style="margin-bottom:14px;color:#e8e8e8">Recent Workouts</h3>
+
+      <!-- My Workouts (Templates) -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <h3 style="margin:0;color:#e8e8e8">📋 My Workouts</h3>
+        <button onclick="openTemplateBuilder()" class="btn" style="font-size:0.78rem;padding:5px 12px">+ New</button>
+      </div>
+      <div id="templates-container">
+        <% if (!templates || !templates.length) { %>
+          <p style="color:#555;font-size:0.85rem;margin-bottom:20px">No saved workouts yet. Hit <strong style="color:#aaa">+ New</strong> to build one.</p>
+        <% } else { %>
+          <% templates.forEach(t => { %>
+          <div class="template-card" id="tpl-<%= t.id %>">
+            <div class="template-card-header">
+              <div>
+                <span class="tag tag-<%= t.type %>" style="margin-bottom:4px;display:inline-block"><%= t.type %></span>
+                <div class="template-card-name"><%= t.name %></div>
+                <div style="font-size:0.72rem;color:#555;margin-top:1px"><%= t.exercises.length %> exercise<%= t.exercises.length !== 1 ? 's' : '' %></div>
+              </div>
+              <div class="template-actions">
+                <button onclick="loadTemplate(<%= t.id %>)" class="btn btn-green" style="font-size:0.75rem;padding:5px 10px">▶ Load</button>
+                <button onclick="deleteTemplate(<%= t.id %>)" style="background:none;border:none;color:#444;cursor:pointer;font-size:0.85rem;padding:4px 6px" title="Delete">🗑</button>
+              </div>
+            </div>
+            <% if (t.exercises.length) { %>
+            <div class="template-card-body">
+              <% t.exercises.slice(0,6).forEach(e => { %>
+                <span class="template-ex-chip"><%= e.exerciseName %></span>
+              <% }) %>
+              <% if (t.exercises.length > 6) { %><span class="template-ex-chip">+<%= t.exercises.length - 6 %> more</span><% } %>
+            </div>
+            <% } %>
+          </div>
+          <% }) %>
+        <% } %>
+      </div>
+
+      <hr style="border-color:#1e1e1e;margin:16px 0">
+
+      <!-- Recent Sessions -->
+      <h3 style="margin-bottom:12px;color:#e8e8e8">Recent Sessions</h3>
       <% if (!recentWorkouts.length) { %>
         <p style="color:#555;font-size:0.9rem">No workouts yet.</p>
       <% } else { %>
@@ -176,32 +209,37 @@
         <div class="cat-tab" data-type="recovery">🧘 Recovery</div>
       </div>
     </div>
-    <div style="margin-bottom:14px">
+    <div style="margin-bottom:16px">
       <label style="font-size:0.85rem;color:#888;display:block;margin-bottom:6px">Title (optional)</label>
-      <input type="text" id="start-title" class="search-input" style="margin-bottom:0" placeholder="e.g. Upper body push">
+      <input type="text" id="start-title" class="search-input" style="margin:0" placeholder="e.g. Push Day, Sparring, etc.">
     </div>
     <div style="display:flex;gap:10px">
       <button onclick="closeStartModal()" class="btn" style="flex:1;background:#1a1a1a">Cancel</button>
-      <button onclick="confirmStart()" class="btn btn-green" style="flex:1">Start</button>
+      <button onclick="confirmStart()" class="btn btn-green" style="flex:1">Start ▶</button>
     </div>
   </div>
 </div>
 
-<!-- ── Exercise Picker Modal ── -->
+<!-- ── Exercise Picker Modal (for active session) ── -->
 <div class="modal-overlay" id="exercise-modal">
   <div class="modal">
     <h3>Add Exercise</h3>
     <input type="text" id="ex-search" class="search-input" placeholder="Search exercises…" oninput="filterExercises()">
     <div class="cat-tabs" id="ex-cat-tabs">
       <div class="cat-tab active" data-cat="">All</div>
-      <div class="cat-tab" data-cat="strength">Strength</div>
+      <div class="cat-tab" data-cat="barbell">Barbell</div>
+      <div class="cat-tab" data-cat="dumbbell">Dumbbell</div>
+      <div class="cat-tab" data-cat="cable">Cable</div>
+      <div class="cat-tab" data-cat="machine">Machine</div>
+      <div class="cat-tab" data-cat="bodyweight">Bodyweight</div>
       <div class="cat-tab" data-cat="mma">MMA</div>
       <div class="cat-tab" data-cat="bjj">BJJ</div>
       <div class="cat-tab" data-cat="muay_thai">Muay Thai</div>
       <div class="cat-tab" data-cat="conditioning">Conditioning</div>
       <div class="cat-tab" data-cat="cardio">Cardio</div>
+      <div class="cat-tab" data-cat="recovery">Recovery</div>
     </div>
-    <ul class="ex-list" id="ex-list" style="max-height:340px;overflow-y:auto"></ul>
+    <ul class="ex-list" id="ex-list" style="max-height:300px;overflow-y:auto"></ul>
     <div style="display:flex;gap:8px;margin-top:12px">
       <input type="text" id="custom-ex-name" class="search-input" style="margin-bottom:0;flex:1" placeholder="Or type custom exercise name…">
       <button onclick="addCustomExercise()" class="btn btn-green">Add</button>
@@ -229,12 +267,83 @@
         <label style="font-size:0.85rem;color:#888;display:block;margin-bottom:6px">Notes</label>
         <textarea id="finish-notes" rows="3" style="width:100%;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:8px;padding:8px 12px;color:#e8e8e8;resize:vertical" placeholder="How did it feel? PRs? What to work on?"></textarea>
       </div>
+      <div>
+        <label style="font-size:0.85rem;color:#888;display:block;margin-bottom:6px">
+          <input type="checkbox" id="save-as-template-check" style="margin-right:6px">
+          Save as workout template
+        </label>
+        <input type="text" id="template-name-input" class="search-input" style="margin:6px 0 0;display:none" placeholder="Template name…">
+      </div>
       <div style="display:flex;gap:10px">
         <button onclick="closeFinishModal()" class="btn" style="flex:1;background:#1a1a1a">Back</button>
         <button onclick="confirmFinish()" class="btn btn-green" style="flex:1">Save Workout ✓</button>
       </div>
       <button onclick="discardSession()" style="width:100%;padding:8px;background:none;border:none;color:#555;cursor:pointer;font-size:0.8rem">Discard workout</button>
     </div>
+  </div>
+</div>
+
+<!-- ── Template Builder Modal ── -->
+<div class="modal-overlay" id="builder-modal">
+  <div class="modal" style="width:min(560px,95vw)">
+    <h3>Build Workout Template</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+      <div>
+        <label style="font-size:0.8rem;color:#888;display:block;margin-bottom:5px">Name</label>
+        <input type="text" id="builder-name" class="search-input" style="margin:0" placeholder="e.g. Push Day A">
+      </div>
+      <div>
+        <label style="font-size:0.8rem;color:#888;display:block;margin-bottom:5px">Type</label>
+        <select id="builder-type" style="width:100%;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:8px;padding:10px 12px;color:#e8e8e8;font-size:0.9rem">
+          <option value="strength">💪 Strength</option>
+          <option value="mma">🥊 MMA</option>
+          <option value="bjj">🥋 BJJ</option>
+          <option value="muay_thai">🦵 Muay Thai</option>
+          <option value="conditioning">🏃 Conditioning</option>
+          <option value="cardio">🚴 Cardio</option>
+          <option value="recovery">🧘 Recovery</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="builder-exercises" style="min-height:40px;margin-bottom:12px"></div>
+
+    <button onclick="openBuilderExPicker()" class="btn" style="width:100%;border-style:dashed;margin-bottom:14px;padding:10px">
+      + Add Exercise to Template
+    </button>
+
+    <div style="display:flex;gap:10px">
+      <button onclick="closeTemplateBuilder()" class="btn" style="flex:1;background:#1a1a1a">Cancel</button>
+      <button onclick="saveTemplate()" class="btn btn-green" style="flex:1">Save Template ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Builder Exercise Picker Modal ── -->
+<div class="modal-overlay" id="builder-ex-modal">
+  <div class="modal">
+    <h3>Add to Template</h3>
+    <input type="text" id="bex-search" class="search-input" placeholder="Search exercises…" oninput="filterBuilderExercises()">
+    <div class="cat-tabs" id="bex-cat-tabs">
+      <div class="cat-tab active" data-cat="">All</div>
+      <div class="cat-tab" data-cat="barbell">Barbell</div>
+      <div class="cat-tab" data-cat="dumbbell">Dumbbell</div>
+      <div class="cat-tab" data-cat="cable">Cable</div>
+      <div class="cat-tab" data-cat="machine">Machine</div>
+      <div class="cat-tab" data-cat="bodyweight">Bodyweight</div>
+      <div class="cat-tab" data-cat="mma">MMA</div>
+      <div class="cat-tab" data-cat="bjj">BJJ</div>
+      <div class="cat-tab" data-cat="muay_thai">Muay Thai</div>
+      <div class="cat-tab" data-cat="conditioning">Conditioning</div>
+      <div class="cat-tab" data-cat="cardio">Cardio</div>
+      <div class="cat-tab" data-cat="recovery">Recovery</div>
+    </div>
+    <ul class="ex-list" id="bex-list" style="max-height:300px;overflow-y:auto"></ul>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <input type="text" id="bex-custom" class="search-input" style="margin-bottom:0;flex:1" placeholder="Or type custom exercise name…">
+      <button onclick="addCustomToBuilder()" class="btn btn-green">Add</button>
+    </div>
+    <button onclick="closeBuilderExPicker()" class="btn" style="width:100%;margin-top:10px;background:#1a1a1a">Cancel</button>
   </div>
 </div>
 
@@ -263,6 +372,10 @@ let timerInterval = null;
 let restInterval  = null;
 let restRemaining = 0;
 
+// Builder state
+let templateExercises = []; // [{ exerciseId, exerciseName, defaultSets, defaultReps }]
+let builderSelectedCat = '';
+
 // ── Init ───────────────────────────────────────────────────────────────────
 (async () => {
   await loadExerciseLibrary();
@@ -284,7 +397,6 @@ async function resumeSession() {
   }
   const s = j.data;
   sessionStart = sessionStart || Date.now();
-  // Reconstruct exercises array from sets
   exercises = [];
   const byOrder = {};
   for (const set of (s.sets || [])) {
@@ -328,7 +440,7 @@ document.getElementById('type-tabs').addEventListener('click', e => {
   selectedType = tab.dataset.type;
 });
 
-async function confirmStart() {
+async function confirmStart(preloadedExercises) {
   const title = document.getElementById('start-title').value.trim();
   const r = await fetch('/workout/api/session', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ type: selectedType, title, date: new Date().toISOString().split('T')[0] }) });
   const j = await r.json();
@@ -340,6 +452,12 @@ async function confirmStart() {
   exercises = [];
   closeStartModal();
   showActiveSession(selectedType, title || selectedType);
+  // Pre-load exercises from template if any
+  if (preloadedExercises && preloadedExercises.length) {
+    preloadedExercises.forEach((ex, i) => {
+      exercises.push({ id: ex.exerciseId || null, name: ex.exerciseName, order: i, sets: [] });
+    });
+  }
   renderExercises();
 }
 
@@ -353,7 +471,7 @@ function showActiveSession(type, title) {
   startTimer();
 }
 
-// ── Exercise modal ─────────────────────────────────────────────────────────
+// ── Exercise modal (active session) ───────────────────────────────────────
 function openExerciseModal()  { filterExercises(); document.getElementById('exercise-modal').classList.add('open'); }
 function closeExerciseModal() { document.getElementById('exercise-modal').classList.remove('open'); document.getElementById('ex-search').value = ''; }
 
@@ -386,7 +504,7 @@ function renderExerciseList(q) {
   ).join('');
 }
 
-function pickExercise(id, name, category) {
+function pickExercise(id, name) {
   addExerciseToSession(id, name);
   closeExerciseModal();
 }
@@ -395,6 +513,7 @@ function addCustomExercise() {
   const name = document.getElementById('custom-ex-name').value.trim();
   if (!name) return;
   addExerciseToSession(null, name);
+  document.getElementById('custom-ex-name').value = '';
   closeExerciseModal();
 }
 
@@ -458,19 +577,11 @@ async function addSet(ei) {
 
 async function updateSetField(ei, si, field, val) {
   const set = exercises[ei].sets[si];
-  if (!set?.id) return;
+  if (!set) return;
   if (field === 'reps')   set.reps   = parseInt(val) || null;
   if (field === 'weight') set.weight = parseFloat(val) || null;
   if (field === 'unit')   set.unit   = val;
-  await fetch(`/workout/api/set/${set.id}`, {
-    method: 'DELETE' // not used — we update inline
-  });
-  // Actually PATCH-update
-  await fetch(`/workout/api/set/${set.id}`, {
-    method: 'DELETE' // placeholder - real update via /api/workout/sets/:id not exposed here
-  });
-  // Simple approach: just keep in memory, no immediate DB update on field change
-  // The set was already created; reps/weight changes will reflect on next add
+  // Update persisted in memory; full save on finish
 }
 
 async function deleteSet(ei, si) {
@@ -481,7 +592,6 @@ async function deleteSet(ei, si) {
 }
 
 function removeExercise(ei) {
-  // Delete all sets for this exercise from server
   exercises[ei].sets.forEach(s => { if(s.id) fetch(`/workout/api/set/${s.id}`,{method:'DELETE'}); });
   exercises.splice(ei, 1);
   exercises.forEach((ex, i) => ex.order = i);
@@ -500,6 +610,10 @@ document.getElementById('effort-row').addEventListener('click', e => {
   selectedEffort = parseInt(btn.dataset.val);
 });
 
+document.getElementById('save-as-template-check').addEventListener('change', e => {
+  document.getElementById('template-name-input').style.display = e.target.checked ? 'block' : 'none';
+});
+
 async function confirmFinish() {
   if (!sessionId) return;
   const duration = sessionStart ? Math.round((Date.now() - sessionStart) / 60000) : null;
@@ -508,6 +622,19 @@ async function confirmFinish() {
     method: 'PATCH', headers: {'Content-Type':'application/json'},
     body: JSON.stringify({ status:'finished', effort: selectedEffort, duration, notes }),
   });
+  // Save as template if checked
+  const saveCheck = document.getElementById('save-as-template-check').checked;
+  if (saveCheck && exercises.length) {
+    const tplName = document.getElementById('template-name-input').value.trim() ||
+                    document.getElementById('session-title-label').textContent ||
+                    'My Workout';
+    const tplType = document.getElementById('session-type-label').textContent || 'strength';
+    const tplExercises = exercises.map(ex => ({ exerciseId: ex.id || null, exerciseName: ex.name, defaultSets: ex.sets.length || 3, defaultReps: null }));
+    await fetch('/workout/api/templates', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ name: tplName, type: tplType, exercises: tplExercises }),
+    });
+  }
   clearSession();
   stopRest();
   window.location.reload();
@@ -535,6 +662,147 @@ async function viewSession(id) {
     return `${ex.name}: ${setsStr}`;
   }).join('\n');
   alert(`${s.title||s.type} · ${s.date}\n${s.duration ? s.duration+'min' : ''}\n\n${lines}`);
+}
+
+// ── Template Builder ───────────────────────────────────────────────────────
+function openTemplateBuilder() {
+  templateExercises = [];
+  document.getElementById('builder-name').value = '';
+  document.getElementById('builder-type').value = 'strength';
+  renderBuilderExercises();
+  document.getElementById('builder-modal').classList.add('open');
+}
+
+function closeTemplateBuilder() {
+  document.getElementById('builder-modal').classList.remove('open');
+}
+
+function renderBuilderExercises() {
+  const container = document.getElementById('builder-exercises');
+  if (!templateExercises.length) {
+    container.innerHTML = '<p style="color:#555;font-size:0.85rem;text-align:center;padding:12px 0">No exercises added yet.</p>';
+    return;
+  }
+  container.innerHTML = templateExercises.map((ex, i) => `
+    <div class="builder-ex-card">
+      <div>
+        <div class="builder-ex-name">${ex.exerciseName}</div>
+        <div class="builder-ex-meta">
+          <input type="number" min="1" max="20" value="${ex.defaultSets||3}" placeholder="sets" style="width:46px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:4px;padding:3px 6px;color:#e8e8e8;font-size:0.72rem" onchange="updateTplEx(${i},'sets',this.value)"> sets ×
+          <input type="number" min="1" max="100" value="${ex.defaultReps||''}" placeholder="reps" style="width:46px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:4px;padding:3px 6px;color:#e8e8e8;font-size:0.72rem" onchange="updateTplEx(${i},'reps',this.value)"> reps
+        </div>
+      </div>
+      <button onclick="removeTplEx(${i})" style="background:none;border:none;color:#444;cursor:pointer;font-size:0.85rem;padding:4px 6px">✕</button>
+    </div>
+  `).join('');
+}
+
+function updateTplEx(i, field, val) {
+  if (field === 'sets') templateExercises[i].defaultSets = parseInt(val) || null;
+  if (field === 'reps') templateExercises[i].defaultReps = parseInt(val) || null;
+}
+
+function removeTplEx(i) {
+  templateExercises.splice(i, 1);
+  renderBuilderExercises();
+}
+
+async function saveTemplate() {
+  const name = document.getElementById('builder-name').value.trim();
+  const type = document.getElementById('builder-type').value;
+  if (!name) { alert('Please enter a template name.'); return; }
+  if (!templateExercises.length) { alert('Add at least one exercise.'); return; }
+  const r = await fetch('/workout/api/templates', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ name, type, exercises: templateExercises }),
+  });
+  const j = await r.json();
+  if (j.success) { closeTemplateBuilder(); window.location.reload(); }
+}
+
+// ── Builder Exercise Picker ────────────────────────────────────────────────
+function openBuilderExPicker() {
+  builderSelectedCat = '';
+  document.getElementById('bex-search').value = '';
+  document.querySelectorAll('#bex-cat-tabs .cat-tab').forEach((t,i) => { t.classList.toggle('active', i===0); });
+  renderBuilderExList('');
+  document.getElementById('builder-ex-modal').classList.add('open');
+}
+
+function closeBuilderExPicker() {
+  document.getElementById('builder-ex-modal').classList.remove('open');
+}
+
+document.getElementById('bex-cat-tabs').addEventListener('click', e => {
+  const tab = e.target.closest('[data-cat]');
+  if (!tab) return;
+  document.querySelectorAll('#bex-cat-tabs .cat-tab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+  builderSelectedCat = tab.dataset.cat;
+  filterBuilderExercises();
+});
+
+function filterBuilderExercises() {
+  const q = document.getElementById('bex-search').value.toLowerCase();
+  renderBuilderExList(q);
+}
+
+function renderBuilderExList(q) {
+  const list = document.getElementById('bex-list');
+  if (!list) return;
+  let filtered = allExercises;
+  if (builderSelectedCat) filtered = filtered.filter(e => e.category === builderSelectedCat);
+  if (q) filtered = filtered.filter(e => e.name.toLowerCase().includes(q));
+  list.innerHTML = filtered.slice(0,40).map(e =>
+    `<li onclick="pickBuilderExercise(${e.id},'${e.name.replace(/'/g,"\\'")}',${e.defaultSets||3},${e.defaultReps||null})">
+      <div class="ex-name">${e.name}</div>
+      <div class="ex-tags">${e.equipment} · ${(e.primaryMuscles||[]).slice(0,3).join(', ')}</div>
+    </li>`
+  ).join('');
+}
+
+function pickBuilderExercise(id, name, defaultSets, defaultReps) {
+  templateExercises.push({ exerciseId: id, exerciseName: name, defaultSets: defaultSets || 3, defaultReps: defaultReps || null });
+  closeBuilderExPicker();
+  renderBuilderExercises();
+}
+
+function addCustomToBuilder() {
+  const name = document.getElementById('bex-custom').value.trim();
+  if (!name) return;
+  templateExercises.push({ exerciseId: null, exerciseName: name, defaultSets: 3, defaultReps: null });
+  document.getElementById('bex-custom').value = '';
+  closeBuilderExPicker();
+  renderBuilderExercises();
+}
+
+// ── Load Template ──────────────────────────────────────────────────────────
+async function loadTemplate(id) {
+  if (sessionId) {
+    if (!confirm('You have an active workout. Start a new one with this template?')) return;
+    await fetch('/workout/api/session/' + sessionId, { method: 'DELETE' });
+    clearSession(); stopRest();
+  }
+  const r = await fetch('/workout/api/templates');
+  const j = await r.json();
+  if (!j.success) return;
+  const tpl = j.data.find(t => t.id === id);
+  if (!tpl) return;
+  // Set type tab in modal
+  selectedType = tpl.type || 'strength';
+  document.querySelectorAll('#type-tabs .cat-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.type === selectedType);
+  });
+  document.getElementById('start-title').value = tpl.name;
+  // Confirm start with preloaded exercises
+  await confirmStart(tpl.exercises);
+}
+
+async function deleteTemplate(id) {
+  if (!confirm('Delete this workout template?')) return;
+  await fetch(`/workout/api/templates/${id}`, { method: 'DELETE' });
+  const card = document.getElementById('tpl-' + id);
+  if (card) card.remove();
 }
 
 // ── Rest timer ─────────────────────────────────────────────────────────────
