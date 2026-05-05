@@ -3,17 +3,20 @@ FROM node:18-alpine
 # Set working directory
 WORKDIR /usr/src/app
 
-# Copy package files
+# sqlite3 requires native compilation on alpine
+RUN apk add --no-cache python3 make g++
+
+# Copy package files first to maximize Docker layer cache hits
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install --production
+# Install production dependencies (builds sqlite3 from source)
+RUN npm install --omit=dev --no-audit --no-fund
 
 # Copy application code
-COPY . .
+COPY --chown=node:node . .
 
-# Create data directory
-RUN mkdir -p /usr/src/app/data && chown -R node:node /usr/src/app
+# Ensure runtime data dir exists and is writable
+RUN mkdir -p /usr/src/app/data && chown -R node:node /usr/src/app/data
 
 # Switch to non-root user
 USER node

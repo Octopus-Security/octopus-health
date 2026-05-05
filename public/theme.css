@@ -38,6 +38,11 @@ nav a {
     transition: background 0.2s, color 0.2s;
 }
 nav a:hover { background: #1a1a1a; color: #2ecc71; }
+nav a.active {
+    background: #162d1e;
+    color: #2ecc71;
+    border: 1px solid #2a5c3a;
+}
 
 /* ── Layout ────────────────────────────────────────────────── */
 .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
