@@ -18,7 +18,7 @@ const AUTH_EXTERNAL_URL = 'https://auth.octopustechnology.net';
 function getActiveTab(requestPath) {
     if (requestPath === '/') return 'dashboard';
     if (requestPath.startsWith('/tools') || requestPath.startsWith('/timers')) return 'tools';
-    if (requestPath.startsWith('/exercises') || requestPath.startsWith('/library') || requestPath.startsWith('/exercise') || requestPath.startsWith('/workout')) return 'exercises';
+    if (requestPath.startsWith('/exercises') || requestPath.startsWith('/library') || requestPath.startsWith('/exercise') || requestPath.startsWith('/workout') || requestPath.startsWith('/plan-maker')) return 'exercises';
     if (requestPath.startsWith('/stretch') || requestPath.startsWith('/routines')) return 'stretch';
     if (requestPath.startsWith('/nutrition') || requestPath.startsWith('/meals')) return 'nutrition';
     if (requestPath.startsWith('/weight')) return 'weight';
@@ -964,6 +964,22 @@ app.get('/library', requireLogin, async (req, res) => {
         secondaryMuscles: JSON.parse(e.secondaryMuscles || '[]'),
     }));
     res.render('library', { title: 'Exercise Library', user: req.session.user, exercises });
+});
+
+// ── Exercise Plan Maker ───────────────────────────────────────────────────────
+
+app.get('/plan-maker', requireLogin, async (req, res) => {
+    const { ExerciseDefinition, ExercisePlan, sequelize } = getDatabase(req.session.user.username);
+    await sequelize.sync();
+    const all = await ExerciseDefinition.findAll({ order: [['category','ASC'],['name','ASC']] });
+    const exercises = all.map(e => ({
+        ...e.toJSON(),
+        primaryMuscles:   JSON.parse(e.primaryMuscles   || '[]'),
+        secondaryMuscles: JSON.parse(e.secondaryMuscles || '[]'),
+    }));
+    const rawPlans = await ExercisePlan.findAll({ order: [['updatedAt','DESC']] });
+    const plans = rawPlans.map(p => ({ ...p.toJSON(), items: JSON.parse(p.items || '[]') }));
+    res.render('plan-maker', { title: 'Plan Maker', user: req.session.user, exercises, plans });
 });
 
 // ── Timers ────────────────────────────────────────────────────────────────────

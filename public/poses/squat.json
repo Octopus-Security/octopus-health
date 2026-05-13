@@ -1,0 +1,50 @@
+{
+  "title": "Deep Squat",
+  "loop": true,
+  "frames": [
+    {
+      "duration": 2500,
+      "ease": "ease-in-out",
+      "label": "Stand",
+      "joints": {
+        "head":      { "x": 50, "y": 8  },
+        "neck":      { "x": 50, "y": 15 },
+        "spine":     { "x": 50, "y": 44 },
+        "shoulderL": { "x": 57, "y": 21 },
+        "shoulderR": { "x": 43, "y": 21 },
+        "elbowL":    { "x": 61, "y": 33 },
+        "elbowR":    { "x": 39, "y": 33 },
+        "handL":     { "x": 63, "y": 45 },
+        "handR":     { "x": 37, "y": 45 },
+        "hipL":      { "x": 54, "y": 52 },
+        "hipR":      { "x": 46, "y": 52 },
+        "kneeL":     { "x": 55, "y": 70 },
+        "kneeR":     { "x": 45, "y": 70 },
+        "footL":     { "x": 57, "y": 92 },
+        "footR":     { "x": 43, "y": 92 }
+      }
+    },
+    {
+      "duration": 2500,
+      "ease": "ease-in-out",
+      "label": "Deep Squat",
+      "joints": {
+        "head":      { "x": 50, "y": 43 },
+        "neck":      { "x": 50, "y": 50 },
+        "spine":     { "x": 50, "y": 67 },
+        "shoulderL": { "x": 59, "y": 56 },
+        "shoulderR": { "x": 42, "y": 56 },
+        "elbowL":    { "x": 68, "y": 68 },
+        "elbowR":    { "x": 33, "y": 68 },
+        "handL":     { "x": 69, "y": 80 },
+        "handR":     { "x": 32, "y": 80 },
+        "hipL":      { "x": 56, "y": 74 },
+        "hipR":      { "x": 44, "y": 74 },
+        "kneeL":     { "x": 67, "y": 83 },
+        "kneeR":     { "x": 33, "y": 83 },
+        "footL":     { "x": 64, "y": 92 },
+        "footR":     { "x": 36, "y": 92 }
+      }
+    }
+  ]
+}

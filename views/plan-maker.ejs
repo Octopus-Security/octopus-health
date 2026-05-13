@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/theme.css">
+  <style>
+    .pm-layout { display:grid; grid-template-columns:1fr 420px; gap:20px; align-items:start; }
+    @media (max-width:900px) { .pm-layout { grid-template-columns:1fr; } }
+
+    /* Left — exercise picker */
+    .picker-head { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
+    .picker-head input { flex:1; min-width:160px; background:#0d0d0d; border:1px solid #2a2a2a; border-radius:8px; padding:7px 12px; color:#e8e8e8; font-size:0.85rem; outline:none; }
+    .picker-head input:focus { border-color:#2ecc71; }
+    .picker-head select { background:#0d0d0d; border:1px solid #2a2a2a; border-radius:8px; padding:7px 10px; color:#e8e8e8; font-size:0.85rem; outline:none; }
+
+    .cat-tabs { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:12px; }
+    .cat-tab { padding:4px 12px; border-radius:16px; border:1px solid #2a2a2a; background:#0d0d0d; color:#666; font-size:0.75rem; cursor:pointer; transition:all 0.12s; }
+    .cat-tab.active { background:#1a2a1a; border-color:#2ecc71; color:#2ecc71; }
+
+    .ex-list { display:flex; flex-direction:column; gap:6px; max-height:60vh; overflow-y:auto; padding-right:4px; }
+    .ex-row {
+      display:flex; align-items:center; gap:10px;
+      background:#0d0d0d; border:1px solid #1e1e1e; border-radius:8px;
+      padding:8px 12px; cursor:pointer; transition:border-color 0.12s;
+    }
+    .ex-row:hover { border-color:#2ecc71; }
+    .ex-row-name { flex:1; font-size:0.85rem; color:#ddd; }
+    .ex-row-cat { font-size:0.68rem; padding:2px 7px; border-radius:4px; font-weight:600; text-transform:uppercase; }
+    .ex-row-add { font-size:1rem; color:#2ecc71; opacity:0.7; transition:opacity 0.1s; }
+    .ex-row:hover .ex-row-add { opacity:1; }
+
+    :root {
+      --c-strength:#5b9bd5; --c-conditioning:#2ecc71; --c-cardio:#1abc9c;
+      --c-mma:#e07b54; --c-bjj:#9b59b6; --c-muay_thai:#e74c3c; --c-recovery:#95a5a6;
+    }
+    .tag-strength    { background:#1a2a4a; color:var(--c-strength); }
+    .tag-conditioning{ background:#1a2a1a; color:var(--c-conditioning); }
+    .tag-cardio      { background:#1a2520; color:var(--c-cardio); }
+    .tag-mma         { background:#2a1a1a; color:var(--c-mma); }
+    .tag-bjj         { background:#1a1a2a; color:var(--c-bjj); }
+    .tag-muay_thai   { background:#2a1a1a; color:var(--c-muay_thai); }
+    .tag-recovery    { background:#252020; color:var(--c-recovery); }
+
+    /* Right — plan builder */
+    .plan-panel { background:#0a0a0a; border:1px solid #222; border-radius:12px; padding:16px; position:sticky; top:80px; }
+    .plan-header { margin-bottom:14px; }
+    .plan-header input { width:100%; background:#111; border:1px solid #2a2a2a; border-radius:8px; padding:8px 12px; color:#e8e8e8; font-size:0.95rem; font-weight:600; outline:none; box-sizing:border-box; }
+    .plan-header input:focus { border-color:#2ecc71; }
+    .plan-type-row { display:flex; gap:6px; margin-top:8px; flex-wrap:wrap; }
+    .type-btn { padding:4px 12px; border-radius:14px; border:1px solid #2a2a2a; background:#111; color:#666; font-size:0.73rem; cursor:pointer; transition:all 0.12s; }
+    .type-btn.active { border-color:#2ecc71; color:#2ecc71; background:#1a2a1a; }
+
+    .plan-items { min-height:80px; margin:14px 0; }
+    .plan-empty { text-align:center; padding:24px 0; color:#333; font-size:0.85rem; border:1px dashed #222; border-radius:8px; }
+    .plan-item {
+      background:#111; border:1px solid #222; border-radius:8px; padding:8px 10px;
+      margin-bottom:6px; display:flex; gap:8px; align-items:flex-start;
+    }
+    .plan-item-grip { color:#333; cursor:grab; font-size:1rem; padding-top:2px; user-select:none; }
+    .plan-item-grip:active { cursor:grabbing; }
+    .plan-item-body { flex:1; min-width:0; }
+    .plan-item-name { font-size:0.82rem; color:#ddd; font-weight:500; margin-bottom:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .plan-item-fields { display:flex; gap:5px; flex-wrap:wrap; }
+    .plan-item-fields input {
+      width:56px; background:#0d0d0d; border:1px solid #2a2a2a; border-radius:5px;
+      padding:3px 6px; color:#ccc; font-size:0.75rem; outline:none; text-align:center;
+    }
+    .plan-item-fields input:focus { border-color:#2ecc71; }
+    .plan-item-fields label { font-size:0.65rem; color:#555; display:block; margin-bottom:1px; }
+    .plan-item-fields .field { display:flex; flex-direction:column; }
+    .plan-item-del { color:#333; cursor:pointer; font-size:0.95rem; padding:2px 0 0 4px; transition:color 0.1s; flex-shrink:0; }
+    .plan-item-del:hover { color:#e74c3c; }
+
+    .plan-notes { width:100%; background:#111; border:1px solid #2a2a2a; border-radius:7px; padding:7px 10px; color:#aaa; font-size:0.8rem; outline:none; resize:vertical; min-height:50px; box-sizing:border-box; margin-bottom:12px; }
+    .plan-notes:focus { border-color:#2ecc71; }
+
+    .plan-save-row { display:flex; gap:8px; }
+    .btn-save { flex:1; padding:9px; background:#2ecc71; color:#000; border:none; border-radius:8px; font-size:0.88rem; font-weight:700; cursor:pointer; transition:opacity 0.15s; }
+    .btn-save:disabled { opacity:0.4; cursor:not-allowed; }
+    .btn-save:not(:disabled):hover { opacity:0.88; }
+    .btn-clear { padding:9px 14px; background:#161616; border:1px solid #2a2a2a; border-radius:8px; font-size:0.82rem; color:#666; cursor:pointer; transition:color 0.1s; }
+    .btn-clear:hover { color:#e74c3c; }
+
+    /* Saved plans */
+    .saved-section { margin-top:28px; }
+    .saved-section h3 { font-size:0.9rem; font-weight:600; color:#888; margin-bottom:12px; text-transform:uppercase; letter-spacing:0.6px; }
+    .saved-plans { display:flex; flex-direction:column; gap:8px; }
+    .saved-plan {
+      background:#0d0d0d; border:1px solid #1e1e1e; border-radius:10px;
+      padding:12px 14px; display:flex; align-items:flex-start; gap:10px;
+    }
+    .saved-plan-body { flex:1; min-width:0; }
+    .saved-plan-name { font-size:0.9rem; font-weight:600; color:#ddd; margin-bottom:3px; }
+    .saved-plan-meta { font-size:0.73rem; color:#555; }
+    .saved-plan-items { margin-top:8px; font-size:0.75rem; color:#666; }
+    .saved-plan-items li { list-style:none; padding:2px 0; }
+    .saved-plan-actions { display:flex; flex-direction:column; gap:5px; flex-shrink:0; }
+    .btn-load { padding:4px 10px; background:#1a2a1a; border:1px solid #2ecc71; border-radius:6px; font-size:0.72rem; color:#2ecc71; cursor:pointer; transition:opacity 0.12s; }
+    .btn-load:hover { opacity:0.8; }
+    .btn-del-plan { padding:4px 10px; background:#1a0a0a; border:1px solid #333; border-radius:6px; font-size:0.72rem; color:#555; cursor:pointer; transition:color 0.12s; }
+    .btn-del-plan:hover { color:#e74c3c; border-color:#e74c3c; }
+
+    .status-msg { font-size:0.8rem; padding:6px 0; color:#2ecc71; min-height:1.2em; }
+    .status-msg.err { color:#e74c3c; }
+  </style>
+</head>
+<body>
+<%- include('partials/nav') %>
+
+<div class="container" style="padding-top:24px">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+    <h2 style="margin:0">🗂 Exercise Plan Maker</h2>
+  </div>
+
+  <div class="pm-layout">
+    <!-- ── Left: exercise picker ───────────────────────────────── -->
+    <div>
+      <div class="picker-head">
+        <input type="text" id="search-input" placeholder="Search exercises..." oninput="filterExercises()">
+        <select id="equip-filter" onchange="filterExercises()">
+          <option value="">All Equipment</option>
+          <option value="barbell">Barbell</option>
+          <option value="dumbbell">Dumbbell</option>
+          <option value="cable_machine">Cable Machine</option>
+          <option value="machine">Machine</option>
+          <option value="bodyweight">Bodyweight</option>
+          <option value="bag">Bag</option>
+          <option value="cardio_machine">Cardio Machine</option>
+          <option value="none">None</option>
+        </select>
+      </div>
+
+      <div class="cat-tabs" id="cat-tabs">
+        <button class="cat-tab active" data-cat="">All</button>
+        <button class="cat-tab" data-cat="strength">Strength</button>
+        <button class="cat-tab" data-cat="conditioning">Conditioning</button>
+        <button class="cat-tab" data-cat="cardio">Cardio</button>
+        <button class="cat-tab" data-cat="mma">MMA</button>
+        <button class="cat-tab" data-cat="bjj">BJJ</button>
+        <button class="cat-tab" data-cat="muay_thai">Muay Thai</button>
+        <button class="cat-tab" data-cat="recovery">Recovery</button>
+      </div>
+
+      <div id="ex-list" class="ex-list"></div>
+    </div>
+
+    <!-- ── Right: plan builder ─────────────────────────────────── -->
+    <div class="plan-panel">
+      <div class="plan-header">
+        <input type="text" id="plan-name" placeholder="Plan name (e.g. Morning Mobility)">
+        <div class="plan-type-row" id="type-btns">
+          <button class="type-btn active" data-type="mobility">Mobility</button>
+          <button class="type-btn" data-type="warmup">Warmup</button>
+          <button class="type-btn" data-type="cooldown">Cooldown</button>
+          <button class="type-btn" data-type="stretch">Stretch</button>
+          <button class="type-btn" data-type="circuit">Circuit</button>
+        </div>
+      </div>
+
+      <div class="plan-items" id="plan-items">
+        <div class="plan-empty" id="plan-empty">← Add exercises from the left</div>
+      </div>
+
+      <textarea class="plan-notes" id="plan-notes" placeholder="Notes (optional)…" rows="2"></textarea>
+
+      <div class="status-msg" id="status-msg"></div>
+
+      <div class="plan-save-row">
+        <button class="btn-save" id="btn-save" onclick="savePlan()">Save Plan</button>
+        <button class="btn-clear" onclick="clearPlan()" title="Clear plan">Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Saved plans -->
+  <div class="saved-section">
+    <h3>Saved Plans</h3>
+    <div class="saved-plans" id="saved-plans"></div>
+  </div>
+</div>
+
+<script>
+const ALL_EXERCISES = <%- JSON.stringify(exercises) %>;
+let SAVED_PLANS    = <%- JSON.stringify(plans) %>;
+
+let activeCat = '';
+let planItems = [];   // [{ exerciseId, name, category, sets, reps, duration, notes }]
+let planType  = 'mobility';
+
+// ── Exercise picker ────────────────────────────────────────────────────────────
+
+document.querySelectorAll('.cat-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.cat-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeCat = btn.dataset.cat;
+    filterExercises();
+  });
+});
+
+document.querySelectorAll('#type-btns .type-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#type-btns .type-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    planType = btn.dataset.type;
+  });
+});
+
+function filterExercises() {
+  const q     = document.getElementById('search-input').value.toLowerCase();
+  const equip = document.getElementById('equip-filter').value;
+  let list = ALL_EXERCISES;
+  if (activeCat) list = list.filter(e => e.category === activeCat);
+  if (equip)     list = list.filter(e => e.equipment === equip);
+  if (q)         list = list.filter(e => e.name.toLowerCase().includes(q));
+  renderList(list);
+}
+
+function renderList(list) {
+  const el = document.getElementById('ex-list');
+  if (!list.length) { el.innerHTML = '<div style="color:#444;text-align:center;padding:16px;font-size:0.82rem;">No exercises found</div>'; return; }
+  el.innerHTML = list.map(e => {
+    const cat = e.category.replace(/_/g,' ');
+    return `<div class="ex-row" onclick="addExercise(${e.id}, ${JSON.stringify(e.name).replace(/"/g,'&quot;')}, '${e.category}')">
+      <span class="ex-row-name">${escHtml(e.name)}</span>
+      <span class="ex-row-cat tag-${e.category}">${cat}</span>
+      <span class="ex-row-add">＋</span>
+    </div>`;
+  }).join('');
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Plan builder ───────────────────────────────────────────────────────────────
+
+function addExercise(id, name, category) {
+  // Look up defaults from library
+  const ex = ALL_EXERCISES.find(e => e.id === id) || {};
+  planItems.push({
+    exerciseId: id,
+    name,
+    category,
+    sets:     ex.defaultSets     || null,
+    reps:     ex.defaultReps     || null,
+    duration: ex.defaultDuration || null,
+    notes:    '',
+  });
+  renderPlan();
+}
+
+function removeItem(idx) {
+  planItems.splice(idx, 1);
+  renderPlan();
+}
+
+function updateField(idx, field, value) {
+  const num = value === '' ? null : parseInt(value) || null;
+  planItems[idx][field] = field === 'notes' ? value : num;
+}
+
+function renderPlan() {
+  const container = document.getElementById('plan-items');
+  const empty     = document.getElementById('plan-empty');
+  if (!planItems.length) {
+    container.innerHTML = '';
+    container.appendChild(empty);
+    return;
+  }
+  container.innerHTML = planItems.map((item, i) => `
+<div class="plan-item" data-idx="${i}">
+  <span class="plan-item-grip" title="drag to reorder">⠿</span>
+  <div class="plan-item-body">
+    <div class="plan-item-name">${escHtml(item.name)}</div>
+    <div class="plan-item-fields">
+      <div class="field"><label>Sets</label><input type="number" min="1" max="99" value="${item.sets ?? ''}" placeholder="—" oninput="updateField(${i},'sets',this.value)"></div>
+      <div class="field"><label>Reps</label><input type="number" min="1" max="999" value="${item.reps ?? ''}" placeholder="—" oninput="updateField(${i},'reps',this.value)"></div>
+      <div class="field"><label>Sec</label><input type="number" min="1" max="9999" value="${item.duration ?? ''}" placeholder="—" oninput="updateField(${i},'duration',this.value)"></div>
+    </div>
+  </div>
+  <span class="plan-item-del" onclick="removeItem(${i})" title="Remove">✕</span>
+</div>`).join('');
+
+  initDrag();
+}
+
+// Simple drag-to-reorder
+function initDrag() {
+  const items = document.querySelectorAll('.plan-item');
+  items.forEach(item => {
+    const grip = item.querySelector('.plan-item-grip');
+    grip.addEventListener('mousedown', onGripDown);
+  });
+}
+
+let _drag = null;
+function onGripDown(e) {
+  e.preventDefault();
+  const row = e.target.closest('.plan-item');
+  _drag = { row, idx: parseInt(row.dataset.idx), startY: e.clientY };
+  row.style.opacity = '0.5';
+  document.addEventListener('mousemove', onDragMove);
+  document.addEventListener('mouseup', onDragUp);
+}
+function onDragMove(e) {
+  if (!_drag) return;
+  const container = document.getElementById('plan-items');
+  const rows = [...container.querySelectorAll('.plan-item')];
+  const overRow = rows.find(r => {
+    const rect = r.getBoundingClientRect();
+    return e.clientY >= rect.top && e.clientY <= rect.bottom && r !== _drag.row;
+  });
+  if (overRow) {
+    const toIdx = parseInt(overRow.dataset.idx);
+    const item = planItems.splice(_drag.idx, 1)[0];
+    planItems.splice(toIdx, 0, item);
+    _drag.idx = toIdx;
+    renderPlan();
+  }
+}
+function onDragUp() {
+  if (_drag) { _drag.row.style.opacity = ''; _drag = null; }
+  document.removeEventListener('mousemove', onDragMove);
+  document.removeEventListener('mouseup', onDragUp);
+}
+
+// ── Save / load ────────────────────────────────────────────────────────────────
+
+async function savePlan() {
+  const name = document.getElementById('plan-name').value.trim();
+  if (!name) { showStatus('Enter a plan name first', true); return; }
+  if (!planItems.length) { showStatus('Add at least one exercise', true); return; }
+
+  const body = {
+    name,
+    type: planType,
+    description: document.getElementById('plan-notes').value.trim() || null,
+    items: planItems.map(({ exerciseId, name, sets, reps, duration, notes }) =>
+      ({ exerciseId, name, sets, reps, duration, notes })),
+  };
+
+  try {
+    document.getElementById('btn-save').disabled = true;
+    const token = localStorage.getItem('authToken');
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+    const r = await fetch('/api/workout/exercise-plans', { method:'POST', headers, body: JSON.stringify(body) });
+    const data = await r.json();
+    if (data.success) {
+      SAVED_PLANS.unshift(data.data);
+      renderSavedPlans();
+      showStatus('Saved ✓');
+    } else {
+      showStatus(data.error || 'Save failed', true);
+    }
+  } catch (err) {
+    showStatus('Network error', true);
+  } finally {
+    document.getElementById('btn-save').disabled = false;
+  }
+}
+
+async function deletePlan(id) {
+  if (!confirm('Delete this plan?')) return;
+  const token = localStorage.getItem('authToken');
+  const headers = {};
+  if (token) headers['Authorization'] = 'Bearer ' + token;
+  const r = await fetch('/api/workout/exercise-plans/' + id, { method:'DELETE', headers });
+  if (r.ok) {
+    SAVED_PLANS = SAVED_PLANS.filter(p => p.id !== id);
+    renderSavedPlans();
+  }
+}
+
+function loadPlan(id) {
+  const plan = SAVED_PLANS.find(p => p.id === id);
+  if (!plan) return;
+  document.getElementById('plan-name').value = plan.name;
+  document.getElementById('plan-notes').value = plan.description || '';
+  planType = plan.type;
+  document.querySelectorAll('#type-btns .type-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.type === planType);
+  });
+  planItems = plan.items.map(item => {
+    const ex = ALL_EXERCISES.find(e => e.id === item.exerciseId) || {};
+    return { ...item, category: ex.category || 'strength' };
+  });
+  renderPlan();
+  showStatus('Plan loaded — edit and resave to update');
+}
+
+function clearPlan() {
+  planItems = [];
+  document.getElementById('plan-name').value = '';
+  document.getElementById('plan-notes').value = '';
+  planType = 'mobility';
+  document.querySelectorAll('#type-btns .type-btn').forEach(b => b.classList.toggle('active', b.dataset.type === 'mobility'));
+  renderPlan();
+  showStatus('');
+}
+
+function showStatus(msg, isErr) {
+  const el = document.getElementById('status-msg');
+  el.textContent = msg;
+  el.className = 'status-msg' + (isErr ? ' err' : '');
+  if (msg && !isErr) setTimeout(() => { el.textContent = ''; }, 3000);
+}
+
+// ── Saved plan list ────────────────────────────────────────────────────────────
+
+function renderSavedPlans() {
+  const el = document.getElementById('saved-plans');
+  if (!SAVED_PLANS.length) {
+    el.innerHTML = '<div style="color:#333;font-size:0.82rem;">No plans saved yet.</div>';
+    return;
+  }
+  el.innerHTML = SAVED_PLANS.map(p => {
+    const typeLabel = p.type.charAt(0).toUpperCase() + p.type.slice(1);
+    const preview   = p.items.slice(0, 4).map(i => `<li>• ${escHtml(i.name)}${i.sets ? ' ×' + i.sets : ''}${i.reps ? ' reps' : ''}${i.duration ? ' ' + i.duration + 's' : ''}</li>`).join('');
+    const more      = p.items.length > 4 ? `<li style="color:#444">+ ${p.items.length - 4} more…</li>` : '';
+    return `<div class="saved-plan">
+  <div class="saved-plan-body">
+    <div class="saved-plan-name">${escHtml(p.name)}</div>
+    <div class="saved-plan-meta">${typeLabel} · ${p.items.length} exercise${p.items.length !== 1 ? 's' : ''}${p.description ? ' · ' + escHtml(p.description.slice(0,60)) : ''}</div>
+    <ul class="saved-plan-items">${preview}${more}</ul>
+  </div>
+  <div class="saved-plan-actions">
+    <button class="btn-load" onclick="loadPlan(${p.id})">Load</button>
+    <button class="btn-del-plan" onclick="deletePlan(${p.id})">Delete</button>
+  </div>
+</div>`;
+  }).join('');
+}
+
+filterExercises();
+renderSavedPlans();
+</script>
+</body>
+</html>
