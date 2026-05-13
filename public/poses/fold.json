@@ -1,0 +1,50 @@
+{
+  "title": "Forward Fold / Hamstring",
+  "loop": true,
+  "frames": [
+    {
+      "duration": 2200,
+      "ease": "ease-in-out",
+      "label": "Upright",
+      "joints": {
+        "head":      { "x": 50, "y": 10 },
+        "neck":      { "x": 50, "y": 17 },
+        "spine":     { "x": 50, "y": 45 },
+        "shoulderL": { "x": 57, "y": 23 },
+        "shoulderR": { "x": 43, "y": 23 },
+        "elbowL":    { "x": 60, "y": 36 },
+        "elbowR":    { "x": 40, "y": 36 },
+        "handL":     { "x": 60, "y": 50 },
+        "handR":     { "x": 40, "y": 50 },
+        "hipL":      { "x": 53, "y": 52 },
+        "hipR":      { "x": 47, "y": 52 },
+        "kneeL":     { "x": 54, "y": 70 },
+        "kneeR":     { "x": 46, "y": 70 },
+        "footL":     { "x": 55, "y": 92 },
+        "footR":     { "x": 45, "y": 92 }
+      }
+    },
+    {
+      "duration": 2800,
+      "ease": "ease-in-out",
+      "label": "Fold Forward",
+      "joints": {
+        "head":      { "x": 70, "y": 55 },
+        "neck":      { "x": 66, "y": 50 },
+        "spine":     { "x": 58, "y": 48 },
+        "shoulderL": { "x": 64, "y": 44 },
+        "shoulderR": { "x": 60, "y": 47 },
+        "elbowL":    { "x": 70, "y": 60 },
+        "elbowR":    { "x": 64, "y": 60 },
+        "handL":     { "x": 74, "y": 75 },
+        "handR":     { "x": 66, "y": 75 },
+        "hipL":      { "x": 52, "y": 52 },
+        "hipR":      { "x": 48, "y": 52 },
+        "kneeL":     { "x": 55, "y": 70 },
+        "kneeR":     { "x": 45, "y": 70 },
+        "footL":     { "x": 56, "y": 92 },
+        "footR":     { "x": 44, "y": 92 }
+      }
+    }
+  ]
+}
