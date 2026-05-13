@@ -93,6 +93,17 @@
     }
     .ex-video-btn:hover .play-circle { transform:scale(1.1); }
 
+    .sf-container { width:100%; height:100%; display:flex; align-items:center; justify-content:center; }
+    .sf-container svg { width:auto; height:100%; max-width:100%; }
+    .sf-guide-link {
+      position:absolute; bottom:6px; right:8px;
+      font-size:0.65rem; padding:3px 8px; border-radius:4px;
+      background:rgba(231,76,60,0.7); color:#fff; text-decoration:none;
+      font-weight:600; letter-spacing:0.3px;
+      transition:background 0.12s;
+    }
+    .sf-guide-link:hover { background:rgba(231,76,60,1); }
+
     .ex-card-body { padding:12px 14px 10px; flex:1; }
     .ex-card-name { font-weight:600; color:#e8e8e8; font-size:0.95rem; line-height:1.3; margin-bottom:6px; }
     .ex-equip-row { display:flex; align-items:center; gap:6px; margin-bottom:8px; }
@@ -260,22 +271,68 @@ const ALL_EXERCISES = <%- JSON.stringify(exercises) %>;
 
 // Map exercise names to pose keys (loaded from /poses/<key>.json)
 const POSE_MAP = {
-  // Lunge / hip flexor
+  // Lunge / hip flexor / kneeling stretches
   "World's Greatest Stretch":          'lunge',
   "Couch Stretch":                     'lunge',
   "Half-Kneeling Hip Flexor Stretch":  'lunge',
   "Standing Hip Flexor PAILs/RAILs":   'lunge',
   "Lizard Stretch":                    'lunge',
-  // Squat / hip width
+  "Walking Lunge":                     'lunge',
+  "Reverse Lunge":                     'lunge',
+  "Bulgarian Split Squat":             'lunge',
+  // Squat / wide stance
   "Frog Stretch":                      'squat',
-  "Butterfly Stretch":                 'squat',
   "Sumo Squat":                        'squat',
-  // Neutral standing exercises
+  "Goblet Squat":                      'squat',
+  "Back Squat":                        'squat',
+  "Front Squat":                       'squat',
+  "Bodyweight Squat":                  'squat',
+  "Air Squat":                         'squat',
+  "Squat":                             'squat',
+  // Seated floor stretches (folded legs)
+  "Butterfly Stretch":                 'seated-fold',
+  "Pigeon Stretch":                    'seated-fold',
+  "Supine Piriformis Stretch":         'seated-fold',
+  "Seated Forward Fold":               'seated-fold',
+  "90/90 Hip Stretch":                 'seated-fold',
+  // Quadruped (hands+knees) stretches
+  "Cat-Cow":                           'quadruped',
+  "Cat Cow":                           'quadruped',
+  "Bird Dog":                          'quadruped',
+  "Thoracic Open Book":                'quadruped',
+  "Thread the Needle":                 'quadruped',
+  // Standing forward fold / hamstring
+  "Standing Forward Fold":             'fold',
+  "Toe Touch":                         'fold',
+  "Standing Hamstring Stretch":        'fold',
+  "Hamstring Stretch":                 'fold',
+  // Side bend / overhead reach (lat, shoulder, side body)
+  "Lat Stretch on Pull-up Bar":        'side-bend',
+  "Overhead Banded Shoulder Stretch":  'side-bend',
+  "Standing Side Bend":                'side-bend',
+  "Doorway Chest Stretch":             'side-bend',
+  "Bretzel Stretch":                   'side-bend',
+  // Standing / breathing (default for many)
   "Standing Figure-4 Stretch":         'stand',
-  "Doorway Chest Stretch":             'stand',
   "Cross-Body Shoulder Stretch":       'stand',
-  "Supine Piriformis Stretch":         'stand',
+  "Sleeper Stretch":                   'stand',
+  "Prone Shoulder ER Stretch":         'stand',
+  "Doorway Wrist Stretch":             'stand',
+  "Walk + Deep Breathing":             'stand',
+  "Deep Breathing":                    'stand',
+  "Box Breathing":                     'stand',
+  "Shadow Boxing":                     'stand',
+  "Jumping Jacks":                     'stand',
+  "High Knees":                        'stand',
+  "Arm Circles":                       'stand',
 };
+
+// Returns pose key for an exercise — by name, then default by category
+function poseForExercise(e) {
+  if (POSE_MAP[e.name]) return POSE_MAP[e.name];
+  if (e.category === 'recovery') return 'stand';
+  return null;
+}
 
 const _sfPlayers = {};
 let activeCat = '';
@@ -331,13 +388,16 @@ function renderGrid(list) {
     const primChips = (e.primaryMuscles||[]).map(m => `<span class="muscle-chip primary">${m.replace(/_/g,' ')}</span>`).join('');
     const secChips  = (e.secondaryMuscles||[]).filter(m => !e.primaryMuscles.includes(m)).map(m => `<span class="muscle-chip">${m.replace(/_/g,' ')}</span>`).join('');
 
-    const poseKey = POSE_MAP[e.name] || null;
+    const poseKey   = poseForExercise(e);
     const mediaAttr = poseKey ? ` data-pose="${poseKey}" data-exid="${e.id}"` : '';
-    const mediaInner = hasVideo
-      ? `<a href="${escHtml(e.videoUrl)}" target="_blank" rel="noopener" class="ex-video-btn" title="Watch on YouTube"><div class="play-circle">▶</div></a><span class="ex-media-icon">${icon}</span>`
-      : poseKey
-        ? `<div class="sf-container" id="sf-${e.id}" style="width:100%;height:100%;"></div>`
-        : `<span class="ex-media-icon">${icon}</span><span class="ex-media-label">animation coming soon</span>`;
+    const guideLink = hasVideo
+      ? `<a href="${escHtml(e.videoUrl)}" target="_blank" rel="noopener" class="sf-guide-link" title="Watch video guide">▶ Guide</a>`
+      : '';
+    const mediaInner = poseKey
+      ? `<div class="sf-container" id="sf-${e.id}"></div>${guideLink}`
+      : hasVideo
+        ? `<a href="${escHtml(e.videoUrl)}" target="_blank" rel="noopener" class="ex-video-btn" title="Watch on YouTube"><div class="play-circle">▶</div></a><span class="ex-media-icon">${icon}</span>`
+        : `<span class="ex-media-icon">${icon}</span><span class="ex-media-label">no animation yet</span>`;
 
     return `
 <div class="ex-card" data-id="${e.id}" data-cat="${e.category}">

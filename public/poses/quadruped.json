@@ -1,0 +1,50 @@
+{
+  "title": "Cat-Cow / Quadruped",
+  "loop": true,
+  "frames": [
+    {
+      "duration": 2000,
+      "ease": "ease-in-out",
+      "label": "Cat (Arch)",
+      "joints": {
+        "head":      { "x": 20, "y": 70 },
+        "neck":      { "x": 25, "y": 67 },
+        "spine":     { "x": 50, "y": 55 },
+        "shoulderL": { "x": 28, "y": 64 },
+        "shoulderR": { "x": 24, "y": 66 },
+        "elbowL":    { "x": 26, "y": 75 },
+        "elbowR":    { "x": 22, "y": 76 },
+        "handL":     { "x": 24, "y": 88 },
+        "handR":     { "x": 20, "y": 88 },
+        "hipL":      { "x": 78, "y": 64 },
+        "hipR":      { "x": 74, "y": 66 },
+        "kneeL":     { "x": 80, "y": 78 },
+        "kneeR":     { "x": 76, "y": 80 },
+        "footL":     { "x": 86, "y": 88 },
+        "footR":     { "x": 82, "y": 88 }
+      }
+    },
+    {
+      "duration": 2000,
+      "ease": "ease-in-out",
+      "label": "Cow (Sag)",
+      "joints": {
+        "head":      { "x": 18, "y": 60 },
+        "neck":      { "x": 24, "y": 63 },
+        "spine":     { "x": 50, "y": 75 },
+        "shoulderL": { "x": 28, "y": 68 },
+        "shoulderR": { "x": 24, "y": 70 },
+        "elbowL":    { "x": 26, "y": 78 },
+        "elbowR":    { "x": 22, "y": 79 },
+        "handL":     { "x": 24, "y": 88 },
+        "handR":     { "x": 20, "y": 88 },
+        "hipL":      { "x": 78, "y": 68 },
+        "hipR":      { "x": 74, "y": 70 },
+        "kneeL":     { "x": 80, "y": 80 },
+        "kneeR":     { "x": 76, "y": 82 },
+        "footL":     { "x": 86, "y": 88 },
+        "footR":     { "x": 82, "y": 88 }
+      }
+    }
+  ]
+}
