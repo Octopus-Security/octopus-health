@@ -221,4 +221,48 @@ router.get('/plans/today', async (req, res) => {
     }
 });
 
+// ── Exercise Plans ────────────────────────────────────────────────────────────
+
+router.get('/exercise-plans', async (req, res) => {
+    try {
+        const { ExercisePlan, sequelize } = getDatabase(req.user.username);
+        await sequelize.sync();
+        const plans = await ExercisePlan.findAll({ order: [['updatedAt', 'DESC']] });
+        res.json({ success: true, data: plans.map(p => ({ ...p.toJSON(), items: JSON.parse(p.items || '[]') })) });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+router.post('/exercise-plans', async (req, res) => {
+    try {
+        const { ExercisePlan, sequelize } = getDatabase(req.user.username);
+        await sequelize.sync();
+        const { name, type, description, items } = req.body;
+        if (!name) return res.status(400).json({ success: false, error: 'name required' });
+        const plan = await ExercisePlan.create({
+            name: name.trim(),
+            type: type || 'mobility',
+            description: description?.trim() || null,
+            items: JSON.stringify(Array.isArray(items) ? items : []),
+        });
+        res.status(201).json({ success: true, data: { ...plan.toJSON(), items: JSON.parse(plan.items) } });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+router.delete('/exercise-plans/:id', async (req, res) => {
+    try {
+        const { ExercisePlan, sequelize } = getDatabase(req.user.username);
+        await sequelize.sync();
+        const plan = await ExercisePlan.findByPk(req.params.id);
+        if (!plan) return res.status(404).json({ success: false, error: 'Not found' });
+        await plan.destroy();
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
 module.exports = router;

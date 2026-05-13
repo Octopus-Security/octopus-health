@@ -500,6 +500,15 @@ const getDatabase = (username) => {
         isCustom:    { type: DataTypes.BOOLEAN, defaultValue: true },
     });
 
+    // Exercise plan builder (mobility / warmup / cooldown / circuit)
+    const ExercisePlan = sequelize.define('ExercisePlan', {
+        name:        { type: DataTypes.STRING, allowNull: false },
+        type:        { type: DataTypes.STRING, allowNull: false, defaultValue: 'mobility' },
+        description: { type: DataTypes.TEXT,   allowNull: true },
+        // JSON array of { exerciseId, name, sets, reps, duration, side, notes }
+        items:       { type: DataTypes.TEXT,   allowNull: false, defaultValue: '[]' },
+    });
+
     // ── Seed function ──────────────────────────────────────────────────────────
 
     async function seedData() {
@@ -550,6 +559,7 @@ const getDatabase = (username) => {
         TrainingPlan,
         TrainingPlanAssignment,
         WorkoutTemplate,
+        ExercisePlan,
         seedData,
     };
 };

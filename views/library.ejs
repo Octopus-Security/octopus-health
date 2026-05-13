@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= title %></title>
   <link rel="stylesheet" href="/theme.css">
+  <script src="/stick-figure.js" defer></script>
   <style>
     .filter-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; align-items:center; }
     .filter-bar input { flex:1; min-width:180px; background:#0d0d0d; border:1px solid #2a2a2a; border-radius:8px; padding:8px 14px; color:#e8e8e8; font-size:0.9rem; }
@@ -256,6 +257,27 @@
 
 <script>
 const ALL_EXERCISES = <%- JSON.stringify(exercises) %>;
+
+// Map exercise names to pose keys (loaded from /poses/<key>.json)
+const POSE_MAP = {
+  // Lunge / hip flexor
+  "World's Greatest Stretch":          'lunge',
+  "Couch Stretch":                     'lunge',
+  "Half-Kneeling Hip Flexor Stretch":  'lunge',
+  "Standing Hip Flexor PAILs/RAILs":   'lunge',
+  "Lizard Stretch":                    'lunge',
+  // Squat / hip width
+  "Frog Stretch":                      'squat',
+  "Butterfly Stretch":                 'squat',
+  "Sumo Squat":                        'squat',
+  // Neutral standing exercises
+  "Standing Figure-4 Stretch":         'stand',
+  "Doorway Chest Stretch":             'stand',
+  "Cross-Body Shoulder Stretch":       'stand',
+  "Supine Piriformis Stretch":         'stand',
+};
+
+const _sfPlayers = {};
 let activeCat = '';
 
 document.querySelectorAll('.cat-tab').forEach(btn => {
@@ -290,7 +312,7 @@ function renderGrid(list) {
   document.getElementById('count-label').textContent = `${list.length} exercise${list.length !== 1 ? 's' : ''}`;
   const grid = document.getElementById('lib-grid');
   grid.innerHTML = list.map(e => {
-    const catClass   = 'tag-' + e.category;
+    const catClass   = 'tag-' + (e.category || 'strength');
     const equipLabel = (e.equipment || '').replace(/_/g,' ');
     const icon       = CAT_ICON[e.category] || CAT_ICON.default;
     const hasInstr   = e.instructions && e.instructions.trim();
@@ -309,13 +331,17 @@ function renderGrid(list) {
     const primChips = (e.primaryMuscles||[]).map(m => `<span class="muscle-chip primary">${m.replace(/_/g,' ')}</span>`).join('');
     const secChips  = (e.secondaryMuscles||[]).filter(m => !e.primaryMuscles.includes(m)).map(m => `<span class="muscle-chip">${m.replace(/_/g,' ')}</span>`).join('');
 
+    const poseKey = POSE_MAP[e.name] || null;
+    const mediaAttr = poseKey ? ` data-pose="${poseKey}" data-exid="${e.id}"` : '';
     const mediaInner = hasVideo
       ? `<a href="${escHtml(e.videoUrl)}" target="_blank" rel="noopener" class="ex-video-btn" title="Watch on YouTube"><div class="play-circle">▶</div></a><span class="ex-media-icon">${icon}</span>`
-      : `<span class="ex-media-icon">${icon}</span><span class="ex-media-label">animation coming soon</span>`;
+      : poseKey
+        ? `<div class="sf-container" id="sf-${e.id}" style="width:100%;height:100%;"></div>`
+        : `<span class="ex-media-icon">${icon}</span><span class="ex-media-label">animation coming soon</span>`;
 
     return `
 <div class="ex-card" data-id="${e.id}" data-cat="${e.category}">
-  <div class="ex-media">${mediaInner}</div>
+  <div class="ex-media"${mediaAttr}>${mediaInner}</div>
   <div class="ex-card-body">
     <div class="ex-card-name">${escHtml(e.name)}</div>
     <div class="ex-equip-row">
@@ -329,6 +355,7 @@ function renderGrid(list) {
   </div>
 </div>`;
   }).join('');
+  setTimeout(initStickFigures, 60);
 }
 
 function toggleInstructions(id) {
@@ -374,6 +401,19 @@ document.getElementById('add-form').addEventListener('submit', async e => {
     window.location.reload();
   }
 });
+
+function initStickFigures() {
+  if (typeof StickFigurePlayer === 'undefined') return;
+  document.querySelectorAll('.ex-media[data-pose]').forEach(function (el) {
+    var key = el.dataset.pose;
+    var exId = el.dataset.exid;
+    var container = document.getElementById('sf-' + exId);
+    if (!container || _sfPlayers[exId]) return;
+    StickFigurePlayer.load(container, key, { autoplay: true }, function (err) {
+      if (!err) _sfPlayers[exId] = true;
+    });
+  });
+}
 
 filterExercises();
 </script>

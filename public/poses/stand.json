@@ -1,0 +1,50 @@
+{
+  "title": "Standing",
+  "loop": true,
+  "frames": [
+    {
+      "duration": 2200,
+      "ease": "ease-in-out",
+      "label": "Breathe In",
+      "joints": {
+        "head":      { "x": 50, "y": 8  },
+        "neck":      { "x": 50, "y": 15 },
+        "spine":     { "x": 50, "y": 44 },
+        "shoulderL": { "x": 57, "y": 21 },
+        "shoulderR": { "x": 43, "y": 21 },
+        "elbowL":    { "x": 60, "y": 33 },
+        "elbowR":    { "x": 40, "y": 33 },
+        "handL":     { "x": 60, "y": 50 },
+        "handR":     { "x": 40, "y": 50 },
+        "hipL":      { "x": 53, "y": 52 },
+        "hipR":      { "x": 47, "y": 52 },
+        "kneeL":     { "x": 54, "y": 70 },
+        "kneeR":     { "x": 46, "y": 70 },
+        "footL":     { "x": 55, "y": 92 },
+        "footR":     { "x": 45, "y": 92 }
+      }
+    },
+    {
+      "duration": 2200,
+      "ease": "ease-in-out",
+      "label": "Breathe Out",
+      "joints": {
+        "head":      { "x": 50, "y": 9  },
+        "neck":      { "x": 50, "y": 16 },
+        "spine":     { "x": 50, "y": 45 },
+        "shoulderL": { "x": 56, "y": 22 },
+        "shoulderR": { "x": 44, "y": 22 },
+        "elbowL":    { "x": 59, "y": 35 },
+        "elbowR":    { "x": 41, "y": 35 },
+        "handL":     { "x": 59, "y": 51 },
+        "handR":     { "x": 41, "y": 51 },
+        "hipL":      { "x": 53, "y": 53 },
+        "hipR":      { "x": 47, "y": 53 },
+        "kneeL":     { "x": 54, "y": 71 },
+        "kneeR":     { "x": 46, "y": 71 },
+        "footL":     { "x": 55, "y": 92 },
+        "footR":     { "x": 45, "y": 92 }
+      }
+    }
+  ]
+}

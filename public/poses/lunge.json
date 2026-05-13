@@ -1,0 +1,50 @@
+{
+  "title": "Hip Flexor Stretch / Lunge",
+  "loop": true,
+  "frames": [
+    {
+      "duration": 2000,
+      "ease": "ease-in-out",
+      "label": "Upright",
+      "joints": {
+        "head":      { "x": 50, "y": 10 },
+        "neck":      { "x": 50, "y": 17 },
+        "spine":     { "x": 49, "y": 48 },
+        "shoulderL": { "x": 56, "y": 23 },
+        "shoulderR": { "x": 43, "y": 23 },
+        "elbowL":    { "x": 58, "y": 37 },
+        "elbowR":    { "x": 41, "y": 37 },
+        "handL":     { "x": 57, "y": 52 },
+        "handR":     { "x": 40, "y": 52 },
+        "hipL":      { "x": 52, "y": 57 },
+        "hipR":      { "x": 45, "y": 57 },
+        "kneeL":     { "x": 64, "y": 73 },
+        "kneeR":     { "x": 34, "y": 73 },
+        "footL":     { "x": 72, "y": 92 },
+        "footR":     { "x": 27, "y": 88 }
+      }
+    },
+    {
+      "duration": 2800,
+      "ease": "ease-in-out",
+      "label": "Sink & Reach",
+      "joints": {
+        "head":      { "x": 49, "y": 9  },
+        "neck":      { "x": 49, "y": 16 },
+        "spine":     { "x": 48, "y": 47 },
+        "shoulderL": { "x": 54, "y": 21 },
+        "shoulderR": { "x": 42, "y": 21 },
+        "elbowL":    { "x": 52, "y":  8 },
+        "elbowR":    { "x": 44, "y":  8 },
+        "handL":     { "x": 51, "y": -2 },
+        "handR":     { "x": 45, "y": -2 },
+        "hipL":      { "x": 51, "y": 59 },
+        "hipR":      { "x": 44, "y": 59 },
+        "kneeL":     { "x": 65, "y": 75 },
+        "kneeR":     { "x": 32, "y": 82 },
+        "footL":     { "x": 73, "y": 92 },
+        "footR":     { "x": 26, "y": 92 }
+      }
+    }
+  ]
+}
