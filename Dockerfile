@@ -1,4 +1,7 @@
-FROM node:18-alpine
+FROM node:22-alpine
+
+# Patch Alpine OS packages before anything else
+RUN apk upgrade --no-cache
 
 # Set working directory
 WORKDIR /usr/src/app
