@@ -17,6 +17,7 @@ services:
       - SESSION_SECRET=${SESSION_SECRET:-change-me-in-production}
       - JWT_SECRET=${JWT_SECRET:-octopus-shared-secret-change-in-production}
       - AUTH_SERVICE_URL=http://octopus-auth:3002
+      - HEALTH_SERVICE_TOKEN=${HEALTH_SERVICE_TOKEN}
     networks:
       - octopus_network
     extra_hosts:
