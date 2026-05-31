@@ -8,6 +8,10 @@ const express = require('express');
 const router  = express.Router();
 const getDatabase = require('../../database');
 
+// Username whose SQLite DB to use for service calls.
+// Must match the username Nick registered with in the health app.
+const SERVICE_USER = process.env.HEALTH_SERVICE_USER || 'psychopathy';
+
 function requireToken(req, res, next) {
   const expected = process.env.HEALTH_SERVICE_TOKEN;
   if (!expected) return res.status(500).json({ error: 'HEALTH_SERVICE_TOKEN not configured' });
@@ -15,11 +19,17 @@ function requireToken(req, res, next) {
   next();
 }
 
+async function getDB() {
+  const db = getDatabase(SERVICE_USER);
+  // Create any missing tables (safe to call on every request — Sequelize no-ops if table exists)
+  await db.sequelize.sync();
+  return db;
+}
+
 // GET /api/service/prs?exercise=Pull-up
-// Returns all PRs for an exercise (or all if no query), newest first.
 router.get('/prs', requireToken, async (req, res) => {
   try {
-    const { PersonalRecord } = await getDatabase();
+    const { PersonalRecord } = await getDB();
     const where = req.query.exercise ? { exerciseName: req.query.exercise } : {};
     const rows = await PersonalRecord.findAll({
       where, order: [['date', 'DESC'], ['createdAt', 'DESC']], limit: 100,
@@ -29,10 +39,9 @@ router.get('/prs', requireToken, async (req, res) => {
 });
 
 // POST /api/service/prs  { exerciseName, reps, sets, weight, weightUnit, durationSecs, date, notes }
-// Logs a PR entry. No uniqueness constraint — every session log is kept.
 router.post('/prs', requireToken, async (req, res) => {
   try {
-    const { PersonalRecord } = await getDatabase();
+    const { PersonalRecord } = await getDB();
     const { exerciseName, reps, sets, weight, weightUnit, durationSecs, date, notes } = req.body;
     if (!exerciseName) return res.status(400).json({ error: 'exerciseName required' });
     const row = await PersonalRecord.create({
@@ -50,10 +59,9 @@ router.post('/prs', requireToken, async (req, res) => {
 });
 
 // GET /api/service/prs/bests
-// Returns the best (max reps) entry per exercise — used to personalise workout targets.
 router.get('/prs/bests', requireToken, async (req, res) => {
   try {
-    const { PersonalRecord, sequelize } = await getDatabase();
+    const { PersonalRecord, sequelize } = await getDB();
     const { QueryTypes } = require('sequelize');
     const rows = await sequelize.query(
       `SELECT exerciseName,

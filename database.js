@@ -597,6 +597,7 @@ const getDatabase = (username) => {
         ExercisePlan,
         PersonalRecord,
         seedData,
+        sequelize,
     };
 };
 
