@@ -21,8 +21,8 @@ function requireToken(req, res, next) {
 
 async function getDB() {
   const db = getDatabase(SERVICE_USER);
-  // Create any missing tables (safe to call on every request — Sequelize no-ops if table exists)
-  await db.sequelize.sync();
+  // Create any missing tables — only if sequelize is available (safe no-op if tables exist)
+  if (db.sequelize) await db.sequelize.sync().catch(() => {});
   return db;
 }
 
