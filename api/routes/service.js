@@ -76,4 +76,29 @@ router.get('/prs/bests', requireToken, async (req, res) => {
   } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
 });
 
+// GET /api/service/templates?slug=mon:gym
+// Returns workout template by slug (dayKey:location), or all if no slug.
+router.get('/templates', requireToken, async (req, res) => {
+  try {
+    const { PersonalRecord, WorkoutTemplate } = await getDB();
+    const where = req.query.slug ? { name: req.query.slug } : {};
+    const rows = await WorkoutTemplate.findAll({ where, order: [['name', 'ASC']] });
+    const templates = rows.map(t => {
+      let meta = {};
+      try { meta = JSON.parse(t.description || '{}'); } catch {}
+      return {
+        id: t.id, slug: t.name, label: meta.label || t.name,
+        type: t.type, location: meta.location || 'home',
+        warmup: meta.warmup, cooldown: meta.cooldown,
+        exercises: JSON.parse(t.exercises || '[]'),
+        isCustom: t.isCustom,
+      };
+    });
+    if (req.query.slug) {
+      return res.json({ ok: true, template: templates[0] || null });
+    }
+    res.json({ ok: true, templates });
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+
 module.exports = router;

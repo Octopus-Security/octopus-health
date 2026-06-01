@@ -202,6 +202,16 @@ const SEED_EXERCISES = [
   { name: 'Dead Bug',                   category: 'strength',    equipment: 'bodyweight', primaryMuscles: ['abs','core'],              secondaryMuscles: ['hip_flexors'],           instructions: 'On back, arms up, knees 90°. Extend opposite arm and leg while pressing lower back to floor. The key is not letting your back arch — builds real anti-extension core strength.', videoUrl: 'https://www.youtube.com/watch?v=4XLEnwUr1d8', mediaUrl: null, defaultSets: 3, defaultReps: 10, defaultDuration: null },
   { name: 'Calf Raise (bodyweight)',    category: 'strength',    equipment: 'bodyweight', primaryMuscles: ['calves'],                  secondaryMuscles: [],                        instructions: 'Stand on edge of step or flat. Rise on balls of feet, full extension. Lower slowly past neutral for full stretch. Can load with a backpack.', videoUrl: 'https://www.youtube.com/watch?v=gwLzBJYoWlI', mediaUrl: null, defaultSets: 4, defaultReps: 25, defaultDuration: null },
 
+  // ── GYM EXERCISES NOT YET IN LIBRARY ─────────────────────────────────────────
+  { name: 'EZ-Bar Curl',               category: 'strength', equipment: 'barbell', primaryMuscles: ['biceps'],         secondaryMuscles: ['brachialis','forearms'],  instructions: 'EZ-bar reduces wrist strain vs straight bar. Full extension at bottom, curl to chin. Keep elbows pinned.', videoUrl: 'https://www.youtube.com/watch?v=zG2p4k2IdAo', mediaUrl: null, defaultSets: 3, defaultReps: 12, defaultDuration: null },
+  { name: 'Calf Raise (machine)',       category: 'strength', equipment: 'machine', primaryMuscles: ['calves'],         secondaryMuscles: [],                        instructions: 'Full range of motion — lower heel below pad level for the stretch. Pause at top for 1s. Better range than bodyweight version.', videoUrl: 'https://www.youtube.com/watch?v=gwLzBJYoWlI', mediaUrl: null, defaultSets: 4, defaultReps: 20, defaultDuration: null },
+  { name: 'Overhead Tricep Extension', category: 'strength', equipment: 'cable_machine', primaryMuscles: ['triceps'],  secondaryMuscles: [],                        instructions: 'Cable or single dumbbell. Keep elbows close to head. Full stretch behind head, extend to lockout. Long head of tricep gets stretched here.', videoUrl: 'https://www.youtube.com/watch?v=2yVyK1K-OOo', mediaUrl: null, defaultSets: 3, defaultReps: 12, defaultDuration: null },
+  { name: 'Pec Deck',                  category: 'strength', equipment: 'machine', primaryMuscles: ['chest'],          secondaryMuscles: ['front_delts'],           instructions: 'Machine chest fly. Slight bend in elbows, squeeze pecs together at peak contraction. Control the eccentric — feel the stretch at full open.', videoUrl: 'https://www.youtube.com/watch?v=bnHyMiGMmvg', mediaUrl: null, defaultSets: 3, defaultReps: 15, defaultDuration: null },
+  { name: 'Incline Dumbbell Press',    category: 'strength', equipment: 'dumbbell', primaryMuscles: ['upper_chest','front_delts'], secondaryMuscles: ['triceps'], instructions: 'Bench at 30–45°. Press dumbbells from chest up and slightly together. Full stretch at bottom.', videoUrl: 'https://www.youtube.com/watch?v=8iPEnn-ltC8', mediaUrl: null, defaultSets: 3, defaultReps: 12, defaultDuration: null },
+  { name: 'Dumbbell Overhead Press',   category: 'strength', equipment: 'dumbbell', primaryMuscles: ['front_delts','side_delts'], secondaryMuscles: ['triceps'], instructions: 'Seated or standing. Press dumbbells from shoulder height to lockout overhead. Control the descent.', videoUrl: 'https://www.youtube.com/watch?v=qEwKn7FlQ9Q', mediaUrl: null, defaultSets: 3, defaultReps: 10, defaultDuration: null },
+  { name: 'Single-Arm Dumbbell Row',   category: 'strength', equipment: 'dumbbell', primaryMuscles: ['lats','rhomboids'], secondaryMuscles: ['biceps','rear_delts'], instructions: 'Support on bench. Row dumbbell to ribcage keeping elbow close. Full stretch at bottom. 12 per side.', videoUrl: 'https://www.youtube.com/watch?v=K0zFKw3MIeE', mediaUrl: null, defaultSets: 3, defaultReps: 12, defaultDuration: null },
+  { name: 'Cable Wood Chop (High)',     category: 'strength', equipment: 'cable_machine', primaryMuscles: ['obliques','core'], secondaryMuscles: ['shoulders','lats'], instructions: 'High pulley to one side. Pull diagonally across body in chopping motion. 12 per side.', videoUrl: 'https://www.youtube.com/watch?v=7Vzy0LG3lZI', mediaUrl: null, defaultSets: 3, defaultReps: 12, defaultDuration: null },
+
   // ── MUAY THAI — STRIKES ──────────────────────────────────────────────────────
   { name: 'Jab Drill',                      category: 'muay_thai', equipment: 'none',  primaryMuscles: ['shoulders','chest'],           secondaryMuscles: ['triceps','core'],          instructions: 'From stance, extend lead hand straight. Rotate shoulder into it, snap back fast. Keep rear hand protecting chin. Drill in front of mirror for form, then on bag.', videoUrl: 'https://www.youtube.com/watch?v=CknYN_pO_qQ', mediaUrl: null, defaultSets: 5, defaultReps: null, defaultDuration: 60 },
   { name: 'Cross Drill',                    category: 'muay_thai', equipment: 'none',  primaryMuscles: ['shoulders','chest'],           secondaryMuscles: ['core','hips','triceps'],   instructions: 'Rotate rear hip and shoulder, drive rear hand straight. Full hip rotation is power — the hand just delivers it. Pivot on rear foot.', videoUrl: 'https://www.youtube.com/watch?v=CknYN_pO_qQ', mediaUrl: null, defaultSets: 5, defaultReps: null, defaultDuration: 60 },
@@ -306,6 +316,171 @@ const SEED_EXERCISES = [
   { name: 'Chin Tuck',                      category: 'recovery', equipment: 'none', primaryMuscles: ['neck','upper_back'],          secondaryMuscles: [],                          instructions: 'Gently pull chin straight back (not down). Hold 5s, repeat 10x. Corrects forward head posture — common from grappling and device use. Use it throughout the day.', videoUrl: 'https://www.youtube.com/watch?v=W0RGrH5Zq8A', mediaUrl: null, defaultSets: 3, defaultReps: 10, defaultDuration: null },
   { name: 'Lumbar Decompression Hang',      category: 'recovery', equipment: 'bodyweight', primaryMuscles: ['lower_back','lats'],      secondaryMuscles: ['shoulders'],              instructions: 'Dead hang from pull-up bar, feet slightly off floor. Relax everything below shoulders. Breathe slowly. Decompresses lumbar spine after heavy training. Even 30s helps.', videoUrl: 'https://www.youtube.com/watch?v=jk8WBNL1P74', mediaUrl: null, defaultSets: 2, defaultReps: null, defaultDuration: 30 },
   { name: 'Scorpion Stretch',               category: 'recovery', equipment: 'none', primaryMuscles: ['thoracic_spine','hip_flexors','chest'], secondaryMuscles: ['shoulders','hips'], instructions: 'Lie face down, swing one leg over to opposite side reaching for the ground. Arms out flat. Rotational stretch for thoracic spine and hip flexors simultaneously.', videoUrl: 'https://www.youtube.com/watch?v=Q5JBAD3Yz-k', mediaUrl: null, defaultSets: 2, defaultReps: 8, defaultDuration: null },
+];
+
+// ── Workout templates — seeded once, editable via the health app UI ──────────
+// slug format: "daykey:location"  e.g. "mon:home", "mon:gym"
+const SEED_WORKOUT_TEMPLATES = [
+  // ── HOME / PARK WORKOUTS ────────────────────────────────────────────────────
+  { slug: 'mon:home', name: 'Push Day — Mon (Home)', type: 'strength', location: 'home',
+    description: 'Chest / Shoulders / Triceps + Core',
+    warmup: 'Jump Rope 3 min easy, then 10 arm circles each direction',
+    cooldown: 'Chest doorway stretch 60s, Shoulder dislocates 10 reps with band',
+    exercises: [
+      { exerciseName: 'Push-up Board Wide',              sets: 4, reps: null, repMode: 'max',  duration: null, prKey: 'Wide Push-up',     notes: 'Full range, controlled 2-sec negative' },
+      { exerciseName: 'Diamond Push-up',                 sets: 3, reps: null, repMode: 'max',  duration: null, prKey: 'Diamond Push-up',  notes: 'Elbows stay close to body' },
+      { exerciseName: 'Pike Push-up',                    sets: 3, reps: 10,   repMode: 'fixed',duration: null, prKey: 'Pike Push-up',     notes: 'Hips high, head to floor' },
+      { exerciseName: 'Resistance Band Lateral Raise',   sets: 3, reps: 15,   repMode: 'fixed',duration: null,                            notes: 'Slow, no shrugging' },
+      { exerciseName: 'Resistance Band Face Pull',       sets: 3, reps: 20,   repMode: 'fixed',duration: null,                            notes: 'Shoulder health — always do these' },
+      { exerciseName: 'Resistance Band Tricep Extension',sets: 3, reps: 15,   repMode: 'fixed',duration: null,                            notes: 'Full lockout' },
+      { exerciseName: 'Ab Roller Rollout',               sets: 4, reps: 8,    repMode: 'fixed',duration: null, prKey: 'Ab Roller Rollout',notes: 'From knees. Pull back with lats, not hips' },
+      { exerciseName: 'Hollow Body Hold',                sets: 3, reps: null, repMode: 'timed',duration: 30,   prKey: 'Hollow Body Hold', notes: 'Lower back glued to floor' },
+    ]},
+  { slug: 'tue:home', name: 'Pull + Core — Tue (Home)', type: 'strength', location: 'home',
+    description: 'Back / Biceps / Abs',
+    warmup: 'Jog to park (cardio warm-up done), 10 scapular pull-ups to activate lats',
+    cooldown: 'Lat stretch on pull-up bar 30s each side, Band pull-aparts 20 reps',
+    exercises: [
+      { exerciseName: 'Pull-up',                         sets: 5, reps: null, repMode: 'max',  duration: null, prKey: 'Pull-up',          notes: 'Dead hang start. Full extension at bottom' },
+      { exerciseName: 'Chin-up',                         sets: 3, reps: null, repMode: 'max',  duration: null, prKey: 'Chin-up',          notes: 'Underhand. Curl the bar to you' },
+      { exerciseName: 'Resistance Band Row',             sets: 4, reps: 15,   repMode: 'fixed',duration: null,                            notes: 'Squeeze shoulder blades 1s at top' },
+      { exerciseName: 'Resistance Band Bicep Curl',      sets: 3, reps: 15,   repMode: 'fixed',duration: null,                            notes: 'Full extension at bottom' },
+      { exerciseName: 'Hanging Leg Raise',               sets: 4, reps: 10,   repMode: 'fixed',duration: null, prKey: 'Hanging Leg Raise',notes: 'Hips stay square, no swinging' },
+      { exerciseName: 'Ab Roller Rollout',               sets: 3, reps: 10,   repMode: 'fixed',duration: null, prKey: 'Ab Roller Rollout',notes: 'Progress to standing rollouts eventually' },
+      { exerciseName: 'Dead Bug',                        sets: 3, reps: 10,   repMode: 'fixed',duration: null,                            notes: '10 per side. Lower back to floor always' },
+    ]},
+  { slug: 'wed:home', name: 'Legs + Conditioning — Wed (Home)', type: 'conditioning', location: 'home',
+    description: 'Legs + Conditioning',
+    warmup: 'Jump Rope 3 min, then 10 bodyweight squats slow',
+    cooldown: 'Hip flexor stretch 60s each, World\'s greatest stretch 6 reps',
+    exercises: [
+      { exerciseName: 'Bodyweight Squat',                sets: 4, reps: 20,   repMode: 'fixed',duration: null,                            notes: 'Full depth, drive knees out' },
+      { exerciseName: 'Bodyweight Bulgarian Split Squat',sets: 3, reps: 12,   repMode: 'fixed',duration: null,                            notes: '12 per leg. Use chair as rear support' },
+      { exerciseName: 'Reverse Lunge',                   sets: 3, reps: 12,   repMode: 'fixed',duration: null,                            notes: '12 per leg. Step back, control the drop' },
+      { exerciseName: 'Jump Squat',                      sets: 4, reps: 15,   repMode: 'fixed',duration: null,                            notes: 'Land soft, knees bent. Power output' },
+      { exerciseName: 'Calf Raise (bodyweight)',         sets: 4, reps: 25,   repMode: 'fixed',duration: null,                            notes: 'Use a step edge for full range' },
+      { exerciseName: 'Weighted Jump Rope',              sets: 5, reps: null, repMode: 'timed',duration: 45,                              notes: '45s on / 15s rest. Conditioning + calves' },
+      { exerciseName: 'Ab Roller Rollout',               sets: 3, reps: 10,   repMode: 'fixed',duration: null, prKey: 'Ab Roller Rollout',notes: 'End every session with core' },
+      { exerciseName: 'Side Plank',                      sets: 3, reps: null, repMode: 'timed',duration: 30,   prKey: 'Side Plank',       notes: '30s each side. Obliques for the V' },
+    ]},
+  { slug: 'thu:home', name: 'Core + Active Recovery — Thu (Home)', type: 'strength', location: 'home',
+    description: 'Core Focus + Active Recovery',
+    warmup: 'Light jump rope 5 min steady pace',
+    cooldown: 'Cat-cow 10 reps, Hip flexor / Psoas release 60s each, Thoracic extension over roller',
+    exercises: [
+      { exerciseName: 'Ab Roller Rollout',               sets: 5, reps: 12,   repMode: 'fixed',duration: null, prKey: 'Ab Roller Rollout',notes: 'Main focus today — more volume' },
+      { exerciseName: 'Hollow Body Hold',                sets: 4, reps: null, repMode: 'timed',duration: 30,   prKey: 'Hollow Body Hold', notes: 'Add 5s each week you hit all sets' },
+      { exerciseName: 'Lying Leg Raise',                 sets: 4, reps: 15,   repMode: 'fixed',duration: null,                            notes: 'Lower back down, never let it arch' },
+      { exerciseName: 'V-Up',                            sets: 3, reps: 15,   repMode: 'fixed',duration: null,                            notes: 'Controlled, feel the crunch' },
+      { exerciseName: 'Side Plank',                      sets: 3, reps: null, repMode: 'timed',duration: 40,   prKey: 'Side Plank',       notes: 'Increase by 5s weekly' },
+      { exerciseName: 'Dead Bug',                        sets: 3, reps: 10,   repMode: 'fixed',duration: null,                            notes: 'Slow and deliberate' },
+      { exerciseName: 'Plank',                           sets: 3, reps: null, repMode: 'timed',duration: 60,   prKey: 'Plank',            notes: 'Squeeze glutes and quads too' },
+      { exerciseName: 'Resistance Band Face Pull',       sets: 3, reps: 20,   repMode: 'fixed',duration: null,                            notes: 'Shoulder maintenance — do daily if possible' },
+    ]},
+  { slug: 'fri:home', name: 'Push Day — Fri (Home)', type: 'strength', location: 'home',
+    description: 'Chest / Shoulders / Triceps (progressive)',
+    warmup: 'Jump Rope 3 min, then 10 slow push-ups as warm-up sets',
+    cooldown: 'Chest doorway stretch, Band pull-aparts 20 reps',
+    exercises: [
+      { exerciseName: 'Push-up Board Wide',              sets: 4, reps: null, repMode: 'max',  duration: null, prKey: 'Wide Push-up',     notes: 'Beat Monday\'s reps if possible' },
+      { exerciseName: 'Push-up Board Narrow',            sets: 3, reps: null, repMode: 'max',  duration: null, prKey: 'Push-up Board Narrow', notes: 'Elbows tight, squeeze triceps at top' },
+      { exerciseName: 'Pike Push-up',                    sets: 3, reps: 12,   repMode: 'fixed',duration: null, prKey: 'Pike Push-up',     notes: 'Try for 2 more reps than Monday' },
+      { exerciseName: 'Resistance Band Lateral Raise',   sets: 4, reps: 15,   repMode: 'fixed',duration: null,                            notes: 'Pause at top for a beat' },
+      { exerciseName: 'Resistance Band Tricep Extension',sets: 3, reps: 15,   repMode: 'fixed',duration: null,                            notes: 'Single arm version for extra stability' },
+      { exerciseName: 'Ab Roller Rollout',               sets: 4, reps: 10,   repMode: 'fixed',duration: null, prKey: 'Ab Roller Rollout',notes: 'More reps than Monday' },
+      { exerciseName: 'Hollow Body Rock',                sets: 3, reps: 10,   repMode: 'fixed',duration: null,                            notes: 'Maintain the hollow shape while rocking' },
+    ]},
+  { slug: 'sat:home', name: 'Full Body Circuit — Sat (Park)', type: 'conditioning', location: 'park',
+    description: 'Full Body Circuit — Park Day (post-jog)',
+    warmup: 'Already jogged here — 5 min easy jump rope to stay warm, then 10 arm circles',
+    cooldown: 'Jog or walk home is the cooldown. Stretch hips and chest when you get back.',
+    exercises: [
+      { exerciseName: 'Pull-up',                         sets: 4, reps: null, repMode: 'max',  duration: null, prKey: 'Pull-up',          notes: 'Rest 2 min between sets. Chase your PR' },
+      { exerciseName: 'Dip',                             sets: 3, reps: null, repMode: 'max',  duration: null, prKey: 'Dip',              notes: 'Use park parallel bars' },
+      { exerciseName: 'Push-up Board Wide',              sets: 3, reps: 20,   repMode: 'fixed',duration: null,                            notes: 'Superset with pull-ups if recovering' },
+      { exerciseName: 'Bodyweight Squat',                sets: 3, reps: 25,   repMode: 'fixed',duration: null,                            notes: 'Fast pace, conditioning focus' },
+      { exerciseName: 'Jump Rope',                       sets: 3, reps: null, repMode: 'timed',duration: 120,                             notes: '2 min rounds, 60s rest' },
+      { exerciseName: 'Shadow Boxing',                   sets: 3, reps: null, repMode: 'timed',duration: 180,                             notes: '3-min rounds. Work technique, not just power' },
+      { exerciseName: 'Hanging Leg Raise',               sets: 4, reps: 12,   repMode: 'fixed',duration: null, prKey: 'Hanging Leg Raise',notes: 'Slow controlled, use the park bar' },
+      { exerciseName: 'Ab Roller Rollout',               sets: 3, reps: 12,   repMode: 'fixed',duration: null, prKey: 'Ab Roller Rollout',notes: 'You brought the roller? Do it. Otherwise plank 3×60s' },
+    ]},
+  { slug: 'sun:home', name: 'Active Recovery — Sun (Home)', type: 'recovery', location: 'home',
+    description: 'Active Recovery + Core',
+    warmup: 'Light walk or easy 10 min jog — whatever feels right',
+    cooldown: 'Full mobility flow: World\'s greatest stretch, hip flexor release, lat stretch, cat-cow, thoracic extension.',
+    exercises: [
+      { exerciseName: 'Ab Roller Rollout',               sets: 3, reps: 10,   repMode: 'fixed',duration: null,                            notes: 'Light, not max effort' },
+      { exerciseName: 'Plank',                           sets: 3, reps: null, repMode: 'timed',duration: 60,   prKey: 'Plank',            notes: 'Focus on breathing' },
+      { exerciseName: 'Dead Bug',                        sets: 3, reps: 10,   repMode: 'fixed',duration: null,                            notes: 'Reset the core' },
+      { exerciseName: 'Resistance Band Face Pull',       sets: 3, reps: 20,   repMode: 'fixed',duration: null,                            notes: 'Shoulder health maintenance' },
+      { exerciseName: 'Band Pull-Apart',                 sets: 3, reps: 20,   repMode: 'fixed',duration: null,                            notes: 'Upper back health' },
+      { exerciseName: 'Jump Rope',                       sets: 1, reps: null, repMode: 'timed',duration: 300,                             notes: '5 min easy — just stay loose' },
+    ]},
+
+  // ── GYM WORKOUTS (work days) ────────────────────────────────────────────────
+  { slug: 'mon:gym', name: 'Push Day — Mon (Gym)', type: 'strength', location: 'gym',
+    description: 'Chest / Shoulders / Triceps (Gym)',
+    warmup: 'Treadmill 5 min easy, then empty-bar bench press 2×10',
+    cooldown: 'Chest doorway stretch 60s, cable rear-delt fly 2×20 for shoulder balance',
+    exercises: [
+      { exerciseName: 'Barbell Bench Press',             sets: 4, reps: null, repMode: 'max',  duration: null, prKey: 'Barbell Bench Press',   notes: 'Work up to a heavy top set, then 3×5' },
+      { exerciseName: 'Incline Dumbbell Press',          sets: 3, reps: 12,   repMode: 'fixed',duration: null, prKey: 'Incline Dumbbell Press', notes: 'Full stretch at bottom' },
+      { exerciseName: 'Cable Chest Fly',                 sets: 3, reps: 15,   repMode: 'fixed',duration: null,                                  notes: 'Cross-body, squeeze at centre' },
+      { exerciseName: 'Dumbbell Overhead Press',         sets: 3, reps: 10,   repMode: 'fixed',duration: null, prKey: 'Dumbbell Overhead Press', notes: 'Seated or standing' },
+      { exerciseName: 'Cable Tricep Pushdown',           sets: 3, reps: 15,   repMode: 'fixed',duration: null,                                  notes: 'Full extension, elbows pinned' },
+      { exerciseName: 'Cable Lateral Raise',             sets: 3, reps: 15,   repMode: 'fixed',duration: null,                                  notes: 'Slow and controlled, no shrugging' },
+      { exerciseName: 'Ab Roller Rollout',               sets: 4, reps: 10,   repMode: 'fixed',duration: null, prKey: 'Ab Roller Rollout',      notes: 'Brought it? Do it. Otherwise cable crunch 4×15' },
+    ]},
+  { slug: 'tue:gym', name: 'Pull + Core — Tue (Gym)', type: 'strength', location: 'gym',
+    description: 'Back / Biceps (Gym)',
+    warmup: 'Treadmill 5 min, then lat pulldown 2×10 light',
+    cooldown: 'Lat stretch 30s each side, foam roll upper back',
+    exercises: [
+      { exerciseName: 'Lat Pulldown',                    sets: 4, reps: null, repMode: 'max',  duration: null, prKey: 'Lat Pulldown',          notes: 'Full range, chest to bar, control the negative' },
+      { exerciseName: 'Seated Cable Row',                sets: 4, reps: 12,   repMode: 'fixed',duration: null, prKey: 'Seated Cable Row',       notes: 'Squeeze shoulder blades 1s at top' },
+      { exerciseName: 'Single-Arm Dumbbell Row',         sets: 3, reps: 12,   repMode: 'fixed',duration: null, prKey: 'Single-Arm Dumbbell Row',notes: '12 per side' },
+      { exerciseName: 'EZ-Bar Curl',                     sets: 3, reps: 12,   repMode: 'fixed',duration: null, prKey: 'EZ-Bar Curl',            notes: 'Full extension at bottom' },
+      { exerciseName: 'Dumbbell Hammer Curl',            sets: 3, reps: 12,   repMode: 'fixed',duration: null,                                  notes: 'Neutral grip — hits brachialis' },
+      { exerciseName: 'Cable Face Pull',                 sets: 3, reps: 20,   repMode: 'fixed',duration: null,                                  notes: 'Shoulder health — always do these' },
+      { exerciseName: 'Hanging Leg Raise',               sets: 4, reps: 12,   repMode: 'fixed',duration: null, prKey: 'Hanging Leg Raise',      notes: 'Use pull-up bar or captain\'s chair' },
+    ]},
+  { slug: 'wed:gym', name: 'Legs + Conditioning — Wed (Gym)', type: 'strength', location: 'gym',
+    description: 'Legs + Conditioning (Gym)',
+    warmup: 'Bike or treadmill 5 min, then 2×10 goblet squat light',
+    cooldown: 'Hip flexor 60s each, hamstring stretch, foam roll quads',
+    exercises: [
+      { exerciseName: 'Barbell Back Squat',              sets: 4, reps: null, repMode: 'max',  duration: null, prKey: 'Barbell Back Squat',    notes: 'Work up to 3×5 heavy, or moderate weight high rep' },
+      { exerciseName: 'Romanian Deadlift (RDL)',         sets: 3, reps: 10,   repMode: 'fixed',duration: null, prKey: 'Romanian Deadlift',     notes: 'Hinge, flat back, feel the hamstring stretch' },
+      { exerciseName: 'Leg Press',                       sets: 3, reps: 15,   repMode: 'fixed',duration: null,                                  notes: 'Full range, knees out' },
+      { exerciseName: 'Leg Curl',                        sets: 3, reps: 12,   repMode: 'fixed',duration: null,                                  notes: '3-second negative' },
+      { exerciseName: 'Calf Raise (machine)',            sets: 4, reps: 20,   repMode: 'fixed',duration: null,                                  notes: 'Full range, pause top and bottom' },
+      { exerciseName: 'Cable Crunch',                    sets: 3, reps: 15,   repMode: 'fixed',duration: null,                                  notes: 'Round the spine into it' },
+      { exerciseName: 'Side Plank',                      sets: 3, reps: null, repMode: 'timed',duration: 30,   prKey: 'Side Plank',            notes: '30s each side' },
+    ]},
+  { slug: 'thu:gym', name: 'Core + Active Recovery — Thu (Gym)', type: 'strength', location: 'gym',
+    description: 'Core + Active Recovery (Gym)',
+    warmup: 'Bike 10 min easy',
+    cooldown: 'Full stretch — hip flexors, lats, thoracic. Take your time.',
+    exercises: [
+      { exerciseName: 'Cable Crunch',                    sets: 5, reps: 15,   repMode: 'fixed',duration: null,                                  notes: 'Round the spine fully' },
+      { exerciseName: 'Cable Wood Chop (High)',          sets: 3, reps: 12,   repMode: 'fixed',duration: null,                                  notes: '12 per side — rotate, don\'t arm-swing' },
+      { exerciseName: 'Hanging Leg Raise',               sets: 4, reps: 12,   repMode: 'fixed',duration: null, prKey: 'Hanging Leg Raise',      notes: 'Controlled, no swing' },
+      { exerciseName: 'Plank',                           sets: 3, reps: null, repMode: 'timed',duration: 60,   prKey: 'Plank',                  notes: 'Squeeze everything' },
+      { exerciseName: 'Cable Face Pull',                 sets: 3, reps: 20,   repMode: 'fixed',duration: null,                                  notes: 'Shoulder maintenance' },
+    ]},
+  { slug: 'fri:gym', name: 'Push Day — Fri (Gym)', type: 'strength', location: 'gym',
+    description: 'Chest / Shoulders / Triceps (Gym, progressive)',
+    warmup: 'Treadmill 5 min, bench warm-up sets',
+    cooldown: 'Chest stretch, cable rear-delt fly 2×20',
+    exercises: [
+      { exerciseName: 'Barbell Bench Press',             sets: 4, reps: null, repMode: 'max',  duration: null, prKey: 'Barbell Bench Press',   notes: 'Beat Monday\'s numbers' },
+      { exerciseName: 'Incline Dumbbell Press',          sets: 3, reps: 12,   repMode: 'fixed',duration: null, prKey: 'Incline Dumbbell Press', notes: 'Go heavier than Monday' },
+      { exerciseName: 'Pec Deck',                        sets: 3, reps: 15,   repMode: 'fixed',duration: null,                                  notes: 'Pump finish for chest' },
+      { exerciseName: 'Dumbbell Lateral Raise',          sets: 4, reps: 15,   repMode: 'fixed',duration: null,                                  notes: 'Slightly more than Monday if possible' },
+      { exerciseName: 'Cable Tricep Pushdown',           sets: 3, reps: 15,   repMode: 'fixed',duration: null,                                  notes: 'Single-rope for variety' },
+      { exerciseName: 'Overhead Tricep Extension',       sets: 3, reps: 12,   repMode: 'fixed',duration: null, prKey: 'Overhead Tricep Extension', notes: 'Cable or dumbbell' },
+      { exerciseName: 'Cable Crunch',                    sets: 4, reps: 15,   repMode: 'fixed',duration: null,                                  notes: 'Core finisher' },
+    ]},
 ];
 
 const SEED_ROUTINES = [
@@ -680,6 +855,21 @@ const getDatabase = (username) => {
         const planCount = await TrainingPlan.count();
         if (planCount === 0) {
             await TrainingPlan.bulkCreate(SEED_PLANS);
+        }
+
+        // Seed workout templates — additive by slug stored in name field
+        const existingTemplateNames = new Set(
+            (await WorkoutTemplate.findAll({ attributes: ['name'] })).map(t => t.name)
+        );
+        const templatesToInsert = SEED_WORKOUT_TEMPLATES.filter(t => !existingTemplateNames.has(t.slug));
+        if (templatesToInsert.length > 0) {
+            await WorkoutTemplate.bulkCreate(templatesToInsert.map(t => ({
+                name:        t.slug,
+                type:        t.type,
+                description: JSON.stringify({ label: t.name, location: t.location, warmup: t.warmup, cooldown: t.cooldown }),
+                exercises:   JSON.stringify(t.exercises),
+                isCustom:    false,
+            })));
         }
     }
 
