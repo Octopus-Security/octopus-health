@@ -76,6 +76,59 @@ router.get('/prs/bests', requireToken, async (req, res) => {
   } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
 });
 
+// POST /api/service/sessions
+// Log a complete workout session with its sets. Also writes an Exercise entry
+// so the dashboard "Today's Exercise" stat updates immediately.
+// Body: { type, title, date, durationMins, effort, notes, sets: [{ exerciseName, sets: [{ reps, weight, duration, notes }] }] }
+router.post('/sessions', requireToken, async (req, res) => {
+  try {
+    const { Exercise, WorkoutSession, WorkoutSet } = await getDB();
+    const { type = 'strength', title, date, durationMins, effort, notes, sets = [] } = req.body;
+    const today = date || new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
+
+    // Create the session
+    const session = await WorkoutSession.create({
+      date: today, type, title: title || null,
+      startedAt: new Date(), finishedAt: new Date(),
+      duration: durationMins || null,
+      effort: effort || null,
+      notes: notes || null,
+      status: 'finished',
+    });
+
+    // Create sets
+    let exerciseOrder = 0;
+    for (const exGroup of sets) {
+      let setNumber = 1;
+      for (const s of (exGroup.sets || [])) {
+        await WorkoutSet.create({
+          sessionId:     session.id,
+          exerciseName:  exGroup.exerciseName,
+          exerciseOrder,
+          setNumber,
+          reps:          s.reps    || null,
+          weight:        s.weight  || null,
+          weightUnit:    s.weightUnit || 'lbs',
+          duration:      s.duration || null,
+          notes:         s.notes   || null,
+        });
+        setNumber++;
+      }
+      exerciseOrder++;
+    }
+
+    // Write to simple Exercise table so dashboard shows activity today
+    await Exercise.create({
+      date: today,
+      type: title || type,
+      duration: durationMins || Math.max(30, sets.length * 5),
+      notes: `Logged via Neith — ${sets.length} exercise(s)`,
+    });
+
+    res.json({ ok: true, sessionId: session.id, exerciseCount: sets.length });
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+
 // GET /api/service/templates?slug=mon:gym
 // Returns workout template by slug (dayKey:location), or all if no slug.
 router.get('/templates', requireToken, async (req, res) => {
