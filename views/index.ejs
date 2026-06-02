@@ -88,7 +88,33 @@
         <div class="dashboard-grid">
             <div class="card">
                 <h2>Today's Exercises</h2>
-                <% if (todayExercises.length > 0) { %>
+                <% if (todayWorkoutSessions && todayWorkoutSessions.length > 0) { %>
+                    <% todayWorkoutSessions.forEach(session => { %>
+                        <div style="margin-bottom:14px; border:1px solid #1e1e1e; border-radius:8px; overflow:hidden;">
+                            <div style="background:#141414; padding:8px 12px; display:flex; justify-content:space-between; align-items:center;">
+                                <strong style="color:#e8e8e8"><%= session.title || session.type %></strong>
+                                <% if (session.duration) { %><span style="font-size:0.75rem;color:#555"><%= session.duration %> min</span><% } %>
+                            </div>
+                            <% if (session.exercises && session.exercises.length > 0) { %>
+                                <table style="width:100%; font-size:0.8rem; border-collapse:collapse;">
+                                    <% session.exercises.forEach(ex => { %>
+                                        <tr style="border-top:1px solid #1a1a1a;">
+                                            <td style="padding:6px 12px; color:#aaa; font-weight:500; white-space:nowrap"><%= ex.name %></td>
+                                            <td style="padding:6px 12px; color:#666; text-align:right">
+                                                <%= ex.sets.map(s => {
+                                                    if (s.duration) return s.duration + 's';
+                                                    const r = s.reps ? s.reps + ' reps' : '';
+                                                    const w = s.weight ? s.weight + (s.weightUnit || 'lbs') : '';
+                                                    return [r, w].filter(Boolean).join(' @ ') || '✓';
+                                                }).join(' · ') %>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                </table>
+                            <% } %>
+                        </div>
+                    <% }) %>
+                <% } else if (todayExercises.length > 0) { %>
                     <% todayExercises.forEach(exercise => { %>
                         <div class="list-item">
                             <strong><%= exercise.type %></strong><br>
@@ -98,7 +124,7 @@
                 <% } else { %>
                     <div class="empty-state">No exercises logged today</div>
                 <% } %>
-                <a href="/exercise" class="btn" style="margin-top: 15px;">Log Exercise</a>
+                <a href="/workout" class="btn" style="margin-top: 15px;">Log Exercise</a>
             </div>
 
             <div class="card">
