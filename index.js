@@ -218,7 +218,7 @@ app.post('/api/auth/login', async (req, res) => {
 
 // Dashboard
 app.get('/', requireLogin, async (req, res) => {
-    const { WeightEntry, Exercise, Meal, Goal, Competition, TrainingSession, sequelize } = getDatabase(req.session.user.username);
+    const { WeightEntry, Exercise, Meal, Goal, Competition, TrainingSession, WorkoutSession, WorkoutSet, sequelize } = getDatabase(req.session.user.username);
     await sequelize.sync();
 
     try {
@@ -231,6 +231,24 @@ app.get('/', requireLogin, async (req, res) => {
 
         const todayCalories = todayMeals.reduce((sum, meal) => sum + (meal.calories || 0), 0);
         const todayExerciseMinutes = todayExercises.reduce((sum, ex) => sum + ex.duration, 0);
+
+        // Fetch today's WorkoutSessions with their sets for the dashboard detail view
+        const rawSessions = await WorkoutSession.findAll({
+            where: { date: todayStr, status: 'finished' },
+            order: [['startedAt', 'ASC']],
+        });
+        const todayWorkoutSessions = await Promise.all(rawSessions.map(async s => {
+            const sets = await WorkoutSet.findAll({
+                where: { sessionId: s.id },
+                order: [['exerciseOrder', 'ASC'], ['setNumber', 'ASC']],
+            });
+            const byExercise = {};
+            for (const set of sets) {
+                if (!byExercise[set.exerciseOrder]) byExercise[set.exerciseOrder] = { name: set.exerciseName, sets: [] };
+                byExercise[set.exerciseOrder].sets.push(set);
+            }
+            return { ...s.toJSON(), exercises: Object.values(byExercise) };
+        }));
 
         // Upcoming competition widget
         const nextComp = await Competition.findOne({
@@ -262,6 +280,7 @@ app.get('/', requireLogin, async (req, res) => {
             todayExerciseMinutes,
             competitionWidget,
             todaySessions,
+            todayWorkoutSessions,
         });
     } catch (error) {
         console.error(error);

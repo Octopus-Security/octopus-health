@@ -347,6 +347,21 @@
   </div>
 </div>
 
+<!-- ── Session Detail Modal ── -->
+<div class="modal-overlay" id="session-detail-modal">
+  <div class="modal" style="width:min(480px,95vw)">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px">
+      <div>
+        <h3 style="margin:0" id="sd-title"></h3>
+        <div id="sd-meta" style="font-size:0.78rem;color:#666;margin-top:3px"></div>
+      </div>
+      <button onclick="document.getElementById('session-detail-modal').classList.remove('open')" style="background:none;border:none;color:#555;cursor:pointer;font-size:1.2rem;padding:0 0 0 12px">✕</button>
+    </div>
+    <hr style="border-color:#1e1e1e;margin:12px 0">
+    <div id="sd-body" style="max-height:60vh;overflow-y:auto"></div>
+  </div>
+</div>
+
 <!-- ── Rest Timer Banner ── -->
 <div class="rest-banner" id="rest-banner">
   <div>
@@ -657,11 +672,24 @@ async function viewSession(id) {
     if (!byOrder[set.exerciseOrder]) byOrder[set.exerciseOrder] = { name: set.exerciseName, sets: [] };
     byOrder[set.exerciseOrder].sets.push(set);
   }
-  const lines = Object.values(byOrder).map(ex => {
-    const setsStr = ex.sets.map(s => `${s.reps||'?'}×${s.weight||'BW'}${s.weightUnit||''}`).join(', ');
-    return `${ex.name}: ${setsStr}`;
-  }).join('\n');
-  alert(`${s.title||s.type} · ${s.date}\n${s.duration ? s.duration+'min' : ''}\n\n${lines}`);
+  const exercises = Object.values(byOrder);
+  const modal = document.getElementById('session-detail-modal');
+  document.getElementById('sd-title').textContent = (s.title || s.type) + (s.duration ? ` · ${s.duration} min` : '');
+  document.getElementById('sd-meta').textContent = s.date + (s.effort ? ` · RPE ${'★'.repeat(s.effort)}` : '') + (s.notes ? ` · ${s.notes}` : '');
+  document.getElementById('sd-body').innerHTML = exercises.map(ex => `
+    <div style="margin-bottom:12px">
+      <div style="font-weight:600;color:#e8e8e8;margin-bottom:4px">${ex.name}</div>
+      <table style="width:100%;font-size:0.82rem;border-collapse:collapse">
+        <tr style="color:#555;font-size:0.75rem"><td style="padding:2px 8px 4px 0">Set</td><td style="padding:2px 8px 4px 0">Reps</td><td style="padding:2px 0 4px">Weight</td></tr>
+        ${ex.sets.map((s,i) => `
+          <tr style="border-top:1px solid #1a1a1a">
+            <td style="padding:5px 8px 5px 0;color:#555">${i+1}</td>
+            <td style="padding:5px 8px 5px 0;color:#ccc">${s.duration ? s.duration+'s' : (s.reps || '—')}</td>
+            <td style="padding:5px 0;color:#ccc">${s.weight ? s.weight+(s.weightUnit||'lbs') : 'BW'}</td>
+          </tr>`).join('')}
+      </table>
+    </div>`).join('') || '<p style="color:#555">No sets recorded.</p>';
+  modal.classList.add('open');
 }
 
 // ── Template Builder ───────────────────────────────────────────────────────
