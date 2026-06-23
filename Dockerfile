@@ -10,10 +10,12 @@ WORKDIR /usr/src/app
 RUN apk add --no-cache python3 make g++
 
 # Copy package files first to maximize Docker layer cache hits
+ARG NPM_TOKEN
 COPY package*.json ./
-
-# Install production dependencies (builds sqlite3 from source)
-RUN npm install --omit=dev --no-audit --no-fund
+RUN echo "@octopus-security:registry=https://npm.pkg.github.com" > .npmrc \
+ && echo "//npm.pkg.github.com/:_authToken=${NPM_TOKEN}" >> .npmrc \
+ && npm install --omit=dev --no-audit --no-fund \
+ && rm -f .npmrc
 
 # Copy application code
 COPY --chown=node:node . .
