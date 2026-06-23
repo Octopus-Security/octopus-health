@@ -5,6 +5,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        - NPM_TOKEN
     container_name: octopus_health_tracker
     restart: always
     ports:
