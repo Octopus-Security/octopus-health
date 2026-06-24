@@ -6,6 +6,7 @@ const fs = require('fs');
 const path = require('path');
 const { Op } = require('sequelize');
 const { AuthClient } = require('@octopus-security/auth-client');
+const axios = require('axios');
 const app = express();
 // Trust proxy for correct IP detection behind Cloudflare/NGINX
 app.set('trust proxy', 1);
@@ -13,6 +14,7 @@ const port = process.env.PORT || 3000;
 const getDatabase = require('./database');
 
 const auth = new AuthClient();
+const AUTH_URL = process.env.AUTH_SERVICE_URL || 'http://octopus-auth:3002';
 
 function getActiveTab(requestPath) {
     if (requestPath === '/') return 'dashboard';
@@ -96,23 +98,24 @@ app.get('/login', (req, res) => {
 
 
 app.post('/login', async (req, res) => {
-    const { username, password } = req.body;
-    
-    try {
-        const r = await auth.login(username, password);
+    const { username, password, totpCode } = req.body;
 
-        if (r.ok && r.data.success) {
-            req.session.user = { username, token: r.data.token };
-            const { sequelize, seedData } = getDatabase(username);
+    try {
+        const r = await axios.post(`${AUTH_URL}/api/auth/login`, { username, password, totpCode }, { timeout: 5000 });
+        if (r.data.success) {
+            req.session.user = { username: r.data.username || username, token: r.data.token };
+            const { sequelize, seedData } = getDatabase(req.session.user.username);
             await sequelize.sync();
             await seedData();
-            res.redirect('/');
-        } else {
-            res.render('login', { title: 'Login', error: r.data.error || 'Login failed', mode: 'login', siteKey: process.env.RECAPTCHA_SITE_KEY });
+            return res.json({ ok: true });
         }
-    } catch (error) {
-        console.error('Login error:', error.message);
-        res.render('login', { title: 'Login', error: 'Login failed', mode: 'login', siteKey: process.env.RECAPTCHA_SITE_KEY });
+        res.status(401).json({ error: 'Credentials or 2FA incorrect' });
+    } catch (err) {
+        if (err.response?.status === 401 || err.response?.status === 403) {
+            return res.status(err.response.status).json({ error: 'Credentials or 2FA incorrect' });
+        }
+        console.error('Login error:', err.message);
+        res.status(503).json({ error: 'Service unavailable' });
     }
 });
 
