@@ -469,3 +469,28 @@ body.login-page {
 .toggle-link { text-align: center; margin-top: 20px; color: #666; }
 .toggle-link a { color: #2ecc71; font-weight: 600; text-decoration: none; }
 .toggle-link a:hover { color: #5df59a; }
+
+/* ── Mobile / responsive ───────────────────────────────────────── */
+@media (max-width: 640px) {
+    .container { padding: 12px; }
+    nav { padding: 10px 12px; }
+    nav h1 { font-size: 18px; }
+    nav a { padding: 6px 10px; font-size: 0.85rem; }
+
+    .card { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    table { min-width: 500px; }
+
+    .card { padding: 16px; }
+
+    .btn, button[type="submit"] { width: 100%; justify-content: center; }
+
+    .login-container { padding: 24px 18px; }
+    .login-container h1 { font-size: 22px; margin-bottom: 20px; }
+
+    .stat { font-size: 28px; }
+
+    .actions { flex-wrap: wrap; }
+
+    /* Prevents iOS zoom-on-focus */
+    input, select, textarea { font-size: 16px; }
+}
