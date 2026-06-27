@@ -25,6 +25,7 @@ function getActiveTab(requestPath) {
     if (requestPath.startsWith('/weight')) return 'weight';
     if (requestPath.startsWith('/goals') || requestPath.startsWith('/planner') || requestPath.startsWith('/plans') || requestPath.startsWith('/accountability')) return 'goals';
     if (requestPath.startsWith('/competitions')) return 'competitions';
+    if (requestPath.startsWith('/stats')) return 'stats';
     return '';
 }
 
@@ -1014,6 +1015,10 @@ app.post('/plans/unassign', requireLogin, async (req, res) => {
     const { TrainingPlanAssignment } = getDatabase(req.session.user.username);
     await TrainingPlanAssignment.update({ status: 'paused' }, { where: { status: 'active' } });
     res.redirect('/plans');
+});
+
+app.get('/stats', requireLogin, (req, res) => {
+    res.render('stats', { title: 'Stats & History', user: req.session.user });
 });
 
 // ─────────────────────────────────────────────────────────────────────────────

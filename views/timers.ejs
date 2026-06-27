@@ -54,6 +54,12 @@
     .cb-history-row .cb-idx { color:#333; min-width:28px; }
     .cb-history-row .cb-combo { color:#888; }
     .cb-round-info { font-size:0.8rem; color:#3498db; text-align:center; min-height:1.2em; margin-bottom:4px; }
+    .it-preset { background:#141414; border:1px solid #2a2a2a; border-radius:8px; padding:6px 12px; color:#888; font-size:0.8rem; cursor:pointer; transition:all 0.15s; display:flex; flex-direction:column; align-items:center; gap:2px; line-height:1.2; }
+    .it-preset:hover { background:#1a2a1a; border-color:#2ecc71; color:#2ecc71; }
+    .it-preset.bike { border-color:#2a3a4a; }
+    .it-preset.bike:hover { background:#1a2a3a; border-color:#3498db; color:#3498db; }
+    .it-preset span { font-size:0.68rem; color:#555; }
+    .it-preset:hover span { color:inherit; opacity:0.7; }
   </style>
 </head>
 <body>
@@ -115,6 +121,20 @@
   <!-- ── Interval Timer ── -->
   <div class="timer-panel" id="panel-interval">
     <div class="timer-card">
+      <!-- Quick presets -->
+      <div style="margin-bottom:16px;">
+        <div style="font-size:0.72rem;color:#555;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Quick Presets</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="it-preset" onclick="itPreset(8,20,10)">Tabata<span>20/10×8</span></button>
+          <button class="it-preset" onclick="itPreset(10,30,30)">30/30<span>×10</span></button>
+          <button class="it-preset" onclick="itPreset(10,40,20)">40/20<span>×10</span></button>
+          <button class="it-preset" onclick="itPreset(10,45,15)">45/15<span>×10</span></button>
+          <button class="it-preset bike" onclick="itPreset(10,10,50)">🚴 Bike Sprint<span>10/50×10</span></button>
+          <button class="it-preset bike" onclick="itPreset(10,20,40)">🚴 Bike 20/40<span>×10</span></button>
+          <button class="it-preset bike" onclick="itPreset(10,30,30)">🚴 Bike 30/30<span>×10</span></button>
+          <button class="it-preset bike" onclick="itPreset(8,40,20)">🚴 Bike 40/20<span>×8</span></button>
+        </div>
+      </div>
       <div class="config-grid config-grid-3">
         <div class="config-item">
           <label>Rounds</label>
@@ -408,6 +428,12 @@ function rtReset() {
 
 // ── Interval Timer ────────────────────────────────────────────────────────────
 let itState = null; let itTick = null;
+function itPreset(rounds, work, rest) {
+  document.getElementById('it-rounds').value = rounds;
+  document.getElementById('it-work').value   = work;
+  document.getElementById('it-rest').value   = rest;
+  itReset();
+}
 function itStart() {
   ctx.resume();
   if (itState && itState.paused) { itState.paused=false; itTick=setInterval(itTick_fn,1000); document.getElementById('it-start').style.display='none'; document.getElementById('it-pause').style.display=''; return; }
