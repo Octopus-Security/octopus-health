@@ -126,7 +126,7 @@ router.delete('/sessions/:id', async (req, res) => {
 
 router.post('/sessions/:id/sets', async (req, res) => {
     try {
-        const { WorkoutSet, sequelize } = getDatabase(req.user.username);
+        const { WorkoutSet, WorkoutSession, PersonalRecord, sequelize } = getDatabase(req.user.username);
         await sequelize.sync();
         const { exerciseName, exerciseId, exerciseOrder, setNumber, reps, weight, weightUnit, duration, distance, distanceUnit, rpe, notes } = req.body;
         if (!exerciseName) return res.status(400).json({ success: false, error: 'exerciseName required' });
@@ -135,7 +135,36 @@ router.post('/sessions/:id/sets', async (req, res) => {
             setNumber: setNumber || 1, reps, weight, weightUnit: weightUnit || 'lbs',
             duration, distance, distanceUnit, rpe, notes,
         });
-        res.status(201).json({ success: true, data: set });
+
+        // Auto-PR detection
+        let newPR = null;
+        try {
+            const session = await WorkoutSession.findByPk(req.params.id);
+            const sessionDate = session?.date || new Date().toISOString().slice(0, 10);
+            const existingPRs = await PersonalRecord.findAll({ where: { exerciseName } });
+
+            if (duration != null && weight == null && reps == null) {
+                // Cardio/timed — lower duration = PR
+                const bestTime = existingPRs.reduce((best, pr) => (pr.durationSecs != null && (best == null || pr.durationSecs < best) ? pr.durationSecs : best), null);
+                if (bestTime == null || duration < bestTime) {
+                    newPR = await PersonalRecord.create({ exerciseName, durationSecs: duration, distance: distance || null, date: sessionDate, notes: distanceUnit ? `${distance} ${distanceUnit}` : null });
+                }
+            } else if (weight != null) {
+                // Strength — higher weight = PR (same or more reps)
+                const bestWeight = existingPRs.reduce((best, pr) => (pr.weight != null && (best == null || pr.weight > best) ? pr.weight : best), null);
+                if (bestWeight == null || weight > bestWeight) {
+                    newPR = await PersonalRecord.create({ exerciseName, weight, weightUnit: weightUnit || 'lbs', reps: reps || null, date: sessionDate });
+                }
+            } else if (reps != null && weight == null) {
+                // Rep-only (pull-ups, push-ups) — more reps = PR
+                const bestReps = existingPRs.reduce((best, pr) => (pr.reps != null && (best == null || pr.reps > best) ? pr.reps : best), null);
+                if (bestReps == null || reps > bestReps) {
+                    newPR = await PersonalRecord.create({ exerciseName, reps, date: sessionDate });
+                }
+            }
+        } catch (_) { /* don't fail the set save over PR logic */ }
+
+        res.status(201).json({ success: true, data: set, newPR });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
     }
@@ -260,6 +289,130 @@ router.delete('/exercise-plans/:id', async (req, res) => {
         if (!plan) return res.status(404).json({ success: false, error: 'Not found' });
         await plan.destroy();
         res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// ── Exercise history & stats ───────────────────────────────────────────────────
+
+// GET /workout/exercise-history?exercise=<name>&limit=200
+router.get('/exercise-history', async (req, res) => {
+    try {
+        const { WorkoutSet, WorkoutSession, sequelize } = getDatabase(req.user.username);
+        await sequelize.sync();
+        const { exercise, limit = 200 } = req.query;
+        if (!exercise) return res.status(400).json({ success: false, error: 'exercise required' });
+
+        const sets = await WorkoutSet.findAll({
+            where: { exerciseName: exercise },
+            order: [['createdAt', 'DESC']],
+            limit: parseInt(limit),
+        });
+
+        const sessionIds = [...new Set(sets.map(s => s.sessionId))];
+        const sessions = await WorkoutSession.findAll({ where: { id: sessionIds } });
+        const sessionMap = Object.fromEntries(sessions.map(s => [s.id, s.toJSON()]));
+
+        const entries = sets.map(s => ({
+            ...s.toJSON(),
+            sessionDate: sessionMap[s.sessionId]?.date || null,
+            sessionType: sessionMap[s.sessionId]?.type || null,
+        }));
+
+        const withWeight   = entries.filter(e => e.weight   != null);
+        const withDuration = entries.filter(e => e.duration != null);
+        const withReps     = entries.filter(e => e.reps     != null && e.weight == null);
+
+        const avg = arr => arr.length ? arr.reduce((s, v) => s + v, 0) / arr.length : null;
+
+        const stats = {
+            totalSets: entries.length,
+            lastDate:  entries[0]?.sessionDate || null,
+            pr: {
+                maxWeight:   withWeight.length   ? Math.max(...withWeight.map(e => e.weight))     : null,
+                minDuration: withDuration.length ? Math.min(...withDuration.map(e => e.duration)) : null,
+                maxReps:     withReps.length     ? Math.max(...withReps.map(e => e.reps))         : null,
+            },
+            averages: {
+                weight:   avg(withWeight.map(e => e.weight)),
+                duration: avg(withDuration.map(e => e.duration)),
+                reps:     avg(withReps.map(e => e.reps)),
+            },
+            weightUnit:   withWeight[0]?.weightUnit   || 'lbs',
+            distanceUnit: entries.find(e => e.distanceUnit)?.distanceUnit || null,
+        };
+
+        res.json({ success: true, data: entries, stats });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// GET /workout/prs  — best PR per exercise (most recent win per exercise)
+router.get('/prs', async (req, res) => {
+    try {
+        const { PersonalRecord, sequelize } = getDatabase(req.user.username);
+        await sequelize.sync();
+        const all = await PersonalRecord.findAll({ order: [['date', 'DESC']] });
+        // Deduplicate: keep best per exerciseName
+        const best = {};
+        for (const pr of all) {
+            const key = pr.exerciseName;
+            if (!best[key]) { best[key] = pr.toJSON(); continue; }
+            // Replace if this PR is better
+            const cur = best[key];
+            if (pr.weight    != null && (cur.weight    == null || pr.weight    > cur.weight))    best[key] = pr.toJSON();
+            if (pr.durationSecs != null && (cur.durationSecs == null || pr.durationSecs < cur.durationSecs)) best[key] = pr.toJSON();
+            if (pr.reps      != null && pr.weight == null && (cur.reps == null || pr.reps > cur.reps)) best[key] = pr.toJSON();
+        }
+        res.json({ success: true, data: Object.values(best).sort((a, b) => a.exerciseName.localeCompare(b.exerciseName)) });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// POST /workout/prs  — manually add a PR
+router.post('/prs', async (req, res) => {
+    try {
+        const { PersonalRecord, sequelize } = getDatabase(req.user.username);
+        await sequelize.sync();
+        const { exerciseName, weight, weightUnit, reps, durationSecs, date, notes } = req.body;
+        if (!exerciseName || !date) return res.status(400).json({ success: false, error: 'exerciseName and date required' });
+        const pr = await PersonalRecord.create({ exerciseName, weight, weightUnit: weightUnit || 'lbs', reps, durationSecs, date, notes });
+        res.status(201).json({ success: true, data: pr });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// DELETE /workout/prs/:id
+router.delete('/prs/:id', async (req, res) => {
+    try {
+        const { PersonalRecord, sequelize } = getDatabase(req.user.username);
+        await sequelize.sync();
+        await PersonalRecord.destroy({ where: { id: req.params.id } });
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// GET /workout/exercise-names — distinct exercise names from logged sets (for autocomplete)
+router.get('/exercise-names', async (req, res) => {
+    try {
+        const { WorkoutSet, sequelize } = getDatabase(req.user.username);
+        await sequelize.sync();
+        const { Op } = require('sequelize');
+        const { q } = req.query;
+        const where = q ? { exerciseName: { [Op.like]: `%${q}%` } } : {};
+        const rows = await WorkoutSet.findAll({
+            where,
+            attributes: ['exerciseName'],
+            group: ['exerciseName'],
+            order: [['exerciseName', 'ASC']],
+        });
+        res.json({ success: true, data: rows.map(r => r.exerciseName) });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
     }

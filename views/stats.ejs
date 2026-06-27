@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/theme.css">
+  <style>
+    .stats-grid { display:grid; grid-template-columns:340px 1fr; gap:20px; align-items:start; }
+    @media(max-width:900px){ .stats-grid { grid-template-columns:1fr; } }
+
+    .search-wrap { position:relative; margin-bottom:10px; }
+    .search-wrap input { width:100%; background:#0d0d0d; border:1px solid #2a2a2a; border-radius:8px; padding:10px 14px; color:#e8e8e8; font-size:0.95rem; box-sizing:border-box; }
+    .search-wrap input:focus { outline:none; border-color:#2ecc71; }
+    .ex-dropdown { position:absolute; top:100%; left:0; right:0; background:#111; border:1px solid #2a2a2a; border-radius:8px; z-index:20; max-height:280px; overflow-y:auto; display:none; }
+    .ex-dropdown.open { display:block; }
+    .ex-opt { padding:9px 14px; cursor:pointer; font-size:0.9rem; color:#ccc; border-bottom:1px solid #1a1a1a; }
+    .ex-opt:hover { background:#1a2a1a; color:#2ecc71; }
+
+    .stat-card { background:#0d0d0d; border:1px solid #2a2a2a; border-radius:12px; padding:18px; margin-bottom:14px; }
+    .stat-card h3 { color:#e8e8e8; margin:0 0 14px; font-size:1rem; }
+    .stat-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .stat-block { background:#141414; border:1px solid #222; border-radius:8px; padding:12px; text-align:center; }
+    .stat-val { font-size:1.6rem; font-weight:700; color:#2ecc71; font-variant-numeric:tabular-nums; }
+    .stat-lbl { font-size:0.72rem; color:#666; text-transform:uppercase; letter-spacing:0.5px; margin-top:4px; }
+
+    .history-table { width:100%; border-collapse:collapse; font-size:0.88rem; }
+    .history-table th { color:#666; font-weight:500; padding:6px 10px; border-bottom:1px solid #222; text-align:left; font-size:0.75rem; text-transform:uppercase; }
+    .history-table td { padding:8px 10px; border-bottom:1px solid #1a1a1a; color:#ccc; }
+    .history-table tr:hover td { background:#0f1a0f; }
+    .pr-badge { display:inline-block; background:#1a3a1a; color:#2ecc71; font-size:0.65rem; font-weight:700; padding:1px 6px; border-radius:4px; margin-left:6px; vertical-align:middle; }
+
+    .pr-list { list-style:none; padding:0; margin:0; }
+    .pr-item { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid #1a1a1a; }
+    .pr-item:last-child { border-bottom:none; }
+    .pr-name { color:#e8e8e8; font-size:0.9rem; font-weight:500; }
+    .pr-val  { color:#2ecc71; font-size:0.9rem; font-weight:700; }
+    .pr-date { color:#555; font-size:0.75rem; margin-top:2px; }
+
+    .tab-row { display:flex; gap:8px; margin-bottom:16px; }
+    .tab-btn { padding:6px 16px; border-radius:20px; border:1px solid #2a2a2a; background:#0d0d0d; color:#888; font-size:0.82rem; cursor:pointer; transition:all 0.15s; }
+    .tab-btn.active { background:#1a2a1a; border-color:#2ecc71; color:#2ecc71; }
+
+    .empty { color:#555; text-align:center; padding:32px; font-size:0.9rem; }
+    .add-pr-form { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; }
+    .add-pr-form .full { grid-column:1/-1; }
+    .add-pr-form input, .add-pr-form select { background:#0d0d0d; border:1px solid #2a2a2a; border-radius:6px; padding:8px 10px; color:#e8e8e8; font-size:0.88rem; width:100%; box-sizing:border-box; }
+    .add-pr-form input:focus, .add-pr-form select:focus { outline:none; border-color:#2ecc71; }
+
+    .spinner { display:inline-block; width:16px; height:16px; border:2px solid #333; border-top-color:#2ecc71; border-radius:50%; animation:spin 0.7s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <%- include('partials/nav') %>
+
+  <div class="container">
+    <h2 style="margin-bottom:20px;">📊 Stats &amp; History</h2>
+
+    <div class="stats-grid">
+      <!-- Left panel: search + PRs list -->
+      <div>
+        <div class="card" style="margin-bottom:16px;">
+          <h3 style="margin-bottom:14px;">Exercise History</h3>
+          <div class="search-wrap">
+            <input id="exSearch" type="text" placeholder="Search exercise…" autocomplete="off">
+            <div class="ex-dropdown" id="exDropdown"></div>
+          </div>
+          <div id="searchHint" style="color:#555;font-size:0.82rem;">Type to search logged exercises</div>
+        </div>
+
+        <div class="card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <h3 style="margin:0;">Personal Records</h3>
+            <button class="btn btn-sm" id="btnAddPR" onclick="toggleAddPR()">+ Add</button>
+          </div>
+          <div id="addPRWrap" style="display:none;margin-bottom:16px;">
+            <div class="add-pr-form" id="addPRForm">
+              <input class="full" id="prExName" placeholder="Exercise name" type="text">
+              <input id="prWeight" placeholder="Weight" type="number" step="0.5">
+              <select id="prWeightUnit"><option value="lbs">lbs</option><option value="kg">kg</option></select>
+              <input id="prReps" placeholder="Reps" type="number">
+              <input id="prDuration" placeholder="Duration (sec)" type="number">
+              <input id="prDate" type="date" class="full">
+              <input class="full" id="prNotes" placeholder="Notes (optional)" type="text">
+              <div class="full" style="display:flex;gap:8px;">
+                <button class="btn" onclick="submitPR()" style="flex:1;">Save PR</button>
+                <button class="btn" onclick="toggleAddPR()" style="flex:1;background:#1a1a1a;border-color:#333;color:#888;">Cancel</button>
+              </div>
+            </div>
+          </div>
+          <ul class="pr-list" id="prList"><li class="empty">Loading…</li></ul>
+        </div>
+      </div>
+
+      <!-- Right panel: history for selected exercise -->
+      <div id="historyPanel">
+        <div class="card" style="color:#555;text-align:center;padding:48px 24px;">
+          <div style="font-size:2rem;margin-bottom:10px;">🔍</div>
+          <div>Search an exercise on the left to see its history and stats</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ── Helpers ──────────────────────────────────────────────────────────────────
+    const fmtDur = s => {
+      if (s == null) return '—';
+      const m = Math.floor(s / 60), sec = s % 60;
+      return m > 0 ? `${m}:${String(sec).padStart(2,'0')}` : `${sec}s`;
+    };
+    const fmtDate = d => d ? new Date(d + 'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—';
+    const round1 = v => v != null ? Math.round(v * 10) / 10 : null;
+
+    // ── PR list ──────────────────────────────────────────────────────────────────
+    async function loadPRs() {
+      const res = await fetch('/api/workout/prs', { credentials:'include' });
+      const j = await res.json();
+      const list = document.getElementById('prList');
+      if (!j.success || !j.data.length) { list.innerHTML = '<li class="empty">No PRs yet — they auto-detect when you log sets</li>'; return; }
+      list.innerHTML = j.data.map(pr => {
+        let val = '—';
+        if (pr.weight != null) val = `${pr.weight} ${pr.weightUnit}${pr.reps ? ' × ' + pr.reps : ''}`;
+        else if (pr.durationSecs != null) val = fmtDur(pr.durationSecs);
+        else if (pr.reps != null) val = `${pr.reps} reps`;
+        return `<li class="pr-item">
+          <div>
+            <div class="pr-name" style="cursor:pointer" onclick="selectExercise(${JSON.stringify(pr.exerciseName)})">${pr.exerciseName}</div>
+            <div class="pr-date">${fmtDate(pr.date)}</div>
+          </div>
+          <div style="text-align:right">
+            <div class="pr-val">${val}</div>
+            <div style="margin-top:4px"><button onclick="deletePR(${pr.id})" style="background:none;border:none;color:#333;cursor:pointer;font-size:0.75rem;" title="Delete">✕</button></div>
+          </div>
+        </li>`;
+      }).join('');
+    }
+
+    async function deletePR(id) {
+      if (!confirm('Delete this PR?')) return;
+      await fetch(`/api/workout/prs/${id}`, { method:'DELETE', credentials:'include' });
+      loadPRs();
+    }
+
+    function toggleAddPR() {
+      const w = document.getElementById('addPRWrap');
+      w.style.display = w.style.display === 'none' ? 'block' : 'none';
+      if (w.style.display === 'block') {
+        document.getElementById('prDate').value = new Date().toISOString().slice(0,10);
+      }
+    }
+
+    async function submitPR() {
+      const body = {
+        exerciseName: document.getElementById('prExName').value.trim(),
+        weight:   parseFloat(document.getElementById('prWeight').value) || null,
+        weightUnit: document.getElementById('prWeightUnit').value,
+        reps:     parseInt(document.getElementById('prReps').value)   || null,
+        durationSecs: parseInt(document.getElementById('prDuration').value) || null,
+        date:     document.getElementById('prDate').value,
+        notes:    document.getElementById('prNotes').value.trim() || null,
+      };
+      if (!body.exerciseName || !body.date) return alert('Exercise name and date required');
+      await fetch('/api/workout/prs', { method:'POST', credentials:'include', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+      toggleAddPR();
+      loadPRs();
+    }
+
+    // ── Exercise search ──────────────────────────────────────────────────────────
+    let searchTimeout;
+    const searchInput = document.getElementById('exSearch');
+    const dropdown    = document.getElementById('exDropdown');
+
+    searchInput.addEventListener('input', () => {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(async () => {
+        const q = searchInput.value.trim();
+        if (q.length < 1) { dropdown.classList.remove('open'); return; }
+        const res = await fetch(`/api/workout/exercise-names?q=${encodeURIComponent(q)}`, { credentials:'include' });
+        const j = await res.json();
+        if (!j.success || !j.data.length) { dropdown.innerHTML = '<div class="ex-opt" style="color:#555">No logged sets found</div>'; dropdown.classList.add('open'); return; }
+        dropdown.innerHTML = j.data.slice(0,20).map(name => `<div class="ex-opt" onclick="selectExercise(${JSON.stringify(name)})">${name}</div>`).join('');
+        dropdown.classList.add('open');
+      }, 200);
+    });
+
+    document.addEventListener('click', e => { if (!e.target.closest('.search-wrap')) dropdown.classList.remove('open'); });
+
+    async function selectExercise(name) {
+      searchInput.value = name;
+      dropdown.classList.remove('open');
+      document.getElementById('searchHint').textContent = '';
+      document.getElementById('historyPanel').innerHTML = '<div class="card" style="text-align:center;padding:40px"><div class="spinner"></div></div>';
+      const res = await fetch(`/api/workout/exercise-history?exercise=${encodeURIComponent(name)}&limit=200`, { credentials:'include' });
+      const j = await res.json();
+      if (!j.success) { document.getElementById('historyPanel').innerHTML = '<div class="card empty">Failed to load</div>'; return; }
+      renderHistory(name, j.data, j.stats);
+    }
+
+    function renderHistory(name, entries, stats) {
+      const isCardio   = stats.pr.minDuration != null && stats.pr.maxWeight == null;
+      const isStrength = stats.pr.maxWeight   != null;
+      const isReps     = stats.pr.maxReps     != null && !isStrength;
+
+      let statCards = '';
+      if (stats.lastDate) {
+        statCards += statBlock(fmtDate(stats.lastDate), 'Last session');
+      }
+      statCards += statBlock(stats.totalSets, 'Total sets logged');
+      if (isStrength) {
+        statCards += statBlock(`${stats.pr.maxWeight} ${stats.weightUnit}`, 'Weight PR');
+        if (stats.averages.weight != null) statCards += statBlock(`${round1(stats.averages.weight)} ${stats.weightUnit}`, 'Avg weight');
+      }
+      if (isCardio) {
+        statCards += statBlock(fmtDur(stats.pr.minDuration), 'Best time (PR)');
+        if (stats.averages.duration != null) statCards += statBlock(fmtDur(Math.round(stats.averages.duration)), 'Avg time');
+      }
+      if (isReps) {
+        statCards += statBlock(stats.pr.maxReps, 'Rep PR');
+        if (stats.averages.reps != null) statCards += statBlock(round1(stats.averages.reps), 'Avg reps');
+      }
+
+      // Build table columns dynamically
+      const hasDist   = entries.some(e => e.distance != null);
+      const hasDur    = entries.some(e => e.duration != null);
+      const hasWeight = entries.some(e => e.weight   != null);
+      const hasReps   = entries.some(e => e.reps     != null);
+
+      // Determine PR values for badge
+      const prWeight = stats.pr.maxWeight;
+      const prDur    = stats.pr.minDuration;
+      const prReps   = stats.pr.maxReps;
+
+      const rows = entries.map(e => {
+        const isPR = (hasWeight && e.weight === prWeight) ||
+                     (hasDur    && e.duration === prDur)  ||
+                     (isReps    && e.reps === prReps && !hasWeight);
+        let cols = `<td>${fmtDate(e.sessionDate)}</td>`;
+        if (hasWeight) cols += `<td>${e.weight != null ? e.weight + ' ' + e.weightUnit : '—'}${isPR && e.weight === prWeight ? '<span class="pr-badge">PR</span>' : ''}</td>`;
+        if (hasReps)   cols += `<td>${e.reps != null ? e.reps : '—'}${isPR && !hasWeight && e.reps === prReps ? '<span class="pr-badge">PR</span>' : ''}</td>`;
+        if (hasDist)   cols += `<td>${e.distance != null ? e.distance + ' ' + (e.distanceUnit || '') : '—'}</td>`;
+        if (hasDur)    cols += `<td>${e.duration != null ? fmtDur(e.duration) : '—'}${isPR && e.duration === prDur ? '<span class="pr-badge">PR</span>' : ''}</td>`;
+        cols += `<td style="color:#555;font-size:0.78rem">${e.rpe != null ? 'RPE '+e.rpe : ''}</td>`;
+        return `<tr>${cols}</tr>`;
+      }).join('');
+
+      let headers = '<th>Date</th>';
+      if (hasWeight) headers += '<th>Weight</th>';
+      if (hasReps)   headers += '<th>Reps</th>';
+      if (hasDist)   headers += '<th>Distance</th>';
+      if (hasDur)    headers += '<th>Time</th>';
+      headers += '<th></th>';
+
+      document.getElementById('historyPanel').innerHTML = `
+        <div class="card" style="margin-bottom:14px;">
+          <h3 style="margin-bottom:14px;">${name}</h3>
+          <div class="stat-grid-2">${statCards}</div>
+        </div>
+        <div class="card">
+          <h3 style="margin-bottom:14px;">All Entries</h3>
+          ${entries.length === 0
+            ? '<div class="empty">No sets logged yet</div>'
+            : `<div style="overflow-x:auto"><table class="history-table"><thead><tr>${headers}</tr></thead><tbody>${rows}</tbody></table></div>`
+          }
+        </div>`;
+    }
+
+    function statBlock(val, lbl) {
+      return `<div class="stat-block"><div class="stat-val">${val}</div><div class="stat-lbl">${lbl}</div></div>`;
+    }
+
+    // Init
+    loadPRs();
+
+    // Pre-fill date
+    document.getElementById('prDate').value = new Date().toISOString().slice(0,10);
+  </script>
+</body>
+</html>
