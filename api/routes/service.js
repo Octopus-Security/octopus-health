@@ -154,4 +154,39 @@ router.get('/templates', requireToken, async (req, res) => {
   } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
 });
 
+// ── Weight ────────────────────────────────────────────────────────────────────
+// For Neith (Discord/Telegram) to read/log Nick's weight into his account. The
+// open, per-account weight UI lives at /weight — this is the bot's service path.
+
+// GET /api/service/weight/latest — most recent bodyweight entry
+router.get('/weight/latest', requireToken, async (req, res) => {
+  try {
+    const { WeightEntry } = await getDB();
+    const row = await WeightEntry.findOne({ order: [['date', 'DESC'], ['createdAt', 'DESC']] });
+    res.json({ ok: true, weight: row });
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+
+// POST /api/service/weight  { weight, unit, date, notes } — idempotent per date
+router.post('/weight', requireToken, async (req, res) => {
+  try {
+    const { WeightEntry } = await getDB();
+    const { weight, unit, date, notes } = req.body;
+    const value = parseFloat(weight);
+    if (!Number.isFinite(value)) return res.status(400).json({ error: 'weight (number) required' });
+    const day = date || new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
+    const existing = await WeightEntry.findOne({ where: { date: day } });
+    let row;
+    if (existing) {
+      existing.weight = value;
+      if (unit)          existing.unit  = unit;
+      if (notes != null) existing.notes = notes;
+      row = await existing.save();
+    } else {
+      row = await WeightEntry.create({ weight: value, unit: unit || 'lbs', date: day, notes: notes || null });
+    }
+    res.json({ ok: true, weight: row });
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+
 module.exports = router;
