@@ -263,9 +263,8 @@ app.get('/tools', requireLogin, (req, res) => {
 // Weight tracking routes
 app.get('/weight', requireLogin, async (req, res) => {
     const { WeightEntry } = getDatabase(req.session.user.username);
-    const entries = await WeightEntry.findAll({ 
-        order: [['date', 'DESC']], 
-        limit: 30 
+    const entries = await WeightEntry.findAll({
+        order: [['date', 'DESC']],
     });
     res.render('weight', { title: 'Weight Tracking', entries, user: req.session.user });
 });
@@ -273,6 +272,16 @@ app.get('/weight', requireLogin, async (req, res) => {
 app.post('/weight', requireLogin, async (req, res) => {
     const { WeightEntry } = getDatabase(req.session.user.username);
     await WeightEntry.create(req.body);
+    res.redirect('/weight');
+});
+
+app.post('/weight/edit/:id', requireLogin, async (req, res) => {
+    const { WeightEntry } = getDatabase(req.session.user.username);
+    const { date, weight, unit, notes } = req.body;
+    await WeightEntry.update(
+        { date, weight, unit, notes },
+        { where: { id: req.params.id } }
+    );
     res.redirect('/weight');
 });
 
