@@ -1,6 +1,4 @@
 const express = require('express');
-const session = require('express-session');
-const SQLiteStore = require('connect-sqlite3')(session);
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
@@ -59,19 +57,57 @@ app.set('views', './views');
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(session({
-    store: new SQLiteStore({ db: 'sessions.sqlite', dir: './data' }),
-    secret: process.env.SESSION_SECRET || 'change-me-in-production',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        secure: false,
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours
-    }
-}));
+// ── Stateless SSO auth ────────────────────────────────────────────────────────
+// One central login at auth.octopustechnology.net sets a JWT cookie scoped to the
+// whole domain. Each request we verify that cookie against octopus-auth (cached)
+// and expose the user as req.user — no local session.
+const SSO_COOKIE     = 'octopus_sso';
+const AUTH_LOGIN_URL = (process.env.AUTH_PUBLIC_URL || 'https://auth.octopustechnology.net') + '/login';
+const _verifyCache = new Map();   // token -> { user, exp }
+const _seededUsers = new Set();   // usernames whose DB has been ensured this run
 
-app.use((req, res, next) => {
-    res.locals.user = req.session?.user || null;
+function parseCookies(req) {
+    const out = {};
+    const header = req.headers.cookie;
+    if (!header) return out;
+    for (const part of header.split(';')) {
+        const i = part.indexOf('=');
+        if (i > -1) out[part.slice(0, i).trim()] = decodeURIComponent(part.slice(i + 1).trim());
+    }
+    return out;
+}
+
+async function verifyToken(token) {
+    const cached = _verifyCache.get(token);
+    if (cached && cached.exp > Date.now()) return cached.user;
+    try {
+        const r = await axios.post(`${AUTH_URL}/api/auth/verify`, {}, {
+            headers: { Authorization: `Bearer ${token}` }, timeout: 5000,
+        });
+        if (r.data && r.data.valid && r.data.user) {
+            _verifyCache.set(token, { user: r.data.user, exp: Date.now() + 5 * 60 * 1000 });
+            return r.data.user;
+        }
+    } catch { /* invalid or auth unreachable → treat as unauthenticated */ }
+    return null;
+}
+
+// Lazily create + seed a user's DB the first time we see them this run.
+async function ensureUserDb(username) {
+    if (_seededUsers.has(username)) return;
+    const { sequelize, seedData } = getDatabase(username);
+    await sequelize.sync();
+    await seedData();
+    _seededUsers.add(username);
+}
+
+app.use(async (req, res, next) => {
+    const token = parseCookies(req)[SSO_COOKIE];
+    if (token) {
+        const user = await verifyToken(token);
+        if (user) req.user = { username: user.username, role: user.role, token };
+    }
+    res.locals.user = req.user || null;
     res.locals.activeTab = getActiveTab(req.path);
     next();
 });
@@ -80,89 +116,31 @@ app.use((req, res, next) => {
 const apiRouter = require('./api');
 app.use('/api', apiRouter);
 
-// Auth middleware
-const requireLogin = (req, res, next) => {
-    if (req.session.user) {
-        next();
-    } else {
-        res.redirect('/login');
+// Auth middleware — require a verified SSO user, else bounce to central login.
+const requireLogin = async (req, res, next) => {
+    if (!req.user) {
+        const back = encodeURIComponent(`https://${req.get('host')}${req.originalUrl}`);
+        return res.redirect(`${AUTH_LOGIN_URL}?redirect=${back}`);
     }
+    try { await ensureUserDb(req.user.username); }
+    catch (e) { console.error('ensureUserDb failed:', e.message); }
+    next();
 };
 
 // Routes
 
+// Login/register/logout are centralized at auth.octopustechnology.net now.
 app.get('/login', (req, res) => {
-    const siteKey = process.env.RECAPTCHA_SITE_KEY;
-    console.log('RECAPTCHA_SITE_KEY for /login page:', siteKey);
-    res.render('login', { title: 'Login', error: null, mode: 'login', siteKey });
+    const back = encodeURIComponent(`https://${req.get('host')}/`);
+    res.redirect(`${AUTH_LOGIN_URL}?redirect=${back}`);
 });
 
-
-app.post('/login', async (req, res) => {
-    const { username, password, totpCode } = req.body;
-
-    try {
-        const clientIp = req.headers['x-forwarded-for']?.split(',')[0].trim() || req.ip || '';
-        const r = await axios.post(`${AUTH_URL}/api/auth/login`, { username, password, totpCode }, {
-            timeout: 5000,
-            headers: { 'X-Forwarded-For': clientIp },
-        });
-        if (r.data.success) {
-            req.session.user = { username: r.data.username || username, token: r.data.token };
-            const { sequelize, seedData } = getDatabase(req.session.user.username);
-            await sequelize.sync();
-            await seedData();
-            return res.json({ ok: true });
-        }
-        res.status(401).json({ error: 'Credentials or 2FA incorrect' });
-    } catch (err) {
-        if (err.response?.status === 401 || err.response?.status === 403) {
-            return res.status(err.response.status).json({ error: 'Credentials or 2FA incorrect' });
-        }
-        console.error('Login error:', err.message);
-        res.status(503).json({ error: 'Service unavailable' });
-    }
-});
-
-
-app.get('/register', (req, res) => {
-    res.render('login', { title: 'Register', error: null, mode: 'register', siteKey: process.env.RECAPTCHA_SITE_KEY });
-});
-
-
-app.post('/register', async (req, res) => {
-    const { username, password, confirmPassword, inviteCode } = req.body;
-
-    try {
-        if (!username || !password || !confirmPassword) {
-            return res.render('login', { title: 'Register', error: 'All fields required', mode: 'register', siteKey: process.env.RECAPTCHA_SITE_KEY });
-        }
-
-        if (password !== confirmPassword) {
-            return res.render('login', { title: 'Register', error: 'Passwords do not match', mode: 'register', siteKey: process.env.RECAPTCHA_SITE_KEY });
-        }
-
-        const r = await auth.register(username, password, null, inviteCode);
-
-        if (r.ok && r.data.success) {
-            req.session.user = { username, token: r.data.token };
-            const { sequelize, seedData } = getDatabase(username);
-            await sequelize.sync();
-            await seedData();
-            res.redirect('/');
-        } else {
-            res.render('login', { title: 'Register', error: r.data.error || 'Registration failed', mode: 'register', siteKey: process.env.RECAPTCHA_SITE_KEY });
-        }
-    } catch (error) {
-        console.error('Registration error:', error.message);
-        res.render('login', { title: 'Register', error: 'Registration failed', mode: 'register', siteKey: process.env.RECAPTCHA_SITE_KEY });
-    }
-});
+app.get('/register', (req, res) => res.redirect(AUTH_LOGIN_URL));
 
 app.get('/logout', (req, res) => {
-    req.session.destroy(() => {
-        res.redirect('/login');
-    });
+    const base = process.env.AUTH_PUBLIC_URL || 'https://auth.octopustechnology.net';
+    const back = encodeURIComponent(`https://${req.get('host')}/`);
+    res.redirect(`${base}/logout?redirect=${back}`);
 });
 
 // REST API endpoints for mobile app
@@ -186,7 +164,7 @@ app.post('/api/auth/login', async (req, res) => {
 
 // Dashboard
 app.get('/', requireLogin, async (req, res) => {
-    const { WeightEntry, Exercise, Meal, Goal, Competition, TrainingSession, WorkoutSession, WorkoutSet, sequelize } = getDatabase(req.session.user.username);
+    const { WeightEntry, Exercise, Meal, Goal, Competition, TrainingSession, WorkoutSession, WorkoutSet, sequelize } = getDatabase(req.user.username);
     await sequelize.sync();
 
     try {
@@ -239,7 +217,7 @@ app.get('/', requireLogin, async (req, res) => {
 
         res.render('index', {
             title: 'Health Tracker Dashboard',
-            user: req.session.user,
+            user: req.user,
             recentWeight,
             todayExercises,
             todayMeals,
@@ -257,26 +235,26 @@ app.get('/', requireLogin, async (req, res) => {
 });
 
 app.get('/tools', requireLogin, (req, res) => {
-    res.render('tools', { title: 'Tools', user: req.session.user });
+    res.render('tools', { title: 'Tools', user: req.user });
 });
 
 // Weight tracking routes
 app.get('/weight', requireLogin, async (req, res) => {
-    const { WeightEntry } = getDatabase(req.session.user.username);
+    const { WeightEntry } = getDatabase(req.user.username);
     const entries = await WeightEntry.findAll({
         order: [['date', 'DESC']],
     });
-    res.render('weight', { title: 'Weight Tracking', entries, user: req.session.user });
+    res.render('weight', { title: 'Weight Tracking', entries, user: req.user });
 });
 
 app.post('/weight', requireLogin, async (req, res) => {
-    const { WeightEntry } = getDatabase(req.session.user.username);
+    const { WeightEntry } = getDatabase(req.user.username);
     await WeightEntry.create(req.body);
     res.redirect('/weight');
 });
 
 app.post('/weight/edit/:id', requireLogin, async (req, res) => {
-    const { WeightEntry } = getDatabase(req.session.user.username);
+    const { WeightEntry } = getDatabase(req.user.username);
     const { date, weight, unit, notes } = req.body;
     await WeightEntry.update(
         { date, weight, unit, notes },
@@ -286,79 +264,79 @@ app.post('/weight/edit/:id', requireLogin, async (req, res) => {
 });
 
 app.post('/weight/delete/:id', requireLogin, async (req, res) => {
-    const { WeightEntry } = getDatabase(req.session.user.username);
+    const { WeightEntry } = getDatabase(req.user.username);
     await WeightEntry.destroy({ where: { id: req.params.id } });
     res.redirect('/weight');
 });
 
 // Exercise tracking routes
 app.get('/exercise', requireLogin, async (req, res) => {
-    const { Exercise } = getDatabase(req.session.user.username);
+    const { Exercise } = getDatabase(req.user.username);
     const exercises = await Exercise.findAll({ 
         order: [['date', 'DESC']], 
         limit: 30 
     });
-    res.render('exercise', { title: 'Exercise Tracking', exercises, user: req.session.user });
+    res.render('exercise', { title: 'Exercise Tracking', exercises, user: req.user });
 });
 
 app.post('/exercise', requireLogin, async (req, res) => {
-    const { Exercise } = getDatabase(req.session.user.username);
+    const { Exercise } = getDatabase(req.user.username);
     await Exercise.create(req.body);
     res.redirect('/exercise');
 });
 
 app.get('/nutrition', requireLogin, async (req, res) => {
-    const { Meal } = getDatabase(req.session.user.username);
+    const { Meal } = getDatabase(req.user.username);
     const meals = await Meal.findAll({
         order: [['date', 'DESC'], ['time', 'DESC']],
         limit: 30
     });
-    res.render('meals', { title: 'Nutrition', meals, user: req.session.user });
+    res.render('meals', { title: 'Nutrition', meals, user: req.user });
 });
 
 app.post('/exercise/delete/:id', requireLogin, async (req, res) => {
-    const { Exercise } = getDatabase(req.session.user.username);
+    const { Exercise } = getDatabase(req.user.username);
     await Exercise.destroy({ where: { id: req.params.id } });
     res.redirect('/exercise');
 });
 
 // Meal/Food tracking routes
 app.get('/meals', requireLogin, async (req, res) => {
-    const { Meal } = getDatabase(req.session.user.username);
+    const { Meal } = getDatabase(req.user.username);
     const meals = await Meal.findAll({ 
         order: [['date', 'DESC'], ['time', 'DESC']], 
         limit: 30 
     });
-    res.render('meals', { title: 'Food Tracking', meals, user: req.session.user });
+    res.render('meals', { title: 'Food Tracking', meals, user: req.user });
 });
 
 app.post('/meals', requireLogin, async (req, res) => {
-    const { Meal } = getDatabase(req.session.user.username);
+    const { Meal } = getDatabase(req.user.username);
     await Meal.create(req.body);
     res.redirect('/meals');
 });
 
 app.post('/meals/delete/:id', requireLogin, async (req, res) => {
-    const { Meal } = getDatabase(req.session.user.username);
+    const { Meal } = getDatabase(req.user.username);
     await Meal.destroy({ where: { id: req.params.id } });
     res.redirect('/meals');
 });
 
 // Goals routes
 app.get('/goals', requireLogin, async (req, res) => {
-    const { Goal } = getDatabase(req.session.user.username);
+    const { Goal } = getDatabase(req.user.username);
     const goals = await Goal.findAll({ order: [['completed', 'ASC'], ['deadline', 'ASC']] });
-    res.render('goals', { title: 'Goals', goals, user: req.session.user });
+    res.render('goals', { title: 'Goals', goals, user: req.user });
 });
 
 app.post('/goals', requireLogin, async (req, res) => {
-    const { Goal } = getDatabase(req.session.user.username);
+    const { Goal } = getDatabase(req.user.username);
     await Goal.create(req.body);
     res.redirect('/goals');
 });
 
 app.post('/goals/toggle/:id', requireLogin, async (req, res) => {
-    const { Goal } = getDatabase(req.session.user.username);
+    const { Goal } = getDatabase(req.user.username);
     const goal = await Goal.findByPk(req.params.id);
     goal.completed = !goal.completed;
     await goal.save();
@@ -366,14 +344,14 @@ app.post('/goals/toggle/:id', requireLogin, async (req, res) => {
 });
 
 app.post('/goals/delete/:id', requireLogin, async (req, res) => {
-    const { Goal } = getDatabase(req.session.user.username);
+    const { Goal } = getDatabase(req.user.username);
     await Goal.destroy({ where: { id: req.params.id } });
     res.redirect('/goals');
 });
 
 // API endpoints for charts
 app.get('/api/weight-data', requireLogin, async (req, res) => {
-    const { WeightEntry } = getDatabase(req.session.user.username);
+    const { WeightEntry } = getDatabase(req.user.username);
     const entries = await WeightEntry.findAll({ 
         order: [['date', 'ASC']], 
         limit: 90 
@@ -383,14 +361,14 @@ app.get('/api/weight-data', requireLogin, async (req, res) => {
 
 // User settings routes
 app.get('/settings', requireLogin, (req, res) => {
-    res.render('settings', { title: 'Account Settings', user: req.session.user, error: null, success: null });
+    res.render('settings', { title: 'Account Settings', user: req.user, error: null, success: null });
 });
 
 app.post('/settings/change-password', requireLogin, async (req, res) => {
     // Password updates are managed by the centralized auth service.
     res.render('settings', {
         title: 'Account Settings',
-        user: req.session.user,
+        user: req.user,
         error: 'Password changes are handled by octopus-auth and are not available from this app yet.',
         success: null
     });
@@ -399,7 +377,7 @@ app.post('/settings/change-password', requireLogin, async (req, res) => {
 app.post('/settings/delete-account', requireLogin, async (req, res) => {
     res.render('settings', {
         title: 'Account Settings',
-        user: req.session.user,
+        user: req.user,
         error: 'Account deletion must be performed via octopus-auth and is not available from this app yet.',
         success: null
     });
@@ -423,7 +401,7 @@ function mapRoutineForClient(routine) {
 }
 
 app.get('/stretch', requireLogin, async (req, res) => {
-    const { Routine, ExerciseDefinition, sequelize } = getDatabase(req.session.user.username);
+    const { Routine, ExerciseDefinition, sequelize } = getDatabase(req.user.username);
     await sequelize.sync();
 
     const all = await Routine.findAll({ order: [['type', 'ASC'], ['name', 'ASC']] });
@@ -443,21 +421,21 @@ app.get('/stretch', requireLogin, async (req, res) => {
 
     res.render('stretch', {
         title: 'Stretch Builder',
-        user: req.session.user,
+        user: req.user,
         routines,
         exerciseLibrary,
     });
 });
 
 app.get('/stretch/api/routines', requireLogin, async (req, res) => {
-    const { Routine, sequelize } = getDatabase(req.session.user.username);
+    const { Routine, sequelize } = getDatabase(req.user.username);
     await sequelize.sync();
     const routines = await Routine.findAll({ order: [['type', 'ASC'], ['name', 'ASC']] });
     res.json({ success: true, data: routines.map(mapRoutineForClient) });
 });
 
 app.post('/stretch/api/routines', requireLogin, async (req, res) => {
-    const { Routine, sequelize } = getDatabase(req.session.user.username);
+    const { Routine, sequelize } = getDatabase(req.user.username);
     await sequelize.sync();
 
     const { name, type, notes, items } = req.body;
@@ -476,7 +454,7 @@ app.post('/stretch/api/routines', requireLogin, async (req, res) => {
 });
 
 app.delete('/stretch/api/routines/:id', requireLogin, async (req, res) => {
-    const { Routine } = getDatabase(req.session.user.username);
+    const { Routine } = getDatabase(req.user.username);
     await Routine.destroy({ where: { id: req.params.id } });
     res.json({ success: true });
 });
@@ -486,7 +464,7 @@ app.get('/routines', requireLogin, async (req, res) => {
 });
 
 app.post('/routines', requireLogin, async (req, res) => {
-    const { Routine, sequelize } = getDatabase(req.session.user.username);
+    const { Routine, sequelize } = getDatabase(req.user.username);
     await sequelize.sync();
     const { name, type, notes } = req.body;
     await Routine.create({ name: name.trim(), type, notes: notes?.trim() || null, items: '[]' });
@@ -494,7 +472,7 @@ app.post('/routines', requireLogin, async (req, res) => {
 });
 
 app.post('/routines/update/:id', requireLogin, async (req, res) => {
-    const { Routine } = getDatabase(req.session.user.username);
+    const { Routine } = getDatabase(req.user.username);
     const r = await Routine.findByPk(req.params.id);
     if (!r) return res.redirect('/routines');
     const { name, type, notes } = req.body;
@@ -503,13 +481,13 @@ app.post('/routines/update/:id', requireLogin, async (req, res) => {
 });
 
 app.post('/routines/delete/:id', requireLogin, async (req, res) => {
-    const { Routine } = getDatabase(req.session.user.username);
+    const { Routine } = getDatabase(req.user.username);
     await Routine.destroy({ where: { id: req.params.id } });
     res.redirect('/routines');
 });
 
 app.post('/routines/:id/items', requireLogin, async (req, res) => {
-    const { Routine, ExerciseDefinition } = getDatabase(req.session.user.username);
+    const { Routine, ExerciseDefinition } = getDatabase(req.user.username);
     const r = await Routine.findByPk(req.params.id);
     if (!r) return res.redirect('/routines');
     const items = JSON.parse(r.items || '[]');
@@ -533,7 +511,7 @@ app.post('/routines/:id/items', requireLogin, async (req, res) => {
 });
 
 app.post('/routines/:id/items/update/:idx', requireLogin, async (req, res) => {
-    const { Routine, ExerciseDefinition } = getDatabase(req.session.user.username);
+    const { Routine, ExerciseDefinition } = getDatabase(req.user.username);
     const r = await Routine.findByPk(req.params.id);
     if (!r) return res.redirect('/routines');
     const items = JSON.parse(r.items || '[]');
@@ -560,7 +538,7 @@ app.post('/routines/:id/items/update/:idx', requireLogin, async (req, res) => {
 });
 
 app.post('/routines/:id/items/delete/:idx', requireLogin, async (req, res) => {
-    const { Routine } = getDatabase(req.session.user.username);
+    const { Routine } = getDatabase(req.user.username);
     const r = await Routine.findByPk(req.params.id);
     if (!r) return res.redirect('/routines');
     const items = JSON.parse(r.items || '[]');
@@ -585,7 +563,7 @@ const SESSION_TYPES = {
 };
 
 app.get('/planner', requireLogin, async (req, res) => {
-    const { ScheduleProfile, TrainingSession, Competition, sequelize } = getDatabase(req.session.user.username);
+    const { ScheduleProfile, TrainingSession, Competition, sequelize } = getDatabase(req.user.username);
     await sequelize.sync();
 
     const schedule = await ScheduleProfile.findOne();
@@ -617,7 +595,7 @@ app.get('/planner', requireLogin, async (req, res) => {
 
     res.render('planner', {
         title: 'Training Planner',
-        user: req.session.user,
+        user: req.user,
         scheduleData,
         upcomingSessions,
         recentSessions,
@@ -629,7 +607,7 @@ app.get('/planner', requireLogin, async (req, res) => {
 });
 
 app.post('/planner/schedule', requireLogin, async (req, res) => {
-    const { ScheduleProfile, sequelize } = getDatabase(req.session.user.username);
+    const { ScheduleProfile, sequelize } = getDatabase(req.user.username);
     await sequelize.sync();
 
     const workDays    = [].concat(req.body.workDays    || []).map(Number);
@@ -653,7 +631,7 @@ app.post('/planner/schedule', requireLogin, async (req, res) => {
 });
 
 app.post('/planner/session', requireLogin, async (req, res) => {
-    const { TrainingSession, sequelize } = getDatabase(req.session.user.username);
+    const { TrainingSession, sequelize } = getDatabase(req.user.username);
     await sequelize.sync();
 
     const { date, type, title, plannedDuration, notes, competitionId } = req.body;
@@ -670,7 +648,7 @@ app.post('/planner/session', requireLogin, async (req, res) => {
 });
 
 app.post('/planner/session/update/:id', requireLogin, async (req, res) => {
-    const { TrainingSession } = getDatabase(req.session.user.username);
+    const { TrainingSession } = getDatabase(req.user.username);
     const s = await TrainingSession.findByPk(req.params.id);
     if (!s) return res.redirect('/planner');
 
@@ -687,7 +665,7 @@ app.post('/planner/session/update/:id', requireLogin, async (req, res) => {
 });
 
 app.post('/planner/session/delete/:id', requireLogin, async (req, res) => {
-    const { TrainingSession } = getDatabase(req.session.user.username);
+    const { TrainingSession } = getDatabase(req.user.username);
     await TrainingSession.destroy({ where: { id: req.params.id } });
     res.redirect('/planner');
 });
@@ -697,7 +675,7 @@ app.post('/planner/session/delete/:id', requireLogin, async (req, res) => {
 const SPORT_LABELS = { muay_thai: '🥊 Muay Thai', bjj: '🥋 BJJ', other: '🏆 Other' };
 
 app.get('/competitions', requireLogin, async (req, res) => {
-    const { Competition, sequelize } = getDatabase(req.session.user.username);
+    const { Competition, sequelize } = getDatabase(req.user.username);
     await sequelize.sync();
 
     const all = await Competition.findAll({ order: [['date', 'ASC']] });
@@ -716,7 +694,7 @@ app.get('/competitions', requireLogin, async (req, res) => {
 
     res.render('competitions', {
         title: 'Competitions',
-        user: req.session.user,
+        user: req.user,
         competitions: enriched,
         sportLabels: SPORT_LABELS,
         todayStr,
@@ -724,7 +702,7 @@ app.get('/competitions', requireLogin, async (req, res) => {
 });
 
 app.post('/competitions', requireLogin, async (req, res) => {
-    const { Competition, sequelize } = getDatabase(req.session.user.username);
+    const { Competition, sequelize } = getDatabase(req.user.username);
     await sequelize.sync();
 
     const { name, sport, date, location, weightClass, registrationDeadline, notes } = req.body;
@@ -740,7 +718,7 @@ app.post('/competitions', requireLogin, async (req, res) => {
 });
 
 app.post('/competitions/delete/:id', requireLogin, async (req, res) => {
-    const { Competition } = getDatabase(req.session.user.username);
+    const { Competition } = getDatabase(req.user.username);
     await Competition.destroy({ where: { id: req.params.id } });
     res.redirect('/competitions');
 });
@@ -748,7 +726,7 @@ app.post('/competitions/delete/:id', requireLogin, async (req, res) => {
 // ── Accountability ────────────────────────────────────────────────────────────
 
 app.get('/accountability', requireLogin, async (req, res) => {
-    const { TrainingSession, sequelize } = getDatabase(req.session.user.username);
+    const { TrainingSession, sequelize } = getDatabase(req.user.username);
     await sequelize.sync();
 
     const today    = new Date();
@@ -805,7 +783,7 @@ app.get('/accountability', requireLogin, async (req, res) => {
 
     res.render('accountability', {
         title: 'Accountability',
-        user: req.session.user,
+        user: req.user,
         heatmap,
         streak,
         weekCompleted,
@@ -819,7 +797,7 @@ app.get('/accountability', requireLogin, async (req, res) => {
 // ── Workout Logger ────────────────────────────────────────────────────────────
 
 app.get('/workout', requireLogin, async (req, res) => {
-    const { WorkoutSession, WorkoutSet, TrainingPlan, TrainingPlanAssignment, WorkoutTemplate, sequelize } = getDatabase(req.session.user.username);
+    const { WorkoutSession, WorkoutSet, TrainingPlan, TrainingPlanAssignment, WorkoutTemplate, sequelize } = getDatabase(req.user.username);
     await sequelize.sync();
     const recent = await WorkoutSession.findAll({ order: [['date','DESC'],['startedAt','DESC']], limit: 10 });
     const recentWithCounts = await Promise.all(recent.map(async s => {
@@ -846,12 +824,12 @@ app.get('/workout', requireLogin, async (req, res) => {
     }
     const rawTemplates = await WorkoutTemplate.findAll({ order: [['name','ASC']] });
     const templates = rawTemplates.map(t => ({ ...t.toJSON(), exercises: JSON.parse(t.exercises || '[]') }));
-    res.render('workout', { title: 'Workout Logger', user: req.session.user, recentWorkouts: recentWithCounts, todayPlan, templates });
+    res.render('workout', { title: 'Workout Logger', user: req.user, recentWorkouts: recentWithCounts, todayPlan, templates });
 });
 
 // Workout AJAX endpoints (session-protected, used by workout.ejs)
 app.post('/workout/api/session', requireLogin, async (req, res) => {
-    const { WorkoutSession, sequelize } = getDatabase(req.session.user.username);
+    const { WorkoutSession, sequelize } = getDatabase(req.user.username);
     await sequelize.sync();
     const { type, title, date } = req.body;
     const session = await WorkoutSession.create({ type, title: title || null, date: date || new Date().toISOString().split('T')[0], startedAt: new Date(), status: 'active' });
@@ -859,7 +837,7 @@ app.post('/workout/api/session', requireLogin, async (req, res) => {
 });
 
 app.patch('/workout/api/session/:id', requireLogin, async (req, res) => {
-    const { WorkoutSession } = getDatabase(req.session.user.username);
+    const { WorkoutSession } = getDatabase(req.user.username);
     const s = await WorkoutSession.findByPk(req.params.id);
     if (!s) return res.status(404).json({ success: false });
     if (req.body.status === 'finished') { s.finishedAt = new Date(); s.status = 'finished'; }
@@ -871,14 +849,14 @@ app.patch('/workout/api/session/:id', requireLogin, async (req, res) => {
 });
 
 app.delete('/workout/api/session/:id', requireLogin, async (req, res) => {
-    const { WorkoutSession, WorkoutSet } = getDatabase(req.session.user.username);
+    const { WorkoutSession, WorkoutSet } = getDatabase(req.user.username);
     await WorkoutSet.destroy({ where: { sessionId: req.params.id } });
     await WorkoutSession.destroy({ where: { id: req.params.id } });
     res.json({ success: true });
 });
 
 app.get('/workout/api/session/:id', requireLogin, async (req, res) => {
-    const { WorkoutSession, WorkoutSet } = getDatabase(req.session.user.username);
+    const { WorkoutSession, WorkoutSet } = getDatabase(req.user.username);
     const session = await WorkoutSession.findByPk(req.params.id);
     if (!session) return res.status(404).json({ success: false });
     const sets = await WorkoutSet.findAll({ where: { sessionId: req.params.id }, order: [['exerciseOrder','ASC'],['setNumber','ASC']] });
@@ -886,7 +864,7 @@ app.get('/workout/api/session/:id', requireLogin, async (req, res) => {
 });
 
 app.post('/workout/api/session/:id/set', requireLogin, async (req, res) => {
-    const { WorkoutSet, sequelize } = getDatabase(req.session.user.username);
+    const { WorkoutSet, sequelize } = getDatabase(req.user.username);
     await sequelize.sync();
     const { exerciseName, exerciseId, exerciseOrder, setNumber, reps, weight, weightUnit, duration, rpe, notes } = req.body;
     const set = await WorkoutSet.create({
@@ -899,13 +877,13 @@ app.post('/workout/api/session/:id/set', requireLogin, async (req, res) => {
 });
 
 app.delete('/workout/api/set/:id', requireLogin, async (req, res) => {
-    const { WorkoutSet } = getDatabase(req.session.user.username);
+    const { WorkoutSet } = getDatabase(req.user.username);
     await WorkoutSet.destroy({ where: { id: req.params.id } });
     res.json({ success: true });
 });
 
 app.get('/workout/api/exercises', requireLogin, async (req, res) => {
-    const { ExerciseDefinition } = getDatabase(req.session.user.username);
+    const { ExerciseDefinition } = getDatabase(req.user.username);
     const { q, category } = req.query;
     let all = await ExerciseDefinition.findAll({ order: [['name','ASC']] });
     if (category) all = all.filter(e => e.category === category);
@@ -915,14 +893,14 @@ app.get('/workout/api/exercises', requireLogin, async (req, res) => {
 
 // Workout templates API
 app.get('/workout/api/templates', requireLogin, async (req, res) => {
-    const { WorkoutTemplate, sequelize } = getDatabase(req.session.user.username);
+    const { WorkoutTemplate, sequelize } = getDatabase(req.user.username);
     await sequelize.sync();
     const templates = await WorkoutTemplate.findAll({ order: [['name','ASC']] });
     res.json({ success: true, data: templates.map(t => ({ ...t.toJSON(), exercises: JSON.parse(t.exercises || '[]') })) });
 });
 
 app.post('/workout/api/templates', requireLogin, async (req, res) => {
-    const { WorkoutTemplate, sequelize } = getDatabase(req.session.user.username);
+    const { WorkoutTemplate, sequelize } = getDatabase(req.user.username);
     await sequelize.sync();
     const { name, type, description, exercises } = req.body;
     if (!name || !Array.isArray(exercises)) return res.status(400).json({ success: false, message: 'name and exercises required' });
@@ -931,7 +909,7 @@ app.post('/workout/api/templates', requireLogin, async (req, res) => {
 });
 
 app.delete('/workout/api/templates/:id', requireLogin, async (req, res) => {
-    const { WorkoutTemplate } = getDatabase(req.session.user.username);
+    const { WorkoutTemplate } = getDatabase(req.user.username);
     await WorkoutTemplate.destroy({ where: { id: req.params.id } });
     res.json({ success: true });
 });
@@ -939,7 +917,7 @@ app.delete('/workout/api/templates/:id', requireLogin, async (req, res) => {
 // ── Exercise Library ──────────────────────────────────────────────────────────
 
 app.get('/exercises', requireLogin, async (req, res) => {
-    const { ExerciseDefinition, sequelize } = getDatabase(req.session.user.username);
+    const { ExerciseDefinition, sequelize } = getDatabase(req.user.username);
     await sequelize.sync();
     const all = await ExerciseDefinition.findAll({ order: [['category','ASC'],['name','ASC']] });
     const exercises = all.map(e => ({
@@ -947,11 +925,11 @@ app.get('/exercises', requireLogin, async (req, res) => {
         primaryMuscles:   JSON.parse(e.primaryMuscles   || '[]'),
         secondaryMuscles: JSON.parse(e.secondaryMuscles || '[]'),
     }));
-    res.render('library', { title: 'Exercises', user: req.session.user, exercises });
+    res.render('library', { title: 'Exercises', user: req.user, exercises });
 });
 
 app.get('/library', requireLogin, async (req, res) => {
-    const { ExerciseDefinition, sequelize } = getDatabase(req.session.user.username);
+    const { ExerciseDefinition, sequelize } = getDatabase(req.user.username);
     await sequelize.sync();
     const all = await ExerciseDefinition.findAll({ order: [['category','ASC'],['name','ASC']] });
     const exercises = all.map(e => ({
@@ -959,13 +937,13 @@ app.get('/library', requireLogin, async (req, res) => {
         primaryMuscles:   JSON.parse(e.primaryMuscles   || '[]'),
         secondaryMuscles: JSON.parse(e.secondaryMuscles || '[]'),
     }));
-    res.render('library', { title: 'Exercise Library', user: req.session.user, exercises });
+    res.render('library', { title: 'Exercise Library', user: req.user, exercises });
 });
 
 // ── Exercise Plan Maker ───────────────────────────────────────────────────────
 
 app.get('/plan-maker', requireLogin, async (req, res) => {
-    const { ExerciseDefinition, ExercisePlan, sequelize } = getDatabase(req.session.user.username);
+    const { ExerciseDefinition, ExercisePlan, sequelize } = getDatabase(req.user.username);
     await sequelize.sync();
     const all = await ExerciseDefinition.findAll({ order: [['category','ASC'],['name','ASC']] });
     const exercises = all.map(e => ({
@@ -975,19 +953,19 @@ app.get('/plan-maker', requireLogin, async (req, res) => {
     }));
     const rawPlans = await ExercisePlan.findAll({ order: [['updatedAt','DESC']] });
     const plans = rawPlans.map(p => ({ ...p.toJSON(), items: JSON.parse(p.items || '[]') }));
-    res.render('plan-maker', { title: 'Plan Maker', user: req.session.user, exercises, plans });
+    res.render('plan-maker', { title: 'Plan Maker', user: req.user, exercises, plans });
 });
 
 // ── Timers ────────────────────────────────────────────────────────────────────
 
 app.get('/timers', requireLogin, (req, res) => {
-    res.render('timers', { title: 'Timers', user: req.session.user });
+    res.render('timers', { title: 'Timers', user: req.user });
 });
 
 // ── Training Plans ────────────────────────────────────────────────────────────
 
 app.get('/plans', requireLogin, async (req, res) => {
-    const { TrainingPlan, TrainingPlanAssignment, sequelize } = getDatabase(req.session.user.username);
+    const { TrainingPlan, TrainingPlanAssignment, sequelize } = getDatabase(req.user.username);
     await sequelize.sync();
     const plans = await TrainingPlan.findAll({ order: [['sport','ASC'],['name','ASC']] });
     const assignment = await TrainingPlanAssignment.findOne({ where: { status: 'active' } });
@@ -1008,11 +986,11 @@ app.get('/plans', requireLogin, async (req, res) => {
         }
     }
     const parsedPlans = plans.map(p => ({ ...p.toJSON(), phases: JSON.parse(p.phases || '[]') }));
-    res.render('plans', { title: 'Training Plans', user: req.session.user, plans: parsedPlans, assignment, activePlan, todaySession });
+    res.render('plans', { title: 'Training Plans', user: req.user, plans: parsedPlans, assignment, activePlan, todaySession });
 });
 
 app.post('/plans/assign', requireLogin, async (req, res) => {
-    const { TrainingPlanAssignment, sequelize } = getDatabase(req.session.user.username);
+    const { TrainingPlanAssignment, sequelize } = getDatabase(req.user.username);
     await sequelize.sync();
     const { planId, startDate } = req.body;
     await TrainingPlanAssignment.update({ status: 'paused' }, { where: { status: 'active' } });
@@ -1021,13 +999,13 @@ app.post('/plans/assign', requireLogin, async (req, res) => {
 });
 
 app.post('/plans/unassign', requireLogin, async (req, res) => {
-    const { TrainingPlanAssignment } = getDatabase(req.session.user.username);
+    const { TrainingPlanAssignment } = getDatabase(req.user.username);
     await TrainingPlanAssignment.update({ status: 'paused' }, { where: { status: 'active' } });
     res.redirect('/plans');
 });
 
 app.get('/stats', requireLogin, (req, res) => {
-    res.render('stats', { title: 'Stats & History', user: req.session.user });
+    res.render('stats', { title: 'Stats & History', user: req.user });
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
