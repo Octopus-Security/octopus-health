@@ -40,7 +40,7 @@
         </div>
 
         <div class="card">
-            <h2>Weight History</h2>
+            <h2>Weight History <span style="font-weight:400;color:#888;font-size:.9rem;">(<%= entries.length %> <%= entries.length === 1 ? 'entry' : 'entries' %>)</span></h2>
             <% if (entries.length > 0) { %>
                 <table>
                     <thead>
@@ -53,13 +53,44 @@
                     </thead>
                     <tbody>
                         <% entries.forEach(entry => { %>
-                            <tr>
+                            <% const isoDate = new Date(entry.date).toISOString().split('T')[0]; %>
+                            <tr id="row-<%= entry.id %>">
                                 <td><%= new Date(entry.date).toLocaleDateString() %></td>
                                 <td><%= entry.weight %> <%= entry.unit %></td>
                                 <td><%= entry.notes || '-' %></td>
                                 <td>
-                                    <form method="POST" action="/weight/delete/<%= entry.id %>" style="display: inline;">
+                                    <button type="button" onclick="editWeight(<%= entry.id %>)">Edit</button>
+                                    <form method="POST" action="/weight/delete/<%= entry.id %>" style="display: inline;" onsubmit="return confirm('Delete this entry?');">
                                         <button type="submit" class="delete-btn">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <tr id="edit-<%= entry.id %>" style="display: none;">
+                                <td colspan="4">
+                                    <form method="POST" action="/weight/edit/<%= entry.id %>" class="form-grid" style="align-items:end;">
+                                        <div class="form-group">
+                                            <label>Date</label>
+                                            <input type="date" name="date" value="<%= isoDate %>" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Weight</label>
+                                            <input type="number" step="0.1" name="weight" value="<%= entry.weight %>" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Unit</label>
+                                            <select name="unit" required>
+                                                <option value="lbs" <%= entry.unit === 'lbs' ? 'selected' : '' %>>lbs</option>
+                                                <option value="kg"  <%= entry.unit === 'kg'  ? 'selected' : '' %>>kg</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Notes</label>
+                                            <input type="text" name="notes" value="<%= entry.notes || '' %>">
+                                        </div>
+                                        <div class="form-group">
+                                            <button type="submit">Save</button>
+                                            <button type="button" onclick="cancelEdit(<%= entry.id %>)">Cancel</button>
+                                        </div>
                                     </form>
                                 </td>
                             </tr>
@@ -71,5 +102,16 @@
             <% } %>
         </div>
     </div>
+
+    <script>
+        function editWeight(id) {
+            document.getElementById('row-' + id).style.display = 'none';
+            document.getElementById('edit-' + id).style.display = '';
+        }
+        function cancelEdit(id) {
+            document.getElementById('edit-' + id).style.display = 'none';
+            document.getElementById('row-' + id).style.display = '';
+        }
+    </script>
 </body>
 </html>
