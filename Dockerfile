@@ -14,7 +14,7 @@ ARG NPM_TOKEN
 COPY package*.json ./
 RUN echo "@octopus-security:registry=https://npm.pkg.github.com" > .npmrc \
  && echo "//npm.pkg.github.com/:_authToken=${NPM_TOKEN}" >> .npmrc \
- && npm install --omit=dev --no-audit --no-fund \
+ && npm install --omit=dev --no-audit --no-fund --legacy-peer-deps \
  && rm -f .npmrc
 
 # Copy application code
