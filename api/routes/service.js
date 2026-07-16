@@ -129,6 +129,58 @@ router.post('/sessions', requireToken, async (req, res) => {
   } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
 });
 
+// GET /api/service/logged-today
+// Did Nick log any training today (ET)? Counts finished workout sessions + PRs.
+// Used by the gym-nudge scheduler to avoid pestering after he's already trained.
+router.get('/logged-today', requireToken, async (req, res) => {
+  try {
+    const { WorkoutSession, PersonalRecord } = await getDB();
+    const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
+    const [sessions, prs] = await Promise.all([
+      WorkoutSession.count({ where: { date: today, status: 'finished' } }),
+      PersonalRecord.count({ where: { date: today } }),
+    ]);
+    res.json({ ok: true, date: today, sessions, prs, any: (sessions + prs) > 0 });
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+
+// POST /api/service/meals  { mealType, description, calories, protein, carbs, fats, date, time, notes }
+// For Neith to log meals into Nick's account so nutrition coaching has data.
+router.post('/meals', requireToken, async (req, res) => {
+  try {
+    const { Meal } = await getDB();
+    const { mealType, description, calories, protein, carbs, fats, date, time, notes } = req.body;
+    if (!description) return res.status(400).json({ ok: false, error: 'description required' });
+    const day  = date || new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
+    const now  = time || new Date().toLocaleTimeString('en-GB', { timeZone: 'America/New_York', hour12: false });
+    const meal = await Meal.create({
+      date: day, time: now,
+      mealType: ['breakfast','lunch','dinner','snack'].includes(mealType) ? mealType : 'snack',
+      description,
+      calories: calories != null ? parseInt(calories) : null,
+      protein:  protein  != null ? parseFloat(protein) : null,
+      carbs:    carbs    != null ? parseFloat(carbs)   : null,
+      fats:     fats     != null ? parseFloat(fats)    : null,
+      notes: notes || null,
+    });
+    res.json({ ok: true, mealId: meal.id, date: day });
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+
+// GET /api/service/nutrition-today — today's macro totals + meal count (ET)
+router.get('/nutrition-today', requireToken, async (req, res) => {
+  try {
+    const { Meal } = await getDB();
+    const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
+    const meals = await Meal.findAll({ where: { date: today } });
+    const sum = k => meals.reduce((t, m) => t + (m[k] || 0), 0);
+    res.json({
+      ok: true, date: today, meals: meals.length,
+      calories: sum('calories'), protein: sum('protein'), carbs: sum('carbs'), fats: sum('fats'),
+    });
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+
 // GET /api/service/templates?slug=mon:gym
 // Returns workout template by slug (dayKey:location), or all if no slug.
 router.get('/templates', requireToken, async (req, res) => {
