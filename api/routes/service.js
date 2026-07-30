@@ -210,18 +210,55 @@ router.post('/meals/from-recipe', requireToken, async (req, res) => {
       ? recipe.title
       : `${recipe.title} — ${portions} serving${portions === 1 ? '' : 's'}`;
 
-    const { Meal } = await getDB();
+    const { Meal, IngredientMatch } = await getDB();
     const day = date || new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
     const now = time || new Date().toLocaleTimeString('en-GB', { timeZone: 'America/New_York', hour12: false });
+
+    // Macros: caller-supplied wins, otherwise resolve them from USDA FoodData
+    // Central (free, and measured rather than estimated). Scaled by portions
+    // eaten over portions the recipe makes — logging one slice of an 8-serving
+    // cheesecake should not record the whole cake.
+    let macros = { calories, protein, carbs, fats };
+    let nutrition = null;
+    const fdcKey = process.env.FDC_API_KEY;
+    if (calories == null && protein == null && fdcKey) {
+      try {
+        const { macrosForIngredients } = require('../nutrition');
+        const perRecipe = await macrosForIngredients(recipe.ingredients || [], { IngredientMatch, apiKey: fdcKey });
+        const scale = portions / (Number(recipe.servings) > 0 ? Number(recipe.servings) : 1);
+        macros = {
+          calories: Math.round(perRecipe.totals.kcal    * scale),
+          protein:  Math.round(perRecipe.totals.protein * scale * 10) / 10,
+          carbs:    Math.round(perRecipe.totals.carbs   * scale * 10) / 10,
+          fats:     Math.round(perRecipe.totals.fats    * scale * 10) / 10,
+        };
+        nutrition = {
+          source: 'usda',
+          coverage: perRecipe.coverage,
+          approximate: perRecipe.approximate,
+          skipped: perRecipe.skipped,
+          matched: perRecipe.counted.length,
+        };
+        // Refuse to record a number built on almost nothing. Below half the
+        // ingredients the total is not an underestimate, it is a different meal.
+        if (perRecipe.coverage < 50) {
+          macros = { calories: null, protein: null, carbs: null, fats: null };
+          nutrition.discarded = `only ${perRecipe.coverage}% of ingredients resolved — macros left blank rather than recording a total this incomplete`;
+        }
+      } catch (e) {
+        nutrition = { source: 'usda', error: e.message };
+      }
+    }
+    const { calories: kcal2, protein: pro2, carbs: carb2, fats: fat2 } = macros;
 
     const meal = await Meal.create({
       date: day, time: now,
       mealType: ['breakfast','lunch','dinner','snack'].includes(mealType) ? mealType : 'snack',
       description,
-      calories: calories != null ? parseInt(calories)   : null,
-      protein:  protein  != null ? parseFloat(protein)  : null,
-      carbs:    carbs    != null ? parseFloat(carbs)    : null,
-      fats:     fats     != null ? parseFloat(fats)     : null,
+      calories: kcal2 != null ? parseInt(kcal2)   : null,
+      protein:  pro2  != null ? parseFloat(pro2)  : null,
+      carbs:    carb2 != null ? parseFloat(carb2) : null,
+      fats:     fat2  != null ? parseFloat(fat2)  : null,
       // Keep the provenance: which recipe, and what was in it at the time. Recipes
       // get edited, so a bare id would not tell you what you actually ate.
       notes: `From shopper recipe #${recipe.id}` +
@@ -232,9 +269,12 @@ router.post('/meals/from-recipe', requireToken, async (req, res) => {
     res.json({
       ok: true, mealId: meal.id, date: day,
       recipe: { id: recipe.id, title: recipe.title },
-      macrosEstimated: calories != null || protein != null,
-      note: (calories == null && protein == null)
-        ? 'Logged with no macros — pass calories/protein/carbs/fats to record them.'
+      macros: { calories: kcal2, protein: pro2, carbs: carb2, fats: fat2 },
+      // The caller is told exactly how the numbers were arrived at, including what
+      // was left out. A total with no provenance invites more trust than it earns.
+      nutrition: nutrition || (calories != null || protein != null ? { source: 'caller' } : { source: 'none' }),
+      note: (kcal2 == null)
+        ? (fdcKey ? 'Logged with no macros — see nutrition.skipped for why.' : 'Logged with no macros — set FDC_API_KEY to resolve them from USDA, or pass them in.')
         : undefined,
     });
   } catch (e) { res.status(500).json({ ok: false, error: e.message }); }

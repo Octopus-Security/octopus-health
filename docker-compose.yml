@@ -25,6 +25,11 @@ services:
       # from a recipe; it does not own or copy them.
       - SHOPPER_URL=${SHOPPER_URL:-http://octopus_shopper_internal:3004}
       - SHOPPER_SERVICE_TOKEN=${SHOPPER_SERVICE_TOKEN}
+      # USDA FoodData Central — free key from https://fdc.nal.usda.gov/api-key-signup
+      # Without it, meals logged from a recipe record no macros (and say so) rather
+      # than guessing. ~3,600 requests/hour, and matches are cached per ingredient
+      # so a repeated recipe needs no calls at all.
+      - FDC_API_KEY=${FDC_API_KEY:-}
     networks:
       - octopus_network
     extra_hosts:
