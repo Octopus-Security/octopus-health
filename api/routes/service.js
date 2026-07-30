@@ -167,6 +167,79 @@ router.post('/meals', requireToken, async (req, res) => {
   } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
 });
 
+// POST /api/service/meals/from-recipe
+//   { recipeId, mealType?, servings?, calories?, protein?, carbs?, fats?, date?, time? }
+//
+// Logs a meal from a recipe held in octopus-shopper. Recipes live there because
+// their ingredient list is the join key for price lookups, which is shopper's job;
+// health only needs the name and the macros, so it reads rather than owns them.
+//
+// Macros are NOT derived here. Turning "2 cups heavy cream" into grams of fat
+// needs a nutrition database or a model, and health has neither — inventing a
+// number would be worse than leaving it blank, because nutrition coaching reads
+// these totals as fact. So: pass them in if you have them (Neith estimates them
+// the same way it does for free-text meals), and if you do not, the meal is logged
+// with macros null and the response says so plainly.
+router.post('/meals/from-recipe', requireToken, async (req, res) => {
+  try {
+    const { recipeId, mealType, servings, calories, protein, carbs, fats, date, time } = req.body;
+    if (!recipeId) return res.status(400).json({ ok: false, error: 'recipeId required' });
+
+    const base  = process.env.SHOPPER_URL || 'http://octopus_shopper_internal:3004';
+    const token = process.env.SHOPPER_SERVICE_TOKEN;
+    if (!token) return res.status(500).json({ ok: false, error: 'SHOPPER_SERVICE_TOKEN not configured on octopus-health' });
+
+    const r = await fetch(`${base}/api/recipes/${encodeURIComponent(recipeId)}`, {
+      headers: { 'X-Service-Token': token },
+    });
+    if (!r.ok) {
+      const detail = r.status === 404 ? 'no recipe with that id' : `shopper returned ${r.status}`;
+      return res.status(r.status === 404 ? 404 : 502).json({ ok: false, error: detail });
+    }
+    const { recipe } = await r.json();
+
+    const portions = Number(servings) > 0 ? Number(servings) : 1;
+    const ingredients = (recipe.ingredients || [])
+      .map(i => (typeof i === 'string' ? i : i.name))
+      .filter(Boolean);
+
+    // The description is what nutrition coaching and the UI read back, so it
+    // carries the portion count — "half the cheesecake" and "the cheesecake" are
+    // not the same meal.
+    const description = portions === 1
+      ? recipe.title
+      : `${recipe.title} — ${portions} serving${portions === 1 ? '' : 's'}`;
+
+    const { Meal } = await getDB();
+    const day = date || new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
+    const now = time || new Date().toLocaleTimeString('en-GB', { timeZone: 'America/New_York', hour12: false });
+
+    const meal = await Meal.create({
+      date: day, time: now,
+      mealType: ['breakfast','lunch','dinner','snack'].includes(mealType) ? mealType : 'snack',
+      description,
+      calories: calories != null ? parseInt(calories)   : null,
+      protein:  protein  != null ? parseFloat(protein)  : null,
+      carbs:    carbs    != null ? parseFloat(carbs)    : null,
+      fats:     fats     != null ? parseFloat(fats)     : null,
+      // Keep the provenance: which recipe, and what was in it at the time. Recipes
+      // get edited, so a bare id would not tell you what you actually ate.
+      notes: `From shopper recipe #${recipe.id}` +
+             (recipe.servings ? ` (recipe serves ${recipe.servings})` : '') +
+             (ingredients.length ? `\nIngredients: ${ingredients.join(', ')}` : ''),
+    });
+
+    res.json({
+      ok: true, mealId: meal.id, date: day,
+      recipe: { id: recipe.id, title: recipe.title },
+      macrosEstimated: calories != null || protein != null,
+      note: (calories == null && protein == null)
+        ? 'Logged with no macros — pass calories/protein/carbs/fats to record them.'
+        : undefined,
+    });
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+
 // GET /api/service/nutrition-today — today's macro totals + meal count (ET)
 router.get('/nutrition-today', requireToken, async (req, res) => {
   try {

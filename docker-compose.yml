@@ -20,6 +20,11 @@ services:
       - JWT_SECRET=${JWT_SECRET:-octopus-shared-secret-change-in-production}
       - AUTH_SERVICE_URL=http://octopus-auth:3002
       - HEALTH_SERVICE_TOKEN=${HEALTH_SERVICE_TOKEN}
+      # Recipes live in octopus-shopper (their ingredient list is the join key for
+      # price lookups, which is shopper's job). Health reads them to log a meal
+      # from a recipe; it does not own or copy them.
+      - SHOPPER_URL=${SHOPPER_URL:-http://octopus_shopper_internal:3004}
+      - SHOPPER_SERVICE_TOKEN=${SHOPPER_SERVICE_TOKEN}
     networks:
       - octopus_network
     extra_hosts:
