@@ -24,8 +24,20 @@
                         </select>
                     </div>
                     <div class="form-group">
+                        <label>Title (optional)</label>
+                        <input type="text" name="title" placeholder="e.g. Freestanding Handstand">
+                    </div>
+                    <div class="form-group">
+                        <label>Exercise / Skill (optional)</label>
+                        <input type="text" name="exerciseName" placeholder="e.g. Handstand, Leg Press">
+                    </div>
+                    <div class="form-group">
                         <label>Target Value</label>
-                        <input type="number" step="0.1" name="targetValue" required>
+                        <input type="number" step="0.1" name="targetValue" value="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Unit (optional)</label>
+                        <input type="text" name="unit" placeholder="lbs / reps / sec">
                     </div>
                     <div class="form-group">
                         <label>Current Value (optional)</label>
@@ -35,6 +47,10 @@
                         <label>Deadline (optional)</label>
                         <input type="date" name="deadline">
                     </div>
+                </div>
+                <div class="form-group">
+                    <label>Progression plan (optional — how the coach should build toward this)</label>
+                    <textarea name="progression" rows="2" placeholder="e.g. wall holds → chest-to-wall → freestanding; add 5s each week"></textarea>
                 </div>
                 <div class="form-group">
                     <label>Description</label>
@@ -51,7 +67,8 @@
                     <div class="goal-item <%= goal.completed ? 'completed' : '' %>">
                         <div class="goal-header">
                             <div>
-                                <strong><%= goal.type.charAt(0).toUpperCase() + goal.type.slice(1) %> Goal</strong>
+                                <strong><%= goal.title || goal.exerciseName || (goal.type.charAt(0).toUpperCase() + goal.type.slice(1) + ' Goal') %></strong>
+                                <span style="color: #888; font-size: 0.85em; margin-left: 6px;"><%= goal.type %></span>
                                 <% if (goal.completed) { %>
                                     <span style="color: #5df59a; margin-left: 10px;">✓ Completed</span>
                                 <% } %>
@@ -68,14 +85,19 @@
                             </div>
                         </div>
                         <div>
-                            <strong>Target:</strong> <%= goal.targetValue %>
+                            <strong>Target:</strong> <%= goal.targetValue %><%= goal.unit ? ' ' + goal.unit : '' %>
                             <% if (goal.currentValue) { %>
-                                | <strong>Current:</strong> <%= goal.currentValue %>
+                                | <strong>Current:</strong> <%= goal.currentValue %><%= goal.unit ? ' ' + goal.unit : '' %>
                             <% } %>
                             <% if (goal.deadline) { %>
                                 | <strong>Deadline:</strong> <%= new Date(goal.deadline).toLocaleDateString() %>
                             <% } %>
                         </div>
+                        <% if (goal.progression) { %>
+                            <div style="margin-top: 8px; color: #aaa;">
+                                <strong>Progression:</strong> <%= goal.progression %>
+                            </div>
+                        <% } %>
                         <% if (goal.description) { %>
                             <div style="margin-top: 8px; color: #888;">
                                 <%= goal.description %>

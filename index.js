@@ -95,8 +95,9 @@ async function verifyToken(token) {
 // Lazily create + seed a user's DB the first time we see them this run.
 async function ensureUserDb(username) {
     if (_seededUsers.has(username)) return;
-    const { sequelize, seedData } = getDatabase(username);
+    const { sequelize, seedData, migrate } = getDatabase(username);
     await sequelize.sync();
+    await migrate();
     await seedData();
     _seededUsers.add(username);
 }

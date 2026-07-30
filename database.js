@@ -688,6 +688,12 @@ const getDatabase = (username) => {
         deadline:     { type: DataTypes.DATEONLY, allowNull: true },
         description:  { type: DataTypes.TEXT,     allowNull: true },
         completed:    { type: DataTypes.BOOLEAN,  defaultValue: false },
+        // Added for goal-driven coaching. Skill/strength goals use type 'exercise'
+        // with an exerciseName; progression holds the step plan the coach follows.
+        title:        { type: DataTypes.STRING,   allowNull: true },  // e.g. "Handstand", "Leg Press 400"
+        exerciseName: { type: DataTypes.STRING,   allowNull: true },  // the exercise/skill this goal targets
+        unit:         { type: DataTypes.STRING,   allowNull: true },  // 'lbs' | 'reps' | 'sec' | …
+        progression:  { type: DataTypes.TEXT,     allowNull: true },  // progression steps / accessory plan
     });
 
     const Routine = sequelize.define('Routine', {
@@ -898,8 +904,30 @@ const getDatabase = (username) => {
         }
     }
 
+    // Idempotent, additive-only migrations for tables that predate new columns.
+    // health uses plain sequelize.sync() (no alter), so new nullable columns must
+    // be added by hand. ADD COLUMN is safe in SQLite; we swallow "duplicate column".
+    async function migrate() {
+        const adds = [
+            ['Goals', 'title',        'VARCHAR(255)'],
+            ['Goals', 'exerciseName', 'VARCHAR(255)'],
+            ['Goals', 'unit',         'VARCHAR(32)'],
+            ['Goals', 'progression',  'TEXT'],
+        ];
+        for (const [table, col, type] of adds) {
+            try {
+                await sequelize.query(`ALTER TABLE "${table}" ADD COLUMN "${col}" ${type}`);
+            } catch (e) {
+                if (!/duplicate column|already exists/i.test(e.message || '')) {
+                    console.error(`migrate: ${table}.${col} failed:`, e.message);
+                }
+            }
+        }
+    }
+
     return {
         sequelize,
+        migrate,
         WeightEntry,
         Exercise,
         Meal,

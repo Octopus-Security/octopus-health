@@ -23,6 +23,8 @@ async function getDB() {
   const db = getDatabase(SERVICE_USER);
   // Create any missing tables — only if sequelize is available (safe no-op if tables exist)
   if (db.sequelize) await db.sequelize.sync().catch(() => {});
+  // Additive column migrations (health uses plain sync(), so new columns need ALTER).
+  if (db.migrate) await db.migrate().catch(() => {});
   return db;
 }
 
@@ -351,6 +353,61 @@ router.post('/weight', requireToken, async (req, res) => {
       row = await WeightEntry.create({ weight: value, unit: unit || 'lbs', date: day, notes: notes || null });
     }
     res.json({ ok: true, weight: row });
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+
+// GET /api/service/goals?active=1  → goals for the service user (active = not completed)
+router.get('/goals', requireToken, async (req, res) => {
+  try {
+    const { Goal } = await getDB();
+    const where = {};
+    if (req.query.active === '1' || req.query.active === 'true') where.completed = false;
+    const rows = await Goal.findAll({ where, order: [['deadline', 'ASC'], ['createdAt', 'DESC']] });
+    res.json({ ok: true, goals: rows });
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+
+// POST /api/service/goals
+//   { type, title, exerciseName, targetValue, currentValue, unit, deadline, progression, description }
+// type defaults to 'exercise'. targetValue is required by the schema; skill goals
+// with no number default to 0.
+router.post('/goals', requireToken, async (req, res) => {
+  try {
+    const { Goal } = await getDB();
+    const b = req.body || {};
+    const type = ['weight', 'exercise', 'calories'].includes(b.type) ? b.type : 'exercise';
+    const target = b.targetValue != null ? parseFloat(b.targetValue) : 0;
+    const row = await Goal.create({
+      type,
+      title:        b.title        || b.exerciseName || null,
+      exerciseName: b.exerciseName || null,
+      targetValue:  Number.isFinite(target) ? target : 0,
+      currentValue: b.currentValue != null ? parseFloat(b.currentValue) : null,
+      unit:         b.unit         || null,
+      deadline:     b.deadline     || null,
+      progression:  b.progression  || null,
+      description:  b.description   || null,
+      completed:    false,
+    });
+    res.json({ ok: true, goal: row });
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+
+// PATCH /api/service/goals/:id  { currentValue, completed, progression, ... }
+router.patch('/goals/:id', requireToken, async (req, res) => {
+  try {
+    const { Goal } = await getDB();
+    const row = await Goal.findByPk(req.params.id);
+    if (!row) return res.status(404).json({ ok: false, error: 'goal not found' });
+    const b = req.body || {};
+    for (const f of ['title', 'exerciseName', 'unit', 'deadline', 'progression', 'description']) {
+      if (b[f] !== undefined) row[f] = b[f];
+    }
+    if (b.targetValue  !== undefined) row.targetValue  = parseFloat(b.targetValue);
+    if (b.currentValue !== undefined) row.currentValue = b.currentValue == null ? null : parseFloat(b.currentValue);
+    if (b.completed    !== undefined) row.completed    = !!b.completed;
+    await row.save();
+    res.json({ ok: true, goal: row });
   } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
 });
 
