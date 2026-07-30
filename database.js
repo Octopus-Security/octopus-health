@@ -824,6 +824,31 @@ const getDatabase = (username) => {
         items:       { type: DataTypes.TEXT,   allowNull: false, defaultValue: '[]' },
     });
 
+    // Remembers which USDA FoodData Central record an ingredient string resolved
+    // to, so a name is matched once and then reused.
+    //
+    // The cache is the feature, not an optimisation. USDA returns dozens of hits
+    // for "heavy cream" across Foundation, SR Legacy and Branded datasets, and the
+    // top result is frequently a branded product with different macros. Picking
+    // wrong yields a confidently wrong number, which is worse than a blank —
+    // nutrition coaching reads these as fact. Caching the chosen fdcId means a bad
+    // match is corrected once rather than re-guessed on every log.
+    const IngredientMatch = sequelize.define('IngredientMatch', {
+        // Lowercased, trimmed ingredient string as it appears in the recipe.
+        query:      { type: DataTypes.STRING,  allowNull: false, unique: true },
+        fdcId:      { type: DataTypes.INTEGER, allowNull: true },   // null = known-unmatchable
+        foodName:   { type: DataTypes.STRING,  allowNull: true },   // what USDA called it
+        dataType:   { type: DataTypes.STRING,  allowNull: true },   // Foundation | SR Legacy | Branded
+        // Per-100g macros, cached so logging a meal needs no network call at all
+        // once every ingredient has been seen before.
+        kcal:       { type: DataTypes.FLOAT,   allowNull: true },
+        protein:    { type: DataTypes.FLOAT,   allowNull: true },
+        carbs:      { type: DataTypes.FLOAT,   allowNull: true },
+        fats:       { type: DataTypes.FLOAT,   allowNull: true },
+        // Set true when a human confirmed it; those are never re-resolved.
+        confirmed:  { type: DataTypes.BOOLEAN, defaultValue: false },
+    });
+
     // ── Seed function ──────────────────────────────────────────────────────────
 
     async function seedData() {
@@ -891,6 +916,7 @@ const getDatabase = (username) => {
         WorkoutTemplate,
         ExercisePlan,
         PersonalRecord,
+        IngredientMatch,
         seedData,
         sequelize,
     };
