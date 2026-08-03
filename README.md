@@ -144,6 +144,29 @@ recoverable; a fabricated log quietly entering your history is not.
 The comparison logic is `api/dedupe-sets.js`, kept separate from the route so it
 can be tested on its own.
 
+### Reading the log back
+
+`GET /api/service/sessions?date=YYYY-MM-DD` (or `?days=N`) returns what was
+actually logged, with every set, grouped by session and dated.
+
+This exists because there was no read path at all. Asked to "review today's
+session", Neith could only answer from its own conversation — and the
+conversation contains previous days' posts, so it reported Sunday's squats,
+RDLs and rows as part of Monday's training. It was not misreading the database;
+it was never looking at it.
+
+`api/audit-sessions.js` prints the same thing from the command line, read-only,
+for checking the log independently of anything the chat says:
+
+```sh
+docker exec octopus_health node api/audit-sessions.js             # last 7 days
+docker exec octopus_health node api/audit-sessions.js 2026-08-03  # one day
+```
+
+It flags any session whose `createdAt` day differs from the day it is filed
+under — the signature of a session logged for the wrong date — and any identical
+sets appearing on more than one day.
+
 ### Which day a session lands on
 
 `date` (YYYY-MM-DD, Eastern Time) is optional and defaults to today in ET. It

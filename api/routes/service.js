@@ -210,6 +210,56 @@ router.post('/sessions', requireToken, async (req, res) => {
   } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
 });
 
+// GET /api/service/sessions?date=YYYY-MM-DD  (or ?days=N for a range back from today)
+// What was actually LOGGED, with every set. This is the read path for "what did
+// I do today" — without it a caller can only answer from its own conversation
+// history, which is how Sunday's squats got reported as Monday's session.
+router.get('/sessions', requireToken, async (req, res) => {
+  try {
+    const { WorkoutSession, WorkoutSet, sequelize } = await getDB();
+    const { QueryTypes } = require('sequelize');
+    const todayET = new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
+
+    const days = Math.max(1, Math.min(60, Number(req.query.days) || 1));
+    const date = req.query.date && /^\d{4}-\d{2}-\d{2}$/.test(req.query.date) ? req.query.date : null;
+    const from = date || new Date(Date.now() - (days - 1) * 864e5)
+      .toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
+    const to   = date || todayET;
+
+    const sessions = await WorkoutSession.findAll({
+      where: { date: { [require('sequelize').Op.between]: [from, to] } },
+      order: [['date', 'DESC'], ['id', 'ASC']],
+    });
+    if (!sessions.length) {
+      return res.json({ ok: true, from, to, today: todayET, sessions: [], note: 'nothing logged in that range' });
+    }
+
+    const rows = await sequelize.query(
+      `SELECT sessionId, exerciseName, exerciseOrder, setNumber, reps, weight, weightUnit, duration, notes
+         FROM WorkoutSets WHERE sessionId IN (:ids)
+        ORDER BY sessionId ASC, exerciseOrder ASC, setNumber ASC`,
+      { replacements: { ids: sessions.map(s => s.id) }, type: QueryTypes.SELECT },
+    );
+
+    const out = sessions.map(s => {
+      const mine = rows.filter(r => r.sessionId === s.id);
+      const byExercise = [];
+      for (const r of mine) {
+        let ex = byExercise.find(e => e.exerciseName === r.exerciseName);
+        if (!ex) { ex = { exerciseName: r.exerciseName, sets: [] }; byExercise.push(ex); }
+        ex.sets.push({ reps: r.reps, weight: r.weight, unit: r.weightUnit, duration: r.duration, notes: r.notes });
+      }
+      return {
+        id: s.id, date: s.date, type: s.type, title: s.title,
+        duration: s.duration, effort: s.effort, notes: s.notes,
+        exercises: byExercise,
+      };
+    });
+
+    res.json({ ok: true, from, to, today: todayET, sessions: out });
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+
 // GET /api/service/logged-today
 // Did Nick log any training today (ET)? Counts finished workout sessions + PRs.
 // Used by the gym-nudge scheduler to avoid pestering after he's already trained.
