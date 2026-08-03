@@ -143,3 +143,17 @@ recoverable; a fabricated log quietly entering your history is not.
 
 The comparison logic is `api/dedupe-sets.js`, kept separate from the route so it
 can be tested on its own.
+
+### Which day a session lands on
+
+`date` (YYYY-MM-DD, Eastern Time) is optional and defaults to today in ET. It
+matters because sessions are frequently logged *after* the fact — the evening's
+training entered the next morning, or a catch-up on Saturday — and without it
+every one of those is stamped with the day it was typed rather than the day it
+was trained. That is how a Sunday workout ends up in Monday's history.
+
+The date is checked rather than trusted: the wrong format, a future date, or a
+year that is more than 12 months back is refused with a message saying what
+today is. A silently wrong date is the one mistake nobody catches until the
+history is already wrong, so the response also returns the date the session was
+actually filed under, for the caller to report back.

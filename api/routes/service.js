@@ -106,7 +106,31 @@ router.post('/sessions', requireToken, async (req, res) => {
   try {
     const { Exercise, WorkoutSession, WorkoutSet } = await getDB();
     const { type = 'strength', title, date, durationMins, effort, notes, sets = [], force = false } = req.body;
-    const today = date || new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
+
+    // Resolve the day this session belongs to.
+    //
+    // Callers may log a session from another day — "yesterday", or last night's
+    // training entered after midnight — so a date is accepted. It is checked
+    // rather than trusted: a malformed or absurd one silently rewriting history
+    // is worse than refusing it, and a caller that got the year wrong should
+    // hear about it now. Everything is Eastern Time, which is the only clock
+    // this log is kept in.
+    const nowET = new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
+    let today = nowET;
+    if (date != null && String(date).trim() !== '') {
+      const asked = String(date).trim();
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(asked) || Number.isNaN(Date.parse(asked))) {
+        return res.status(400).json({ ok: false, error: `date must be YYYY-MM-DD, got "${asked}"` });
+      }
+      if (asked > nowET) {
+        return res.status(400).json({ ok: false, error: `date ${asked} is in the future (today is ${nowET})` });
+      }
+      const oldest = new Date(Date.now() - 366 * 24 * 3600 * 1000).toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
+      if (asked < oldest) {
+        return res.status(400).json({ ok: false, error: `date ${asked} is more than a year ago — check the year` });
+      }
+      today = asked;
+    }
 
     // Drop exercises that have already been logged, unless forced.
     //
@@ -129,7 +153,7 @@ router.post('/sessions', requireToken, async (req, res) => {
       // Nothing new at all. Do NOT create an empty session — that is exactly the
       // duplicate this is here to prevent.
       return res.json({
-        ok: true, sessionId: null, exerciseCount: 0, skipped,
+        ok: true, sessionId: null, date: today, exerciseCount: 0, skipped,
         message: 'Nothing logged — every exercise sent was already in the log. ' +
                  'Send force: true if this workout really was repeated exactly.',
       });
@@ -175,7 +199,9 @@ router.post('/sessions', requireToken, async (req, res) => {
     });
 
     res.json({
-      ok: true, sessionId: session.id, exerciseCount: keep.length,
+      // The date it actually landed on, so the caller reports that rather than
+      // whatever it assumed. A wrong date is invisible otherwise.
+      ok: true, sessionId: session.id, date: today, exerciseCount: keep.length,
       // What was actually written, so the caller reports the log rather than
       // whatever it believed it sent.
       logged: keep.map(e => ({ exerciseName: e.exerciseName, sets: (e.sets || []).length })),
