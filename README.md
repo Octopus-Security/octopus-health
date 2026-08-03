@@ -116,3 +116,30 @@ Data is stored in SQLite databases in the `/data` directory. Each user gets thei
 ## License
 
 MIT
+
+## Workout logging is deduplicated on purpose
+
+`POST /api/service/sessions` drops any exercise whose sets exactly match one
+already logged in the last ten days, and reports what it dropped and when it saw
+it before.
+
+This exists because Neith logs sessions from a chat, and the conversation it is
+reading contains previous days' logs. It has repeatedly re-sent those old
+exercises alongside the new ones — one message reporting bench, incline press
+and flyes came back as a ten-exercise session carrying another day's squats,
+RDLs and rows at that day's exact weights. Every POST creates a new session, so
+the same mistake also produces duplicate history.
+
+Its tool description already said, in capitals, to log only what was reported.
+It did it anyway. An instruction to a model cannot be the control for data
+integrity, so the check lives here, in the service that owns the data, where
+nothing can talk its way past it.
+
+The signal is exact repetition: same exercise name, same number of sets, same
+reps and weights in the same order. Genuinely repeating a session to the rep and
+the pound happens, so the response says what was skipped and `force: true`
+overrides it — being told "I skipped those, confirm and I'll log them" is
+recoverable; a fabricated log quietly entering your history is not.
+
+The comparison logic is `api/dedupe-sets.js`, kept separate from the route so it
+can be tested on its own.

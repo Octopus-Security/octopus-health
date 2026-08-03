@@ -7,10 +7,30 @@
 const express = require('express');
 const router  = express.Router();
 const getDatabase = require('../../database');
+const { partition } = require('../dedupe-sets');
 
 // Username whose SQLite DB to use for service calls.
 // Must match the username Nick registered with in the health app.
 const SERVICE_USER = process.env.HEALTH_SERVICE_USER || 'psychopathy';
+
+/**
+ * Every set logged since `since`, flat, newest sessions included.
+ *
+ * Ten days is enough to catch a transcript being re-read without making a
+ * genuine repeat of the same session a month later look like a duplicate.
+ */
+async function recentSetRows(db, since) {
+  const { QueryTypes } = require('sequelize');
+  return db.sequelize.query(
+    `SELECT ws.id AS sessionId, ws.date AS date, s.exerciseName, s.reps, s.weight,
+            s.duration, s.setNumber
+       FROM WorkoutSets s
+       JOIN WorkoutSessions ws ON ws.id = s.sessionId
+      WHERE ws.date >= :since
+      ORDER BY ws.date DESC, s.exerciseOrder ASC, s.setNumber ASC`,
+    { replacements: { since }, type: QueryTypes.SELECT },
+  ).catch(() => []);
+}
 
 function requireToken(req, res, next) {
   const expected = process.env.HEALTH_SERVICE_TOKEN;
@@ -85,8 +105,35 @@ router.get('/prs/bests', requireToken, async (req, res) => {
 router.post('/sessions', requireToken, async (req, res) => {
   try {
     const { Exercise, WorkoutSession, WorkoutSet } = await getDB();
-    const { type = 'strength', title, date, durationMins, effort, notes, sets = [] } = req.body;
+    const { type = 'strength', title, date, durationMins, effort, notes, sets = [], force = false } = req.body;
     const today = date || new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
+
+    // Drop exercises that have already been logged, unless forced.
+    //
+    // Neith logs from a chat whose history contains previous days' logs, and it
+    // has repeatedly re-sent those old exercises along with the new ones — a
+    // three-exercise push day came back as ten, carrying another day's squats
+    // and rows at that day's exact weights. Its tool description already says in
+    // capitals to log only what was reported; it did it anyway, so the check
+    // belongs here, where an instruction cannot be argued with. See
+    // api/dedupe-sets.js.
+    let keep = sets, skipped = [];
+    if (!force && sets.length) {
+      const since = new Date(Date.now() - 10 * 24 * 3600 * 1000)
+        .toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
+      const recent = await recentSetRows(await getDB(), since);
+      ({ keep, skipped } = partition(sets, recent, today));
+    }
+
+    if (!keep.length && skipped.length) {
+      // Nothing new at all. Do NOT create an empty session — that is exactly the
+      // duplicate this is here to prevent.
+      return res.json({
+        ok: true, sessionId: null, exerciseCount: 0, skipped,
+        message: 'Nothing logged — every exercise sent was already in the log. ' +
+                 'Send force: true if this workout really was repeated exactly.',
+      });
+    }
 
     // Create the session
     const session = await WorkoutSession.create({
@@ -100,7 +147,7 @@ router.post('/sessions', requireToken, async (req, res) => {
 
     // Create sets
     let exerciseOrder = 0;
-    for (const exGroup of sets) {
+    for (const exGroup of keep) {
       let setNumber = 1;
       for (const s of (exGroup.sets || [])) {
         await WorkoutSet.create({
@@ -123,11 +170,17 @@ router.post('/sessions', requireToken, async (req, res) => {
     await Exercise.create({
       date: today,
       type: title || type,
-      duration: durationMins || Math.max(30, sets.length * 5),
-      notes: `Logged via Neith — ${sets.length} exercise(s)`,
+      duration: durationMins || Math.max(30, keep.length * 5),
+      notes: `Logged via Neith — ${keep.length} exercise(s)`,
     });
 
-    res.json({ ok: true, sessionId: session.id, exerciseCount: sets.length });
+    res.json({
+      ok: true, sessionId: session.id, exerciseCount: keep.length,
+      // What was actually written, so the caller reports the log rather than
+      // whatever it believed it sent.
+      logged: keep.map(e => ({ exerciseName: e.exerciseName, sets: (e.sets || []).length })),
+      skipped,
+    });
   } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
 });
 
