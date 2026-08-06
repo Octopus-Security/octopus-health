@@ -6,6 +6,31 @@ const { Op } = require('sequelize');
 const { AuthClient } = require('@octopus-security/auth-client');
 const axios = require('axios');
 const app = express();
+
+// Express 4 does NOT catch a rejected promise from an async route handler, and
+// since Node 15 an unhandled rejection TERMINATES THE PROCESS. So one query
+// that rejects does not fail one request — it kills the service, dropping every
+// other request in flight with it. Docker restarts the container, which is why
+// it reads as a random blip rather than as an error.
+//
+// Measured on express 4.21.2 under this Node: without the wrapper the process
+// is dead and the port unreachable; with it, the request gets a 500 and the
+// service carries on.
+//
+// 55 of the 58 async routes here have no try/catch of their own, so any query
+// that rejects — a locked database, a bad id, a column that does not exist —
+// takes the whole tracker down.
+//
+// Wrapping the routing methods once catches every handler, present and future,
+// and forwards the rejection to the error handler at the bottom of this file.
+for (const method of ['get', 'post', 'put', 'patch', 'delete', 'use']) {
+    const original = app[method].bind(app);
+    app[method] = (...args) => original(...args.map(a =>
+        typeof a === 'function' && a.length < 4
+            ? function (req, res, next) { return Promise.resolve(a(req, res, next)).catch(next); }
+            : a));
+}
+
 // Trust proxy for correct IP detection behind Cloudflare/NGINX
 app.set('trust proxy', 1);
 const port = process.env.PORT || 3000;
@@ -1013,6 +1038,24 @@ app.get('/stats', requireLogin, (req, res) => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
+
+// Anything reaching here failed rather than answered. This app serves both
+// pages and JSON, so it has to reply in kind: an HTML error page to a browser
+// and JSON to fetch(), because an HTML error body breaks the caller's r.json()
+// and produces the same silent nothing as the hang it is replacing.
+app.use((err, req, res, next) => {
+    console.error(`[health] ${req.method} ${req.originalUrl} failed:`, err);
+    if (res.headersSent) return next(err);
+    const wantsJson = req.originalUrl.startsWith('/api/') ||
+                      (req.get('accept') || '').includes('application/json');
+    if (wantsJson) {
+        return res.status(500).json({ error: err.message || 'internal error' });
+    }
+    res.status(500).send(
+        '<h1>Something went wrong</h1>' +
+        '<p>That request failed. The error is in the server log.</p>' +
+        '<p><a href="/">Back</a></p>');
+});
 
 app.listen(port, () => {
     console.log(`Health Tracker running on port ${port}`);
