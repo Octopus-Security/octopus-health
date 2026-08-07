@@ -8,6 +8,7 @@ const express = require('express');
 const router  = express.Router();
 const getDatabase = require('../../database');
 const { partition } = require('../dedupe-sets');
+const { detectPR, rebuildPRs } = require('../pr-detect');
 
 // Username whose SQLite DB to use for service calls.
 // Must match the username Nick registered with in the health app.
@@ -104,7 +105,7 @@ router.get('/prs/bests', requireToken, async (req, res) => {
 // Body: { type, title, date, durationMins, effort, notes, sets: [{ exerciseName, sets: [{ reps, weight, duration, notes }] }] }
 router.post('/sessions', requireToken, async (req, res) => {
   try {
-    const { Exercise, WorkoutSession, WorkoutSet } = await getDB();
+    const { Exercise, WorkoutSession, WorkoutSet, PersonalRecord } = await getDB();
     const { type = 'strength', title, date, durationMins, effort, notes, sets = [], force = false } = req.body;
 
     // Resolve the day this session belongs to.
@@ -169,8 +170,14 @@ router.post('/sessions', requireToken, async (req, res) => {
       status: 'finished',
     });
 
-    // Create sets
+    // Create sets, and detect PRs exactly as the web app does.
+    //
+    // This path did not do the PR half at all. Everything logged by talking to
+    // Neith produced sets and no records, so the stats page — which tells you
+    // records "auto-detect when you log sets" — stayed empty for months of real
+    // training. One shared implementation now, in api/pr-detect.js.
     let exerciseOrder = 0;
+    const newPRs = [];
     for (const exGroup of keep) {
       let setNumber = 1;
       for (const s of (exGroup.sets || [])) {
@@ -185,6 +192,14 @@ router.post('/sessions', requireToken, async (req, res) => {
           duration:      s.duration || null,
           notes:         s.notes   || null,
         });
+        try {
+          const pr = await detectPR({ PersonalRecord }, {
+            exerciseName: exGroup.exerciseName,
+            reps: s.reps || null, weight: s.weight || null,
+            weightUnit: s.weightUnit || 'lbs', duration: s.duration || null,
+          }, today);
+          if (pr) newPRs.push({ exerciseName: pr.exerciseName, weight: pr.weight, reps: pr.reps, durationSecs: pr.durationSecs });
+        } catch (_) { /* never fail a logged set over PR bookkeeping */ }
         setNumber++;
       }
       exerciseOrder++;
@@ -206,6 +221,8 @@ router.post('/sessions', requireToken, async (req, res) => {
       // whatever it believed it sent.
       logged: keep.map(e => ({ exerciseName: e.exerciseName, sets: (e.sets || []).length })),
       skipped,
+      // So Neith can say "that's a PR" in the same breath as confirming the log.
+      newPRs,
     });
   } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
 });

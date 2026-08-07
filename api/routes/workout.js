@@ -1,6 +1,7 @@
 const express = require('express');
 const getDatabase = require('../../database');
 const { authenticateToken } = require('../middleware/auth');
+const { detectPR, rebuildPRs } = require('../pr-detect');
 
 const router = express.Router();
 router.use(authenticateToken);
@@ -136,32 +137,15 @@ router.post('/sessions/:id/sets', async (req, res) => {
             duration, distance, distanceUnit, rpe, notes,
         });
 
-        // Auto-PR detection
+        // Auto-PR detection — shared with the service path, which for months
+        // did not do it at all. See api/pr-detect.js.
         let newPR = null;
         try {
             const session = await WorkoutSession.findByPk(req.params.id);
             const sessionDate = session?.date || new Date().toISOString().slice(0, 10);
-            const existingPRs = await PersonalRecord.findAll({ where: { exerciseName } });
-
-            if (duration != null && weight == null && reps == null) {
-                // Cardio/timed — lower duration = PR
-                const bestTime = existingPRs.reduce((best, pr) => (pr.durationSecs != null && (best == null || pr.durationSecs < best) ? pr.durationSecs : best), null);
-                if (bestTime == null || duration < bestTime) {
-                    newPR = await PersonalRecord.create({ exerciseName, durationSecs: duration, distance: distance || null, date: sessionDate, notes: distanceUnit ? `${distance} ${distanceUnit}` : null });
-                }
-            } else if (weight != null) {
-                // Strength — higher weight = PR (same or more reps)
-                const bestWeight = existingPRs.reduce((best, pr) => (pr.weight != null && (best == null || pr.weight > best) ? pr.weight : best), null);
-                if (bestWeight == null || weight > bestWeight) {
-                    newPR = await PersonalRecord.create({ exerciseName, weight, weightUnit: weightUnit || 'lbs', reps: reps || null, date: sessionDate });
-                }
-            } else if (reps != null && weight == null) {
-                // Rep-only (pull-ups, push-ups) — more reps = PR
-                const bestReps = existingPRs.reduce((best, pr) => (pr.reps != null && (best == null || pr.reps > best) ? pr.reps : best), null);
-                if (bestReps == null || reps > bestReps) {
-                    newPR = await PersonalRecord.create({ exerciseName, reps, date: sessionDate });
-                }
-            }
+            newPR = await detectPR({ PersonalRecord },
+                { exerciseName, reps, weight, weightUnit, duration, distance, distanceUnit },
+                sessionDate);
         } catch (_) { /* don't fail the set save over PR logic */ }
 
         res.status(201).json({ success: true, data: set, newPR });
@@ -399,6 +383,28 @@ router.delete('/prs/:id', async (req, res) => {
 });
 
 // GET /workout/exercise-names — distinct exercise names from logged sets (for autocomplete)
+// POST /workout/prs/rebuild — derive PRs from every set already logged.
+//
+// Sets logged through the service path (i.e. by talking to Neith) never ran PR
+// detection, so an account can hold months of training and show "No PRs yet".
+// Fixing the write path only helps future sets; this recovers what is already
+// there. Existing PRs are respected, so it is safe to run repeatedly.
+router.post('/prs/rebuild', async (req, res) => {
+    try {
+        const db = getDatabase(req.user.username);
+        await db.sequelize.sync();
+        const { scanned, created } = await rebuildPRs(db);
+        res.json({
+            success: true,
+            scanned,
+            created: created.length,
+            prs: created.map(p => ({ exerciseName: p.exerciseName, weight: p.weight, reps: p.reps, durationSecs: p.durationSecs, date: p.date })),
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
 router.get('/exercise-names', async (req, res) => {
     try {
         const { WorkoutSet, sequelize } = getDatabase(req.user.username);
