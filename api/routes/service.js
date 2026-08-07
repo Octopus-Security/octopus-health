@@ -10,9 +10,45 @@ const getDatabase = require('../../database');
 const { partition } = require('../dedupe-sets');
 const { detectPR, rebuildPRs } = require('../pr-detect');
 
-// Username whose SQLite DB to use for service calls.
-// Must match the username Nick registered with in the health app.
+// Whose database a service call lands in when the caller doesn't say.
+//
+// This used to be the ONLY answer: one env var decided the owner of every write
+// on this API, so the health service had no per-user concept at all. That was
+// fine while exactly one person could talk to Neith and is a data leak the
+// moment a second can — their workouts, weight, meals and goals would all be
+// written into this account.
+//
+// Callers now name the account (X-Service-User). The default remains, so a
+// caller that hasn't been updated behaves exactly as before and Nick's data
+// stays in the file it is already in — health can deploy before cortex does.
 const SERVICE_USER = process.env.HEALTH_SERVICE_USER || 'psychopathy';
+
+// A username becomes a FILENAME (`data/<username>_health.sqlite`). While it came
+// from a const or from octopus-auth that was safe; arriving in a header it is
+// not, so it is checked against a whitelist rather than sanitised — a name that
+// doesn't match is refused, never repaired into something that opens a
+// different account's database or a path outside the data directory.
+const USERNAME_RE = /^[A-Za-z0-9_-]{1,64}$/;
+
+/**
+ * The account this call is for. Header first, then body/query for callers that
+ * can't set headers, then the configured default.
+ * @throws {Error} with .status 400 on a name that could escape the data dir
+ */
+function serviceUser(req) {
+  // `username` in the body is the convention the planned cross-app data-rights
+  // endpoints use (POST /api/service/export-user { username }, /delete-user) —
+  // accepted here so this API has one idea of who a call is for, not two.
+  const raw = req.get('X-Service-User')
+           || (req.body && (req.body.username || req.body.user))
+           || (req.query && (req.query.username || req.query.user))
+           || SERVICE_USER;
+  const name = String(raw).trim();
+  if (!USERNAME_RE.test(name)) {
+    throw Object.assign(new Error(`invalid user "${name}"`), { status: 400 });
+  }
+  return name;
+}
 
 /**
  * Every set logged since `since`, flat, newest sessions included.
@@ -40,8 +76,23 @@ function requireToken(req, res, next) {
   next();
 }
 
-async function getDB() {
-  const db = getDatabase(SERVICE_USER);
+// Resolve the account once, before any handler runs. Doing it inside a handler
+// would surface a bad username as a 500 — every route here ends in a catch that
+// reports 500 — and "invalid user" is a request error the caller must see as
+// one. requireToken runs first so an unauthenticated caller still gets 401.
+router.use(requireToken, (req, res, next) => {
+  try { req.serviceUser = serviceUser(req); next(); }
+  catch (e) { res.status(e.status || 400).json({ ok: false, error: e.message }); }
+});
+
+/**
+ * The database for THIS request's account.
+ *
+ * Takes `req` rather than a username so a route physically cannot forget to
+ * scope itself — there is no zero-argument form that quietly means "Nick".
+ */
+async function getDB(req) {
+  const db = getDatabase(req.serviceUser || serviceUser(req));
   // Create any missing tables — only if sequelize is available (safe no-op if tables exist)
   if (db.sequelize) await db.sequelize.sync().catch(() => {});
   // Additive column migrations (health uses plain sync(), so new columns need ALTER).
@@ -52,7 +103,7 @@ async function getDB() {
 // GET /api/service/prs?exercise=Pull-up
 router.get('/prs', requireToken, async (req, res) => {
   try {
-    const { PersonalRecord } = await getDB();
+    const { PersonalRecord } = await getDB(req);
     const where = req.query.exercise ? { exerciseName: req.query.exercise } : {};
     const rows = await PersonalRecord.findAll({
       where, order: [['date', 'DESC'], ['createdAt', 'DESC']], limit: 100,
@@ -64,7 +115,7 @@ router.get('/prs', requireToken, async (req, res) => {
 // POST /api/service/prs  { exerciseName, reps, sets, weight, weightUnit, durationSecs, date, notes }
 router.post('/prs', requireToken, async (req, res) => {
   try {
-    const { PersonalRecord } = await getDB();
+    const { PersonalRecord } = await getDB(req);
     const { exerciseName, reps, sets, weight, weightUnit, durationSecs, date, notes } = req.body;
     if (!exerciseName) return res.status(400).json({ error: 'exerciseName required' });
     const row = await PersonalRecord.create({
@@ -84,7 +135,7 @@ router.post('/prs', requireToken, async (req, res) => {
 // GET /api/service/prs/bests
 router.get('/prs/bests', requireToken, async (req, res) => {
   try {
-    const { PersonalRecord, sequelize } = await getDB();
+    const { PersonalRecord, sequelize } = await getDB(req);
     const { QueryTypes } = require('sequelize');
     const rows = await sequelize.query(
       `SELECT exerciseName,
@@ -105,7 +156,7 @@ router.get('/prs/bests', requireToken, async (req, res) => {
 // Body: { type, title, date, durationMins, effort, notes, sets: [{ exerciseName, sets: [{ reps, weight, duration, notes }] }] }
 router.post('/sessions', requireToken, async (req, res) => {
   try {
-    const { Exercise, WorkoutSession, WorkoutSet, PersonalRecord } = await getDB();
+    const { Exercise, WorkoutSession, WorkoutSet, PersonalRecord } = await getDB(req);
     const { type = 'strength', title, date, durationMins, effort, notes, sets = [], force = false } = req.body;
 
     // Resolve the day this session belongs to.
@@ -146,7 +197,7 @@ router.post('/sessions', requireToken, async (req, res) => {
     if (!force && sets.length) {
       const since = new Date(Date.now() - 10 * 24 * 3600 * 1000)
         .toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
-      const recent = await recentSetRows(await getDB(), since);
+      const recent = await recentSetRows(await getDB(req), since);
       ({ keep, skipped } = partition(sets, recent, today));
     }
 
@@ -233,7 +284,7 @@ router.post('/sessions', requireToken, async (req, res) => {
 // history, which is how Sunday's squats got reported as Monday's session.
 router.get('/sessions', requireToken, async (req, res) => {
   try {
-    const { WorkoutSession, WorkoutSet, sequelize } = await getDB();
+    const { WorkoutSession, WorkoutSet, sequelize } = await getDB(req);
     const { QueryTypes } = require('sequelize');
     const todayET = new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
 
@@ -282,7 +333,7 @@ router.get('/sessions', requireToken, async (req, res) => {
 // Used by the gym-nudge scheduler to avoid pestering after he's already trained.
 router.get('/logged-today', requireToken, async (req, res) => {
   try {
-    const { WorkoutSession, PersonalRecord } = await getDB();
+    const { WorkoutSession, PersonalRecord } = await getDB(req);
     const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
     const [sessions, prs] = await Promise.all([
       WorkoutSession.count({ where: { date: today, status: 'finished' } }),
@@ -296,7 +347,7 @@ router.get('/logged-today', requireToken, async (req, res) => {
 // For Neith to log meals into Nick's account so nutrition coaching has data.
 router.post('/meals', requireToken, async (req, res) => {
   try {
-    const { Meal } = await getDB();
+    const { Meal } = await getDB(req);
     const { mealType, description, calories, protein, carbs, fats, date, time, notes } = req.body;
     if (!description) return res.status(400).json({ ok: false, error: 'description required' });
     const day  = date || new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
@@ -358,7 +409,7 @@ router.post('/meals/from-recipe', requireToken, async (req, res) => {
       ? recipe.title
       : `${recipe.title} — ${portions} serving${portions === 1 ? '' : 's'}`;
 
-    const { Meal, IngredientMatch } = await getDB();
+    const { Meal, IngredientMatch } = await getDB(req);
     const day = date || new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
     const now = time || new Date().toLocaleTimeString('en-GB', { timeZone: 'America/New_York', hour12: false });
 
@@ -431,7 +482,7 @@ router.post('/meals/from-recipe', requireToken, async (req, res) => {
 // GET /api/service/nutrition-today — today's macro totals + meal count (ET)
 router.get('/nutrition-today', requireToken, async (req, res) => {
   try {
-    const { Meal } = await getDB();
+    const { Meal } = await getDB(req);
     const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
     const meals = await Meal.findAll({ where: { date: today } });
     const sum = k => meals.reduce((t, m) => t + (m[k] || 0), 0);
@@ -446,7 +497,7 @@ router.get('/nutrition-today', requireToken, async (req, res) => {
 // Returns workout template by slug (dayKey:location), or all if no slug.
 router.get('/templates', requireToken, async (req, res) => {
   try {
-    const { PersonalRecord, WorkoutTemplate } = await getDB();
+    const { PersonalRecord, WorkoutTemplate } = await getDB(req);
     const where = req.query.slug ? { name: req.query.slug } : {};
     const rows = await WorkoutTemplate.findAll({ where, order: [['name', 'ASC']] });
     const templates = rows.map(t => {
@@ -474,7 +525,7 @@ router.get('/templates', requireToken, async (req, res) => {
 // GET /api/service/weight/latest — most recent bodyweight entry
 router.get('/weight/latest', requireToken, async (req, res) => {
   try {
-    const { WeightEntry } = await getDB();
+    const { WeightEntry } = await getDB(req);
     const row = await WeightEntry.findOne({ order: [['date', 'DESC'], ['createdAt', 'DESC']] });
     res.json({ ok: true, weight: row });
   } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
@@ -483,7 +534,7 @@ router.get('/weight/latest', requireToken, async (req, res) => {
 // POST /api/service/weight  { weight, unit, date, notes } — idempotent per date
 router.post('/weight', requireToken, async (req, res) => {
   try {
-    const { WeightEntry } = await getDB();
+    const { WeightEntry } = await getDB(req);
     const { weight, unit, date, notes } = req.body;
     const value = parseFloat(weight);
     if (!Number.isFinite(value)) return res.status(400).json({ error: 'weight (number) required' });
@@ -505,7 +556,7 @@ router.post('/weight', requireToken, async (req, res) => {
 // GET /api/service/goals?active=1  → goals for the service user (active = not completed)
 router.get('/goals', requireToken, async (req, res) => {
   try {
-    const { Goal } = await getDB();
+    const { Goal } = await getDB(req);
     const where = {};
     if (req.query.active === '1' || req.query.active === 'true') where.completed = false;
     const rows = await Goal.findAll({ where, order: [['deadline', 'ASC'], ['createdAt', 'DESC']] });
@@ -519,7 +570,7 @@ router.get('/goals', requireToken, async (req, res) => {
 // with no number default to 0.
 router.post('/goals', requireToken, async (req, res) => {
   try {
-    const { Goal } = await getDB();
+    const { Goal } = await getDB(req);
     const b = req.body || {};
     const type = ['weight', 'exercise', 'calories'].includes(b.type) ? b.type : 'exercise';
     const target = b.targetValue != null ? parseFloat(b.targetValue) : 0;
@@ -542,7 +593,7 @@ router.post('/goals', requireToken, async (req, res) => {
 // PATCH /api/service/goals/:id  { currentValue, completed, progression, ... }
 router.patch('/goals/:id', requireToken, async (req, res) => {
   try {
-    const { Goal } = await getDB();
+    const { Goal } = await getDB(req);
     const row = await Goal.findByPk(req.params.id);
     if (!row) return res.status(404).json({ ok: false, error: 'goal not found' });
     const b = req.body || {};
