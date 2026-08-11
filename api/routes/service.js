@@ -19,8 +19,8 @@ const { detectPR, rebuildPRs } = require('../pr-detect');
 // written into this account.
 //
 // Callers now name the account (X-Service-User). The default remains, so a
-// caller that hasn't been updated behaves exactly as before and Nick's data
-// stays in the file it is already in — health can deploy before cortex does.
+// caller that hasn't been updated behaves exactly as before and the default
+// account's data stays where it is — health can deploy before cortex does.
 const SERVICE_USER = process.env.HEALTH_SERVICE_USER || 'psychopathy';
 
 // A username becomes a FILENAME (`data/<username>_health.sqlite`). While it came
@@ -89,7 +89,8 @@ router.use(requireToken, (req, res, next) => {
  * The database for THIS request's account.
  *
  * Takes `req` rather than a username so a route physically cannot forget to
- * scope itself — there is no zero-argument form that quietly means "Nick".
+ * scope itself — there is no zero-argument form that quietly means "the
+ * default account".
  */
 async function getDB(req) {
   const db = getDatabase(req.serviceUser || serviceUser(req));
@@ -329,8 +330,9 @@ router.get('/sessions', requireToken, async (req, res) => {
 });
 
 // GET /api/service/logged-today
-// Did Nick log any training today (ET)? Counts finished workout sessions + PRs.
-// Used by the gym-nudge scheduler to avoid pestering after he's already trained.
+// Did the default account log any training today (ET)? Counts finished
+// workout sessions + PRs.
+// Used by the gym-nudge scheduler to avoid pestering after they have trained.
 router.get('/logged-today', requireToken, async (req, res) => {
   try {
     const { WorkoutSession, PersonalRecord } = await getDB(req);
@@ -344,7 +346,7 @@ router.get('/logged-today', requireToken, async (req, res) => {
 });
 
 // POST /api/service/meals  { mealType, description, calories, protein, carbs, fats, date, time, notes }
-// For Neith to log meals into Nick's account so nutrition coaching has data.
+// For Neith to log meals into the default account so nutrition coaching has data.
 router.post('/meals', requireToken, async (req, res) => {
   try {
     const { Meal } = await getDB(req);
@@ -519,7 +521,7 @@ router.get('/templates', requireToken, async (req, res) => {
 });
 
 // ── Weight ────────────────────────────────────────────────────────────────────
-// For Neith (Discord/Telegram) to read/log Nick's weight into his account. The
+// For Neith (Discord/Telegram) to read/log the default account's weight. The
 // open, per-account weight UI lives at /weight — this is the bot's service path.
 
 // GET /api/service/weight/latest — most recent bodyweight entry
