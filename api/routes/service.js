@@ -185,30 +185,49 @@ router.post('/sessions', requireToken, async (req, res) => {
       today = asked;
     }
 
-    // Drop exercises that have already been logged, unless forced.
+    // Hold back exercises that are already in the log, unless forced.
     //
     // Neith logs from a chat whose history contains previous days' logs, and it
     // has repeatedly re-sent those old exercises along with the new ones — a
     // three-exercise push day came back as ten, carrying another day's squats
     // and rows at that day's exact weights. Its tool description already says in
     // capitals to log only what was reported; it did it anyway, so the check
-    // belongs here, where an instruction cannot be argued with. See
-    // api/dedupe-sets.js.
-    let keep = sets, skipped = [];
+    // belongs here, where an instruction cannot be argued with.
+    //
+    // HELD, not dropped. This used to decide, and it was wrong in the expensive
+    // direction: a warm-up is byte-identical every session by design, so a
+    // 5-minute bike and 2x10 goblet squats became unloggable the day after they
+    // were first logged. An identical submission is also just plainly legitimate
+    // when it is a later day — repeating a workout is a normal thing to do.
+    //
+    // A fabricated log is bad. A log with unexplained holes is worse, because it
+    // costs you confidence in all of it and then the tracking is pointless. So
+    // nothing is discarded: what collides comes back as a question.
+    // See api/dedupe-sets.js.
+    let keep = sets, needsConfirm = [];
     if (!force && sets.length) {
       const since = new Date(Date.now() - 10 * 24 * 3600 * 1000)
         .toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
       const recent = await recentSetRows(await getDB(req), since);
-      ({ keep, skipped } = partition(sets, recent, today));
+      ({ keep, needsConfirm } = partition(sets, recent, today));
     }
 
-    if (!keep.length && skipped.length) {
-      // Nothing new at all. Do NOT create an empty session — that is exactly the
-      // duplicate this is here to prevent.
+    if (!keep.length && needsConfirm.length) {
+      // Everything collided. Do NOT create an empty session, and do NOT throw
+      // the request away either — answer with the question.
       return res.json({
-        ok: true, sessionId: null, date: today, exerciseCount: 0, skipped,
-        message: 'Nothing logged — every exercise sent was already in the log. ' +
-                 'Send force: true if this workout really was repeated exactly.',
+        ok: true, sessionId: null, date: today, exerciseCount: 0,
+        needsConfirm,
+        // Kept under the old key too: cortex is deployed separately and may be a
+        // release behind, and a rename that silently empties a field is how the
+        // caller stops mentioning the skip at all.
+        skipped: needsConfirm,
+        question: needsConfirm.length === 1
+          ? `${needsConfirm[0].exerciseName} is already in the log (${needsConfirm[0].alreadyLoggedOn}). Did you do it again? Nothing has been saved yet.`
+          : `${needsConfirm.length} of these are already in the log. Did you do them again? Nothing has been saved yet.`,
+        message: 'NOTHING WAS SAVED. Every exercise sent is already in the log. '
+               + 'Ask whether they were really done again, and re-send with force: true if yes. '
+               + 'Do not silently drop them and do not claim they were logged.',
       });
     }
 
@@ -272,7 +291,11 @@ router.post('/sessions', requireToken, async (req, res) => {
       // What was actually written, so the caller reports the log rather than
       // whatever it believed it sent.
       logged: keep.map(e => ({ exerciseName: e.exerciseName, sets: (e.sets || []).length })),
-      skipped,
+      needsConfirm,
+      skipped: needsConfirm,          // legacy key — see the note above
+      question: needsConfirm.length
+        ? `${needsConfirm.map(n => n.exerciseName).join(', ')} ${needsConfirm.length === 1 ? 'is' : 'are'} already in the log and ${needsConfirm.length === 1 ? 'was' : 'were'} NOT saved. Did you do ${needsConfirm.length === 1 ? 'it' : 'them'} again?`
+        : null,
       // So Neith can say "that's a PR" in the same breath as confirming the log.
       newPRs,
     });
@@ -570,12 +593,56 @@ router.get('/goals', requireToken, async (req, res) => {
 //   { type, title, exerciseName, targetValue, currentValue, unit, deadline, progression, description }
 // type defaults to 'exercise'. targetValue is required by the schema; skill goals
 // with no number default to 0.
+/**
+ * Compare goal names the way a person would.
+ *
+ * set_goal creates, and it was called more than once for the same ambition with
+ * the wording drifting slightly each time — "Freestanding Handstand Push-up -> 1"
+ * and "Freestanding Handstand Push-up -> 1 reps" became two rows, as did two
+ * phrasings of "Visible Abs". Every one of them is then injected into the
+ * coaching context on every message, so the duplication is not cosmetic: it is
+ * paid for in tokens and it teaches the model there are two separate goals.
+ *
+ * Punctuation, case and a trailing target ("-> 1", "1 reps") are noise here.
+ */
+function goalKey(title, exerciseName) {
+  return String(title || exerciseName || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .replace(/\b\d+\s*(reps?|secs?|seconds?|mins?|minutes?|lbs?|kg)?\b\s*$/g, '')
+    .trim();
+}
+
 router.post('/goals', requireToken, async (req, res) => {
   try {
     const { Goal } = await getDB(req);
     const b = req.body || {};
     const type = ['weight', 'exercise', 'calories'].includes(b.type) ? b.type : 'exercise';
     const target = b.targetValue != null ? parseFloat(b.targetValue) : 0;
+
+    // Update the matching goal rather than adding a second one. An ambition
+    // restated is the same ambition — the newer wording and progression win,
+    // and nothing is lost because this is an UPDATE, never a delete.
+    const key = goalKey(b.title, b.exerciseName);
+    if (key) {
+      const existing = (await Goal.findAll({ where: { completed: false } }))
+        .find(g => goalKey(g.title, g.exerciseName) === key);
+      if (existing) {
+        for (const [f, v] of Object.entries({
+          title:        b.title        || existing.title,
+          exerciseName: b.exerciseName || existing.exerciseName,
+          targetValue:  Number.isFinite(target) && target ? target : existing.targetValue,
+          currentValue: b.currentValue != null ? parseFloat(b.currentValue) : existing.currentValue,
+          unit:         b.unit         || existing.unit,
+          deadline:     b.deadline     || existing.deadline,
+          progression:  b.progression  || existing.progression,
+          description:  b.description  || existing.description,
+        })) existing[f] = v;
+        await existing.save();
+        return res.json({ ok: true, goal: existing, updatedExisting: true });
+      }
+    }
+
     const row = await Goal.create({
       type,
       title:        b.title        || b.exerciseName || null,
