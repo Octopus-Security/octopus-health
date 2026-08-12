@@ -42,7 +42,12 @@ const AUTH_URL = process.env.AUTH_SERVICE_URL || 'http://octopus-auth:3002';
 function getActiveTab(requestPath) {
     if (requestPath === '/') return 'dashboard';
     if (requestPath.startsWith('/tools') || requestPath.startsWith('/timers')) return 'tools';
-    if (requestPath.startsWith('/exercises') || requestPath.startsWith('/library') || requestPath.startsWith('/exercise') || requestPath.startsWith('/workout') || requestPath.startsWith('/plan-maker')) return 'exercises';
+    // Before the /exercise* line below, which would otherwise swallow it —
+    // startsWith('/plan-maker') never got a chance because the same branch
+    // returned 'exercises' for it, so BOTH nav links lit up and only cleared
+    // when you clicked something else entirely.
+    if (requestPath.startsWith('/plan-maker')) return 'plan-maker';
+    if (requestPath.startsWith('/exercises') || requestPath.startsWith('/library') || requestPath.startsWith('/exercise') || requestPath.startsWith('/workout')) return 'exercises';
     if (requestPath.startsWith('/stretch') || requestPath.startsWith('/routines')) return 'stretch';
     if (requestPath.startsWith('/nutrition') || requestPath.startsWith('/meals')) return 'nutrition';
     if (requestPath.startsWith('/weight')) return 'weight';
