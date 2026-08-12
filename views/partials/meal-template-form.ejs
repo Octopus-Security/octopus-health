@@ -1,0 +1,56 @@
+<%
+// Shared by "new" and every "edit" block. `t` is null when creating.
+// Slot rows are rendered server-side so the form works with JavaScript disabled;
+// the Add-ingredient button clones the same markup for new rows.
+const slots = t ? t.slots : [];
+%>
+<div class="form-grid">
+    <div class="form-group">
+        <label>Name</label>
+        <input type="text" name="name" value="<%= t ? t.name : '' %>" placeholder="Protein Shake" required>
+    </div>
+    <div class="form-group">
+        <label>Logs as</label>
+        <select name="mealType">
+            <% ['breakfast','lunch','dinner','snack'].forEach(m => { %>
+                <option value="<%= m %>" <%= t && t.mealType === m ? 'selected' : '' %>><%= m %></option>
+            <% }) %>
+        </select>
+    </div>
+</div>
+
+<label style="display:block; margin:.6rem 0 .3rem;">Ingredients</label>
+<div class="slots">
+    <% slots.forEach(s => { const p = s.product || {}; %>
+        <div class="slot-group">
+            <div class="slot-row">
+                <input type="text" name="slotName" value="<%= s.name %>" placeholder="ingredient">
+                <input type="text" name="slotMeasure" value="<%= s.measure || '' %>" placeholder="2 scoops">
+                <span>
+                    <button type="button" class="product-toggle" onclick="toggleProduct(this)">product</button>
+                    <button type="button" class="product-toggle" onclick="removeSlot(this)">✕</button>
+                </span>
+            </div>
+            <div class="product-box" <%= s.product ? '' : 'hidden' %>>
+                <div style="font-size:.75rem; opacity:.7; margin-bottom:.4rem;">
+                    Copy these off the package. Clear "per" to look the ingredient up in USDA instead.
+                </div>
+                <input type="text" name="prodLabel" value="<%= p.label || '' %>" placeholder="brand / product name" style="margin-bottom:.4rem;">
+                <div class="product-grid">
+                    <div><label>per</label><input type="number" step="any" name="prodPer" value="<%= p.per != null ? p.per : '' %>"></div>
+                    <div><label>unit</label><input type="text" name="prodUnit" value="<%= p.unit || '' %>" placeholder="scoop"></div>
+                    <div><label>kcal</label><input type="number" step="any" name="prodKcal" value="<%= p.kcal != null ? p.kcal : '' %>"></div>
+                    <div><label>protein g</label><input type="number" step="any" name="prodProtein" value="<%= p.protein != null ? p.protein : '' %>"></div>
+                    <div><label>carbs g</label><input type="number" step="any" name="prodCarbs" value="<%= p.carbs != null ? p.carbs : '' %>"></div>
+                    <div><label>fats g</label><input type="number" step="any" name="prodFats" value="<%= p.fats != null ? p.fats : '' %>"></div>
+                </div>
+            </div>
+        </div>
+    <% }) %>
+</div>
+<button type="button" class="toggle-btn" onclick="addSlot(this.closest('form').querySelector('.slots'))">+ Add ingredient</button>
+
+<div class="form-group" style="margin-top:.8rem;">
+    <label>Notes (copied onto every meal logged from this)</label>
+    <textarea name="notes" rows="2"><%= t && t.notes ? t.notes : '' %></textarea>
+</div>

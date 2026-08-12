@@ -9,6 +9,7 @@ const router  = express.Router();
 const getDatabase = require('../../database');
 const { partition } = require('../dedupe-sets');
 const { detectPR, rebuildPRs } = require('../pr-detect');
+const { macrosForTemplate, describe, provenance } = require('../meal-template');
 
 // Whose database a service call lands in when the caller doesn't say.
 //
@@ -388,6 +389,77 @@ router.post('/meals', requireToken, async (req, res) => {
       notes: notes || null,
     });
     res.json({ ok: true, mealId: meal.id, date: day });
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+
+// GET /api/service/meal-templates — the caller's saved meals, names and ids only.
+//
+// Neith needs this to turn "log my shake" into an id. Macros are deliberately not
+// computed here: the list is read to pick from, and resolving every template's
+// unlabelled ingredients through USDA on every list call would be several network
+// round-trips to answer a question nobody asked.
+router.get('/meal-templates', requireToken, async (req, res) => {
+  try {
+    const { MealTemplate } = await getDB(req);
+    const rows = await MealTemplate.findAll({ where: { archived: false }, order: [['name', 'ASC']] });
+    res.json({
+      ok: true,
+      templates: rows.map(t => {
+        let slots = [];
+        try { slots = JSON.parse(t.ingredients || '[]'); } catch { /* a corrupt row still lists */ }
+        return {
+          id: t.id, name: t.name, mealType: t.mealType,
+          ingredients: slots.map(s => `${s.measure || ''} ${s.name}`.trim()),
+        };
+      }),
+    });
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+
+// POST /api/service/meal-templates/:id/log  { servings?, mealType?, date?, time? }
+//
+// findByPk with no owner clause is correct here and only here: getDB(req) already
+// resolved the account at the door and opened THAT person's database file, so
+// there is no row in it belonging to anyone else. A template that isn't found is a
+// 404 — a 403 would confirm the id exists in someone else's file.
+router.post('/meal-templates/:id/log', requireToken, async (req, res) => {
+  try {
+    const { MealTemplate, Meal, IngredientMatch } = await getDB(req);
+    const t = await MealTemplate.findByPk(req.params.id);
+    if (!t) return res.status(404).json({ ok: false, error: 'no such saved meal' });
+
+    let slots = [];
+    try { slots = JSON.parse(t.ingredients || '[]'); } catch { /* treated as empty below */ }
+    const servings = Number(req.body.servings) > 0 ? Number(req.body.servings) : 1;
+    const result = await macrosForTemplate(slots, {
+      IngredientMatch, apiKey: process.env.FDC_API_KEY, servings,
+    });
+
+    const day = req.body.date || new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
+    const now = req.body.time || new Date().toLocaleTimeString('en-GB', { timeZone: 'America/New_York', hour12: false });
+    const meal = await Meal.create({
+      date: day, time: now,
+      mealType: ['breakfast','lunch','dinner','snack'].includes(req.body.mealType) ? req.body.mealType : t.mealType,
+      description: describe(t.name, slots, servings),
+      calories: result.totals.kcal    || null,
+      protein:  result.totals.protein || null,
+      carbs:    result.totals.carbs   || null,
+      fats:     result.totals.fats    || null,
+      notes: [t.notes, provenance(result)].filter(Boolean).join('\n'),
+    });
+
+    // `skipped` is returned rather than folded into a success message so the model
+    // has to see it. A shake logged without its peanut butter is a wrong number,
+    // and Neith repeating a wrong number as fact is the failure this whole
+    // nutrition path is built to avoid.
+    res.json({
+      ok: true, mealId: meal.id, date: day, name: t.name, servings,
+      totals: result.totals, counted: result.counted, skipped: result.skipped,
+      approximate: result.approximate, coverage: result.coverage,
+      note: result.skipped.length
+        ? `Logged, but ${result.skipped.length} ingredient(s) could not be counted — the totals are LOW. Tell the user which.`
+        : undefined,
+    });
   } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
 });
 

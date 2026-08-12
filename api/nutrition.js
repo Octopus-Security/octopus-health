@@ -294,4 +294,4 @@ async function macrosForIngredients(ingredients, { IngredientMatch, apiKey }) {
   };
 }
 
-module.exports = { macrosForIngredients, parseQuantity, searchTerm, resolveFood };
+module.exports = { macrosForIngredients, parseQuantity, searchTerm, resolveFood, MASS_G, VOL_ML };

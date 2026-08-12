@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/theme.css">
+    <style>
+        .slot-row { display: grid; grid-template-columns: 2fr 1fr auto; gap: .5rem; margin-bottom: .4rem; align-items: start; }
+        .slot-row input { width: 100%; }
+        .product-box { grid-column: 1 / -1; margin: .1rem 0 .8rem 1rem; padding: .6rem .8rem; border-left: 3px solid #444; background: rgba(255,255,255,.03); }
+        .product-box[hidden] { display: none; }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: .4rem; }
+        .product-grid label { display: block; font-size: .7rem; opacity: .65; margin-bottom: .15rem; }
+        .product-toggle { background: none; border: 1px solid #555; color: inherit; font-size: .72rem; padding: .25rem .5rem; cursor: pointer; border-radius: 4px; }
+        .slot-hint { font-size: .75rem; opacity: .6; margin: .2rem 0 .8rem 1rem; }
+        .tmpl { border: 1px solid #333; border-radius: 6px; padding: .9rem 1rem; margin-bottom: 1rem; }
+        .tmpl-head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
+        .tmpl-lines { font-size: .85rem; opacity: .8; margin: .5rem 0; }
+        .tmpl-lines li { margin: .15rem 0; }
+        .brand { opacity: .55; font-size: .78rem; }
+        .no-brand { color: #d9a441; font-size: .78rem; }
+        .log-form { display: flex; gap: .4rem; align-items: center; flex-wrap: wrap; }
+        .log-form input, .log-form select { width: auto; }
+        .macros { font-size: .85rem; margin-top: .5rem; min-height: 1.2em; }
+        .macros .low { color: #d9a441; }
+    </style>
+</head>
+<body>
+    <%- include('partials/nav') %>
+
+    <div class="container">
+        <% if (flash) { %><div class="card success" style="padding:.7rem 1rem;"><%= flash %></div><% } %>
+        <% if (warn)  { %><div class="card error"   style="padding:.7rem 1rem;"><%= warn %></div><% } %>
+
+        <div class="card">
+            <h2>🥤 Saved Meals</h2>
+            <p style="opacity:.7; font-size:.85rem;">
+                Meals you eat the same way repeatedly. The ingredient lines stay put; the
+                <strong>product</strong> on each line is the tub or carton you currently have —
+                change that one field when you buy a different brand and every future log is right.
+                Lines with no product are looked up in the USDA database, which is accurate for
+                real foods and useless for supplements.
+            </p>
+
+            <% if (templates.length === 0) { %>
+                <div class="empty-state">Nothing saved yet. Build one below — or use the shake quick-start.</div>
+            <% } %>
+
+            <% templates.forEach(t => { %>
+                <div class="tmpl">
+                    <div class="tmpl-head">
+                        <h3 style="margin:0;"><%= t.name %> <span class="brand">· <%= t.mealType %></span></h3>
+                        <div class="log-form">
+                            <form method="POST" action="/meal-templates/<%= t.id %>/log" class="log-form">
+                                <input type="number" name="servings" value="1" step="0.25" min="0.25" style="width:4.5rem;" title="servings">
+                                <input type="date" name="date" value="<%= new Date().toISOString().split('T')[0] %>">
+                                <button type="submit">Log it</button>
+                            </form>
+                            <button type="button" class="toggle-btn" onclick="preview(<%= t.id %>)">Check macros</button>
+                            <button type="button" class="toggle-btn" onclick="document.getElementById('edit-<%= t.id %>').hidden = !document.getElementById('edit-<%= t.id %>').hidden">Edit</button>
+                        </div>
+                    </div>
+
+                    <ul class="tmpl-lines">
+                        <% t.slots.forEach(s => { %>
+                            <li>
+                                <%= s.measure %> <%= s.name %>
+                                <% if (s.product && s.product.label) { %>
+                                    <span class="brand">— <%= s.product.label %>
+                                        (<%= s.product.kcal %> kcal / <%= s.product.per %> <%= s.product.unit %>)</span>
+                                <% } else if (s.product) { %>
+                                    <span class="brand">— label: <%= s.product.kcal %> kcal / <%= s.product.per %> <%= s.product.unit %></span>
+                                <% } else { %>
+                                    <span class="no-brand">— no product set, looked up generically</span>
+                                <% } %>
+                            </li>
+                        <% }) %>
+                    </ul>
+                    <div class="macros" id="macros-<%= t.id %>"></div>
+
+                    <div id="edit-<%= t.id %>" hidden style="margin-top:1rem; border-top:1px solid #333; padding-top:1rem;">
+                        <form method="POST" action="/meal-templates/<%= t.id %>">
+                            <%- include('partials/meal-template-form', { t: t }) %>
+                            <button type="submit">Save changes</button>
+                        </form>
+                        <form method="POST" action="/meal-templates/<%= t.id %>/delete" style="margin-top:.6rem;"
+                              onsubmit="return confirm('Delete <%= t.name %>? Meals already logged from it are not affected.')">
+                            <button type="submit" class="btn-danger">Delete saved meal</button>
+                        </form>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+
+        <div class="card">
+            <h2>➕ New Saved Meal</h2>
+            <form method="POST" action="/meal-templates" id="new-form">
+                <%- include('partials/meal-template-form', { t: null }) %>
+                <button type="submit">Save meal</button>
+                <button type="button" class="toggle-btn" onclick="quickStart()">Quick-start: protein shake</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+    // Slot rows are parallel form arrays, so adding one is cloning the markup the
+    // server already knows how to read. No JSON round-trip, and the page still works
+    // for the rows that are already there if this script fails to run.
+    function addSlot(box) {
+        box.appendChild(document.getElementById('slot-template').content.cloneNode(true));
+        return box.lastElementChild;
+    }
+
+    function toggleProduct(btn) {
+        const box = btn.closest('.slot-group').querySelector('.product-box');
+        box.hidden = !box.hidden;
+    }
+
+    function removeSlot(btn) { btn.closest('.slot-group').remove(); }
+
+    // Nick's shake, as a starting point. Everything here is editable — the point of
+    // the quick-start is that the ingredient LINES are typical; the numbers on the
+    // labels are whatever is in your cupboard, so they are left blank for you to
+    // copy off the tub.
+    const SHAKE = [
+      { slotName: 'protein powder',  slotMeasure: '2 scoops',    prodUnit: 'scoop' },
+      { slotName: 'whole milk',      slotMeasure: '1/2 cup' },
+      { slotName: 'greek yogurt',    slotMeasure: '1/2 cup' },
+      { slotName: 'frozen berries',  slotMeasure: '1/2 cup' },
+      { slotName: 'peanut butter (chunky)', slotMeasure: '2 spoonfuls', prodUnit: 'spoonful' },
+      { slotName: 'creatine',        slotMeasure: '1 serving',   prodUnit: 'serving', prodKcal: 0, prodProtein: 0, prodCarbs: 0, prodFats: 0, prodPer: 1, prodLabel: 'creatine monohydrate (no macros)' },
+    ];
+
+    function quickStart() {
+        const form = document.getElementById('new-form');
+        form.querySelector('[name="name"]').value = 'Protein Shake';
+        form.querySelector('[name="mealType"]').value = 'snack';
+        const box = form.querySelector('.slots');
+        box.innerHTML = '';
+        for (const s of SHAKE) {
+            const group = addSlot(box);
+            for (const [k, v] of Object.entries(s)) {
+                const el = group.querySelector('[name="' + k + '"]');
+                if (el) el.value = v;
+            }
+            if (s.prodPer != null) group.querySelector('.product-box').hidden = false;
+        }
+    }
+
+    async function preview(id) {
+        const out = document.getElementById('macros-' + id);
+        out.textContent = 'checking…';
+        try {
+            const r = await fetch('/meal-templates/' + id + '/preview', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ servings: 1 }),
+            });
+            const d = await r.json();
+            if (!d.ok) { out.textContent = d.error || 'could not calculate'; return; }
+            let s = d.totals.kcal + ' kcal · ' + d.totals.protein + 'g P · ' + d.totals.carbs + 'g C · ' + d.totals.fats + 'g F';
+            if (d.approximate) s += ' (approximate)';
+            out.innerHTML = s;
+            if (d.skipped.length) {
+                out.innerHTML += '<div class="low">Not counted: ' +
+                    d.skipped.map(x => x.name + ' (' + x.reason + ')').join('; ') +
+                    ' — the total above is low by these.</div>';
+            }
+        } catch (e) {
+            out.textContent = 'could not calculate: ' + e.message;
+        }
+    }
+    </script>
+
+    <template id="slot-template">
+        <div class="slot-group">
+            <div class="slot-row">
+                <input type="text" name="slotName" placeholder="ingredient, e.g. protein powder">
+                <input type="text" name="slotMeasure" placeholder="2 scoops">
+                <span>
+                    <button type="button" class="product-toggle" onclick="toggleProduct(this)">product</button>
+                    <button type="button" class="product-toggle" onclick="removeSlot(this)">✕</button>
+                </span>
+            </div>
+            <div class="product-box" hidden>
+                <div style="font-size:.75rem; opacity:.7; margin-bottom:.4rem;">
+                    Copy these off the package. Leave blank to look the ingredient up in USDA instead.
+                </div>
+                <input type="text" name="prodLabel" placeholder="brand / product name" style="margin-bottom:.4rem;">
+                <div class="product-grid">
+                    <div><label>per</label><input type="number" step="any" name="prodPer" placeholder="1"></div>
+                    <div><label>unit</label><input type="text" name="prodUnit" placeholder="scoop"></div>
+                    <div><label>kcal</label><input type="number" step="any" name="prodKcal"></div>
+                    <div><label>protein g</label><input type="number" step="any" name="prodProtein"></div>
+                    <div><label>carbs g</label><input type="number" step="any" name="prodCarbs"></div>
+                    <div><label>fats g</label><input type="number" step="any" name="prodFats"></div>
+                </div>
+            </div>
+        </div>
+    </template>
+</body>
+</html>

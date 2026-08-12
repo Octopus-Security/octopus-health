@@ -49,7 +49,10 @@ function getActiveTab(requestPath) {
     if (requestPath.startsWith('/plan-maker')) return 'plan-maker';
     if (requestPath.startsWith('/exercises') || requestPath.startsWith('/library') || requestPath.startsWith('/exercise') || requestPath.startsWith('/workout')) return 'exercises';
     if (requestPath.startsWith('/stretch') || requestPath.startsWith('/routines')) return 'stretch';
-    if (requestPath.startsWith('/nutrition') || requestPath.startsWith('/meals')) return 'nutrition';
+    // '/meal-templates' is listed on its own because it does NOT start with
+    // '/meals' — the hyphen is not an 's'. Relying on a shared prefix here is the
+    // same mistake that lit up two nav links for /plan-maker.
+    if (requestPath.startsWith('/nutrition') || requestPath.startsWith('/meals') || requestPath.startsWith('/meal-templates')) return 'nutrition';
     if (requestPath.startsWith('/weight')) return 'weight';
     if (requestPath.startsWith('/goals') || requestPath.startsWith('/planner') || requestPath.startsWith('/plans') || requestPath.startsWith('/accountability')) return 'goals';
     if (requestPath.startsWith('/competitions')) return 'competitions';
@@ -354,6 +357,116 @@ app.post('/meals/delete/:id', requireLogin, async (req, res) => {
     const { Meal } = getDatabase(req.user.username);
     await Meal.destroy({ where: { id: req.params.id } });
     res.redirect('/meals');
+});
+
+// ── Saved meals (templates) ───────────────────────────────────────────────────
+//
+// getDatabase(req.user.username) opens THAT person's file, so every query below is
+// scoped by construction — pattern B in octopus-ops/MULTI-USER.md. The `where: {
+// id }` clauses carry no owner column on purpose: there is no row in this file that
+// belongs to anyone else. A missing template is a 404, never a 403, since a 403
+// would confirm that somebody else's template exists.
+
+const { macrosForTemplate, describe, provenance, slotsFromForm } = require('./api/meal-template');
+
+const parseSlots = t => { try { return JSON.parse(t.ingredients || '[]'); } catch { return []; } };
+
+app.get('/meal-templates', requireLogin, async (req, res) => {
+    const { MealTemplate } = getDatabase(req.user.username);
+    const rows = await MealTemplate.findAll({ where: { archived: false }, order: [['name', 'ASC']] });
+    const templates = rows.map(t => ({
+        id: t.id, name: t.name, mealType: t.mealType, notes: t.notes,
+        slots: parseSlots(t),
+    }));
+    res.render('meal-templates', {
+        title: 'Saved Meals', templates, user: req.user,
+        flash: req.query.logged ? `Logged: ${req.query.logged}` : null,
+        warn: req.query.missed || null,
+    });
+});
+
+app.post('/meal-templates', requireLogin, async (req, res) => {
+    const { MealTemplate } = getDatabase(req.user.username);
+    const name = String(req.body.name || '').trim();
+    if (!name) return res.redirect('/meal-templates');
+    await MealTemplate.create({
+        name,
+        mealType: ['breakfast', 'lunch', 'dinner', 'snack'].includes(req.body.mealType) ? req.body.mealType : 'snack',
+        ingredients: JSON.stringify(slotsFromForm(req.body)),
+        notes: req.body.notes || null,
+    });
+    res.redirect('/meal-templates');
+});
+
+app.post('/meal-templates/:id', requireLogin, async (req, res) => {
+    const { MealTemplate } = getDatabase(req.user.username);
+    const t = await MealTemplate.findByPk(req.params.id);
+    if (!t) return res.status(404).send('No such saved meal');
+    const name = String(req.body.name || '').trim();
+    await t.update({
+        name: name || t.name,
+        mealType: ['breakfast', 'lunch', 'dinner', 'snack'].includes(req.body.mealType) ? req.body.mealType : t.mealType,
+        ingredients: JSON.stringify(slotsFromForm(req.body)),
+        notes: req.body.notes || null,
+    });
+    res.redirect('/meal-templates');
+});
+
+app.post('/meal-templates/:id/delete', requireLogin, async (req, res) => {
+    const { MealTemplate } = getDatabase(req.user.username);
+    const t = await MealTemplate.findByPk(req.params.id);
+    if (!t) return res.status(404).send('No such saved meal');
+    await t.destroy();
+    res.redirect('/meal-templates');
+});
+
+// Macros without logging anything — so the numbers can be checked, and a slot that
+// will not resolve can be found BEFORE it silently drops out of a logged total.
+app.post('/meal-templates/:id/preview', requireLogin, async (req, res) => {
+    const { MealTemplate, IngredientMatch } = getDatabase(req.user.username);
+    const t = await MealTemplate.findByPk(req.params.id);
+    if (!t) return res.status(404).json({ error: 'No such saved meal' });
+    const result = await macrosForTemplate(parseSlots(t), {
+        IngredientMatch, apiKey: process.env.FDC_API_KEY,
+        servings: req.body.servings || 1,
+    });
+    res.json({ ok: true, name: t.name, ...result });
+});
+
+app.post('/meal-templates/:id/log', requireLogin, async (req, res) => {
+    const { MealTemplate, Meal, IngredientMatch } = getDatabase(req.user.username);
+    const t = await MealTemplate.findByPk(req.params.id);
+    if (!t) return res.status(404).send('No such saved meal');
+
+    const slots = parseSlots(t);
+    const servings = Number(req.body.servings) > 0 ? Number(req.body.servings) : 1;
+    const result = await macrosForTemplate(slots, {
+        IngredientMatch, apiKey: process.env.FDC_API_KEY, servings,
+    });
+
+    const now = new Date();
+    await Meal.create({
+        date:     req.body.date || now.toISOString().slice(0, 10),
+        time:     req.body.time || now.toTimeString().slice(0, 8),
+        mealType: ['breakfast', 'lunch', 'dinner', 'snack'].includes(req.body.mealType) ? req.body.mealType : t.mealType,
+        description: describe(t.name, slots, servings),
+        calories: result.totals.kcal    || null,
+        protein:  result.totals.protein || null,
+        carbs:    result.totals.carbs   || null,
+        fats:     result.totals.fats    || null,
+        // What went into the number, so a wrong total can be explained later
+        // instead of merely doubted.
+        notes: [t.notes, provenance(result)].filter(Boolean).join('\n'),
+    });
+
+    // An uncounted ingredient is carried back to the page. Logging a shake that
+    // quietly lost its peanut butter is how a nutrition log stops being worth
+    // keeping, and the user should see it at the moment it happens.
+    const missed = result.skipped.length
+        ? `Not counted: ${result.skipped.map(s => s.name).join(', ')} — the total is low by these.`
+        : '';
+    res.redirect('/meal-templates?logged=' + encodeURIComponent(`${t.name} · ${result.totals.kcal} kcal, ${result.totals.protein}g protein`)
+        + (missed ? '&missed=' + encodeURIComponent(missed) : ''));
 });
 
 // Goals routes

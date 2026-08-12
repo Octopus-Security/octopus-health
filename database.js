@@ -855,6 +855,24 @@ const getDatabase = (username) => {
         confirmed:  { type: DataTypes.BOOLEAN, defaultValue: false },
     });
 
+    // A meal you eat the same way repeatedly, saved so it is one click instead of
+    // seven fields — and so the macros are the same number every time rather than
+    // re-estimated on each log.
+    //
+    // `ingredients` holds slots, not a recipe: each carries the role ("protein
+    // powder"), the amount ("2 scoops"), and optionally the specific product
+    // currently being used with the macros off its label. See api/meal-template.js
+    // for why the product is stored per slot and not merged into the ingredient
+    // name — briefly, the tub changes far more often than the shake does, and the
+    // two must be editable apart.
+    const MealTemplate = sequelize.define('MealTemplate', {
+        name:        { type: DataTypes.STRING, allowNull: false },
+        mealType:    { type: DataTypes.ENUM('breakfast', 'lunch', 'dinner', 'snack'), allowNull: false, defaultValue: 'snack' },
+        ingredients: { type: DataTypes.TEXT,   allowNull: false, defaultValue: '[]' },
+        notes:       { type: DataTypes.TEXT,   allowNull: true },
+        archived:    { type: DataTypes.BOOLEAN, defaultValue: false },
+    });
+
     // ── Seed function ──────────────────────────────────────────────────────────
 
     async function seedData() {
@@ -945,6 +963,7 @@ const getDatabase = (username) => {
         ExercisePlan,
         PersonalRecord,
         IngredientMatch,
+        MealTemplate,
         seedData,
         sequelize,
     };
