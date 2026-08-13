@@ -174,13 +174,19 @@ test('bodyweight exercises keep their reps-only record', () => {
 });
 
 test('a row recording nothing at all is not a personal best', () => {
-  // Ten of these existed on the first account, from an early import. They
-  // rendered as an exercise name beside a dash.
+  // Six of these existed on the first account, from an early import. They
+  // rendered as an exercise name beside a dash. Note the distinction that
+  // matters: a row with only a DURATION is a real record (an L-Sit hold), not
+  // an empty one, and must survive this filter.
   const best = bestPerExercise([
     { exerciseName: 'Dead Bug',  weight: null, reps: null, durationSecs: null },
     { exerciseName: 'Band Pull', weight: null, reps: 20,   durationSecs: null },
+    // A hold. No weight and no reps, which is the same shape as the empty rows
+    // on a careless count — and it is a record. Counting "no weight and no
+    // reps" said ten rows were junk when six were; the other four were these.
+    { exerciseName: 'L-Sit',     weight: null, reps: null, durationSecs: 10 },
   ]);
-  assert.deepEqual(best.map(b => b.exerciseName), ['Band Pull']);
+  assert.deepEqual(best.map(b => b.exerciseName).sort(), ['Band Pull', 'L-Sit']);
 });
 
 test('timed efforts rank above reps-only and prefer the shorter time', () => {

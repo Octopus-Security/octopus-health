@@ -109,7 +109,7 @@ async function rebuildPRs({ PersonalRecord, WorkoutSet, WorkoutSession }) {
  * One record per exercise: the best of everything held for it.
  *
  * A row with no weight, no time and no reps records nothing. They exist — an
- * early import produced ten on the first account — and they render as a bare
+ * early import produced six on the first account — and they render as a bare
  * dash: an exercise listed as a personal best with no best in it. Dropped here
  * rather than deleted, because they are still somebody's history and nothing is
  * gained by destroying a row that simply is not shown.
