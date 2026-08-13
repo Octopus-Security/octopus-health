@@ -19,7 +19,7 @@
 const { test } = require('node:test');
 const assert   = require('node:assert');
 
-const { detectPR, rebuildPRs } = require('../api/pr-detect');
+const { detectPR, rebuildPRs, bestPerExercise } = require('../api/pr-detect');
 
 /** Minimal stand-in for the PersonalRecord model. */
 function prModel(seed = []) {
@@ -129,4 +129,74 @@ test('rebuild respects records that already exist', async () => {
 
   const { created } = await rebuildPRs({ PersonalRecord, WorkoutSet, WorkoutSession });
   assert.equal(created.length, 0, 'safe to run twice, and on an account that used the web app all along');
+});
+
+// ── Picking which record to show ─────────────────────────────────────────────
+//
+// Every one of these was visible on the Stats page at once: bodyweight lifts
+// listed with no weight (correct), barbell lifts listed with no weight
+// (wrong — the weighted record existed in the sets and never made it to a PR),
+// and rows showing a bare dash because nothing at all was recorded.
+
+test('a weighted record outranks a reps-only one for the same exercise', () => {
+  // The bug this replaces: three sequential `if`s over one accumulator, so the
+  // reps-only branch still ran after the weighted branch had already won and
+  // could overwrite it. It bit hardest when the weighted PR had no reps stored,
+  // because then `cur.reps == null` was true and the overwrite always fired.
+  const best = bestPerExercise([
+    { exerciseName: 'Bench Press', weight: 225, reps: null, durationSecs: null },
+    { exerciseName: 'Bench Press', weight: null, reps: 12,  durationSecs: null },
+  ]);
+  assert.equal(best.length, 1);
+  assert.equal(best[0].weight, 225, '225 lbs is the record, not 12 reps');
+});
+
+test('within a kind, the better number wins', () => {
+  const best = bestPerExercise([
+    { exerciseName: 'Squat', weight: 295, reps: 5,  durationSecs: null },
+    { exerciseName: 'Squat', weight: 315, reps: 1,  durationSecs: null },
+    { exerciseName: 'Squat', weight: 315, reps: 3,  durationSecs: null },
+  ]);
+  assert.equal(best[0].weight, 315);
+  assert.equal(best[0].reps, 3, 'same weight, more reps is the better set');
+});
+
+test('bodyweight exercises keep their reps-only record', () => {
+  // Dips and chin-ups genuinely have no weight. They are not broken rows and
+  // must not be filtered out with the ones that are.
+  const best = bestPerExercise([
+    { exerciseName: 'Dips', weight: null, reps: 20, durationSecs: null },
+    { exerciseName: 'Dips', weight: null, reps: 12, durationSecs: null },
+  ]);
+  assert.equal(best.length, 1);
+  assert.equal(best[0].reps, 20);
+  assert.equal(best[0].weight, null);
+});
+
+test('a row recording nothing at all is not a personal best', () => {
+  // Ten of these existed on the first account, from an early import. They
+  // rendered as an exercise name beside a dash.
+  const best = bestPerExercise([
+    { exerciseName: 'Dead Bug',  weight: null, reps: null, durationSecs: null },
+    { exerciseName: 'Band Pull', weight: null, reps: 20,   durationSecs: null },
+  ]);
+  assert.deepEqual(best.map(b => b.exerciseName), ['Band Pull']);
+});
+
+test('timed efforts rank above reps-only and prefer the shorter time', () => {
+  const best = bestPerExercise([
+    { exerciseName: 'Mile', weight: null, reps: null, durationSecs: 420 },
+    { exerciseName: 'Mile', weight: null, reps: null, durationSecs: 390 },
+    { exerciseName: 'Mile', weight: null, reps: 1,    durationSecs: null },
+  ]);
+  assert.equal(best[0].durationSecs, 390, 'faster, matching detectPR');
+});
+
+test('records come back sorted, one per exercise', () => {
+  const best = bestPerExercise([
+    { exerciseName: 'Squat', weight: 315, reps: 1, durationSecs: null },
+    { exerciseName: 'Dips',  weight: null, reps: 20, durationSecs: null },
+    { exerciseName: 'Bench', weight: 225, reps: 5, durationSecs: null },
+  ]);
+  assert.deepEqual(best.map(b => b.exerciseName), ['Bench', 'Dips', 'Squat']);
 });

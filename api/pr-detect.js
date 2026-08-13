@@ -105,4 +105,43 @@ async function rebuildPRs({ PersonalRecord, WorkoutSet, WorkoutSession }) {
   return { scanned: sets.length, created };
 }
 
-module.exports = { detectPR, rebuildPRs };
+/**
+ * One record per exercise: the best of everything held for it.
+ *
+ * A row with no weight, no time and no reps records nothing. They exist — an
+ * early import produced ten on the first account — and they render as a bare
+ * dash: an exercise listed as a personal best with no best in it. Dropped here
+ * rather than deleted, because they are still somebody's history and nothing is
+ * gained by destroying a row that simply is not shown.
+ *
+ * Kind is compared before magnitude. Weighted beats timed beats reps-only,
+ * because "10 reps" and "50 lbs" are not points on one scale, and the row worth
+ * showing is the most specific thing known about that exercise.
+ *
+ * This replaced three sequential `if`s over a shared accumulator, where the
+ * second and third still ran after the first had already replaced the entry —
+ * so a reps-only row could overwrite the heavier record it had just lost to.
+ */
+function bestPerExercise(prs) {
+  const rank = pr => (pr.weight != null ? 3 : pr.durationSecs != null ? 2 : 1);
+
+  const beats = (a, b) => {
+    if (rank(a) !== rank(b)) return rank(a) > rank(b);
+    if (a.weight != null) {
+      return a.weight !== b.weight ? a.weight > b.weight : (a.reps || 0) > (b.reps || 0);
+    }
+    // Shorter is better, matching detectPR: these are efforts against the clock.
+    if (a.durationSecs != null) return a.durationSecs < b.durationSecs;
+    return (a.reps || 0) > (b.reps || 0);
+  };
+
+  const best = new Map();
+  for (const pr of prs) {
+    if (pr.weight == null && pr.durationSecs == null && pr.reps == null) continue;
+    const cur = best.get(pr.exerciseName);
+    if (!cur || beats(pr, cur)) best.set(pr.exerciseName, pr);
+  }
+  return [...best.values()].sort((a, b) => a.exerciseName.localeCompare(b.exerciseName));
+}
+
+module.exports = { detectPR, rebuildPRs, bestPerExercise };

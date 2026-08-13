@@ -1,7 +1,7 @@
 const express = require('express');
 const getDatabase = require('../../database');
 const { requireUser } = require('../middleware/auth');
-const { detectPR, rebuildPRs } = require('../pr-detect');
+const { detectPR, rebuildPRs, bestPerExercise } = require('../pr-detect');
 
 const router = express.Router();
 router.use(requireUser);
@@ -339,18 +339,7 @@ router.get('/prs', async (req, res) => {
         const { PersonalRecord, sequelize } = getDatabase(req.user.username);
         await sequelize.sync();
         const all = await PersonalRecord.findAll({ order: [['date', 'DESC']] });
-        // Deduplicate: keep best per exerciseName
-        const best = {};
-        for (const pr of all) {
-            const key = pr.exerciseName;
-            if (!best[key]) { best[key] = pr.toJSON(); continue; }
-            // Replace if this PR is better
-            const cur = best[key];
-            if (pr.weight    != null && (cur.weight    == null || pr.weight    > cur.weight))    best[key] = pr.toJSON();
-            if (pr.durationSecs != null && (cur.durationSecs == null || pr.durationSecs < cur.durationSecs)) best[key] = pr.toJSON();
-            if (pr.reps      != null && pr.weight == null && (cur.reps == null || pr.reps > cur.reps)) best[key] = pr.toJSON();
-        }
-        res.json({ success: true, data: Object.values(best).sort((a, b) => a.exerciseName.localeCompare(b.exerciseName)) });
+        res.json({ success: true, data: bestPerExercise(all.map(pr => pr.toJSON())) });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
     }
