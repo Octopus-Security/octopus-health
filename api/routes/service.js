@@ -12,6 +12,23 @@ const { partition } = require('../dedupe-sets');
 const { detectPR, rebuildPRs } = require('../pr-detect');
 const { macrosForTemplate, describe, provenance } = require('../meal-template');
 const { isFinished, mealFor } = require('../meal-prep');
+const { resolveExerciseNames, questionText } = require('../exercise-names');
+
+/**
+ * Every exercise name this account already uses.
+ *
+ * Both what they have actually logged and the exercise library, because a name
+ * in the library is one they can pick in the web app tomorrow — matching only
+ * against past sets would let the two vocabularies drift apart, which is the
+ * same failure one level up.
+ */
+async function knownExerciseNames(db) {
+  const [logged] = await db.sequelize.query(
+    'select distinct exerciseName as n from WorkoutSets where exerciseName is not null'
+  );
+  const defs = await db.ExerciseDefinition.findAll({ attributes: ['name'] });
+  return [...new Set([...logged.map(r => r.n), ...defs.map(d => d.name)].filter(Boolean))];
+}
 
 // Whose database a service call lands in when the caller doesn't say.
 //
@@ -186,6 +203,53 @@ router.post('/sessions', requireToken, async (req, res) => {
         return res.status(400).json({ ok: false, error: `date ${asked} is more than a year ago — check the year` });
       }
       today = asked;
+    }
+
+    // ── Is every exercise one this account already knows? ────────────────────
+    //
+    // Asked BEFORE anything is written, and for the whole message at once.
+    //
+    // The log grew seven pairs of near-duplicates — `Bench Press` beside
+    // `Barbell Bench Press`, `Tricep Pushdown` beside `Cable Tricep Pushdown` —
+    // because a name logged from a chat is whatever got said that day, and each
+    // spelling then keeps its own history. A 205 lb bench and a 185 lb bench sat
+    // in the table as two different lifts and neither one was the record.
+    //
+    // The account's own exercise names are right here, so the question belongs
+    // here too, while the person who knows the answer is still in the
+    // conversation. Note that equipment is never assumed away: `Cable Face Pull`
+    // and `Resistance Band Face Pull` have the same shape as the pairs above and
+    // are genuinely different lifts, so this asks rather than deciding.
+    // See api/exercise-names.js.
+    if (sets.length) {
+      const known = await knownExerciseNames(await getDB(req));
+      const { resolved, questions } = resolveExerciseNames(
+        sets.map(s => s.exerciseName).filter(Boolean), known);
+
+      if (questions.length) {
+        // Every ambiguity, not the first one. A workout is logged as a unit, so
+        // answering them one per round trip would leave a half-logged session
+        // and no clear account of which half.
+        return res.json({
+          ok: true, sessionId: null, date: today, exerciseCount: 0,
+          needsNaming: questions,
+          question: questionText(questions),
+          message: 'NOTHING WAS SAVED. '
+            + (questions.length === 1
+                ? 'One exercise name looks like something already logged under a different name.'
+                : `${questions.length} exercise names look like things already logged under different names.`)
+            + ' Ask which is meant — ALL of them, in one message — then re-send the whole '
+            + 'workout using the names chosen. Do not guess, do not pick the closest, and do '
+            + 'not log the unambiguous exercises on their own.',
+        });
+      }
+
+      // Write under the name the account already uses, so today's sets join
+      // their own history instead of starting a second one beside it.
+      for (const s of sets) {
+        const name = resolved.get(s.exerciseName);
+        if (name) s.exerciseName = name;
+      }
     }
 
     // Hold back exercises that are already in the log, unless forced.
