@@ -5,11 +5,13 @@
 'use strict';
 
 const express = require('express');
+const { Op } = require('sequelize');
 const router  = express.Router();
 const getDatabase = require('../../database');
 const { partition } = require('../dedupe-sets');
 const { detectPR, rebuildPRs } = require('../pr-detect');
 const { macrosForTemplate, describe, provenance } = require('../meal-template');
+const { isFinished, mealFor } = require('../meal-prep');
 
 // Whose database a service call lands in when the caller doesn't say.
 //
@@ -412,6 +414,54 @@ router.get('/meal-templates', requireToken, async (req, res) => {
           ingredients: slots.map(s => `${s.measure || ''} ${s.name}`.trim()),
         };
       }),
+    });
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+
+// GET /api/service/meal-preps — what is actually in the fridge right now.
+//
+// The question this exists to answer out loud is "how many meal preps do I
+// have", so finished batches are excluded: a zero row is history, and Neith
+// reading it back as an option is worse than not mentioning it.
+router.get('/meal-preps', requireToken, async (req, res) => {
+  try {
+    const { MealPrep } = await getDB(req);
+    const rows = await MealPrep.findAll({
+      where: { portionsLeft: { [Op.gt]: 0 } },
+      order: [['preppedOn', 'DESC'], ['name', 'ASC']],
+    });
+    res.json({
+      ok: true,
+      preps: rows.map(p => ({
+        id: p.id, name: p.name, portionsLeft: p.portionsLeft, portions: p.portions,
+        preppedOn: p.preppedOn, mealType: p.mealType,
+        perPortion: { kcal: p.kcal, protein: p.protein, carbs: p.carbs, fats: p.fats },
+      })),
+    });
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+
+// POST /api/service/meal-preps/:id/log — eat one portion.
+//
+// Deliberately NOT given a `servings` multiplier like the template route has.
+// A batch is a counted thing: eating two is two portions off the count, and
+// accepting a fractional multiplier here would let the log and the count
+// disagree about what is left, which is the one number this table exists for.
+router.post('/meal-preps/:id/log', requireToken, async (req, res) => {
+  try {
+    const { MealPrep, Meal } = await getDB(req);
+    const p = await MealPrep.findByPk(req.params.id);
+    if (!p) return res.status(404).json({ ok: false, error: 'no such meal prep' });
+    if (isFinished(p)) {
+      return res.status(409).json({ ok: false, error: `${p.name} is finished — nothing left to log` });
+    }
+
+    await Meal.create(mealFor(p, req.body));
+    await p.update({ portionsLeft: p.portionsLeft - 1 });
+
+    res.json({
+      ok: true, name: p.name, portionsLeft: p.portionsLeft,
+      logged: { kcal: p.kcal, protein: p.protein, carbs: p.carbs, fats: p.fats },
     });
   } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
 });

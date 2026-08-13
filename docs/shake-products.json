@@ -1,0 +1,77 @@
+{
+  "_comment": [
+    "Label macros transcribed from photographs of the tubs actually open, 2026-08-12.",
+    "These are the PRODUCT half of the saved-meal slots: the shake stays the same,",
+    "these change whenever something else is on sale. Kept here so a swapped brand",
+    "can be diffed against what the numbers used to be, and so the transcription",
+    "can be rechecked against the photo rather than retyped from memory.",
+    "",
+    "Per SERVING as printed on the label. The slot decides how many servings its",
+    "measure amounts to -- see api/meal-template.js servingsFor()."
+  ],
+
+  "_shake": {
+    "name": "Shake",
+    "mealType": "breakfast",
+    "slots": [
+      { "name": "creatine",        "measure": "1 dose",     "product": "creatine-monohydrate" },
+      { "name": "protein powder",  "measure": "2 scoops",   "product": "whey-protein" },
+      { "name": "peanut butter",   "measure": "2 spoons",   "product": null },
+      { "name": "yogurt",          "measure": "half cup",   "product": "yogurt-plain-whole" },
+      { "name": "berries",         "measure": "half cup",   "product": "frozen-fruit-blend" },
+      { "name": "milk",            "measure": "until smooth", "product": "milk-whole-organic" }
+    ]
+  },
+
+  "products": {
+    "creatine-monohydrate": {
+      "label": "Micronized Creatine Powder (Glanbia / Optimum Nutrition)",
+      "servingSize": "5 g (1 rounded teaspoon)",
+      "servingsPerContainer": 135,
+      "kcal": 0, "protein": 0, "carbs": 0, "fats": 0,
+      "note": "Supplement Facts panel, not Nutrition Facts: it lists 5 g creatine monohydrate and no energy or macros at all. Recorded as zeros because that is what the label asserts, NOT because the value is unknown -- an important difference when a slot with no product is skipped from the total."
+    },
+
+    "whey-protein": {
+      "label": "Whey protein blend, 31 g scoop",
+      "servingSize": "31 g (about 1 scoop)",
+      "servingsPerContainer": 62,
+      "kcal": 120, "protein": 24, "carbs": 2, "fats": 1.5,
+      "detail": { "satFat": 1, "cholesterolMg": 55, "sodiumMg": 130, "sugars": 2 },
+      "note": "The shake uses 2 scoops = 2 servings."
+    },
+
+    "milk-whole-organic": {
+      "label": "Organic whole milk (ADUSA / Salisbury NC)",
+      "servingSize": "1 cup (240 mL)",
+      "servingsPerContainer": 16,
+      "kcal": 150, "protein": 8, "carbs": 12, "fats": 8,
+      "detail": { "satFat": 5, "cholesterolMg": 25, "sodiumMg": 105, "sugars": 12, "fiber": 0 },
+      "note": "Poured 'until smooth', so no fixed measure. Estimate a cup unless the slot says otherwise -- and see the warning about unmeasured slots in the meal-prep notes."
+    },
+
+    "yogurt-plain-whole": {
+      "label": "Stonyfield Organic whole milk yogurt, plain",
+      "servingSize": "3/4 cup (170 g)",
+      "servingsPerContainer": 5,
+      "kcal": 120, "protein": 6, "carbs": 8, "fats": 7,
+      "detail": { "satFat": 4.5, "cholesterolMg": 25, "sodiumMg": 85, "sugars": 6, "fiber": 0 },
+      "note": "Label serving is 3/4 cup; the shake uses half a cup, i.e. 0.667 of a serving."
+    },
+
+    "frozen-fruit-blend": {
+      "label": "Wyman's frozen fruit blend -- banana, strawberry, wild blueberry",
+      "servingSize": "1 cup (140 g)",
+      "servingsPerContainer": 10,
+      "kcal": 80, "protein": 0.5, "carbs": 20, "fats": 0,
+      "detail": { "fiber": 5, "sugars": 13, "sodiumMg": 10 },
+      "note": "Label says 'Protein less than 1g'. Recorded as 0.5 rather than 0 or 1 -- rounding it to 1 inflates every shake, rounding to 0 is the same lie downward, and half a gram is the honest reading of 'less than 1'."
+    },
+
+    "peanut-butter": {
+      "label": "NOT YET TRANSCRIBED -- photograph missing",
+      "kcal": null, "protein": null, "carbs": null, "fats": null,
+      "note": "Five of the six labels arrived; peanut butter was not among them. Left null on purpose so the slot reports as uncounted rather than silently contributing zero. Two spoons of peanut butter is roughly 190 kcal / 7 g protein / 16 g fat, which is NOT written into the numbers above because a guessed macro that looks measured is the exact failure api/nutrition.js exists to avoid."
+    }
+  }
+}

@@ -873,6 +873,44 @@ const getDatabase = (username) => {
         archived:    { type: DataTypes.BOOLEAN, defaultValue: false },
     });
 
+    // A batch cooked from a saved meal: "I made three of these on Sunday."
+    //
+    // Separate from MealTemplate, and a SNAPSHOT rather than a reference, which
+    // is the whole point. A template is deliberately live — the tub of protein
+    // behind the shake changes whenever something else is on sale, and swapping
+    // it is one field on one slot so every FUTURE log is right. A batch is the
+    // opposite: those portions are already in the fridge, made with whatever was
+    // open that day. Recomputing them from the template later would silently
+    // restate Sunday's dinner in terms of Thursday's yogurt.
+    //
+    // So `slots` and the per-portion macros are frozen here at prep time, and
+    // logging a portion copies them out rather than recalculating. It also means
+    // a batch outlives the template it came from: rename it, edit it, delete it,
+    // and the three portions still in the fridge still log correctly.
+    const MealPrep = sequelize.define('MealPrep', {
+        name:       { type: DataTypes.STRING, allowNull: false },
+        // Nullable on purpose: the template may be edited or deleted while
+        // portions remain. Kept only to offer "prep this again".
+        templateId: { type: DataTypes.INTEGER, allowNull: true },
+        mealType:   { type: DataTypes.ENUM('breakfast', 'lunch', 'dinner', 'snack'), allowNull: false, defaultValue: 'snack' },
+        portions:     { type: DataTypes.INTEGER, allowNull: false, defaultValue: 1 },
+        portionsLeft: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 1 },
+        preppedOn:  { type: DataTypes.DATEONLY, allowNull: false },
+        // Per portion, not per batch — that is the number every log needs, and
+        // storing the batch total would mean re-dividing on each log by a
+        // `portions` that can be corrected after the fact.
+        kcal:    { type: DataTypes.FLOAT, allowNull: true },
+        protein: { type: DataTypes.FLOAT, allowNull: true },
+        carbs:   { type: DataTypes.FLOAT, allowNull: true },
+        fats:    { type: DataTypes.FLOAT, allowNull: true },
+        // What went in, and how the number was arrived at. Same reasoning as
+        // Meal.notes: a total that cannot be explained later is one that gets
+        // doubted and then ignored.
+        slots:      { type: DataTypes.TEXT, allowNull: false, defaultValue: '[]' },
+        provenance: { type: DataTypes.TEXT, allowNull: true },
+        notes:      { type: DataTypes.TEXT, allowNull: true },
+    });
+
     // ── Seed function ──────────────────────────────────────────────────────────
 
     async function seedData() {

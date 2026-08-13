@@ -368,18 +368,30 @@ app.post('/meals/delete/:id', requireLogin, async (req, res) => {
 // would confirm that somebody else's template exists.
 
 const { macrosForTemplate, describe, provenance, slotsFromForm } = require('./api/meal-template');
+const { snapshotFor, clampPortions, isFinished, mealFor } = require('./api/meal-prep');
 
 const parseSlots = t => { try { return JSON.parse(t.ingredients || '[]'); } catch { return []; } };
 
 app.get('/meal-templates', requireLogin, async (req, res) => {
-    const { MealTemplate } = getDatabase(req.user.username);
+    const { MealTemplate, MealPrep } = getDatabase(req.user.username);
     const rows = await MealTemplate.findAll({ where: { archived: false }, order: [['name', 'ASC']] });
     const templates = rows.map(t => ({
         id: t.id, name: t.name, mealType: t.mealType, notes: t.notes,
         slots: parseSlots(t),
     }));
+    // Finished batches stay in the table but drop off the page: "0 left" is a
+    // row that can only be cleared by hand, and a list that accumulates them
+    // stops being glanceable, which is the only thing it is for.
+    const preps = (await MealPrep.findAll({
+        where: { portionsLeft: { [Op.gt]: 0 } },
+        order: [['preppedOn', 'DESC'], ['name', 'ASC']],
+    })).map(p => ({
+        id: p.id, name: p.name, portions: p.portions, portionsLeft: p.portionsLeft,
+        preppedOn: p.preppedOn, mealType: p.mealType,
+        kcal: p.kcal, protein: p.protein, carbs: p.carbs, fats: p.fats,
+    }));
     res.render('meal-templates', {
-        title: 'Saved Meals', templates, user: req.user,
+        title: 'Saved Meals', templates, preps, user: req.user,
         flash: req.query.logged ? `Logged: ${req.query.logged}` : null,
         warn: req.query.missed || null,
     });
@@ -467,6 +479,81 @@ app.post('/meal-templates/:id/log', requireLogin, async (req, res) => {
         : '';
     res.redirect('/meal-templates?logged=' + encodeURIComponent(`${t.name} · ${result.totals.kcal} kcal, ${result.totals.protein}g protein`)
         + (missed ? '&missed=' + encodeURIComponent(missed) : ''));
+});
+
+// ── Meal preps: a batch cooked from a saved meal ─────────────────────────────
+//
+// "I made three of these on Sunday" and then, on three separate days, "log one".
+// The macros are computed ONCE here and frozen on the batch — see the MealPrep
+// comment in database.js. Logging a portion later copies them out rather than
+// recomputing, because by Thursday the template may name a different tub.
+
+app.post('/meal-templates/:id/prep', requireLogin, async (req, res) => {
+    const { MealTemplate, MealPrep, IngredientMatch } = getDatabase(req.user.username);
+    const t = await MealTemplate.findByPk(req.params.id);
+    if (!t) return res.status(404).send('No such saved meal');
+
+    const slots = parseSlots(t);
+
+    // servings: 1 — the batch's macros are per PORTION, so the template is
+    // costed once and the count is carried separately. See snapshotFor().
+    const result = await macrosForTemplate(slots, {
+        IngredientMatch, apiKey: process.env.FDC_API_KEY, servings: 1,
+    });
+
+    const row = snapshotFor(t, slots, result, {
+        portions: req.body.portions,
+        preppedOn: req.body.preppedOn,
+        notes: req.body.notes,
+    });
+    const portions = row.portions;
+    await MealPrep.create({ ...row, provenance: provenance(result) });
+
+    // Same warning as logging: a batch whose peanut butter did not resolve is
+    // low by that much in every portion it will ever produce, and this is the
+    // one moment where fixing it costs nothing.
+    const missed = result.skipped.length
+        ? `Not counted: ${result.skipped.map(s => s.name).join(', ')} — every portion of this batch is low by these.`
+        : '';
+    res.redirect('/meal-templates?logged=' + encodeURIComponent(`${portions} × ${t.name} prepped`)
+        + (missed ? '&missed=' + encodeURIComponent(missed) : ''));
+});
+
+app.post('/meal-preps/:id/log', requireLogin, async (req, res) => {
+    const { MealPrep, Meal } = getDatabase(req.user.username);
+    const p = await MealPrep.findByPk(req.params.id);
+    if (!p) return res.status(404).send('No such meal prep');
+    if (isFinished(p)) return res.redirect('/meal-templates?missed=' +
+        encodeURIComponent(`${p.name} is finished — nothing left to log.`));
+
+    await Meal.create(mealFor(p, req.body));
+
+    // Decrement after the Meal row exists: if the write above throws, the
+    // portion is still in the fridge and still counted. The opposite order
+    // loses a portion to an error and there is no way to notice.
+    await p.update({ portionsLeft: p.portionsLeft - 1 });
+
+    const left = p.portionsLeft;
+    res.redirect('/meal-templates?logged=' + encodeURIComponent(
+        `${p.name} · ${p.kcal || 0} kcal, ${p.protein || 0}g protein — ${left} left`));
+});
+
+// Threw the rest out, or ate two at once and the count drifted. Correcting the
+// count is not the same as logging: this must not write a Meal row.
+app.post('/meal-preps/:id/adjust', requireLogin, async (req, res) => {
+    const { MealPrep } = getDatabase(req.user.username);
+    const p = await MealPrep.findByPk(req.params.id);
+    if (!p) return res.status(404).send('No such meal prep');
+    await p.update({ portionsLeft: clampPortions(req.body.portionsLeft, p.portions) });
+    res.redirect('/meal-templates');
+});
+
+app.post('/meal-preps/:id/delete', requireLogin, async (req, res) => {
+    const { MealPrep } = getDatabase(req.user.username);
+    const p = await MealPrep.findByPk(req.params.id);
+    if (!p) return res.status(404).send('No such meal prep');
+    await p.destroy();
+    res.redirect('/meal-templates');
 });
 
 // Goals routes
