@@ -178,17 +178,28 @@
 
     function removeSlot(btn) { btn.closest('.slot-group').remove(); }
 
-    // Nick's shake, as a starting point. Everything here is editable — the point of
-    // the quick-start is that the ingredient LINES are typical; the numbers on the
-    // labels are whatever is in your cupboard, so they are left blank for you to
-    // copy off the tub.
+    // The shake, with the labels off the tubs photographed on 2026-08-12.
+    // Comes to 700 kcal / 67 P / 37 C / 32 F, taking a cup of milk for
+    // "until smooth" — checked through macrosForTemplate, not by hand.
+    //
+    // Still only a starting point: every field is editable, and the products are
+    // whatever is in YOUR cupboard. Swap the tub and the numbers beside it and
+    // every future log is right, which is the entire reason products live on the
+    // slot instead of in the name.
+    //
+    // Peanut butter is written '2 tbsp' against a per-2-tbsp label, NOT
+    // '2 spoons'. VOL_ML knows tbsp and does not know spoon, so the mismatch
+    // makes servingsFor() return null and the slot is dropped from the total —
+    // 510 kcal instead of 700, with the loss reported only as a footnote. The
+    // other legal spelling is '2 spoonfuls' against a per-2-'spoonful' product;
+    // either is fine, one of each is what breaks.
     const SHAKE = [
-      { slotName: 'protein powder',  slotMeasure: '2 scoops',    prodUnit: 'scoop' },
-      { slotName: 'whole milk',      slotMeasure: '1/2 cup' },
-      { slotName: 'greek yogurt',    slotMeasure: '1/2 cup' },
-      { slotName: 'frozen berries',  slotMeasure: '1/2 cup' },
-      { slotName: 'peanut butter (chunky)', slotMeasure: '2 spoonfuls', prodUnit: 'spoonful' },
-      { slotName: 'creatine',        slotMeasure: '1 serving',   prodUnit: 'serving', prodKcal: 0, prodProtein: 0, prodCarbs: 0, prodFats: 0, prodPer: 1, prodLabel: 'creatine monohydrate (no macros)' },
+      { slotName: 'creatine',        slotMeasure: '1 tsp',    prodUnit: 'tsp',   prodPer: 1,    prodKcal: 0,   prodProtein: 0,   prodCarbs: 0,  prodFats: 0,   prodLabel: 'Micronized creatine — 5 g, no macros on the panel' },
+      { slotName: 'protein powder',  slotMeasure: '2 scoops', prodUnit: 'scoop', prodPer: 1,    prodKcal: 120, prodProtein: 24,  prodCarbs: 2,  prodFats: 1.5, prodLabel: 'Whey blend — 31 g scoop' },
+      { slotName: 'peanut butter',   slotMeasure: '2 tbsp',   prodUnit: 'tbsp',  prodPer: 2,    prodKcal: 190, prodProtein: 7,   prodCarbs: 6,  prodFats: 16,  prodLabel: 'Peanut butter — 2 tbsp serving' },
+      { slotName: 'yogurt',          slotMeasure: '1/2 cup',  prodUnit: 'cup',   prodPer: 0.75, prodKcal: 120, prodProtein: 6,   prodCarbs: 8,  prodFats: 7,   prodLabel: 'Stonyfield organic whole milk, plain — 3/4 cup' },
+      { slotName: 'frozen berries',  slotMeasure: '1/2 cup',  prodUnit: 'cup',   prodPer: 1,    prodKcal: 80,  prodProtein: 0.5, prodCarbs: 20, prodFats: 0,   prodLabel: "Wyman's banana, strawberry, wild blueberry" },
+      { slotName: 'whole milk',      slotMeasure: '1 cup',    prodUnit: 'cup',   prodPer: 1,    prodKcal: 150, prodProtein: 8,   prodCarbs: 12, prodFats: 8,   prodLabel: 'Organic whole milk — "until smooth", taken as a cup' },
     ];
 
     function quickStart() {

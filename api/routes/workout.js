@@ -1,10 +1,10 @@
 const express = require('express');
 const getDatabase = require('../../database');
-const { authenticateToken } = require('../middleware/auth');
+const { requireUser } = require('../middleware/auth');
 const { detectPR, rebuildPRs } = require('../pr-detect');
 
 const router = express.Router();
-router.use(authenticateToken);
+router.use(requireUser);
 
 // ── Exercise library ──────────────────────────────────────────────────────────
 

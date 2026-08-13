@@ -27,6 +27,33 @@ nav .container {
     align-items: center;
     flex-wrap: wrap;
 }
+/* Content links.
+ *
+ * There was no bare `a` rule at all — only `nav a` and `.toggle-link a` — so any
+ * link written inline in body copy fell through to the browser default: blue,
+ * then purple once visited, on a #161616 card. Unreadable, and it matched
+ * nothing else on the page.
+ *
+ * Green is already this app's accent (buttons, .toggle-link, .comp-result), so
+ * links join that rather than introducing a third colour. Underlined only on
+ * hover: inside a card the colour alone is enough to read as a link, and a
+ * permanent underline turns a sentence with two links in it into noise.
+ *
+ * `nav a` and `.toggle-link a` both out-specify this, so neither changes.
+ */
+a {
+    color: #2ecc71;
+    text-decoration: none;
+}
+a:hover, a:focus-visible {
+    color: #5df59a;
+    text-decoration: underline;
+}
+/* Keeping the visited colour identical is deliberate: these are app links, not
+ * documents to be read once, and "already visited" is not information here. */
+a:visited { color: #2ecc71; }
+a:visited:hover { color: #5df59a; }
+
 nav h1 { font-size: 24px; color: #e8e8e8; }
 nav .nav-links { display: flex; gap: 10px; flex-wrap: wrap; }
 nav a {

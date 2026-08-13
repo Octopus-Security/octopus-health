@@ -1,11 +1,11 @@
 const express = require('express');
 const getDatabase = require('../../database');
-const { authenticateToken } = require('../middleware/auth');
+const { requireUser } = require('../middleware/auth');
 
 const router = express.Router();
 
 // Apply authentication to all health routes
-router.use(authenticateToken);
+router.use(requireUser);
 
 // Weight endpoints
 router.get('/weight', async (req, res) => {

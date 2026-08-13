@@ -1002,6 +1002,7 @@ const getDatabase = (username) => {
         PersonalRecord,
         IngredientMatch,
         MealTemplate,
+        MealPrep,
         seedData,
         sequelize,
     };
