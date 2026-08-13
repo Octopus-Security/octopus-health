@@ -16,10 +16,33 @@
     "slots": [
       { "name": "creatine",        "measure": "1 dose",     "product": "creatine-monohydrate" },
       { "name": "protein powder",  "measure": "2 scoops",   "product": "whey-protein" },
-      { "name": "peanut butter",   "measure": "2 spoons",   "product": null },
+      { "name": "peanut butter",   "measure": "2 tbsp",     "product": "peanut-butter" },
       { "name": "yogurt",          "measure": "half cup",   "product": "yogurt-plain-whole" },
       { "name": "berries",         "measure": "half cup",   "product": "frozen-fruit-blend" },
       { "name": "milk",            "measure": "until smooth", "product": "milk-whole-organic" }
+    ]
+  },
+
+  "_verifiedTotals": {
+    "_comment": [
+      "Run through api/meal-template.js macrosForTemplate() on 2026-08-12 rather",
+      "than worked out by hand, with milk taken as one cup for 'until smooth'.",
+      "Six slots counted, none skipped."
+    ],
+    "perShake": { "kcal": 700, "protein": 67.3, "carbs": 37.3, "fats": 31.7 },
+
+    "_theTrap": [
+      "Writing the peanut butter slot as '2 spoons' instead of '2 tbsp' gives 510",
+      "kcal and 60.3 g protein: servingsFor() cannot convert 'spoon' to 'tbsp',",
+      "so the slot lands in `skipped` and the shake loses 190 kcal and 7 g of",
+      "protein. The page does say 'Not counted: peanut butter' -- but it reads as",
+      "a footnote next to a number that looks complete.",
+      "",
+      "Two ways to write it, and they must not be mixed:",
+      "  the label's unit  -- slot '2 tbsp',   product per 2 unit 'tbsp'   (used here)",
+      "  the kitchen unit  -- slot '2 spoons', product per 2 unit 'spoon'",
+      "The second is what the module's own notes mean by 'a label lets them",
+      "define it once'; either is right, one of each is what breaks."
     ]
   },
 
@@ -69,9 +92,13 @@
     },
 
     "peanut-butter": {
-      "label": "NOT YET TRANSCRIBED -- photograph missing",
-      "kcal": null, "protein": null, "carbs": null, "fats": null,
-      "note": "Five of the six labels arrived; peanut butter was not among them. Left null on purpose so the slot reports as uncounted rather than silently contributing zero. Two spoons of peanut butter is roughly 190 kcal / 7 g protein / 16 g fat, which is NOT written into the numbers above because a guessed macro that looks measured is the exact failure api/nutrition.js exists to avoid."
+      "label": "Peanut butter",
+      "servingSize": "2 tbsp",
+      "per": 2,
+      "unit": "tbsp",
+      "kcal": 190, "protein": 7, "carbs": 6, "fats": 16,
+      "detail": { "satFat": 3, "transFat": 0, "cholesterolMg": 0, "sodiumMg": 125, "fiber": 2, "sugars": 3, "addedSugars": 2, "ironMg": 0.4, "potassiumMg": 90 },
+      "note": "Write the slot as '2 tbsp', NOT '2 spoons'. api/nutrition.js VOL_ML knows tbsp/tablespoon and does not know 'spoon' or 'spoonful', so servingsFor() cannot convert one to the other and returns null -- which skips the slot and drops 190 kcal and 7 g of protein out of the shake without saying anything louder than a line in `skipped`. The label's own serving IS 2 tbsp, so '2 tbsp' is both correct and exactly one serving."
     }
   }
 }
