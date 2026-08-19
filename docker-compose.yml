@@ -36,6 +36,26 @@ services:
       # A Portainer variable only interpolates into THIS file — a name absent
       # here never reaches the container, whatever the UI shows.
       - AUTH_PUBLIC_KEY=${AUTH_PUBLIC_KEY:-}
+      # Make "sign out everywhere" mean something HERE.
+      #
+      # createAuthMiddleware() defaults to local mode, which checks a signature
+      # and an expiry and nothing else. Revocation is a per-user tokenEpoch that
+      # only octopus-auth knows, so a local check cannot see it: a revoked or
+      # stolen session kept full access to these /api routes for the remaining
+      # seven days of the token, and this service holds a database per user.
+      # The estate found this on 2026-08-19 while acting on the JWT_SECRET
+      # incident — the kill switch was being relied on without reaching here.
+      #
+      # Set to a literal 1, not ${AUTH_REMOTE_VERIFY:-1}. A variable that is
+      # missing from Portainer must not be able to turn a security control off
+      # quietly; that is precisely how JWT_SECRET became a public secret.
+      #
+      # Cost: one cached call to auth per token (60s TTL, so that is also the
+      # revocation window), and these routes 401 while auth is down. Fail-closed
+      # is deliberate — a revocation check that opens the gate when it cannot
+      # reach the authority is not a revocation check — and the SSO cookie path
+      # has always behaved this way, so auth being down already meant no login.
+      - AUTH_REMOTE_VERIFY=1
       - AUTH_SERVICE_URL=http://octopus-auth:3002
       - HEALTH_SERVICE_TOKEN=${HEALTH_SERVICE_TOKEN}
       # Recipes live in octopus-shopper (their ingredient list is the join key for
