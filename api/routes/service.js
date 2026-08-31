@@ -863,4 +863,64 @@ router.patch('/goals/:id', requireToken, async (req, res) => {
   } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
 });
 
+// ── Training plans (service side — cortex tools) ─────────────────────────────
+//
+// Mirrors the user-auth /workout/plans routes, but token-scoped to the acting
+// account so cortex can start a comp-prep plan and read the day's session.
+
+// GET /api/service/plans  → available plans + the active assignment
+router.get('/plans', requireToken, async (req, res) => {
+  try {
+    const { TrainingPlan, TrainingPlanAssignment } = await getDB(req);
+    const plans = await TrainingPlan.findAll({ order: [['sport', 'ASC'], ['durationWeeks', 'ASC']] });
+    const active = await TrainingPlanAssignment.findOne({ where: { status: 'active' }, order: [['createdAt', 'DESC']] });
+    res.json({ ok: true, plans, activeAssignment: active });
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+
+// POST /api/service/plans/start  { sport?, compDate }
+// Picks the plan that fits the weeks until the comp, back-dates the start so the
+// taper lands on comp week, and makes it the active assignment. One call.
+router.post('/plans/start', requireToken, async (req, res) => {
+  try {
+    const { TrainingPlan, TrainingPlanAssignment } = await getDB(req);
+    const { sport = 'bjj', compDate } = req.body || {};
+    if (!compDate) return res.status(400).json({ ok: false, error: 'compDate required (YYYY-MM-DD)' });
+    const { weeksUntil, selectPlan, alignedStartDate } = require('../plan-select');
+    const rows = await TrainingPlan.findAll({ where: { sport } });
+    if (!rows.length) return res.status(404).json({ ok: false, error: `No ${sport} plans available` });
+    const weeks = weeksUntil(compDate);
+    const plan = selectPlan(rows.map(r => r.toJSON()), weeks);
+    const startDate = alignedStartDate(compDate, plan.durationWeeks);
+    await TrainingPlanAssignment.update({ status: 'paused' }, { where: { status: 'active' } });
+    const assignment = await TrainingPlanAssignment.create({ planId: plan.id, startDate, status: 'active' });
+    res.status(201).json({ ok: true, plan: plan.name, sport, durationWeeks: plan.durationWeeks,
+      weeksUntil: weeks, startDate, compDate, assignment });
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+
+// GET /api/service/plans/today  → today's session from the active plan (deterministic)
+router.get('/plans/today', requireToken, async (req, res) => {
+  try {
+    const { TrainingPlan, TrainingPlanAssignment } = await getDB(req);
+    const assignment = await TrainingPlanAssignment.findOne({ where: { status: 'active' } });
+    if (!assignment) return res.json({ ok: true, active: false });
+    const plan = await TrainingPlan.findByPk(assignment.planId);
+    if (!plan) return res.json({ ok: true, active: false });
+    const phases = JSON.parse(plan.phases || '[]');
+    const start = new Date(assignment.startDate);
+    const today = new Date();
+    const weekNumber = Math.floor((today - start) / (7 * 24 * 60 * 60 * 1000)) + 1;
+    const dayOfWeek = today.getDay();
+    let currentPhase = phases[0];
+    for (const phase of phases) {
+      const [startW, endW] = String(phase.weeks).split('–').map(Number);
+      if (weekNumber >= startW && weekNumber <= endW) { currentPhase = phase; break; }
+    }
+    const todaySession = currentPhase?.weeklySchedule?.find(d => d.day === dayOfWeek) || null;
+    res.json({ ok: true, active: true, plan: plan.name, durationWeeks: plan.durationWeeks,
+      phase: currentPhase?.name, weekNumber, todaySession });
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+
 module.exports = router;
