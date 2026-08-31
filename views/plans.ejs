@@ -79,18 +79,44 @@
     <h3>⚡ Assign a Plan</h3>
     <form action="/plans/assign" method="POST">
       <div class="assign-row">
-        <select name="planId" required>
+        <select name="planId" id="planSelect" required>
           <option value="">Select plan…</option>
           <% plans.forEach(p => { %>
-          <option value="<%= p.id %>" <%= (assignment && assignment.planId === p.id) ? 'selected' : '' %>>
+          <option value="<%= p.id %>" data-weeks="<%= p.durationWeeks %>" <%= (assignment && assignment.planId === p.id) ? 'selected' : '' %>>
             <%= p.name %>
           </option>
           <% }) %>
         </select>
-        <input type="date" name="startDate" value="<%= new Date().toISOString().split('T')[0] %>">
+        <input type="date" name="startDate" id="startDate" value="<%= new Date().toISOString().split('T')[0] %>">
         <button type="submit" class="btn btn-green">Assign</button>
       </div>
+      <!-- Optional: enter your comp date and the start is back-dated so the plan's
+           final (deload) week lands on comp week — no date maths. -->
+      <div class="assign-row" style="margin-top:10px">
+        <label style="flex:1;min-width:140px;color:#888;font-size:0.85rem">
+          …or pick your competition date and auto-align the taper:
+        </label>
+        <input type="date" id="compDate" placeholder="Competition date">
+      </div>
     </form>
+    <script>
+      // start = comp − (weeks*7 − 1) days, so weekNumber on comp day == plan length
+      // (the taper/deload week). Same math as the server's /plans/start.
+      (function () {
+        const sel = document.getElementById('planSelect');
+        const comp = document.getElementById('compDate');
+        const start = document.getElementById('startDate');
+        function align() {
+          const weeks = Number(sel.selectedOptions[0] && sel.selectedOptions[0].dataset.weeks);
+          if (!weeks || !comp.value) return;
+          const d = new Date(comp.value + 'T00:00:00Z');
+          d.setUTCDate(d.getUTCDate() - (weeks * 7 - 1));
+          start.value = d.toISOString().slice(0, 10);
+        }
+        sel.addEventListener('change', align);
+        comp.addEventListener('change', align);
+      })();
+    </script>
     <% if (assignment) { %>
     <form action="/plans/unassign" method="POST" style="margin-top:10px">
       <button type="submit" class="btn" style="font-size:0.8rem;padding:6px 14px;color:#e74c3c;border-color:#3a1a1a">
