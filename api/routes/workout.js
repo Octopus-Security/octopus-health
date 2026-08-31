@@ -208,6 +208,32 @@ router.post('/plans/assign', async (req, res) => {
     }
 });
 
+// POST /plans/start  { sport?, compDate }  — pick the plan that fits the weeks
+// until the comp, back-date the start so the taper lands on comp week, and make it
+// the active assignment. One call for "I have a comp on <date>".
+router.post('/plans/start', async (req, res) => {
+    try {
+        const { TrainingPlan, TrainingPlanAssignment, sequelize } = getDatabase(req.user.username);
+        await sequelize.sync();
+        const { sport = 'bjj', compDate } = req.body;
+        if (!compDate) return res.status(400).json({ success: false, error: 'compDate required (YYYY-MM-DD)' });
+        const { weeksUntil, selectPlan, alignedStartDate } = require('../plan-select');
+        const rows = await TrainingPlan.findAll({ where: { sport } });
+        if (!rows.length) return res.status(404).json({ success: false, error: `No ${sport} plans available` });
+        const weeks = weeksUntil(compDate);
+        const plan = selectPlan(rows.map(r => r.toJSON()), weeks);
+        const startDate = alignedStartDate(compDate, plan.durationWeeks);
+        await TrainingPlanAssignment.update({ status: 'paused' }, { where: { status: 'active' } });
+        const assignment = await TrainingPlanAssignment.create({ planId: plan.id, startDate, status: 'active' });
+        res.status(201).json({ success: true, data: {
+            plan: plan.name, durationWeeks: plan.durationWeeks, weeksUntil: weeks,
+            startDate, compDate, assignment,
+        } });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
 router.get('/plans/today', async (req, res) => {
     try {
         const { TrainingPlan, TrainingPlanAssignment, sequelize } = getDatabase(req.user.username);

@@ -640,6 +640,126 @@ const SEED_PLANS = [
       },
     ]),
   },
+  {
+    name: '4-Week BJJ Competition Prep',
+    sport: 'bjj',
+    durationWeeks: 4,
+    description: 'A month out. Two weeks of drilling volume and strength, then peak and taper so you arrive sharp on comp day. The taper is the final week.',
+    phases: JSON.stringify([
+      {
+        name: 'Development', weeks: '1–2', focus: 'Technical volume, positional work, maintain strength',
+        weeklySchedule: [
+          { day: 1, title: 'BJJ — Guard + A-Game', type: 'bjj', duration: 90, description: 'Guard passing/retention 30 min, then positional sparring 4×8 min. Work your A-game.' },
+          { day: 2, title: 'Strength — Full Body', type: 'strength', duration: 60, description: 'Deadlift 4×5, hip thrust 3×8, pull-ups 4×max, cable row 3×12. Posterior chain for grappling.' },
+          { day: 3, title: 'BJJ — Top Game', type: 'bjj', duration: 90, description: 'Takedowns, top control, passing. Full drilling sequence + positional rounds.' },
+          { day: 4, title: 'Conditioning', type: 'conditioning', duration: 40, description: 'Assault bike intervals + guard-retention and hip-escape circuits. Grappling-specific gas.' },
+          { day: 5, title: 'BJJ — Open Rolling', type: 'bjj', duration: 90, description: '6–8 live rounds. Execute your game plan, work weaknesses.' },
+          { day: 6, title: 'Open Mat / Extra', type: 'bjj', duration: 60, description: 'Extra rolling or drilling if fresh; otherwise skip and recover.' },
+          { day: 0, title: 'Rest', type: 'recovery', duration: 0, description: 'Full rest or light mobility.' },
+        ],
+      },
+      {
+        name: 'Peak + Taper', weeks: '3–4', focus: 'Competition-pace rolling in week 3, taper in week 4 — arrive sharp',
+        weeklySchedule: [
+          { day: 1, title: 'BJJ — Drill + Positional', type: 'bjj', duration: 90, description: 'Drill A-game sequences 30 min, then competition-pace positional work.' },
+          { day: 2, title: 'Light Conditioning', type: 'conditioning', duration: 30, description: 'Easy bike, hip mobility, light bodyweight. Nothing draining.' },
+          { day: 3, title: 'BJJ — Hard Rolling', type: 'bjj', duration: 90, description: 'Competition-intensity rounds, 5 min no breaks. Week 4: cut to 3–4 technical rounds only.' },
+          { day: 4, title: 'Technique Sharpening', type: 'technique', duration: 45, description: 'Drill the sequences that need polish. No live rolling.' },
+          { day: 5, title: 'BJJ — Final Prep', type: 'bjj', duration: 60, description: 'Week 3: hard rounds. Week 4: 2–3 technical rounds only, stay healthy.' },
+          { day: 6, title: 'Rest / Visualisation', type: 'recovery', duration: 20, description: 'Rest. Visualise your A-game and competition scenarios.' },
+          { day: 0, title: 'Rest', type: 'recovery', duration: 0, description: 'Full rest. Eat, hydrate, sleep.' },
+        ],
+      },
+    ]),
+  },
+  {
+    name: '2-Week BJJ Competition Prep',
+    sport: 'bjj',
+    durationWeeks: 2,
+    description: 'Short notice. One week to sharpen the A-game at competition pace, one week to taper and arrive fresh. No new stimulus — polish what you have.',
+    phases: JSON.stringify([
+      {
+        name: 'Sharpen', weeks: '1–1', focus: 'Competition-pace rolling, drill the A-game, stay healthy',
+        weeklySchedule: [
+          { day: 1, title: 'BJJ — A-Game Drilling', type: 'bjj', duration: 90, description: 'Drill your top sequences 30 min, then competition-pace positional rounds.' },
+          { day: 2, title: 'Light Strength', type: 'strength', duration: 40, description: 'Light full-body: pull-ups, hip thrust, core. Keep it crisp, no soreness.' },
+          { day: 3, title: 'BJJ — Hard Rolling', type: 'bjj', duration: 90, description: 'Competition-intensity rounds, 5 min. Apply the game plan.' },
+          { day: 4, title: 'Light Conditioning', type: 'conditioning', duration: 30, description: 'Easy bike + mobility. Stay loose.' },
+          { day: 5, title: 'BJJ — Positional Sharpening', type: 'bjj', duration: 75, description: 'Positional starts from your worst spots. Technical, controlled.' },
+          { day: 6, title: 'Open Mat (Optional)', type: 'bjj', duration: 45, description: 'Only if fresh. Otherwise rest.' },
+          { day: 0, title: 'Rest', type: 'recovery', duration: 0, description: 'Full rest.' },
+        ],
+      },
+      {
+        name: 'Taper', weeks: '2–2', focus: 'Cut volume, keep sharp, peak for comp day',
+        weeklySchedule: [
+          { day: 1, title: 'BJJ — Light Drilling', type: 'technique', duration: 45, description: 'Light A-game drilling. Feel sharp, not tired.' },
+          { day: 2, title: 'Easy Movement', type: 'recovery', duration: 30, description: 'Walk, mobility, light stretch. No training.' },
+          { day: 3, title: 'BJJ — Technical Rounds', type: 'bjj', duration: 45, description: '2–3 technical rounds only. Stay healthy and sharp.' },
+          { day: 4, title: 'Active Rest', type: 'recovery', duration: 20, description: 'Foam roll, light stretch. Recover.' },
+          { day: 5, title: 'Final Tune-Up', type: 'technique', duration: 30, description: 'Visualisation + light drilling. Feel ready.' },
+          { day: 6, title: 'Rest', type: 'recovery', duration: 0, description: 'Rest. Eat well, hydrate, sleep.' },
+          { day: 0, title: 'Rest', type: 'recovery', duration: 0, description: 'Competition day area — rest or travel.' },
+        ],
+      },
+    ]),
+  },
+  {
+    name: '8-Week BJJ Competition Prep',
+    sport: 'bjj',
+    durationWeeks: 8,
+    description: 'Longer runway. Builds an aerobic-grappling base and strength, raises drilling and live volume, then peaks and tapers into comp day. Taper is the final week.',
+    phases: JSON.stringify([
+      {
+        name: 'Base', weeks: '1–2', focus: 'Aerobic grappling, technical volume, strength foundation',
+        weeklySchedule: [
+          { day: 1, title: 'BJJ — Technical Drilling', type: 'bjj', duration: 90, description: 'High-volume drilling: guard, escapes, transitions. Light positional only.' },
+          { day: 2, title: 'Strength — Lower', type: 'strength', duration: 60, description: 'Back squat 4×5, RDL 4×8, leg press 3×10, core.' },
+          { day: 3, title: 'BJJ — Positional', type: 'bjj', duration: 90, description: 'Positional sparring from all major spots. Build aerobic base grappling.' },
+          { day: 4, title: 'Strength — Upper', type: 'strength', duration: 60, description: 'Bench 4×5, row 4×6, OHP 3×8, pull-ups 3×max.' },
+          { day: 5, title: 'BJJ — Light Rolling', type: 'bjj', duration: 90, description: 'Technical drilling + 3–4 light rounds. Flow, don’t grind.' },
+          { day: 6, title: 'Conditioning', type: 'conditioning', duration: 40, description: 'Assault bike intervals + grappling circuits.' },
+          { day: 0, title: 'Rest / Mobility', type: 'recovery', duration: 30, description: 'Foam roll, light stretch, or full rest.' },
+        ],
+      },
+      {
+        name: 'Development', weeks: '3–5', focus: 'Drilling volume, live rolling, maintain strength',
+        weeklySchedule: [
+          { day: 1, title: 'BJJ — Guard + A-Game', type: 'bjj', duration: 90, description: 'Guard passing/retention 30 min, positional sparring 4×8 min. Build A-game.' },
+          { day: 2, title: 'Strength — Full Body', type: 'strength', duration: 60, description: 'Deadlift 4×5, hip thrust 3×8, pull-ups 4×max, cable row 3×12.' },
+          { day: 3, title: 'BJJ — Top Game', type: 'bjj', duration: 90, description: 'Takedowns, top control, passing. Full drilling + positional rounds.' },
+          { day: 4, title: 'Conditioning', type: 'conditioning', duration: 40, description: 'Assault bike intervals + hip escapes + guard retention. Grappling-specific.' },
+          { day: 5, title: 'BJJ — Open Rolling', type: 'bjj', duration: 90, description: '6–8 live rounds. Execute game plan, attack weaknesses.' },
+          { day: 6, title: 'Open Mat', type: 'bjj', duration: 90, description: 'Extra rolling or drilling. Sharpen the competition game plan.' },
+          { day: 0, title: 'Rest', type: 'recovery', duration: 0, description: 'Full rest.' },
+        ],
+      },
+      {
+        name: 'Peaking', weeks: '6–7', focus: 'Competition-pace rolling, sharpen A-game',
+        weeklySchedule: [
+          { day: 1, title: 'BJJ — Drill + Positional', type: 'bjj', duration: 90, description: 'Drill A-game 30 min, then competition-pace positional work.' },
+          { day: 2, title: 'Light Conditioning', type: 'conditioning', duration: 30, description: 'Easy bike, hip mobility, light bodyweight.' },
+          { day: 3, title: 'BJJ — Hard Rolling', type: 'bjj', duration: 90, description: 'Competition-intensity rounds, 5 min no breaks. Apply A-game.' },
+          { day: 4, title: 'Technique Sharpening', type: 'technique', duration: 45, description: 'Drill sequences that need polish. No live rolling.' },
+          { day: 5, title: 'BJJ — Final Hard Prep', type: 'bjj', duration: 75, description: 'Last block of hard rounds before the taper.' },
+          { day: 6, title: 'Rest / Visualisation', type: 'recovery', duration: 20, description: 'Rest. Visualise competition scenarios.' },
+          { day: 0, title: 'Rest', type: 'recovery', duration: 0, description: 'Full rest.' },
+        ],
+      },
+      {
+        name: 'Taper', weeks: '8–8', focus: 'Cut volume, keep sharp, peak for comp day',
+        weeklySchedule: [
+          { day: 1, title: 'BJJ — Light Drilling', type: 'technique', duration: 45, description: 'Light A-game drilling. Sharp, not tired.' },
+          { day: 2, title: 'Easy Movement', type: 'recovery', duration: 30, description: 'Walk, mobility, light stretch.' },
+          { day: 3, title: 'BJJ — Technical Rounds', type: 'bjj', duration: 45, description: '2–3 technical rounds only. Stay healthy.' },
+          { day: 4, title: 'Active Rest', type: 'recovery', duration: 20, description: 'Foam roll, light stretch.' },
+          { day: 5, title: 'Final Tune-Up', type: 'technique', duration: 30, description: 'Visualisation + light drilling. Feel ready.' },
+          { day: 6, title: 'Rest', type: 'recovery', duration: 0, description: 'Rest. Eat well, hydrate, sleep.' },
+          { day: 0, title: 'Rest', type: 'recovery', duration: 0, description: 'Competition day area — rest or travel.' },
+        ],
+      },
+    ]),
+  },
 ];
 
 // ── Per-user database factory ─────────────────────────────────────────────────
@@ -939,9 +1059,15 @@ const getDatabase = (username) => {
                 }))
               );
             }
-        const planCount = await TrainingPlan.count();
-        if (planCount === 0) {
-            await TrainingPlan.bulkCreate(SEED_PLANS);
+        // Additive by name, like the workout templates below: a plan already in the
+        // table is left alone, and plans added to SEED_PLANS later (the 2/4/8-week BJJ
+        // blocks) reach existing accounts on the next sync rather than only fresh ones.
+        const existingPlanNames = new Set(
+            (await TrainingPlan.findAll({ attributes: ['name'] })).map(p => p.name)
+        );
+        const plansToInsert = SEED_PLANS.filter(p => !existingPlanNames.has(p.name));
+        if (plansToInsert.length > 0) {
+            await TrainingPlan.bulkCreate(plansToInsert);
         }
 
         // Seed workout templates — additive by slug stored in name field
