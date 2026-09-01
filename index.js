@@ -54,7 +54,8 @@ function getActiveTab(requestPath) {
     // same mistake that lit up two nav links for /plan-maker.
     if (requestPath.startsWith('/nutrition') || requestPath.startsWith('/meals') || requestPath.startsWith('/meal-templates')) return 'nutrition';
     if (requestPath.startsWith('/weight')) return 'weight';
-    if (requestPath.startsWith('/goals') || requestPath.startsWith('/planner') || requestPath.startsWith('/plans') || requestPath.startsWith('/accountability')) return 'goals';
+    if (requestPath.startsWith('/plans')) return 'plans';
+    if (requestPath.startsWith('/goals') || requestPath.startsWith('/planner') || requestPath.startsWith('/accountability')) return 'goals';
     if (requestPath.startsWith('/competitions')) return 'competitions';
     if (requestPath.startsWith('/stats')) return 'stats';
     return '';
