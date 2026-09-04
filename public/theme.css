@@ -521,3 +521,12 @@ body.login-page {
     /* Prevents iOS zoom-on-focus */
     input, select, textarea { font-size: 16px; }
 }
+
+/* The `hidden` attribute is defeated by any class rule that sets `display`:
+   same specificity, and the author sheet beats the browser's own
+   `[hidden]{display:none}`. In octopus-science that broke three pages at once —
+   a placeholder stuck behind a molecule, a progress bar that never went away,
+   and three tab panels rendering on top of each other, which made the tabs look
+   dead. Nothing in this file sets `display` on a hidden-toggled element today;
+   this is so that adding one later cannot quietly reopen it. */
+[hidden] { display: none !important; }
