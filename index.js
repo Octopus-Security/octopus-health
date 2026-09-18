@@ -36,6 +36,8 @@ for (const method of ['get', 'post', 'put', 'patch', 'delete', 'use']) {
 app.set('trust proxy', 1);
 const port = process.env.PORT || 3000;
 const getDatabase = require('./database');
+const { parseWorkout, buildPreview } = require('./api/workout-parse');
+const { detectPR } = require('./api/pr-detect');
 
 const auth = new AuthClient();
 const AUTH_URL = process.env.AUTH_SERVICE_URL || 'http://octopus-auth:3002';
@@ -1139,6 +1141,59 @@ app.delete('/workout/api/set/:id', requireLogin, async (req, res) => {
     const { WorkoutSet } = getDatabase(req.user.username);
     await WorkoutSet.destroy({ where: { id: req.params.id } });
     res.json({ success: true });
+});
+
+// Quick-log: turn free text ("20 pull ups, bench 3x10 135lbs") into sets with NO
+// model — the deterministic replacement for routing every workout through an LLM.
+// `commit` falsy ⇒ a dry-run PREVIEW the user confirms/edits (nothing written);
+// `commit:true` ⇒ writes one finished session + its sets. Anything the parser
+// can't read with confidence comes back in `unparsed` for the user to tap in —
+// it is never guessed. See api/workout-parse.js + test/workout-parse.test.js.
+app.post('/workout/api/quick-log', requireLogin, async (req, res) => {
+    try {
+        const { text, commit, date, type, title } = req.body || {};
+        const parsed = parseWorkout(text);
+        const { ExerciseDefinition, WorkoutSession, WorkoutSet, PersonalRecord, sequelize } = getDatabase(req.user.username);
+        await sequelize.sync();
+
+        // Match each parsed name to the library (canonical name + id), inventing nothing.
+        const library = (await ExerciseDefinition.findAll({ attributes: ['id', 'name'] }))
+            .map(e => ({ id: e.id, name: e.name }));
+        const preview = buildPreview(parsed, library);
+
+        if (!commit) {
+            return res.json({ success: true, committed: false, preview, unparsed: parsed.unparsed });
+        }
+        if (!preview.length) {
+            return res.status(400).json({ success: false, error: 'Nothing loggable to commit', unparsed: parsed.unparsed });
+        }
+
+        const logDate = (date && /^\d{4}-\d{2}-\d{2}$/.test(date)) ? date : new Date().toISOString().slice(0, 10);
+        const session = await WorkoutSession.create({
+            date: logDate, type: type || 'strength', title: title || null,
+            startedAt: new Date(), status: 'finished', finishedAt: new Date(),
+        });
+        const prs = [];
+        for (const ex of preview) {
+            for (const s of ex.sets) {
+                await WorkoutSet.create({
+                    sessionId: session.id, exerciseName: ex.name, exerciseId: ex.exerciseId,
+                    exerciseOrder: ex.order, setNumber: s.setNumber,
+                    reps: s.reps, weight: s.weight, weightUnit: s.weightUnit,
+                    duration: s.duration, notes: s.notes,
+                });
+                try {   // PR detection must never fail the log
+                    const pr = await detectPR({ PersonalRecord },
+                        { exerciseName: ex.name, reps: s.reps, weight: s.weight, weightUnit: s.weightUnit, duration: s.duration },
+                        logDate);
+                    if (pr) prs.push(pr);
+                } catch (_) { /* ignore */ }
+            }
+        }
+        res.json({ success: true, committed: true, sessionId: session.id, logged: preview, unparsed: parsed.unparsed, prs });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
 });
 
 app.get('/workout/api/exercises', requireLogin, async (req, res) => {

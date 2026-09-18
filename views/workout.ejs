@@ -99,6 +99,22 @@
           <h2 style="margin:0">🏋️ Workout Logger</h2>
           <button onclick="openStartModal()" class="btn">+ New Workout</button>
         </div>
+
+        <!-- ── Quick Log: type it, no model, no waiting ── -->
+        <div class="card" id="quick-log-card" style="margin-bottom:16px;border-color:#2a3a2a">
+          <div style="font-weight:600;color:#e8e8e8;margin-bottom:6px">⚡ Quick log</div>
+          <div style="color:#777;font-size:0.8rem;margin-bottom:8px">
+            Type it plainly — e.g. <em>20 pull ups, bench 3x10 135lbs, plank 30 sec</em>. Parsed instantly on-device; you confirm before it saves.
+          </div>
+          <textarea id="ql-text" rows="2" placeholder="20 pull ups, 5 min bag work, bicep curls 10 each side 20lbs and 10 each side 25lbs"
+            style="width:100%;background:#0d0d0d;border:1px solid #2a2a2a;color:#e8e8e8;border-radius:8px;padding:10px;font-size:0.9rem;resize:vertical;box-sizing:border-box"></textarea>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button onclick="quickLogPreview()" class="btn" style="flex:1">Preview</button>
+            <button onclick="document.getElementById('ql-text').value='';qlClear()" class="btn" style="background:#1a1a1a">Clear</button>
+          </div>
+          <div id="ql-result" style="margin-top:12px;display:none"></div>
+        </div>
+
         <div id="no-session" style="text-align:center;padding:60px 20px;color:#555;font-size:0.9rem">
           No active workout. Hit <strong style="color:#2ecc71">New Workout</strong> to start logging,
           or load one of your saved workouts on the right.
@@ -850,6 +866,67 @@ function startRestTimer(seconds) {
 }
 function stopRest()   { clearInterval(restInterval); document.getElementById('rest-banner').classList.remove('show'); }
 function adjustRest(d){ restRemaining = Math.max(0, restRemaining + d); if(restRemaining<=0) stopRest(); }
+
+// ── Quick log (deterministic text parse, no model) ──────────────────────────
+function qlEsc(s){ return String(s==null?'':s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function qlClear(){ const r=document.getElementById('ql-result'); r.style.display='none'; r.innerHTML=''; }
+
+function qlSetLine(s){
+  const bits=[];
+  if (s.reps!=null) bits.push(s.reps+' reps');
+  if (s.weight!=null) bits.push(s.weight+' '+(s.weightUnit||'lbs'));
+  if (s.duration!=null) bits.push(s.duration>=60 ? (s.duration/60)+' min' : s.duration+'s');
+  if (s.notes) bits.push('('+s.notes+')');
+  return bits.join(' · ') || '—';
+}
+
+async function quickLogPreview(){
+  const text = document.getElementById('ql-text').value.trim();
+  const box = document.getElementById('ql-result');
+  if (!text){ qlClear(); return; }
+  box.style.display='block';
+  box.innerHTML='<span style="color:#777;font-size:0.85rem">Reading…</span>';
+  let d;
+  try { const res = await fetch('/workout/api/quick-log', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ text }) }); d = await res.json(); }
+  catch(e){ box.innerHTML='<span style="color:#e74c3c">Could not reach the server.</span>'; return; }
+  if (!d.success){ box.innerHTML='<span style="color:#e74c3c">'+qlEsc(d.error||'Parse failed')+'</span>'; return; }
+
+  let html='';
+  if (d.preview.length){
+    html += '<div style="font-size:0.8rem;color:#777;margin-bottom:6px">Read as — check it, then log:</div>';
+    html += d.preview.map(ex => `
+      <div style="background:#0d0d0d;border:1px solid #2a2a2a;border-radius:8px;padding:8px 10px;margin-bottom:6px">
+        <div style="font-weight:600;color:#e8e8e8">${qlEsc(ex.name)}${ex.matched?' <span style="color:#2ecc71;font-size:0.7rem">✓ library</span>':' <span style="color:#b0902e;font-size:0.7rem">new name</span>'}</div>
+        ${ex.sets.map(s=>`<div style="color:#aaa;font-size:0.82rem;margin-top:2px">Set ${s.setNumber}: ${qlEsc(qlSetLine(s))}</div>`).join('')}
+      </div>`).join('');
+  }
+  if (d.unparsed && d.unparsed.length){
+    html += '<div style="background:#241a1a;border:1px solid #4a2a2a;border-radius:8px;padding:8px 10px;margin-bottom:6px;color:#e0a0a0;font-size:0.82rem">'
+          + 'Couldn\'t read (add these by hand): ' + d.unparsed.map(qlEsc).join('; ') + '</div>';
+  }
+  if (d.preview.length){
+    html += '<button onclick="quickLogCommit()" class="btn btn-green" style="width:100%;margin-top:4px">✓ Log '
+          + d.preview.reduce((n,e)=>n+e.sets.length,0) + ' set(s)</button>';
+  } else {
+    html += '<div style="color:#777;font-size:0.85rem">Nothing loggable yet — try e.g. "20 pull ups, bench 3x10 135lbs".</div>';
+  }
+  box.innerHTML = html;
+}
+
+async function quickLogCommit(){
+  const text = document.getElementById('ql-text').value.trim();
+  const box = document.getElementById('ql-result');
+  if (!text) return;
+  box.innerHTML='<span style="color:#777;font-size:0.85rem">Saving…</span>';
+  let d;
+  try { const res = await fetch('/workout/api/quick-log', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ text, commit:true }) }); d = await res.json(); }
+  catch(e){ box.innerHTML='<span style="color:#e74c3c">Could not reach the server.</span>'; return; }
+  if (!d.success){ box.innerHTML='<span style="color:#e74c3c">'+qlEsc(d.error||'Save failed')+'</span>'; return; }
+  const prMsg = (d.prs && d.prs.length) ? ' 🏆 '+d.prs.length+' PR(s)!' : '';
+  box.innerHTML='<span style="color:#2ecc71">Logged ✓'+prMsg+' — refreshing…</span>';
+  document.getElementById('ql-text').value='';
+  setTimeout(()=>window.location.reload(), 700);
+}
 </script>
 </body>
 </html>
