@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="<%= asset('/theme.css') %>">
+    <style>
+      .log-card { background:#0d0d0d; border:1px solid #2a2a2a; border-radius:10px; margin-bottom:14px; overflow:hidden; }
+      .log-head { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px 16px; background:#141414; border-bottom:1px solid #1e1e1e; }
+      .log-date { font-size:0.78rem; color:#666; }
+      .log-title { font-weight:600; color:#e8e8e8; font-size:1rem; }
+      .log-meta { font-size:0.75rem; color:#666; margin-top:2px; }
+      .log-body { padding:10px 16px 14px; }
+      .log-ex { margin-bottom:10px; }
+      .log-ex-name { font-weight:600; color:#e8e8e8; font-size:0.9rem; margin-bottom:3px; }
+      .log-sets { width:100%; font-size:0.82rem; border-collapse:collapse; }
+      .log-sets td { padding:4px 10px 4px 0; }
+      .log-sets tr { border-top:1px solid #171717; }
+      .log-sets .h td { color:#555; font-size:0.72rem; border:none; }
+      .del-btn { background:none; border:1px solid #3a2020; color:#a05050; border-radius:6px; cursor:pointer; font-size:0.72rem; padding:4px 9px; }
+      .del-btn:hover { background:#241414; color:#e07070; }
+      .filter-row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:16px; }
+      .filter-row a { font-size:0.8rem; padding:5px 12px; border-radius:16px; border:1px solid #2a2a2a; color:#888; text-decoration:none; }
+      .filter-row a.on { background:#1a2a1a; border-color:#2ecc71; color:#2ecc71; }
+    </style>
+</head>
+<body>
+    <%- include('partials/nav') %>
+
+    <div class="container" style="padding-top:24px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <h2 style="margin:0">📒 Workout Logs</h2>
+        <a href="/workout" class="btn">＋ Log a workout</a>
+      </div>
+
+      <div class="filter-row">
+        <span style="color:#555;font-size:0.78rem">Filter:</span>
+        <a href="/logs" class="<%= filterType === 'all' ? 'on' : '' %>">All</a>
+        <% types.forEach(t => { %>
+          <a href="/logs?type=<%= encodeURIComponent(t) %>" class="<%= filterType === t ? 'on' : '' %>"><%= t %></a>
+        <% }) %>
+      </div>
+
+      <% if (!sessions.length) { %>
+        <div style="text-align:center;padding:60px 20px;color:#555">
+          No workouts logged yet. Head to <a href="/workout" style="color:#2ecc71">the logger</a> and use ⚡ Quick log.
+        </div>
+      <% } else { %>
+        <% sessions.forEach(s => { %>
+          <div class="log-card" id="log-<%= s.id %>">
+            <div class="log-head">
+              <div>
+                <div class="log-date"><%= s.date %><% if (s.status === 'active') { %> · <span style="color:#b0902e">in progress</span><% } %></div>
+                <div class="log-title"><%= s.title || (s.type ? s.type.charAt(0).toUpperCase() + s.type.slice(1) : 'Workout') %></div>
+                <div class="log-meta">
+                  <%= s.exercises.length %> exercise<%= s.exercises.length === 1 ? '' : 's' %> · <%= s.setCount %> set<%= s.setCount === 1 ? '' : 's' %>
+                  <% if (s.duration) { %> · <%= s.duration %> min<% } %>
+                  <% if (s.effort) { %> · RPE <%= '★'.repeat(s.effort) %><% } %>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span class="tag tag-<%= s.type %>"><%= s.type %></span>
+                <button class="del-btn" onclick="deleteSession(<%= s.id %>)">Delete</button>
+              </div>
+            </div>
+            <div class="log-body">
+              <% if (!s.exercises.length) { %>
+                <div style="color:#555;font-size:0.85rem">No sets recorded.</div>
+              <% } %>
+              <% s.exercises.forEach(ex => { %>
+                <div class="log-ex">
+                  <div class="log-ex-name"><%= ex.name %></div>
+                  <table class="log-sets">
+                    <tr class="h"><td>Set</td><td>Reps / Time</td><td>Weight</td><td>Notes</td></tr>
+                    <% ex.sets.forEach((st, i) => { %>
+                      <tr>
+                        <td style="color:#555"><%= st.setNumber || (i + 1) %></td>
+                        <td style="color:#ccc"><%= st.duration ? (st.duration >= 60 ? (st.duration / 60) + ' min' : st.duration + 's') : (st.reps != null ? st.reps : '—') %></td>
+                        <td style="color:#ccc"><%= st.weight != null ? st.weight + (st.weightUnit || 'lbs') : 'BW' %></td>
+                        <td style="color:#777"><%= st.notes || '' %></td>
+                      </tr>
+                    <% }) %>
+                  </table>
+                </div>
+              <% }) %>
+            </div>
+          </div>
+        <% }) %>
+        <div style="color:#444;font-size:0.75rem;text-align:center;margin-top:8px">Showing your most recent sessions.</div>
+      <% } %>
+    </div>
+
+    <script>
+      async function deleteSession(id) {
+        if (!confirm('Delete this whole workout and its sets? This cannot be undone.')) return;
+        try {
+          const res = await fetch('/workout/api/session/' + id, { method: 'DELETE' });
+          const d = await res.json();
+          if (d && d.success) { const el = document.getElementById('log-' + id); if (el) el.remove(); }
+          else alert('Could not delete.');
+        } catch (e) { alert('Could not reach the server.'); }
+      }
+    </script>
+</body>
+</html>

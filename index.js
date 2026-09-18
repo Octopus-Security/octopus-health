@@ -1085,7 +1085,28 @@ app.get('/workout', requireLogin, async (req, res) => {
     }
     const rawTemplates = await WorkoutTemplate.findAll({ order: [['name','ASC']] });
     const templates = rawTemplates.map(t => ({ ...t.toJSON(), exercises: JSON.parse(t.exercises || '[]') }));
-    res.render('workout', { title: 'Workout Logger', user: req.user, recentWorkouts: recentWithCounts, todayPlan, templates });
+    res.render('workout', { title: 'Workout Logger', user: req.user, activeTab: 'workout', recentWorkouts: recentWithCounts, todayPlan, templates });
+});
+
+// Workout Logs — full session history, sets grouped by exercise, with a type filter.
+app.get('/logs', requireLogin, async (req, res) => {
+    const { WorkoutSession, WorkoutSet, sequelize } = getDatabase(req.user.username);
+    await sequelize.sync();
+    const { type } = req.query;
+    const where = {};
+    if (type && type !== 'all') where.type = type;
+    const rows = await WorkoutSession.findAll({ where, order: [['date', 'DESC'], ['startedAt', 'DESC']], limit: 200 });
+    const sessions = await Promise.all(rows.map(async s => {
+        const sets = await WorkoutSet.findAll({ where: { sessionId: s.id }, order: [['exerciseOrder', 'ASC'], ['setNumber', 'ASC']] });
+        const byOrder = new Map();   // group sets into exercises by their exerciseOrder
+        for (const st of sets) {
+            if (!byOrder.has(st.exerciseOrder)) byOrder.set(st.exerciseOrder, { name: st.exerciseName, sets: [] });
+            byOrder.get(st.exerciseOrder).sets.push(st.toJSON());
+        }
+        return { ...s.toJSON(), exercises: [...byOrder.values()], setCount: sets.length };
+    }));
+    const types = [...new Set((await WorkoutSession.findAll({ attributes: ['type'] })).map(s => s.type))].filter(Boolean).sort();
+    res.render('logs', { title: 'Workout Logs', user: req.user, activeTab: 'logs', sessions, types, filterType: type || 'all' });
 });
 
 // Workout AJAX endpoints (session-protected, used by workout.ejs)
