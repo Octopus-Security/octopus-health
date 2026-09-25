@@ -119,13 +119,15 @@ MIT
 
 ## Reading content (`content/`)
 
-Training, nutrition and MMA articles live as Markdown in [`content/`](content/):
-six workouts, four nutrition pieces, four MMA breakdowns and a curated links
-page. They are **not loaded by the app yet** — no route serves them and they
+Training, nutrition, MMA and calisthenics articles live as Markdown in
+[`content/`](content/): six workouts, four nutrition pieces, four MMA
+breakdowns, nine calisthenics progression ladders with four routines (for a
+pull-up bar, dip bars and push-up handles), and a curated links page. They are **not loaded by the app yet** — no route serves them and they
 are deliberately not seeded into the per-user databases.
 [`content/README.md`](content/README.md) lists the batch, explains that choice,
 and lists what still needs a human to verify (links marked "⚠ verify", and a
-few facts). `test/content.test.js` checks each piece has its required sections.
+few facts). `test/content.test.js` checks each piece has its required sections,
+and that every calisthenics rung has a move-up standard and a regression.
 
 ## Workout logging is deduplicated on purpose
 

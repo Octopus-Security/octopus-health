@@ -19,7 +19,16 @@
  *    domains nor marked "⚠ verify" — i.e. a guessed link presented as
  *    trustworthy;
  *  - a file with no front matter title/category, which a future loader would
- *    have to special-case.
+ *    have to special-case;
+ *  - (calisthenics) a progression-ladder rung without its "Move up when"
+ *    standard or its "Regression" — a ladder with no standard gives no rule
+ *    for when to move up, and one with no regression leaves someone stuck on
+ *    a rung that is too hard, which is how people grind through bad reps and
+ *    get hurt;
+ *  - (calisthenics) equipment beyond the owner's pull-up bar, dip bars and
+ *    push-up handles creeping in unmarked — rings, weights, bands — when the
+ *    batch was written for exactly that kit and anything else must say
+ *    "optional".
  *
  * Pure fs, no dependencies — runs without the GitHub Packages token.
  *
@@ -57,6 +66,9 @@ function headings(text) {
 const WORKOUTS  = mdFiles('workouts');
 const NUTRITION = mdFiles('nutrition');
 const MMA       = mdFiles('mma');
+const CAL_LADDERS  = mdFiles('calisthenics').filter(f => !f.name.endsWith('/README.md'));
+const CAL_ROUTINES = mdFiles('calisthenics/routines');
+const CAL_INDEX    = { name: 'calisthenics/README.md', text: fs.readFileSync(path.join(ROOT, 'calisthenics', 'README.md'), 'utf8') };
 const LINKS     = { name: 'links.md', text: fs.readFileSync(path.join(ROOT, 'links.md'), 'utf8') };
 
 test('the batch is all there: 6 workouts, 4 nutrition, 4 MMA', () => {
@@ -70,6 +82,9 @@ test('every content file has front matter with a title and the right category', 
     ...WORKOUTS.map(f => [f, 'workout']),
     ...NUTRITION.map(f => [f, 'nutrition']),
     ...MMA.map(f => [f, 'mma']),
+    ...CAL_LADDERS.map(f => [f, 'calisthenics-ladder']),
+    ...CAL_ROUTINES.map(f => [f, 'calisthenics-routine']),
+    [CAL_INDEX, 'calisthenics-index'],
     [LINKS, 'links'],
   ];
   for (const [f, category] of expect) {
@@ -80,9 +95,9 @@ test('every content file has front matter with a title and the right category', 
   }
 });
 
-test('every workout has goal, equipment, warm-up, session, cool-down, progression', () => {
+test('every workout and calisthenics routine has goal, equipment, warm-up, session, cool-down, progression', () => {
   const required = [/^goal$/, /^equipment$/, /^warm-up/, /^the session$/, /^cool-down/, /^progression$/];
-  for (const f of WORKOUTS) {
+  for (const f of [...WORKOUTS, ...CAL_ROUTINES]) {
     const hs = headings(f.text);
     for (const re of required) {
       assert.ok(hs.some(h => re.test(h)), `${f.name}: missing section ${re}`);
@@ -125,9 +140,89 @@ test('every link on links.md is https and either a canonical domain root or mark
 });
 
 test('links inside articles point only at canonical domains', () => {
-  for (const f of [...WORKOUTS, ...NUTRITION, ...MMA]) {
+  for (const f of [...WORKOUTS, ...NUTRITION, ...MMA, ...CAL_LADDERS, ...CAL_ROUTINES, CAL_INDEX]) {
     for (const [, url] of f.text.matchAll(/\]\((https?:[^)\s]+)\)/g)) {
       assert.ok(CANONICAL_DOMAINS.has(new URL(url).hostname), `${f.name}: non-canonical link ${url}`);
     }
+  }
+});
+
+// ── Calisthenics ────────────────────────────────────────────────────────────
+
+// A rung is a numbered "### N. Name" heading and everything up to the next
+// heading of level 2 or 3. Un-numbered "###" headings are side notes (bench
+// dips, Korean dips), deliberately not rungs.
+function rungs(text) {
+  const out = [];
+  const lines = text.split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    const m = lines[i].match(/^### (\d+)\. (.+)$/);
+    if (!m) continue;
+    let j = i + 1;
+    while (j < lines.length && !/^#{2,3} /.test(lines[j])) j++;
+    out.push({ n: Number(m[1]), name: m[2], body: lines.slice(i + 1, j).join('\n') });
+  }
+  return out;
+}
+
+const RUNG_FIELDS = ['Equipment', 'How', 'Common faults', 'Move up when', 'Regression'];
+
+test('calisthenics: every required movement family has a ladder, plus 4 routines', () => {
+  const families = CAL_LADDERS.map(f => frontMatter(f.text).family).sort();
+  assert.deepStrictEqual(families,
+    ['chin-ups', 'core', 'dips', 'legs', 'pike-hspu', 'pull-ups', 'push-ups', 'rows', 'skills']);
+  assert.strictEqual(CAL_ROUTINES.length, 4);
+});
+
+test('calisthenics: every ladder rung has equipment, cues, faults, a move-up standard and a regression', () => {
+  for (const f of CAL_LADDERS) {
+    const rs = rungs(f.text);
+    assert.ok(rs.length >= 4, `${f.name}: only ${rs.length} rungs`);
+    rs.forEach((r, i) => assert.strictEqual(r.n, i + 1, `${f.name}: rung numbering breaks at "${r.name}"`));
+    for (const r of rs) {
+      for (const field of RUNG_FIELDS) {
+        const m = r.body.match(new RegExp(`^- \\*\\*${field}:\\*\\*\\s*(\\S.*)$`, 'm'));
+        assert.ok(m, `${f.name} rung ${r.n} "${r.name}": missing or empty "${field}"`);
+      }
+    }
+  }
+});
+
+test('calisthenics: every ladder ends with safety notes', () => {
+  for (const f of CAL_LADDERS) {
+    assert.ok(headings(f.text).includes('safety notes'), `${f.name}: no "Safety notes" section`);
+  }
+});
+
+// The owner has a pull-up bar, dip bars and push-up handles. Anything else
+// named as equipment must be marked optional on the same line.
+const OUTSIDE_KIT = /\b(rings?|dumbbells?|barbells?|kettlebells?|weight vest|weights?|bands?|resistance band|cable)\b/i;
+
+test('calisthenics: equipment beyond bar, dip bars and handles is always marked optional', () => {
+  const equipmentLines = [];
+  for (const f of CAL_LADDERS) {
+    for (const r of rungs(f.text)) {
+      const m = r.body.match(/^- \*\*Equipment:\*\*(.*)$/m);
+      if (m) equipmentLines.push([`${f.name} rung ${r.n}`, m[1]]);
+    }
+  }
+  for (const f of CAL_ROUTINES) {
+    const sec = f.text.split(/^## /m).find(s => /^equipment\b/i.test(s)) || '';
+    for (const line of sec.split('\n').slice(1)) if (line.trim()) equipmentLines.push([f.name, line]);
+  }
+  assert.ok(equipmentLines.length > 40, 'equipment lines not found');
+  for (const [where, line] of equipmentLines) {
+    if (OUTSIDE_KIT.test(line)) {
+      assert.match(line, /optional/i, `${where}: "${line.trim()}" names equipment outside the kit without marking it optional`);
+    }
+  }
+});
+
+test('calisthenics: the index states the handle assumption and how progression, regression and deloads work', () => {
+  const t = CAL_INDEX.text;
+  assert.match(t, /\*\*Assumption:\*\*[^\n]*parallettes/i, 'handles-as-parallettes assumption not stated');
+  for (const h of ['the standards', 'moving up', 'regressing', 'stalls and deloads']) {
+    assert.ok(headings(t).concat(t.split('\n').filter(l => /^### /.test(l)).map(l => l.slice(4).trim().toLowerCase())).includes(h),
+      `index: no "${h}" section`);
   }
 });

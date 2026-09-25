@@ -1,10 +1,10 @@
 ---
-title: Curated Links — Training, Nutrition, MMA
+title: Curated Links — Training, Nutrition, MMA, Calisthenics
 category: links
 summary: Canonical reference sites for the topics in this content batch. Entries marked ⚠ verify need a human to confirm the URL before use.
 ---
 
-# Curated Links — Training, Nutrition, MMA
+# Curated Links — Training, Nutrition, MMA, Calisthenics
 
 Only well-known, canonical sites are listed. Where the site is real but the
 exact URL (a sub-page, a recently moved domain) could not be confirmed when this
@@ -42,3 +42,8 @@ entry before relying on it. No URL here was guessed to fill a gap.
 - [IMMAF — International Mixed Martial Arts Federation](https://www.immaf.org) — ⚠ verify: amateur MMA federation; confirm the domain.
 - [USADA — Global DRO](https://www.globaldro.com) — ⚠ verify: lookup of whether a medication is prohibited in sport; confirm the domain and which anti-doping programme applies to your competition.
 - [CDC HEADS UP (concussion)](https://www.cdc.gov/heads-up/) — ⚠ verify: CDC reorganised its site; confirm the path.
+
+## Calisthenics
+
+- [r/bodyweightfitness — Recommended Routine (wiki)](https://www.reddit.com/r/bodyweightfitness/wiki/kb/recommended_routine) — ⚠ verify: a long-running community bodyweight routine with progression charts; the wiki path has moved before, so confirm it. Reddit is a community forum, not an authority.
+- *Overcoming Gravity* by Steven Low: a book-length treatment of bodyweight progressions and programming. No link is given, to avoid guessing a store or publisher URL.
