@@ -941,6 +941,58 @@ const getDatabase = (username) => {
         notes:        { type: DataTypes.TEXT,    allowNull: true },
     }, { tableName: 'PersonalRecords' });
 
+
+    // ── Skill tree, fitness tests, benchmarks (additive: sync() creates them) ──
+    // The tree itself is DATA in content/calisthenics/skill-tree.json; these
+    // tables hold only what THIS user did. A skill is achieved when an attempt
+    // with result 'succeeded' exists - derived, never stored (api/skill-tree.js).
+    const SkillAttempt = sequelize.define('SkillAttempt', {
+        skillId: { type: DataTypes.STRING,   allowNull: false },
+        date:    { type: DataTypes.DATEONLY, allowNull: false },
+        result:  { type: DataTypes.STRING,   allowNull: false },   // 'succeeded' | 'not_yet'
+        reps:    { type: DataTypes.INTEGER,  allowNull: true },
+        seconds: { type: DataTypes.INTEGER,  allowNull: true },
+        notes:   { type: DataTypes.TEXT,     allowNull: true },
+    }, { tableName: 'SkillAttempts' });
+
+    // One row per measured item per test. `item` is a fitness-tests.js id, or a
+    // slug for a custom benchmark; `detail` is JSON (treadmill protocol, side...).
+    const FitnessResult = sequelize.define('FitnessResult', {
+        item:    { type: DataTypes.STRING,   allowNull: false },
+        battery: { type: DataTypes.STRING,   allowNull: true },
+        value:   { type: DataTypes.FLOAT,    allowNull: false },
+        unit:    { type: DataTypes.STRING,   allowNull: true },
+        date:    { type: DataTypes.DATEONLY, allowNull: false },
+        detail:  { type: DataTypes.TEXT,     allowNull: true },
+        notes:   { type: DataTypes.TEXT,     allowNull: true },
+    }, { tableName: 'FitnessResults' });
+
+    const Benchmark = sequelize.define('Benchmark', {
+        item:       { type: DataTypes.STRING,  allowNull: false, unique: true },
+        name:       { type: DataTypes.STRING,  allowNull: false },
+        short:      { type: DataTypes.STRING,  allowNull: true },
+        unit:       { type: DataTypes.STRING,  allowNull: true },
+        better:     { type: DataTypes.STRING,  allowNull: false, defaultValue: 'higher' },
+        focus:      { type: DataTypes.STRING,  allowNull: true },
+        everyWeeks: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 1 },
+        dayOfWeek:  { type: DataTypes.INTEGER, allowNull: true },   // null = the user's benchmark day
+        position:   { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
+        enabled:    { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
+        seedKey:    { type: DataTypes.STRING,  allowNull: true },
+    }, { tableName: 'Benchmarks' });
+
+    // Which defaults have ever been created for this user. A default that is in
+    // here is never re-created, which is what makes a deletion stick.
+    const BenchmarkSeed = sequelize.define('BenchmarkSeed', {
+        seedKey: { type: DataTypes.STRING, primaryKey: true },
+    }, { tableName: 'BenchmarkSeeds', timestamps: false });
+
+    // Small per-user key/value: equipment, focus, benchmark day, reminder state.
+    const UserSetting = sequelize.define('UserSetting', {
+        key:   { type: DataTypes.STRING, primaryKey: true },
+        value: { type: DataTypes.TEXT },
+    }, { tableName: 'UserSettings', timestamps: false });
+
     // Exercise plan builder (mobility / warmup / cooldown / circuit)
     const ExercisePlan = sequelize.define('ExercisePlan', {
         name:        { type: DataTypes.STRING, allowNull: false },
@@ -1133,6 +1185,11 @@ const getDatabase = (username) => {
         IngredientMatch,
         MealTemplate,
         MealPrep,
+        SkillAttempt,
+        FitnessResult,
+        Benchmark,
+        BenchmarkSeed,
+        UserSetting,
         seedData,
         sequelize,
     };

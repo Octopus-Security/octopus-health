@@ -530,3 +530,30 @@ body.login-page {
    dead. Nothing in this file sets `display` on a hidden-toggled element today;
    this is so that adding one later cannot quietly reopen it. */
 [hidden] { display: none !important; }
+
+/* ── Skill tree, tests, benchmarks (views/skills|tests|benchmarks|treadmill.ejs) ── */
+.fx-chip { display:inline-block; padding:2px 8px; border-radius:999px; font-size:0.75rem; border:1px solid #2a2a2a; color:#888; }
+.fx-chip.achieved { color:#2ecc71; border-color:#2ecc71; }
+.fx-chip.unlocked { color:#3498db; border-color:#3498db; }
+.fx-chip.locked { color:#666; }
+.fx-skill { border-top:1px solid #1e1e1e; padding:12px 0; }
+.fx-skill.is-locked { opacity:0.55; }
+.fx-skill h4 { margin:0 0 4px; font-size:1rem; color:#e8e8e8; overflow-wrap:anywhere; }
+.fx-meta { color:#777; font-size:0.85rem; overflow-wrap:anywhere; }
+.fx-row { display:flex; gap:8px; flex-wrap:wrap; align-items:flex-end; }
+.fx-row > * { min-width:0; }
+.fx-row input, .fx-row select { width:auto; max-width:100%; }
+.fx-wrap { overflow-wrap:anywhere; }
+.fx-table-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+.fx-up { color:#2ecc71; } .fx-down { color:#e74c3c; }
+.fx-big { font-size:2.6rem; font-weight:700; font-variant-numeric:tabular-nums; line-height:1.1; overflow-wrap:anywhere; }
+.fx-grid2 { display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:12px; }
+.fx-stat { background:#0d0d0d; border:1px solid #1e1e1e; border-radius:10px; padding:12px; text-align:center; min-width:0; }
+.fx-stat .l { color:#777; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.06em; }
+.fx-stat .v { font-size:1.6rem; font-weight:700; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+#sched { table-layout: fixed; width: 100%; }
+#sched th, #sched td { padding: 6px 8px; font-size: 0.85rem; overflow-wrap: anywhere; }
+#banner.fx-big { font-size: 1.5rem; margin: 14px 0; }
+.container input[type="radio"], .container input[type="checkbox"] { width: auto; padding: 0; appearance: auto; -webkit-appearance: auto; accent-color: #2ecc71; background: transparent; }
+#sched th { text-transform: none; letter-spacing: 0; font-size: 0.8rem; }
+#sched th:first-child, #sched td:first-child { width: 4rem; }

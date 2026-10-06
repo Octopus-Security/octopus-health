@@ -14,7 +14,7 @@ plan, so six extra templates would have appeared in every account's logger.
 Putting prose into those seeds would have changed production data for both
 accounts as a side effect of adding reading material.
 
-So this batch is **not loaded by the app** yet. It ships in the image (nothing
+So this batch is **not served as articles** yet (the one exception: `calisthenics/skill-tree.json` is loaded by the skill tree, and `api/skill-tree.js` reads the `### N.` rung headings of the ladders to check its links). It ships in the image (nothing
 excludes it) but no route serves it, and `.md` is not in `build.js`'s hashed
 extensions, so it does not move `/api/build`. Rendering it (e.g. a `/learn`
 page reading `content/**/*.md`) is a separate, deliberate change.

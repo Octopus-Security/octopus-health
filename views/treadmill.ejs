@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="<%= asset('/theme.css') %>">
+</head>
+<body>
+<%- include('partials/nav') %>
+<div class="container" data-msg-root>
+  <div class="card">
+    <h2>Treadmill test</h2>
+    <p class="fx-meta">Pick a test, set up the treadmill, press Start. Tones and spoken cues tell you when the speed changes, so you can keep your eyes forward. Stop whenever you must; stop at once if you feel dizzy, chest pain or sharp pain. General information, not medical advice. The cues are this app's own.</p>
+    <p class="fx-msg"></p>
+    <div class="fx-row">
+      <label><input type="radio" name="mode" value="progressive" <%= mode !== 'cooper' ? 'checked' : '' %>> Progressive: speed rises every minute</label>
+      <label><input type="radio" name="mode" value="cooper" <%= mode === 'cooper' ? 'checked' : '' %>> 12 minutes: as far as you can</label>
+    </div>
+  </div>
+
+  <div class="card" id="setup">
+    <div id="prog-setup">
+      <h3>Progressive settings</h3>
+      <div class="fx-row">
+        <div class="form-group"><label for="unit">Units</label>
+          <select id="unit"><option value="kmh">km/h</option><option value="mph">mph</option></select></div>
+        <div class="form-group"><label for="start">Start speed</label><input id="start" type="number" step="0.1" min="2" max="20" value="<%= defaults.kmh.start %>" style="width:90px"></div>
+        <div class="form-group"><label for="step">Increase per minute</label><input id="step" type="number" step="0.1" min="0.1" max="2" value="<%= defaults.kmh.step %>" style="width:90px"></div>
+        <div class="form-group"><label for="incline">Incline %</label><input id="incline" type="number" step="0.5" min="0" max="15" value="0" style="width:80px"></div>
+      </div>
+      <p class="fx-meta">Stage lasts 60 s. Default 8.0 km/h rising 0.5 km/h a stage (5.0 mph rising 0.3 mph). Use the same settings each time you repeat it. A 1 % incline is the usual way to make treadmill effort resemble outdoors. This is a progressive ramp for tracking yourself, not a VO2max predictor.</p>
+      <div class="fx-table-wrap"><table id="sched"><thead></thead><tbody></tbody></table></div>
+    </div>
+    <div class="fx-row" style="margin-top:10px">
+      <label><input type="checkbox" id="snd" checked> Tones</label>
+      <label><input type="checkbox" id="voice" checked> Voice</label>
+      <a id="wav" class="btn" href="/tests/treadmill/audio.wav" download>Download tones as a WAV file</a>
+    </div>
+    <p class="fx-meta">The file has the tones only (a triple tone at each speed change, a ticking count before it); speeds are in the table above. The page also speaks each speed.</p>
+  </div>
+
+  <div class="card" id="run">
+    <div class="fx-grid2">
+      <div class="fx-stat"><div class="l" id="l-main">Stage</div><div class="v" id="stage">-</div></div>
+      <div class="fx-stat"><div class="l">Speed</div><div class="v" id="speed">-</div></div>
+      <div class="fx-stat"><div class="l">Next change in</div><div class="v" id="remain">-</div></div>
+      <div class="fx-stat"><div class="l">Time</div><div class="v" id="clock">0:00</div></div>
+      <div class="fx-stat"><div class="l">Distance (est.)</div><div class="v" id="dist">0 m</div></div>
+      <div class="fx-stat"><div class="l">Incline</div><div class="v" id="inc">0 %</div></div>
+    </div>
+    <p class="fx-big" id="banner" aria-live="polite" style="text-align:center">Ready</p>
+    <div class="fx-row" style="justify-content:center">
+      <button id="btn-start" type="button">Start</button>
+      <button id="btn-pause" type="button" disabled>Pause</button>
+      <button id="btn-stop" type="button" disabled>Stop</button>
+    </div>
+  </div>
+
+  <div class="card" id="result" hidden>
+    <h3>Result</h3>
+    <p id="result-text" class="fx-wrap"></p>
+    <div id="cooper-entry" class="fx-row" hidden>
+      <div class="form-group"><label for="cdist">Distance on the display</label><input id="cdist" type="number" step="any" min="0" style="width:110px"></div>
+      <div class="form-group"><label for="cunit">in</label><select id="cunit"><option value="km">km</option><option value="mi">miles</option><option value="m">metres</option></select></div>
+    </div>
+    <div class="fx-row"><button id="btn-record" type="button">Record result</button> <span id="rec-msg" class="fx-meta"></span></div>
+  </div>
+  <p><a href="/tests">Back to fitness tests</a></p>
+</div>
+<script src="<%= asset('/js/fx.js') %>"></script>
+<script src="<%= asset('/js/treadmill.js') %>"></script>
+<script src="<%= asset('/js/treadmill-page.js') %>"></script>
+</body>
+</html>

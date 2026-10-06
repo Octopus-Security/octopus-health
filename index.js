@@ -44,7 +44,7 @@ const AUTH_URL = process.env.AUTH_SERVICE_URL || 'http://octopus-auth:3002';
 
 function getActiveTab(requestPath) {
     if (requestPath === '/') return 'dashboard';
-    if (requestPath.startsWith('/tools') || requestPath.startsWith('/timers')) return 'tools';
+    if (requestPath.startsWith('/tools') || requestPath.startsWith('/timers') || requestPath.startsWith('/skills') || requestPath.startsWith('/tests') || requestPath.startsWith('/benchmarks')) return 'tools';
     // Before the /exercise* line below, which would otherwise swallow it —
     // startsWith('/plan-maker') never got a chance because the same branch
     // returned 'exercises' for it, so BOTH nav links lit up and only cleared
@@ -297,6 +297,9 @@ app.get('/', requireLogin, async (req, res) => {
         res.status(500).send('Error loading dashboard');
     }
 });
+
+// Skill tree, fitness tests, treadmill test, weekly benchmarks (api/web-fitness.js).
+require('./api/web-fitness')(app, { requireLogin, getDatabase });
 
 app.get('/tools', requireLogin, (req, res) => {
     res.render('tools', { title: 'Tools', user: req.user });

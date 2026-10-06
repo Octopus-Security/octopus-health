@@ -1,0 +1,1620 @@
+{
+ "version": 1,
+ "note": "Skill tree data. A skill's ref points into content/calisthenics/<file> '### <rung>.' so the full progression text lives there once. Criteria are coaching conventions (see content/calisthenics/README.md), not physiological thresholds.",
+ "skills": [
+  {
+   "id": "wrist-prep",
+   "name": "Wrist prep",
+   "line": "mobility",
+   "equipment": [],
+   "how": "Kneel, palms down, fingers forward then sideways then back; rock gently over the hands, then wrist circles. Pain-free, no forcing.",
+   "criterion": {
+    "sets": 2,
+    "hold": 60,
+    "note": "2 rounds of 60 s of rocks and circles, pain-free"
+   },
+   "requires": [],
+   "ref": null,
+   "aliases": [
+    "wrist warm-up",
+    "wrist mobility"
+   ]
+  },
+  {
+   "id": "shoulder-overhead-reach",
+   "name": "Overhead shoulder reach",
+   "line": "mobility",
+   "equipment": [
+    "wall"
+   ],
+   "how": "Back to the wall, ribs down, glutes and head touching it; slide the arms overhead keeping the lower back flat and the forearms on the wall.",
+   "criterion": {
+    "sets": 3,
+    "reps": 10,
+    "note": "arms fully overhead without the ribs flaring or the lower back arching"
+   },
+   "requires": [],
+   "ref": null,
+   "aliases": [
+    "wall slides",
+    "wall angels",
+    "overhead mobility"
+   ]
+  },
+  {
+   "id": "deep-squat-hold",
+   "name": "Deep squat hold",
+   "line": "mobility",
+   "equipment": [],
+   "how": "Sink into a full-depth squat with heels down and chest up; hold, using a doorframe for balance if needed.",
+   "criterion": {
+    "sets": 3,
+    "hold": 30
+   },
+   "requires": [],
+   "ref": null,
+   "aliases": [
+    "deep squat",
+    "asian squat"
+   ]
+  },
+  {
+   "id": "hamstring-fold",
+   "name": "Seated forward fold",
+   "line": "mobility",
+   "equipment": [],
+   "how": "Sit with straight legs and fold from the hips, reaching toward the toes without rounding hard; breathe and relax.",
+   "criterion": {
+    "sets": 3,
+    "hold": 30,
+    "note": "hands reach the toes or beyond without bending the knees"
+   },
+   "requires": [],
+   "ref": null,
+   "aliases": [
+    "hamstring stretch",
+    "toe touch"
+   ]
+  },
+  {
+   "id": "wall-plank",
+   "name": "Wall plank",
+   "line": "handstand",
+   "equipment": [
+    "wall"
+   ],
+   "how": "Hands on the floor, feet on the wall at hip height, body straight from head to heels with arms locked and shoulders pushed tall.",
+   "criterion": {
+    "sets": 3,
+    "hold": 30
+   },
+   "requires": [
+    "wrist-prep"
+   ],
+   "ref": null,
+   "aliases": [
+    "plank on wall",
+    "feet on wall plank"
+   ]
+  },
+  {
+   "id": "handstand-bail",
+   "name": "Handstand bail (safe exit)",
+   "line": "handstand",
+   "equipment": [],
+   "how": "On a clear floor practise coming down out of a kick-up: step out, or cartwheel out, with control, before holding anything.",
+   "criterion": {
+    "sets": 1,
+    "reps": 5,
+    "note": "5 clean exits in a row"
+   },
+   "requires": [],
+   "ref": null,
+   "aliases": [
+    "cartwheel out",
+    "bail out"
+   ]
+  },
+  {
+   "id": "wall-handstand-hold",
+   "name": "Wall handstand hold",
+   "line": "handstand",
+   "equipment": [
+    "wall"
+   ],
+   "how": "Chest-to-wall: walk the feet up the wall as the hands walk in; arms locked, shoulders elevated, body tight. Exit under control.",
+   "criterion": {
+    "sets": 3,
+    "hold": 30
+   },
+   "requires": [
+    "wall-plank",
+    "handstand-bail",
+    "shoulder-overhead-reach"
+   ],
+   "ref": {
+    "file": "pike-and-handstand-push-ups.md",
+    "rung": 4
+   },
+   "aliases": [
+    "handstand hold",
+    "wall handstand",
+    "chest to wall handstand"
+   ]
+  },
+  {
+   "id": "pike-pushup",
+   "name": "Pike push-up",
+   "line": "handstand",
+   "equipment": [],
+   "how": "From a push-up start walk the feet in and lift the hips into an inverted V; lower the head to a tripod point just ahead of the hands and press.",
+   "criterion": {
+    "sets": 3,
+    "reps": 10
+   },
+   "requires": [
+    "pushup"
+   ],
+   "ref": {
+    "file": "pike-and-handstand-push-ups.md",
+    "rung": 1
+   },
+   "aliases": [
+    "pike push up",
+    "pike pushup"
+   ]
+  },
+  {
+   "id": "elevated-pike-pushup",
+   "name": "Elevated pike push-up",
+   "line": "handstand",
+   "equipment": [
+    "chair"
+   ],
+   "how": "Feet on a chair or box (braced), hips stacked over the shoulders as far as you can, then pike push-ups.",
+   "criterion": {
+    "sets": 3,
+    "reps": 8,
+    "note": "torso close to vertical"
+   },
+   "requires": [
+    "pike-pushup"
+   ],
+   "ref": {
+    "file": "pike-and-handstand-push-ups.md",
+    "rung": 2
+   },
+   "aliases": [
+    "elevated pike",
+    "feet elevated pike push-up"
+   ]
+  },
+  {
+   "id": "deficit-pike-pushup-handles",
+   "name": "Deficit pike push-up on handles",
+   "line": "handstand",
+   "equipment": [
+    "handles",
+    "chair"
+   ],
+   "how": "Elevated pike with hands on push-up handles so the head can drop below hand level for extra range.",
+   "criterion": {
+    "sets": 3,
+    "reps": 8,
+    "note": "full controlled depth"
+   },
+   "requires": [
+    "elevated-pike-pushup"
+   ],
+   "ref": {
+    "file": "pike-and-handstand-push-ups.md",
+    "rung": 3
+   },
+   "aliases": [
+    "deficit pike",
+    "pike on handles"
+   ]
+  },
+  {
+   "id": "hspu-negative",
+   "name": "Wall handstand push-up negative",
+   "line": "handstand",
+   "equipment": [
+    "wall"
+   ],
+   "how": "From the wall handstand lower slowly (3-5 s) until the head touches a folded cushion, then come down off the wall and reset.",
+   "criterion": {
+    "sets": 3,
+    "reps": 5,
+    "note": "each lowering 5 s"
+   },
+   "requires": [
+    "wall-handstand-hold",
+    "elevated-pike-pushup"
+   ],
+   "ref": {
+    "file": "pike-and-handstand-push-ups.md",
+    "rung": 5
+   },
+   "aliases": [
+    "handstand push-up negative",
+    "hspu negative",
+    "negative handstand push-up"
+   ]
+  },
+  {
+   "id": "hspu-partial",
+   "name": "Partial-range wall handstand push-up",
+   "line": "handstand",
+   "equipment": [
+    "wall"
+   ],
+   "how": "Lower to a stack of cushions, pause, press back to lockout. Lower the stack over weeks.",
+   "criterion": {
+    "sets": 3,
+    "reps": 5,
+    "note": "to a given height; then lower the stack"
+   },
+   "requires": [
+    "hspu-negative"
+   ],
+   "ref": {
+    "file": "pike-and-handstand-push-ups.md",
+    "rung": 6
+   },
+   "aliases": [
+    "partial handstand push-up"
+   ]
+  },
+  {
+   "id": "hspu",
+   "name": "Wall handstand push-up (full)",
+   "line": "handstand",
+   "equipment": [
+    "wall"
+   ],
+   "how": "Full range to the floor or a thin mat, with a controlled lowering and a press to lockout, facing the wall.",
+   "criterion": {
+    "sets": 3,
+    "reps": 3,
+    "note": "our benchmark, the content sets no number; strict and controlled"
+   },
+   "requires": [
+    "hspu-partial"
+   ],
+   "ref": {
+    "file": "pike-and-handstand-push-ups.md",
+    "rung": 7
+   },
+   "aliases": [
+    "handstand push-up",
+    "handstand pushup",
+    "hspu",
+    "wall hspu",
+    "wall handstand push-up"
+   ]
+  },
+  {
+   "id": "deficit-hspu-handles",
+   "name": "Deficit wall handstand push-up on handles",
+   "line": "handstand",
+   "equipment": [
+    "wall",
+    "handles"
+   ],
+   "how": "Full wall handstand push-up with the hands on push-up handles so the head travels below hand level.",
+   "criterion": {
+    "sets": 3,
+    "reps": 3,
+    "note": "our benchmark; stable handles, mat under the head"
+   },
+   "requires": [
+    "hspu",
+    "deficit-pike-pushup-handles"
+   ],
+   "ref": {
+    "file": "pike-and-handstand-push-ups.md",
+    "rung": 8
+   },
+   "aliases": [
+    "deficit handstand push-up",
+    "deficit hspu"
+   ],
+   "caveat": "Handles must be rock solid and non-rolling; a fall from here is onto the head. Use a mat.",
+   "longTerm": true
+  },
+  {
+   "id": "handstand-heel-pulls",
+   "name": "Handstand heel pulls",
+   "line": "handstand",
+   "equipment": [
+    "wall"
+   ],
+   "how": "Kick up to the wall, then gently pull one heel then both away from it, catching balance with finger pressure; return to the wall.",
+   "criterion": {
+    "sets": 3,
+    "hold": 5,
+    "note": "3 sets of heels off the wall for about 5 s"
+   },
+   "requires": [
+    "wall-handstand-hold"
+   ],
+   "ref": null,
+   "aliases": [
+    "toe pulls",
+    "heel pulls",
+    "balance drills"
+   ]
+  },
+  {
+   "id": "freestanding-handstand",
+   "name": "Freestanding handstand",
+   "line": "handstand",
+   "equipment": [],
+   "how": "Kick up on a clear floor with a bail ready; balance with finger pressure, body stacked straight.",
+   "criterion": {
+    "sets": 3,
+    "hold": 10,
+    "note": "3 holds of about 10 s, no wall contact"
+   },
+   "requires": [
+    "handstand-heel-pulls"
+   ],
+   "ref": null,
+   "aliases": [
+    "handstand",
+    "free handstand",
+    "freestanding handstand hold"
+   ],
+   "longTerm": true
+  },
+  {
+   "id": "freestanding-hspu",
+   "name": "Freestanding handstand push-up",
+   "line": "handstand",
+   "equipment": [],
+   "how": "From a freestanding handstand lower under control and press back, keeping balance throughout.",
+   "criterion": {
+    "sets": 3,
+    "reps": 3,
+    "note": "our benchmark"
+   },
+   "requires": [
+    "freestanding-handstand",
+    "hspu"
+   ],
+   "ref": null,
+   "aliases": [
+    "freestanding hspu"
+   ],
+   "longTerm": true
+  },
+  {
+   "id": "incline-pushup",
+   "name": "Incline push-up",
+   "line": "push",
+   "equipment": [],
+   "how": "Hands on a stable raised surface (table, counter, sturdy bench), body straight; lower the chest to the edge and press.",
+   "criterion": {
+    "sets": 3,
+    "reps": 12,
+    "note": "at about 45 degrees or lower"
+   },
+   "requires": [],
+   "ref": {
+    "file": "push-ups-on-handles.md",
+    "rung": 1
+   },
+   "aliases": [
+    "incline push up",
+    "wall push-up"
+   ]
+  },
+  {
+   "id": "pushup",
+   "name": "Push-up",
+   "line": "push",
+   "equipment": [],
+   "how": "Plank with elbows about 45 degrees; lower the chest to a fist above the floor, press up. On push-up handles the wrists stay neutral, but the floor works too.",
+   "criterion": {
+    "sets": 3,
+    "reps": 12
+   },
+   "requires": [
+    "incline-pushup"
+   ],
+   "ref": {
+    "file": "push-ups-on-handles.md",
+    "rung": 2
+   },
+   "aliases": [
+    "push up",
+    "pushup",
+    "push-up on handles",
+    "push ups"
+   ]
+  },
+  {
+   "id": "deficit-pushup",
+   "name": "Deep (deficit) push-up on handles",
+   "line": "push",
+   "equipment": [
+    "handles"
+   ],
+   "how": "Push-up with the hands on handles so the chest sinks below hand level; control the bottom, no bouncing.",
+   "criterion": {
+    "sets": 3,
+    "reps": 10,
+    "note": "full controlled depth"
+   },
+   "requires": [
+    "pushup"
+   ],
+   "ref": {
+    "file": "push-ups-on-handles.md",
+    "rung": 3
+   },
+   "aliases": [
+    "deficit push-up",
+    "deep push-up",
+    "deficit pushup"
+   ]
+  },
+  {
+   "id": "archer-pushup",
+   "name": "Archer push-up on handles",
+   "line": "push",
+   "equipment": [
+    "handles"
+   ],
+   "how": "Wide stance, lower toward one hand while the other arm stays long, then press back and alternate.",
+   "criterion": {
+    "sets": 3,
+    "reps": 6,
+    "perSide": true
+   },
+   "requires": [
+    "deficit-pushup"
+   ],
+   "ref": {
+    "file": "push-ups-on-handles.md",
+    "rung": 4
+   },
+   "aliases": [
+    "archer push up"
+   ]
+  },
+  {
+   "id": "pseudo-planche-pushup",
+   "name": "Pseudo-planche push-up on handles",
+   "line": "push",
+   "equipment": [
+    "handles"
+   ],
+   "how": "Hands by the hips pointing back or out, lean the shoulders well past the hands and push-up while keeping the lean.",
+   "criterion": {
+    "sets": 3,
+    "reps": 8,
+    "note": "keeping the forward lean"
+   },
+   "requires": [
+    "deficit-pushup",
+    "planche-lean"
+   ],
+   "ref": {
+    "file": "push-ups-on-handles.md",
+    "rung": 5
+   },
+   "aliases": [
+    "pseudo planche push-up",
+    "planche push-up",
+    "pppu"
+   ]
+  },
+  {
+   "id": "one-arm-pushup-progression",
+   "name": "One-arm push-up progression",
+   "line": "push",
+   "equipment": [
+    "handles"
+   ],
+   "how": "Incline one-arm push-ups, then one-arm negatives, then full reps; feet wide, hips square.",
+   "criterion": {
+    "sets": 3,
+    "reps": 5,
+    "perSide": true,
+    "note": "on the incline, before lowering the height"
+   },
+   "requires": [
+    "archer-pushup",
+    "pseudo-planche-pushup"
+   ],
+   "ref": {
+    "file": "push-ups-on-handles.md",
+    "rung": 6
+   },
+   "aliases": [
+    "one arm push-up",
+    "one-arm push up"
+   ],
+   "longTerm": true
+  },
+  {
+   "id": "planche-lean",
+   "name": "Planche lean",
+   "line": "planche",
+   "equipment": [
+    "handles"
+   ],
+   "how": "Straight-arm plank on handles, lean the shoulders forward over and past the hands, toes light, hollow body. Short, quality holds.",
+   "criterion": {
+    "sets": 3,
+    "hold": 15,
+    "note": "a clear lean with protracted shoulders"
+   },
+   "requires": [
+    "pushup",
+    "wrist-prep"
+   ],
+   "ref": null,
+   "aliases": [
+    "tuck planche lean",
+    "planche lean",
+    "lean"
+   ],
+   "caveat": "Straight-arm work loads elbows and wrists; two or three sessions a week at most."
+  },
+  {
+   "id": "crow",
+   "name": "Crow pose on handles",
+   "line": "planche",
+   "equipment": [
+    "handles"
+   ],
+   "how": "Squat on the handles, knees on the upper arms, lean forward until the feet lift; gaze ahead, hands pressing the floor.",
+   "criterion": {
+    "sets": 3,
+    "hold": 20
+   },
+   "requires": [
+    "pushup",
+    "wrist-prep"
+   ],
+   "ref": {
+    "file": "skills-and-statics.md",
+    "rung": 4
+   },
+   "aliases": [
+    "crow pose",
+    "crow stand"
+   ]
+  },
+  {
+   "id": "tuck-planche",
+   "name": "Tuck planche on handles",
+   "line": "planche",
+   "equipment": [
+    "handles"
+   ],
+   "how": "From the lean lift the feet with knees tucked, back rounded slightly, arms straight; hold.",
+   "criterion": {
+    "sets": 3,
+    "hold": 10
+   },
+   "requires": [
+    "crow",
+    "planche-lean",
+    "pseudo-planche-pushup"
+   ],
+   "ref": {
+    "file": "skills-and-statics.md",
+    "rung": 5
+   },
+   "aliases": [
+    "tuck planche",
+    "planche tuck"
+   ]
+  },
+  {
+   "id": "advanced-tuck-planche",
+   "name": "Advanced tuck planche",
+   "line": "planche",
+   "equipment": [
+    "handles"
+   ],
+   "how": "Tuck planche with the back flat and hips opened to about 90 degrees; long-term goal.",
+   "criterion": {
+    "sets": 3,
+    "hold": 8,
+    "note": "our benchmark; the content gives no number"
+   },
+   "requires": [
+    "tuck-planche"
+   ],
+   "ref": {
+    "file": "skills-and-statics.md",
+    "rung": 5
+   },
+   "aliases": [
+    "adv tuck planche"
+   ],
+   "longTerm": true
+  },
+  {
+   "id": "support-hold",
+   "name": "Support hold",
+   "line": "dips",
+   "equipment": [
+    "handles|dip-bars"
+   ],
+   "how": "Straight arms on the bars or handles, shoulders pressed down away from the ears, elbows locked, body still.",
+   "criterion": {
+    "sets": 3,
+    "hold": 30,
+    "note": "shoulders depressed throughout"
+   },
+   "requires": [],
+   "ref": {
+    "file": "dips.md",
+    "rung": 1
+   },
+   "aliases": [
+    "parallel bar support",
+    "support hold on handles",
+    "dip support"
+   ]
+  },
+  {
+   "id": "dip-negative",
+   "name": "Negative dip",
+   "line": "dips",
+   "equipment": [
+    "dip-bars"
+   ],
+   "how": "From support, lower slowly (5 s) to the target depth, then step down.",
+   "criterion": {
+    "sets": 3,
+    "reps": 5,
+    "note": "each lowering 5 s"
+   },
+   "requires": [
+    "support-hold"
+   ],
+   "ref": {
+    "file": "dips.md",
+    "rung": 2
+   }
+  },
+  {
+   "id": "assisted-dip",
+   "name": "Feet-assisted dip",
+   "line": "dips",
+   "equipment": [
+    "dip-bars"
+   ],
+   "how": "Dip with light foot pressure on a chair or box under or behind you.",
+   "criterion": {
+    "sets": 3,
+    "reps": 8,
+    "note": "light foot pressure"
+   },
+   "requires": [
+    "dip-negative"
+   ],
+   "ref": {
+    "file": "dips.md",
+    "rung": 3
+   }
+  },
+  {
+   "id": "dip",
+   "name": "Dip",
+   "line": "dips",
+   "equipment": [
+    "dip-bars"
+   ],
+   "how": "Strict full-range dip on parallel bars, controlled down and a full lockout.",
+   "criterion": {
+    "sets": 3,
+    "reps": 10
+   },
+   "requires": [
+    "assisted-dip"
+   ],
+   "ref": {
+    "file": "dips.md",
+    "rung": 4
+   },
+   "aliases": [
+    "dips",
+    "parallel bar dip"
+   ]
+  },
+  {
+   "id": "handle-dip",
+   "name": "Dip on handles",
+   "line": "dips",
+   "equipment": [
+    "handles"
+   ],
+   "how": "Strict dip between two tall, stable handles or parallettes, body clearing the floor.",
+   "criterion": {
+    "sets": 3,
+    "reps": 8,
+    "note": "our benchmark; the content does not rate handle dips"
+   },
+   "requires": [
+    "support-hold",
+    "pushup"
+   ],
+   "ref": null,
+   "aliases": [
+    "parallette dip",
+    "handles dip"
+   ],
+   "caveat": "Only if the handles are tall enough for your body to clear the floor at the bottom and are completely stable; otherwise use dip bars."
+  },
+  {
+   "id": "tuck-lsit",
+   "name": "Tuck L-sit",
+   "line": "lsit",
+   "equipment": [
+    "handles|dip-bars"
+   ],
+   "how": "Support hold with knees pulled to the chest and feet off the floor; shoulders pushed down, back round.",
+   "criterion": {
+    "sets": 3,
+    "hold": 20
+   },
+   "requires": [
+    "support-hold",
+    "hollow-hold"
+   ],
+   "ref": {
+    "file": "core-on-bars.md",
+    "rung": 5
+   },
+   "aliases": [
+    "tuck l sit",
+    "tuck lsit",
+    "tuck l-sit on handles"
+   ]
+  },
+  {
+   "id": "one-leg-lsit",
+   "name": "One-leg L-sit",
+   "line": "lsit",
+   "equipment": [
+    "handles|dip-bars"
+   ],
+   "how": "One leg straight forward, the other tucked; hold and switch.",
+   "criterion": {
+    "sets": 3,
+    "hold": 15,
+    "perSide": true
+   },
+   "requires": [
+    "tuck-lsit"
+   ],
+   "ref": {
+    "file": "core-on-bars.md",
+    "rung": 6
+   },
+   "aliases": [
+    "single leg l-sit"
+   ]
+  },
+  {
+   "id": "lsit",
+   "name": "L-sit",
+   "line": "lsit",
+   "equipment": [
+    "handles|dip-bars"
+   ],
+   "how": "Both legs straight and horizontal in front, arms locked, shoulders depressed.",
+   "criterion": {
+    "sets": 3,
+    "hold": 15
+   },
+   "requires": [
+    "one-leg-lsit"
+   ],
+   "ref": {
+    "file": "core-on-bars.md",
+    "rung": 7
+   },
+   "aliases": [
+    "l sit",
+    "l-sit",
+    "lsit",
+    "l-sit on handles"
+   ]
+  },
+  {
+   "id": "plank",
+   "name": "Plank",
+   "line": "core",
+   "equipment": [],
+   "how": "Forearms or hands on the floor, glutes tight, ribs down, straight line from head to heels.",
+   "criterion": {
+    "sets": 3,
+    "hold": 30
+   },
+   "requires": [],
+   "ref": null,
+   "aliases": [
+    "front plank"
+   ]
+  },
+  {
+   "id": "hollow-hold",
+   "name": "Hollow body hold",
+   "line": "core",
+   "equipment": [],
+   "how": "On your back, lower back glued to the floor, arms overhead and legs low, shoulders lifted; hold the shape.",
+   "criterion": {
+    "sets": 3,
+    "hold": 20
+   },
+   "requires": [
+    "plank"
+   ],
+   "ref": null,
+   "aliases": [
+    "hollow hold",
+    "hollow body"
+   ]
+  },
+  {
+   "id": "hanging-knee-raise",
+   "name": "Hanging knee raise",
+   "line": "core",
+   "equipment": [
+    "bar"
+   ],
+   "how": "Dead hang, raise the knees to the chest with no swing.",
+   "criterion": {
+    "sets": 3,
+    "reps": 12
+   },
+   "requires": [
+    "dead-hang"
+   ],
+   "ref": {
+    "file": "core-on-bars.md",
+    "rung": 1
+   }
+  },
+  {
+   "id": "hanging-leg-raise",
+   "name": "Hanging leg raise",
+   "line": "core",
+   "equipment": [
+    "bar"
+   ],
+   "how": "Straight or slightly bent legs up to at least horizontal, hips square.",
+   "criterion": {
+    "sets": 3,
+    "reps": 10
+   },
+   "requires": [
+    "hanging-knee-raise"
+   ],
+   "ref": {
+    "file": "core-on-bars.md",
+    "rung": 2
+   }
+  },
+  {
+   "id": "toes-to-bar",
+   "name": "Toes to bar",
+   "line": "core",
+   "equipment": [
+    "bar"
+   ],
+   "how": "Strict leg raise all the way to the bar, controlled lowering.",
+   "criterion": {
+    "sets": 3,
+    "reps": 8,
+    "note": "strict, needs clearance for the legs"
+   },
+   "requires": [
+    "hanging-leg-raise"
+   ],
+   "ref": {
+    "file": "core-on-bars.md",
+    "rung": 3
+   },
+   "aliases": [
+    "ttb"
+   ]
+  },
+  {
+   "id": "windshield-wiper",
+   "name": "Windshield wiper",
+   "line": "core",
+   "equipment": [
+    "bar"
+   ],
+   "how": "Toes at the bar, rotate the legs side to side keeping them high.",
+   "criterion": {
+    "sets": 3,
+    "reps": 6,
+    "perSide": true
+   },
+   "requires": [
+    "toes-to-bar"
+   ],
+   "ref": {
+    "file": "core-on-bars.md",
+    "rung": 4
+   },
+   "aliases": [
+    "windshield wipers"
+   ]
+  },
+  {
+   "id": "squat",
+   "name": "Bodyweight squat",
+   "line": "legs",
+   "equipment": [],
+   "how": "Feet shoulder width, full depth, knees tracking the toes, chest up.",
+   "criterion": {
+    "sets": 3,
+    "reps": 20,
+    "note": "full depth"
+   },
+   "requires": [],
+   "ref": {
+    "file": "legs.md",
+    "rung": 1
+   },
+   "aliases": [
+    "air squat"
+   ]
+  },
+  {
+   "id": "split-squat",
+   "name": "Split squat",
+   "line": "legs",
+   "equipment": [],
+   "how": "Long stance, lower the back knee toward the floor, front shin near vertical.",
+   "criterion": {
+    "sets": 3,
+    "reps": 12,
+    "perSide": true
+   },
+   "requires": [
+    "squat"
+   ],
+   "ref": {
+    "file": "legs.md",
+    "rung": 2
+   }
+  },
+  {
+   "id": "bulgarian-split-squat",
+   "name": "Bulgarian split squat",
+   "line": "legs",
+   "equipment": [
+    "chair"
+   ],
+   "how": "Rear foot on a chair or step; lower under control on the front leg.",
+   "criterion": {
+    "sets": 3,
+    "reps": 12,
+    "perSide": true
+   },
+   "requires": [
+    "split-squat"
+   ],
+   "ref": {
+    "file": "legs.md",
+    "rung": 3
+   },
+   "aliases": [
+    "bulgarian"
+   ]
+  },
+  {
+   "id": "shrimp-squat",
+   "name": "Shrimp squat",
+   "line": "legs",
+   "equipment": [],
+   "how": "Hold the rear foot, lower the rear knee to the floor on one leg and stand.",
+   "criterion": {
+    "sets": 3,
+    "reps": 8,
+    "perSide": true,
+    "note": "with a light knee touch"
+   },
+   "requires": [
+    "bulgarian-split-squat"
+   ],
+   "ref": {
+    "file": "legs.md",
+    "rung": 4
+   },
+   "aliases": [
+    "shrimp"
+   ]
+  },
+  {
+   "id": "pistol-squat",
+   "name": "Pistol squat",
+   "line": "legs",
+   "equipment": [],
+   "how": "Single-leg squat to full depth with the other leg straight in front.",
+   "criterion": {
+    "sets": 3,
+    "reps": 5,
+    "perSide": true,
+    "note": "unassisted"
+   },
+   "requires": [
+    "shrimp-squat",
+    "deep-squat-hold"
+   ],
+   "ref": {
+    "file": "legs.md",
+    "rung": 5
+   },
+   "aliases": [
+    "pistol",
+    "single leg squat"
+   ],
+   "longTerm": true
+  },
+  {
+   "id": "glute-bridge",
+   "name": "Glute bridge",
+   "line": "hinge",
+   "equipment": [],
+   "how": "On the back, feet flat, drive hips up and squeeze the glutes at the top.",
+   "criterion": {
+    "sets": 3,
+    "reps": 20
+   },
+   "requires": [],
+   "ref": {
+    "file": "legs.md",
+    "rung": 6
+   },
+   "aliases": [
+    "bridge"
+   ]
+  },
+  {
+   "id": "single-leg-bridge",
+   "name": "Single-leg glute bridge",
+   "line": "hinge",
+   "equipment": [],
+   "how": "Bridge with one foot on the floor, hips level.",
+   "criterion": {
+    "sets": 3,
+    "reps": 15,
+    "perSide": true
+   },
+   "requires": [
+    "glute-bridge"
+   ],
+   "ref": {
+    "file": "legs.md",
+    "rung": 7
+   }
+  },
+  {
+   "id": "single-leg-rdl",
+   "name": "Single-leg Romanian deadlift",
+   "line": "hinge",
+   "equipment": [],
+   "how": "Hinge on one leg with a flat back, the other leg trailing, no balance support.",
+   "criterion": {
+    "sets": 3,
+    "reps": 12,
+    "perSide": true
+   },
+   "requires": [
+    "single-leg-bridge"
+   ],
+   "ref": {
+    "file": "legs.md",
+    "rung": 8
+   },
+   "aliases": [
+    "single leg rdl",
+    "pistol rdl"
+   ]
+  },
+  {
+   "id": "nordic-curl",
+   "name": "Nordic curl (eccentric)",
+   "line": "hinge",
+   "equipment": [],
+   "how": "Kneel with the feet anchored, lower the torso forward under control as far as you can.",
+   "criterion": {
+    "sets": 3,
+    "reps": 5,
+    "note": "controlled lowering most of the way"
+   },
+   "requires": [
+    "single-leg-rdl"
+   ],
+   "ref": {
+    "file": "legs.md",
+    "rung": 9
+   },
+   "aliases": [
+    "nordic",
+    "nordic hamstring curl"
+   ],
+   "caveat": "Needs the feet anchored securely under something heavy or held by a partner.",
+   "longTerm": true
+  },
+  {
+   "id": "dead-hang",
+   "name": "Dead hang",
+   "line": "pull",
+   "equipment": [
+    "bar"
+   ],
+   "how": "Hang from a bar with a firm grip, shoulders engaged, relaxed legs.",
+   "criterion": {
+    "sets": 3,
+    "hold": 30,
+    "note": "including 10 s in an active hang"
+   },
+   "requires": [],
+   "ref": {
+    "file": "pull-ups.md",
+    "rung": 1
+   },
+   "aliases": [
+    "hang",
+    "bar hang"
+   ]
+  },
+  {
+   "id": "scap-pullup",
+   "name": "Scapular pull-up",
+   "line": "pull",
+   "equipment": [
+    "bar"
+   ],
+   "how": "From a dead hang depress and retract the shoulder blades to lift the body a few centimetres, arms straight.",
+   "criterion": {
+    "sets": 3,
+    "reps": 10,
+    "note": "1 s pause at the top"
+   },
+   "requires": [
+    "dead-hang"
+   ],
+   "ref": {
+    "file": "pull-ups.md",
+    "rung": 2
+   },
+   "aliases": [
+    "scapular pull-up",
+    "scap pull"
+   ]
+  },
+  {
+   "id": "negative-pullup",
+   "name": "Negative pull-up",
+   "line": "pull",
+   "equipment": [
+    "bar"
+   ],
+   "how": "Jump or step to the top, lower yourself slowly over about 5 s.",
+   "criterion": {
+    "sets": 3,
+    "reps": 5,
+    "note": "each lowering 5 s"
+   },
+   "requires": [
+    "scap-pullup"
+   ],
+   "ref": {
+    "file": "pull-ups.md",
+    "rung": 4
+   }
+  },
+  {
+   "id": "assisted-pullup",
+   "name": "Feet-assisted pull-up",
+   "line": "pull",
+   "equipment": [
+    "bar"
+   ],
+   "how": "Pull up with light foot pressure on a chair or box.",
+   "criterion": {
+    "sets": 3,
+    "reps": 8,
+    "note": "light foot pressure"
+   },
+   "requires": [
+    "negative-pullup"
+   ],
+   "ref": {
+    "file": "pull-ups.md",
+    "rung": 5
+   }
+  },
+  {
+   "id": "pullup",
+   "name": "Pull-up",
+   "line": "pull",
+   "equipment": [
+    "bar"
+   ],
+   "how": "Dead hang to chin over the bar, controlled lowering to full extension.",
+   "criterion": {
+    "sets": 3,
+    "reps": 8,
+    "note": "strict"
+   },
+   "requires": [
+    "assisted-pullup"
+   ],
+   "ref": {
+    "file": "pull-ups.md",
+    "rung": 6
+   },
+   "aliases": [
+    "pull up",
+    "pull-ups",
+    "pullups"
+   ]
+  },
+  {
+   "id": "chinup",
+   "name": "Chin-up",
+   "line": "pull",
+   "equipment": [
+    "bar"
+   ],
+   "how": "Underhand grip, chin over the bar, controlled lowering.",
+   "criterion": {
+    "sets": 3,
+    "reps": 8
+   },
+   "requires": [
+    "negative-pullup"
+   ],
+   "ref": {
+    "file": "chin-ups.md",
+    "rung": 4
+   },
+   "aliases": [
+    "chin up",
+    "chin-ups"
+   ]
+  },
+  {
+   "id": "l-sit-pullup",
+   "name": "L-sit pull-up",
+   "line": "pull",
+   "equipment": [
+    "bar"
+   ],
+   "how": "Pull-up with the legs held at or near horizontal.",
+   "criterion": {
+    "sets": 3,
+    "reps": 6
+   },
+   "requires": [
+    "pullup",
+    "hanging-leg-raise"
+   ],
+   "ref": {
+    "file": "pull-ups.md",
+    "rung": 7
+   }
+  },
+  {
+   "id": "archer-pullup",
+   "name": "Archer pull-up",
+   "line": "pull",
+   "equipment": [
+    "bar"
+   ],
+   "how": "Pull toward one hand while the other arm stays long, then alternate.",
+   "criterion": {
+    "sets": 3,
+    "reps": 5,
+    "perSide": true
+   },
+   "requires": [
+    "pullup"
+   ],
+   "ref": {
+    "file": "pull-ups.md",
+    "rung": 8
+   }
+  },
+  {
+   "id": "typewriter-pullup",
+   "name": "Typewriter pull-up",
+   "line": "pull",
+   "equipment": [
+    "bar"
+   ],
+   "how": "At the top, shift side to side keeping the chin above the bar.",
+   "criterion": {
+    "sets": 3,
+    "reps": 4,
+    "note": "side to side and back is 1"
+   },
+   "requires": [
+    "archer-pullup"
+   ],
+   "ref": {
+    "file": "pull-ups.md",
+    "rung": 9
+   }
+  },
+  {
+   "id": "one-arm-pullup-progression",
+   "name": "One-arm pull-up progression",
+   "line": "pull",
+   "equipment": [
+    "bar"
+   ],
+   "how": "One-arm negatives of 5 s each side, then assisted reps.",
+   "criterion": {
+    "sets": 3,
+    "reps": 3,
+    "perSide": true,
+    "note": "5 s negatives"
+   },
+   "requires": [
+    "archer-pullup",
+    "typewriter-pullup"
+   ],
+   "ref": {
+    "file": "pull-ups.md",
+    "rung": 10
+   },
+   "aliases": [
+    "one arm pull-up"
+   ],
+   "longTerm": true
+  },
+  {
+   "id": "chest-to-bar-pullup",
+   "name": "Chest-to-bar pull-up",
+   "line": "pull",
+   "equipment": [
+    "bar"
+   ],
+   "how": "A strict pull-up pulled higher until the lower chest touches the bar.",
+   "criterion": {
+    "sets": 3,
+    "reps": 5
+   },
+   "requires": [
+    "pullup"
+   ],
+   "ref": {
+    "file": "skills-and-statics.md",
+    "rung": 6
+   },
+   "aliases": [
+    "c2b"
+   ]
+  },
+  {
+   "id": "muscle-up",
+   "name": "Muscle-up",
+   "line": "pull",
+   "equipment": [
+    "bar",
+    "dip-bars"
+   ],
+   "how": "Strict pull to the bar, transition over it and press out to support.",
+   "criterion": {
+    "sets": 3,
+    "reps": 3,
+    "note": "strict"
+   },
+   "requires": [
+    "chest-to-bar-pullup",
+    "dip"
+   ],
+   "ref": {
+    "file": "skills-and-statics.md",
+    "rung": 7
+   },
+   "aliases": [
+    "muscle up"
+   ],
+   "caveat": "Needs a bar with room above it; doorway bars often do not allow it.",
+   "longTerm": true
+  },
+  {
+   "id": "incline-row",
+   "name": "Steep incline row",
+   "line": "rows",
+   "equipment": [
+    "bar|dip-bars"
+   ],
+   "how": "Hold a low bar, body at a steep angle, row the chest to the bar.",
+   "criterion": {
+    "sets": 3,
+    "reps": 12
+   },
+   "requires": [],
+   "ref": {
+    "file": "rows.md",
+    "rung": 1
+   },
+   "aliases": [
+    "incline row"
+   ],
+   "caveat": "Bar must be low and set securely (dip bar or low pull-up bar)."
+  },
+  {
+   "id": "inverted-row-bent",
+   "name": "Inverted row, knees bent",
+   "line": "rows",
+   "equipment": [
+    "bar|dip-bars"
+   ],
+   "how": "Hip-height bar, knees bent, row the chest to the bar.",
+   "criterion": {
+    "sets": 3,
+    "reps": 10
+   },
+   "requires": [
+    "incline-row"
+   ],
+   "ref": {
+    "file": "rows.md",
+    "rung": 3
+   }
+  },
+  {
+   "id": "inverted-row",
+   "name": "Inverted row, legs straight",
+   "line": "rows",
+   "equipment": [
+    "bar|dip-bars"
+   ],
+   "how": "Body straight, heels on the floor, row with a 1 s squeeze at the top.",
+   "criterion": {
+    "sets": 3,
+    "reps": 10
+   },
+   "requires": [
+    "inverted-row-bent"
+   ],
+   "ref": {
+    "file": "rows.md",
+    "rung": 4
+   },
+   "aliases": [
+    "inverted row",
+    "bodyweight row"
+   ]
+  },
+  {
+   "id": "feet-elevated-row",
+   "name": "Feet-elevated inverted row",
+   "line": "rows",
+   "equipment": [
+    "bar|dip-bars"
+   ],
+   "how": "Feet on a chair or box, row to the bar.",
+   "criterion": {
+    "sets": 3,
+    "reps": 10
+   },
+   "requires": [
+    "inverted-row"
+   ],
+   "ref": {
+    "file": "rows.md",
+    "rung": 5
+   }
+  },
+  {
+   "id": "archer-row",
+   "name": "Archer row",
+   "line": "rows",
+   "equipment": [
+    "bar"
+   ],
+   "how": "Row to one hand while the other arm extends; hip-height bar.",
+   "criterion": {
+    "sets": 3,
+    "reps": 6,
+    "perSide": true
+   },
+   "requires": [
+    "feet-elevated-row"
+   ],
+   "ref": {
+    "file": "rows.md",
+    "rung": 6
+   }
+  },
+  {
+   "id": "skin-the-cat",
+   "name": "Skin the cat",
+   "line": "levers",
+   "equipment": [
+    "bar"
+   ],
+   "how": "From a hang tuck the knees and rotate backward through the arms, then reverse slowly.",
+   "criterion": {
+    "sets": 3,
+    "reps": 5,
+    "note": "slow"
+   },
+   "requires": [
+    "pullup"
+   ],
+   "ref": {
+    "file": "skills-and-statics.md",
+    "rung": 3
+   },
+   "aliases": [
+    "skin the cat"
+   ],
+   "caveat": "Have a practised bail; check the room above and below the bar."
+  },
+  {
+   "id": "tuck-back-lever",
+   "name": "Tuck back lever",
+   "line": "levers",
+   "equipment": [
+    "bar"
+   ],
+   "how": "From skin-the-cat hold a tucked horizontal position behind the bar, arms straight.",
+   "criterion": {
+    "sets": 3,
+    "hold": 10
+   },
+   "requires": [
+    "skin-the-cat"
+   ],
+   "ref": {
+    "file": "skills-and-statics.md",
+    "rung": 3
+   },
+   "aliases": [
+    "back lever",
+    "tuck back lever"
+   ],
+   "longTerm": true
+  },
+  {
+   "id": "tuck-front-lever",
+   "name": "Tuck front lever",
+   "line": "levers",
+   "equipment": [
+    "bar"
+   ],
+   "how": "Hang, lift the knees tucked until the back is flat and horizontal, arms straight.",
+   "criterion": {
+    "sets": 3,
+    "hold": 15,
+    "note": "flat back, straight arms"
+   },
+   "requires": [
+    "pullup",
+    "hollow-hold"
+   ],
+   "ref": {
+    "file": "skills-and-statics.md",
+    "rung": 2
+   },
+   "aliases": [
+    "front lever",
+    "tuck front lever"
+   ],
+   "longTerm": true
+  }
+ ]
+}
