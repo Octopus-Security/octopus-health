@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="<%= asset('/theme.css') %>">
+</head>
+<body>
+<%- include('partials/nav') %>
+<div class="container" data-msg-root>
+  <div class="card">
+    <h2>Skill tree</h2>
+    <p class="fx-meta">Achieved <%= summary.achieved.length %> of <%= summary.total %>. A skill unlocks when every prerequisite is achieved. Full cues, faults and regressions are in the progression ladders under <code>content/calisthenics/</code>; the standards are coaching conventions, not tests, and this is not medical advice.</p>
+    <p class="fx-msg"></p>
+    <% if (summary.available.length || summary.inProgress.length) { %>
+      <p class="fx-wrap"><strong>Available now:</strong>
+        <% summary.inProgress.concat(summary.available).slice(0, 12).forEach(function (s, i) { %><%= i ? ', ' : '' %><%= s.name %><% }) %></p>
+    <% } %>
+  </div>
+
+  <div class="card">
+    <h2>My equipment</h2>
+    <p class="fx-meta">Random picks and plans prefer skills your equipment allows. Floor and body are always assumed<%= equipment.isDefault ? '; you have not set a list yet, so a wall and a chair are assumed' : '' %>.</p>
+    <form data-json action="/skills/api/equipment" data-method="PUT">
+      <input type="hidden" name="action" value="set">
+      <div class="fx-row">
+        <% known.forEach(function (k) { %>
+          <label class="fx-wrap"><input type="checkbox" class="eq-box" value="<%= k %>" <%= equipment.effective.includes(k) ? 'checked' : '' %>> <%= k %></label>
+        <% }) %>
+      </div>
+      <input type="hidden" name="equipment" id="eq-value" value="">
+      <button type="submit" style="margin-top:10px">Save equipment</button>
+    </form>
+  </div>
+
+  <% lines.forEach(function (line) { %>
+  <div class="card">
+    <h2><%= line.title %></h2>
+    <% line.skills.forEach(function (s) { %>
+      <div class="fx-skill <%= s.status === 'locked' ? 'is-locked' : '' %>">
+        <h4><%= s.name %> <span class="fx-chip <%= s.status %>"><%= s.status %></span>
+          <% if (!s.equipmentOk) { %><span class="fx-chip">needs <%= s.missingEquipment.join(', ') %></span><% } %></h4>
+        <div class="fx-meta">Standard: <%= s.criterionText %><% if (s.requires.length) { %> · needs: <%= s.requiresNames.join(', ') %><% } %></div>
+        <div class="fx-wrap"><%= s.how %></div>
+        <% if (s.caveat) { %><div class="fx-meta">Note: <%= s.caveat %></div><% } %>
+        <% if (s.ref) { %><div class="fx-meta">Full progression: <%= s.ref.path %> (rung <%= s.ref.rung %>)</div><% } %>
+        <% if (s.attempts) { %><div class="fx-meta">Attempts: <%= s.attempts %><%= s.achievedAt ? ' · achieved ' + s.achievedAt : '' %></div><% } %>
+        <% if (s.status !== 'locked') { %>
+        <form data-json action="/skills/api/attempts" class="fx-row" style="margin-top:8px">
+          <input type="hidden" name="skill" value="<%= s.id %>">
+          <select name="result"><option value="succeeded">Succeeded</option><option value="not_yet">Not yet</option></select>
+          <input type="number" name="reps" min="0" placeholder="reps" style="width:80px">
+          <input type="number" name="seconds" min="0" placeholder="seconds" style="width:90px">
+          <input type="text" name="notes" placeholder="notes" maxlength="200" style="width:140px">
+          <button type="submit" class="btn-sm">Log</button>
+        </form>
+        <% } %>
+      </div>
+    <% }) %>
+  </div>
+  <% }) %>
+
+  <div class="card">
+    <h2>Recent attempts</h2>
+    <% if (!recent.length) { %><p class="empty-state">Nothing logged yet.</p><% } %>
+    <% recent.forEach(function (a) { %>
+      <div class="list-item fx-row"><span class="fx-wrap"><%= a.date %> · <%= a.name %> · <%= a.result === 'succeeded' ? 'succeeded' : 'not yet' %><%= a.reps != null ? ' · ' + a.reps + ' reps' : '' %><%= a.seconds != null ? ' · ' + a.seconds + ' s' : '' %></span>
+        <button class="delete-btn btn-sm" data-act data-method="DELETE" data-url="/skills/api/attempts/<%= a.id %>" data-confirm="Delete this attempt? Skills that depended on it may lock again.">Delete</button></div>
+    <% }) %>
+  </div>
+</div>
+<script src="<%= asset('/js/fx.js') %>"></script>
+<script>
+  document.querySelector('form[action="/skills/api/equipment"]').addEventListener('submit', function () {
+    document.getElementById('eq-value').value = Array.prototype.filter.call(document.querySelectorAll('.eq-box'), function (b) { return b.checked; }).map(function (b) { return b.value; }).join(',');
+  }, true);
+</script>
+</body>
+</html>

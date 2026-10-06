@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="<%= asset('/theme.css') %>">
+</head>
+<body>
+<%- include('partials/nav') %>
+<div class="container" data-msg-root>
+  <div class="card">
+    <h2>Fitness tests</h2>
+    <p class="fx-meta">Record results over time and compare with your own earlier results. There are no age or sex tables here: the only yardstick is you. Test fresh, after a warm-up, the same way each time. Stop if anything hurts. General information, not medical advice.</p>
+    <p class="fx-msg"></p>
+  </div>
+
+  <% batteries.forEach(function (b) { %>
+  <div class="card">
+    <h2><%= b.name %></h2>
+    <p class="fx-meta"><%= b.blurb %></p>
+    <% b.items.forEach(function (it) { %>
+      <div class="fx-skill">
+        <h4><%= it.name %> <span class="fx-meta">(<%= it.better === 'lower' ? 'lower is better' : 'higher is better' %>, <%= it.unit %>)</span></h4>
+        <details><summary class="fx-meta">How to test</summary><div class="fx-wrap"><%= it.how %></div>
+          <% if (it.link) { %><div><a href="<%= it.link %>">Open the guided test</a></div><% } %></details>
+        <% if (it.trend.latest) { %>
+          <div class="fx-meta">Latest <strong><%= fmt(it, it.trend.latest.value) %></strong> (<%= it.trend.latest.date %>) · best <%= fmt(it, it.trend.best.value) %>
+            <% if (it.trend.vsPrevious) { %> · vs previous <span class="<%= it.trend.vsPrevious.improved === true ? 'fx-up' : (it.trend.vsPrevious.improved === false ? 'fx-down' : '') %>"><%= it.trend.vsPrevious.delta > 0 ? '+' : '' %><%= it.trend.vsPrevious.delta %></span><% } %></div>
+        <% } %>
+        <form data-json action="/tests/api/results" class="fx-row" style="margin-top:6px">
+          <input type="hidden" name="item" value="<%= it.id %>">
+          <input type="<%= it.kind === 'time' ? 'text' : 'number' %>" name="value" step="any" min="0" placeholder="<%= it.kind === 'time' ? 'mm:ss or seconds' : it.unit %>" required style="width:130px">
+          <input type="text" name="notes" placeholder="notes" maxlength="200" style="width:150px">
+          <button type="submit" class="btn-sm">Record</button>
+        </form>
+      </div>
+    <% }) %>
+  </div>
+  <% }) %>
+
+  <div class="card">
+    <h2>Recent results</h2>
+    <% if (!recent.length) { %><p class="empty-state">Nothing recorded yet.</p><% } %>
+    <% recent.forEach(function (r) { %>
+      <div class="list-item fx-row"><span class="fx-wrap"><%= r.date %> · <%= r.name %> · <strong><%= r.shown %></strong><%= r.notes ? ' · ' + r.notes : '' %></span>
+        <button class="delete-btn btn-sm" data-act data-method="DELETE" data-url="/tests/api/results/<%= r.id %>" data-confirm="Delete this result?">Delete</button></div>
+    <% }) %>
+    <p><a href="/benchmarks">Weekly benchmarks and trends</a></p>
+  </div>
+</div>
+<script src="<%= asset('/js/fx.js') %>"></script>
+</body>
+</html>

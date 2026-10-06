@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="<%= asset('/theme.css') %>">
+</head>
+<body>
+<%- include('partials/nav') %>
+<div class="container" data-msg-root>
+  <div class="card">
+    <h2>Weekly benchmarks</h2>
+    <p class="fx-meta">The movements you re-test on a schedule. They are part of every week's plan, on the day set below. Trends compare your latest result with the result from a week and from four weeks before it. Today is <%= today %>.</p>
+    <p class="fx-msg"></p>
+    <div class="fx-row">
+      <form data-json action="/benchmarks/api/focus" data-method="PUT" class="fx-row">
+        <div class="form-group"><label>Focus</label>
+          <select name="focus"><% focuses.forEach(function (f) { %><option value="<%= f %>" <%= f === focus ? 'selected' : '' %>><%= f %></option><% }) %></select></div>
+        <button type="submit" class="btn-sm">Set focus</button>
+      </form>
+      <form data-json action="/benchmarks/api/day" data-method="PUT" class="fx-row">
+        <div class="form-group"><label>Benchmark day</label>
+          <select name="day"><% dayNames.forEach(function (d, i) { %><option value="<%= i %>" <%= i === benchmarkDay ? 'selected' : '' %>><%= d %></option><% }) %></select></div>
+        <button type="submit" class="btn-sm">Set day</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Trends</h2>
+    <div class="fx-table-wrap"><table>
+      <thead><tr><th>Movement</th><th>Latest</th><th>Best</th><th>vs last week</th><th>vs 4 weeks</th></tr></thead>
+      <tbody>
+      <% benchmarks.forEach(function (b) { var t = b.trend; var it = getItem(b.item) || b; %>
+        <tr><td class="fx-wrap"><%= b.name %></td>
+          <td><%= t.latest ? fmt(it, t.latest.value) + ' (' + t.latest.date + ')' : 'no results' %></td>
+          <td><%= t.best ? fmt(it, t.best.value) : '-' %></td>
+          <% ['vsLastWeek', 'vs4Weeks'].forEach(function (k) { var c = t[k]; %>
+            <td><% if (c) { %><span class="<%= c.improved === true ? 'fx-up' : (c.improved === false ? 'fx-down' : '') %>"><%= c.delta > 0 ? '+' : '' %><%= c.delta %></span><% } else { %>-<% } %></td>
+          <% }) %></tr>
+      <% }) %>
+      </tbody></table></div>
+  </div>
+
+  <div class="card">
+    <h2>Log a result</h2>
+    <form data-json action="/benchmarks/api/log" class="fx-row">
+      <div class="form-group"><label>Movement</label>
+        <select name="benchmark"><% benchmarks.forEach(function (b) { %><option value="<%= b.id %>"><%= b.name %></option><% }) %></select></div>
+      <div class="form-group"><label>Result</label><input type="text" name="value" required style="width:110px" placeholder="number"></div>
+      <div class="form-group"><label>Notes</label><input type="text" name="notes" maxlength="200" style="width:150px"></div>
+      <button type="submit" class="btn-sm">Log</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>Your list</h2>
+    <p class="fx-meta">Edit freely: your changes are kept, and a movement you remove stays removed.</p>
+    <% benchmarks.forEach(function (b) { %>
+      <div class="fx-skill">
+        <form data-json action="/benchmarks/api/<%= b.id %>" data-method="PATCH" class="fx-row" data-reload="no">
+          <div class="form-group"><label>Name</label><input type="text" name="name" value="<%= b.name %>" maxlength="80" style="width:170px"></div>
+          <div class="form-group"><label>Every (weeks)</label><input type="number" name="everyWeeks" value="<%= b.everyWeeks %>" min="1" max="12" style="width:70px"></div>
+          <div class="form-group"><label>Day</label>
+            <select name="dayOfWeek"><option value="default" <%= b.dayOfWeek == null ? 'selected' : '' %>>benchmark day</option>
+              <% dayNames.forEach(function (d, i) { %><option value="<%= i %>" <%= b.dayOfWeek === i ? 'selected' : '' %>><%= d %></option><% }) %></select></div>
+          <div class="form-group"><label>Focus</label>
+            <select name="focus"><% focuses.forEach(function (f) { %><option value="<%= f %>" <%= f === b.focus ? 'selected' : '' %>><%= f %></option><% }) %></select></div>
+          <label><input type="checkbox" name="enabled" <%= b.enabled ? 'checked' : '' %>> on</label>
+          <button type="submit" class="btn-sm">Save</button>
+        </form>
+        <div class="fx-row" style="margin-top:6px">
+          <button class="btn-sm" data-act data-url="/benchmarks/api/<%= b.id %>/move" data-body='{"direction":"up"}'>Up</button>
+          <button class="btn-sm" data-act data-url="/benchmarks/api/<%= b.id %>/move" data-body='{"direction":"down"}'>Down</button>
+          <button class="delete-btn btn-sm" data-act data-method="DELETE" data-url="/benchmarks/api/<%= b.id %>" data-confirm="Remove this benchmark? Past results are kept.">Remove</button>
+          <span class="fx-meta">due this week: <%= b.dueThisWeek ? 'yes' : 'no' %></span>
+        </div>
+      </div>
+    <% }) %>
+    <h3>Add a movement</h3>
+    <form data-json action="/benchmarks/api/add" class="fx-row">
+      <div class="form-group"><label>From the test list</label>
+        <select name="item"><option value="">- or custom below -</option><% catalog.forEach(function (c) { %><option value="<%= c.id %>"><%= c.name %></option><% }) %></select></div>
+      <div class="form-group"><label>Custom name</label><input type="text" name="name" maxlength="80" style="width:170px"></div>
+      <div class="form-group"><label>Unit</label><input type="text" name="unit" maxlength="16" style="width:70px" placeholder="reps"></div>
+      <div class="form-group"><label>Every (weeks)</label><input type="number" name="everyWeeks" value="1" min="1" max="12" style="width:70px"></div>
+      <button type="submit" class="btn-sm">Add</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>Reminder</h2>
+    <p class="fx-meta">One message on your benchmark day with the week's movements, and one follow-up the next day only if some are still unlogged. It is sent by the chat bot. Separate from workout reminders.</p>
+    <form data-json action="/benchmarks/api/reminder" data-method="PUT" class="fx-row">
+      <label><input type="checkbox" name="enabled" <%= reminder.enabled ? 'checked' : '' %>> on</label>
+      <div class="form-group"><label>Day</label>
+        <select name="day"><% dayNames.forEach(function (d, i) { %><option value="<%= i %>" <%= i === reminder.day ? 'selected' : '' %>><%= d %></option><% }) %></select></div>
+      <div class="form-group"><label>Time</label><input type="text" name="time" value="<%= reminder.time %>" style="width:80px"></div>
+      <div class="form-group"><label>Time zone</label><input type="text" name="tz" value="<%= reminder.tz %>" style="width:170px"></div>
+      <button type="submit" class="btn-sm">Save reminder</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>This week</h2>
+    <p class="fx-meta">Week of <%= plan.weekStart %> · focus <%= plan.focus %>. Built from your skill tree and equipment (see <a href="/skills">Skill tree</a>).</p>
+    <% plan.days.forEach(function (d) { %>
+      <div class="fx-skill">
+        <h4><%= d.name %> <span class="fx-meta"><%= d.date %> · <%= d.kind %></span></h4>
+        <% d.blocks.forEach(function (bl) { %><div class="fx-wrap"><%= bl.name %> - <%= bl.instruction %></div><% }) %>
+        <% d.benchmarks.forEach(function (bm) { %><div class="fx-wrap"><strong>Benchmark:</strong> <%= bm.name %><%= bm.doneThisWeek ? ' (done)' : '' %></div><% }) %>
+      </div>
+    <% }) %>
+  </div>
+</div>
+<script src="<%= asset('/js/fx.js') %>"></script>
+</body>
+</html>
