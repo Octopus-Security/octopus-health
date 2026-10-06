@@ -554,4 +554,6 @@ body.login-page {
 #sched { table-layout: fixed; width: 100%; }
 #sched th, #sched td { padding: 6px 8px; font-size: 0.85rem; overflow-wrap: anywhere; }
 #banner.fx-big { font-size: 1.5rem; margin: 14px 0; }
-.container input[type="radio"], .container input[type="checkbox"] { width: auto; }
+.container input[type="radio"], .container input[type="checkbox"] { width: auto; padding: 0; appearance: auto; -webkit-appearance: auto; accent-color: #2ecc71; background: transparent; }
+#sched th { text-transform: none; letter-spacing: 0; font-size: 0.8rem; }
+#sched th:first-child, #sched td:first-child { width: 4rem; }

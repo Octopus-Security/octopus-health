@@ -15,7 +15,7 @@
     <p class="fx-meta">Pick a test, set up the treadmill, press Start. Tones and spoken cues tell you when the speed changes, so you can keep your eyes forward. Stop whenever you must; stop at once if you feel dizzy, chest pain or sharp pain. General information, not medical advice. The cues are this app's own.</p>
     <p class="fx-msg"></p>
     <div class="fx-row">
-      <label><input type="radio" name="mode" value="progressive" <%= mode === 'progressive' ? 'checked' : '' %>> Progressive: speed rises every minute</label>
+      <label><input type="radio" name="mode" value="progressive" <%= mode !== 'cooper' ? 'checked' : '' %>> Progressive: speed rises every minute</label>
       <label><input type="radio" name="mode" value="cooper" <%= mode === 'cooper' ? 'checked' : '' %>> 12 minutes: as far as you can</label>
     </div>
   </div>
@@ -31,7 +31,7 @@
         <div class="form-group"><label for="incline">Incline %</label><input id="incline" type="number" step="0.5" min="0" max="15" value="0" style="width:80px"></div>
       </div>
       <p class="fx-meta">Stage lasts 60 s. Default 8.0 km/h rising 0.5 km/h a stage (5.0 mph rising 0.3 mph). Use the same settings each time you repeat it. A 1 % incline is the usual way to make treadmill effort resemble outdoors. This is a progressive ramp for tracking yourself, not a VO2max predictor.</p>
-      <div class="fx-table-wrap"><table id="sched"><thead><tr><th>Stage</th><th>From</th><th>Speed</th></tr></thead><tbody></tbody></table></div>
+      <div class="fx-table-wrap"><table id="sched"><thead></thead><tbody></tbody></table></div>
     </div>
     <div class="fx-row" style="margin-top:10px">
       <label><input type="checkbox" id="snd" checked> Tones</label>

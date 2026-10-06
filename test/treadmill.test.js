@@ -110,3 +110,18 @@ test('our own cues: nothing here names or quotes a published test recording', ()
     assert.ok(!all.includes(banned), `cue text must not contain "${banned}"`);
   }
 });
+
+test('the printed table carries speed(n) = start + (n-1) x step, in the chosen unit, for km/h and mph', () => {
+  for (const o of [{ unit: 'kmh' }, { unit: 'mph' }, { unit: 'kmh', start: 6.5, step: 0.7 }, { unit: 'mph', start: 4, step: 0.2 }]) {
+    const t = TM.scheduleTable(15, o), p = TM.opts(o);
+    assert.strictEqual(t.head[2], o.unit === 'mph' ? 'mph' : 'km/h');
+    assert.strictEqual(t.rows.length, 15);
+    t.rows.forEach((r, i) => {
+      assert.strictEqual(Number(r[2]), Math.round((p.start + i * p.step) * 10) / 10, `stage ${i + 1} ${JSON.stringify(o)}`);
+      assert.strictEqual(r[1], `${i}:00`);
+    });
+    assert.deepStrictEqual(t.head.length, 3, 'no incline column when incline is 0');
+  }
+  const inc = TM.scheduleTable(2, { incline: 1.5 });
+  assert.deepStrictEqual([inc.head[3], inc.rows[0][3]], ['Incline', '1.5 %']);
+});

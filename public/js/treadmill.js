@@ -87,6 +87,25 @@
   }
 
   /**
+   * The table the page prints: columns and rows as plain strings, from the same
+   * schedule() the cues use, so the visible table cannot disagree with the
+   * spoken speeds. An Incline column appears only when an incline is set.
+   */
+  function scheduleTable(n, o) {
+    o = opts(o);
+    var label = o.unit === 'mph' ? 'mph' : 'km/h';
+    var head = ['Stage', 'From', label];
+    if (o.incline > 0) head.push('Incline');
+    var rows = schedule(n, o).map(function (r) {
+      var m = Math.floor(r.startSec / 60), s = r.startSec % 60;
+      var row = [String(r.stage), m + ':' + ('0' + s).slice(-2), r.speed.toFixed(1)];
+      if (o.incline > 0) row.push(o.incline + ' %');
+      return row;
+    });
+    return { head: head, rows: rows };
+  }
+
+  /**
    * Distance in metres covered after `sec` seconds of the test (sec >= 0),
    * stage by stage - each stage at its own speed.
    */
@@ -215,7 +234,7 @@
   return {
     STAGE_SECONDS: STAGE_SECONDS, COUNTIN_SECONDS: COUNTIN_SECONDS, COOPER_SECONDS: COOPER_SECONDS,
     KMH_PER_MPH: KMH_PER_MPH, DEFAULTS: DEFAULTS, TONES: TONES,
-    opts: opts, stageSpeed: stageSpeed, toKmh: toKmh, schedule: schedule, distanceAt: distanceAt,
+    opts: opts, stageSpeed: stageSpeed, toKmh: toKmh, schedule: schedule, scheduleTable: scheduleTable, distanceAt: distanceAt,
     stateAt: stateAt, stageSpeech: stageSpeech, progressiveEvents: progressiveEvents,
     cooperEvents: cooperEvents, eventsBetween: eventsBetween, renderWav: renderWav,
   };

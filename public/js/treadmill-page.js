@@ -22,15 +22,16 @@
   function now() { return performance.now() / 1000; }
 
   function renderSchedule() {
-    var tb = $('sched').querySelector('tbody'); tb.textContent = '';
-    var o = opts();
-    TM.schedule(15, o).forEach(function (r) {
+    var o = opts(), t = TM.scheduleTable(15, o), tbl = $('sched');
+    var thead = tbl.querySelector('thead'), tb = tbl.querySelector('tbody');
+    thead.textContent = ''; tb.textContent = '';
+    function fill(parent, cells, tag) {
       var tr = document.createElement('tr');
-      [r.stage, fmtClock(r.startSec), r.speed.toFixed(1) + (o.unit === 'mph' ? ' mph' : ' km/h')].forEach(function (v) {
-        var td = document.createElement('td'); td.textContent = v; tr.appendChild(td);
-      });
-      tb.appendChild(tr);
-    });
+      cells.forEach(function (v) { var c = document.createElement(tag); c.textContent = v; tr.appendChild(c); });
+      parent.appendChild(tr);
+    }
+    fill(thead, t.head, 'th');
+    t.rows.forEach(function (r) { fill(tb, r, 'td'); });
     var q = new URLSearchParams({ mode: mode, unit: o.unit, start: o.start, step: o.step, incline: o.incline, stages: 15 });
     $('wav').href = '/tests/treadmill/audio.wav?' + q.toString();
   }
