@@ -57,6 +57,10 @@ services:
       # has always behaved this way, so auth being down already meant no login.
       - AUTH_REMOTE_VERIFY=1
       - AUTH_SERVICE_URL=http://octopus-auth:3002
+      # Per-user app access (appAccess.js): refuse accounts the owner has turned
+      # this app off for. Defaults to this app's own slug in octopus-auth's hub list.
+      - APP_ACCESS_SLUG=${APP_ACCESS_SLUG:-health}
+      - UPGRADE_URL=${UPGRADE_URL:-}
       - HEALTH_SERVICE_TOKEN=${HEALTH_SERVICE_TOKEN}
       # Recipes live in octopus-shopper (their ingredient list is the join key for
       # price lookups, which is shopper's job). Health reads them to log a meal

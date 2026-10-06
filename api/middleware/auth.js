@@ -55,7 +55,10 @@ if (/^(1|true|yes)$/i.test(process.env.AUTH_REMOTE_VERIFY || '') && !authenticat
  * Bearer still works and is still checked properly — mobile and service callers
  * carry no cookie, and fall through to the token gate unchanged.
  */
-const requireUser = (req, res, next) =>
-  (req.user && req.user.username) ? next() : authenticateToken(req, res, next);
+const appAccessGate = require('../../appGate');
+const requireUser = (req, res, next) => {
+  const gated = (err) => (err ? next(err) : appAccessGate(req, res, next));
+  return (req.user && req.user.username) ? gated() : authenticateToken(req, res, gated);
+};
 
 module.exports = { authenticateToken, requireUser };

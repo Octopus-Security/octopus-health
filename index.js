@@ -41,6 +41,7 @@ const { detectPR } = require('./api/pr-detect');
 
 const auth = new AuthClient();
 const AUTH_URL = process.env.AUTH_SERVICE_URL || 'http://octopus-auth:3002';
+const appAccessGate = require('./appGate');
 
 function getActiveTab(requestPath) {
     if (requestPath === '/') return 'dashboard';
@@ -96,6 +97,8 @@ app.get('/api/build', (_req, res) => res.json({
     service: 'octopus-health',
     build: BUILD,
     startedAt: STARTED_AT,
+    // Derived from the gate object requireLogin calls, so it cannot disagree with it.
+    ...(appAccessGate.slug ? { gate: appAccessGate.slug } : {}),
 }));
 
 // Static files
@@ -183,9 +186,13 @@ const requireLogin = async (req, res, next) => {
         const back = encodeURIComponent(`https://${req.get('host')}${req.originalUrl}`);
         return res.redirect(`${AUTH_LOGIN_URL}?redirect=${back}`);
     }
-    try { await ensureUserDb(req.user.username); }
-    catch (e) { console.error('ensureUserDb failed:', e.message); }
-    next();
+    // Signed in is not the same as entitled to THIS app.
+    appAccessGate(req, res, async (err) => {
+        if (err) return next(err);
+        try { await ensureUserDb(req.user.username); }
+        catch (e) { console.error('ensureUserDb failed:', e.message); }
+        next();
+    });
 };
 
 // Routes
