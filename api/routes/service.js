@@ -13,6 +13,7 @@ const { detectPR, rebuildPRs } = require('../pr-detect');
 const { macrosForTemplate, describe, provenance } = require('../meal-template');
 const { isFinished, mealFor } = require('../meal-prep');
 const { resolveExerciseNames, questionText } = require('../exercise-names');
+const { resolveSessionTitle, titleQuestionText, seedSessionTitles } = require('../session-titles');
 
 /**
  * Every exercise name this account already uses.
@@ -178,7 +179,7 @@ router.get('/prs/bests', requireToken, async (req, res) => {
 router.post('/sessions', requireToken, async (req, res) => {
   try {
     const { Exercise, WorkoutSession, WorkoutSet, PersonalRecord } = await getDB(req);
-    const { type = 'strength', title, date, durationMins, effort, notes, sets = [], force = false } = req.body;
+    const { type = 'strength', title, date, durationMins, effort, notes, sets = [], force = false, newTitle = false } = req.body;
 
     // Resolve the day this session belongs to.
     //
@@ -203,6 +204,55 @@ router.post('/sessions', requireToken, async (req, res) => {
         return res.status(400).json({ ok: false, error: `date ${asked} is more than a year ago — check the year` });
       }
       today = asked;
+    }
+
+    // ── Is the title one this account already uses? ──────────────────────────
+    //
+    // The user's own instruction: "it should use known titles, if one isn't
+    // known it should ask to add them to the db." Checked before anything is
+    // written, same as the exercise-name question below — the Logs page shows
+    // this as the session's headline, and once it diverges ("Strength" beside
+    // "strength day" beside a single exercise name standing in for the whole
+    // session) there is no good place downstream to fix it.
+    //
+    // No title at all is NOT an error: that keeps today's fallback (the
+    // session's `type` stands in for the title on the Logs page) untouched.
+    // See api/session-titles.js for why "unknown" is one bucket here, unlike
+    // the exercise-name check's ambiguous/new split — a title with nothing
+    // close is still asked about, because the whole point is to keep this
+    // list short and curated rather than letting it grow a new entry per typo.
+    let resolvedTitle = null;
+    if (title != null && String(title).trim() !== '') {
+      const titleDb = await getDB(req);
+      await seedSessionTitles(titleDb);
+      const knownTitles = (await titleDb.SessionTitle.findAll({ attributes: ['name'] })).map(t => t.name);
+      const asked = String(title).trim();
+      const r = resolveSessionTitle(asked, knownTitles);
+
+      if (r.status === 'unknown' && !newTitle) {
+        return res.json({
+          ok: true, sessionId: null, date: today, exerciseCount: 0,
+          needsTitle: { title: asked, candidates: r.candidates },
+          question: titleQuestionText(asked, r.candidates),
+          message: 'NOTHING WAS SAVED. That title does not match one already in use. '
+            + (r.candidates.length
+                ? 'Ask whether one of the candidates is meant, or whether it is a genuinely new title.'
+                : 'Ask whether it is a genuinely new title to add.')
+            + ' Re-send the whole workout — with the chosen title, or with the same title and '
+            + 'newTitle: true to add it — once he has answered. Do not guess and do not log '
+            + 'the workout under a bare type in the meantime.',
+        });
+      }
+
+      if (r.status === 'unknown') {
+        // newTitle: true — he confirmed this is a genuinely new title.
+        // findOrCreate rather than create: two requests racing on the same
+        // brand-new title (a slow reply, re-sent) must not create two rows.
+        const [row] = await titleDb.SessionTitle.findOrCreate({ where: { name: asked } });
+        resolvedTitle = row.name;
+      } else {
+        resolvedTitle = r.name; // known — use the account's own spelling/case
+      }
     }
 
     // ── Is every exercise one this account already knows? ────────────────────
@@ -298,15 +348,48 @@ router.post('/sessions', requireToken, async (req, res) => {
       });
     }
 
-    // Create the session
-    const session = await WorkoutSession.create({
-      date: today, type, title: title || null,
-      startedAt: new Date(), finishedAt: new Date(),
-      duration: durationMins || null,
-      effort: effort || null,
-      notes: notes || null,
-      status: 'finished',
-    });
+    // Find or create TODAY's session of this TYPE.
+    //
+    // "exercises should be grouped by day" (the user's own words) means a
+    // workout reported across three messages is one session, not three — the
+    // Logs page showed three "1 exercise · 1 set" cards for what was really
+    // one day of training. Merged on date + type, not date alone, so Strength
+    // and Conditioning on the same day stay separate sessions and the Logs
+    // page's type filter keeps working exactly as it does today.
+    let session = await WorkoutSession.findOne({ where: { date: today, type } });
+    if (!session) {
+      session = await WorkoutSession.create({
+        date: today, type, title: resolvedTitle || null,
+        startedAt: new Date(), finishedAt: new Date(),
+        duration: durationMins || null,
+        effort: effort || null,
+        notes: notes || null,
+        status: 'finished',
+      });
+    } else {
+      // Appending to a session created earlier today. finishedAt and effort
+      // move forward with the latest call — a later RPE is usually the fuller
+      // picture of the whole day, not a correction of an earlier one — and
+      // duration accumulates, because a second message is more training on
+      // top of the first, not a restatement of it. Nothing here subtracts.
+      session.finishedAt = new Date();
+      if (durationMins != null) session.duration = (session.duration || 0) + durationMins;
+      if (effort != null) session.effort = effort;
+      if (notes) session.notes = session.notes ? `${session.notes}\n${notes}` : notes;
+      // Only fill a title the session doesn't have yet. A session that
+      // already has one keeps it — a later message's title is not assumed to
+      // supersede the first, since nothing asked which should win.
+      if (resolvedTitle && !session.title) session.title = resolvedTitle;
+      await session.save();
+    }
+
+    // Continue exerciseOrder from this session's current max rather than
+    // restarting at 0. The Logs page groups sets into exercises by
+    // exerciseOrder (octopus-health/index.js, the /logs route) — restarting
+    // would assign an already-used order to a NEW exercise and merge two
+    // different exercises into one row on the page.
+    let nextOrder = await WorkoutSet.max('exerciseOrder', { where: { sessionId: session.id } });
+    nextOrder = (nextOrder == null ? -1 : nextOrder) + 1;
 
     // Create sets, and detect PRs exactly as the web app does.
     //
@@ -314,10 +397,28 @@ router.post('/sessions', requireToken, async (req, res) => {
     // Neith produced sets and no records, so the stats page — which tells you
     // records "auto-detect when you log sets" — stayed empty for months of real
     // training. One shared implementation now, in api/pr-detect.js.
-    let exerciseOrder = 0;
     const newPRs = [];
     for (const exGroup of keep) {
-      let setNumber = 1;
+      // Same exercise already in this session — earlier in today's session, or
+      // from an earlier message that appended to it. Its sets join that group
+      // (continuing setNumber) rather than starting a second group with the
+      // same name, so three separate bicep-curl messages read as one exercise
+      // with three sets. Exact match: sets were already rewritten to the
+      // account's known spelling above, so this is a plain compare, not
+      // another round of fuzzy matching.
+      const existingSet = await WorkoutSet.findOne({
+        where: { sessionId: session.id, exerciseName: exGroup.exerciseName },
+        order: [['exerciseOrder', 'DESC']],
+      });
+      let exerciseOrder, setNumber;
+      if (existingSet) {
+        exerciseOrder = existingSet.exerciseOrder;
+        const maxSetNumber = await WorkoutSet.max('setNumber', { where: { sessionId: session.id, exerciseOrder } });
+        setNumber = (maxSetNumber == null ? 0 : maxSetNumber) + 1;
+      } else {
+        exerciseOrder = nextOrder++;
+        setNumber = 1;
+      }
       for (const s of (exGroup.sets || [])) {
         await WorkoutSet.create({
           sessionId:     session.id,
@@ -340,16 +441,35 @@ router.post('/sessions', requireToken, async (req, res) => {
         } catch (_) { /* never fail a logged set over PR bookkeeping */ }
         setNumber++;
       }
-      exerciseOrder++;
     }
 
-    // Write to simple Exercise table so dashboard shows activity today
-    await Exercise.create({
-      date: today,
-      type: title || type,
-      duration: durationMins || Math.max(30, keep.length * 5),
-      notes: `Logged via Neith — ${keep.length} exercise(s)`,
+    // Keep the dashboard "Today's Exercise" stat as ONE row per day, updated —
+    // not a row appended per call, which is what used to double- (or triple-)
+    // count a day the moment a workout was logged across more than one
+    // message. Recomputed from today's own sessions/sets rather than
+    // incremented field-by-field: an incremented counter drifts the moment a
+    // call is retried, and this way the row is always a correct restatement of
+    // what is actually in WorkoutSessions/WorkoutSets for the day, not a
+    // running tally of calls made.
+    const todaysSessions = await WorkoutSession.findAll({ where: { date: today } });
+    const todaysSets = todaysSessions.length
+      ? await WorkoutSet.findAll({ where: { sessionId: todaysSessions.map(s => s.id) } })
+      : [];
+    const exerciseGroupCount = new Set(todaysSets.map(s => `${s.sessionId}:${s.exerciseOrder}`)).size;
+    const totalDurationMins = todaysSessions.reduce((sum, s) => sum + (s.duration || 0), 0)
+      || Math.max(30, exerciseGroupCount * 5);
+    const [exerciseRow] = await Exercise.findOrCreate({
+      where: { date: today },
+      defaults: {
+        type: resolvedTitle || type,
+        duration: totalDurationMins,
+        notes: `Logged via Neith — ${exerciseGroupCount} exercise(s)`,
+      },
     });
+    exerciseRow.type = resolvedTitle || exerciseRow.type;
+    exerciseRow.duration = totalDurationMins;
+    exerciseRow.notes = `Logged via Neith — ${exerciseGroupCount} exercise(s)`;
+    await exerciseRow.save();
 
     res.json({
       // The date it actually landed on, so the caller reports that rather than

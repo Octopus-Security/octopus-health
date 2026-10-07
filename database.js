@@ -929,6 +929,18 @@ const getDatabase = (username) => {
         isCustom:    { type: DataTypes.BOOLEAN, defaultValue: true },
     });
 
+    // Known session titles — "Push", "Pull", "Legs" and the rest of a typical
+    // split. Exists so the Logs page shows a real title instead of whatever
+    // got typed that day, or a single exercise name standing in for the whole
+    // session. `name` is not marked unique: uniqueness is enforced canonically
+    // (case/punctuation/plural insensitive) in api/session-titles.js, the same
+    // way exercise names are, and a bare DB-level exact-string constraint
+    // would catch far less than that while still letting "pull" and "Pull."
+    // duplicate each other.
+    const SessionTitle = sequelize.define('SessionTitle', {
+        name: { type: DataTypes.STRING, allowNull: false },
+    });
+
     // Personal records — best performance per exercise over time
     const PersonalRecord = sequelize.define('PersonalRecord', {
         exerciseName: { type: DataTypes.STRING,  allowNull: false },
@@ -1177,6 +1189,7 @@ const getDatabase = (username) => {
         ExerciseDefinition,
         WorkoutSession,
         WorkoutSet,
+        SessionTitle,
         TrainingPlan,
         TrainingPlanAssignment,
         WorkoutTemplate,
