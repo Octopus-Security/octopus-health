@@ -10,9 +10,9 @@
  *
  * Read-only. Nothing here writes, so it is safe to run against production.
  *
- *   docker exec octopus_health node api/audit-sessions.js            # last 7 days
- *   docker exec octopus_health node api/audit-sessions.js 2026-08-03 # one day
- *   docker exec octopus_health node api/audit-sessions.js --days 14
+ *   docker exec octopus_health_tracker node api/audit-sessions.js            # last 7 days
+ *   docker exec octopus_health_tracker node api/audit-sessions.js 2026-08-03 # one day
+ *   docker exec octopus_health_tracker node api/audit-sessions.js --days 14
  */
 
 const getDatabase = require('../database');

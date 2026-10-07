@@ -226,8 +226,8 @@ it was never looking at it.
 for checking the log independently of anything the chat says:
 
 ```sh
-docker exec octopus_health node api/audit-sessions.js             # last 7 days
-docker exec octopus_health node api/audit-sessions.js 2026-08-03  # one day
+docker exec octopus_health_tracker node api/audit-sessions.js             # last 7 days
+docker exec octopus_health_tracker node api/audit-sessions.js 2026-08-03  # one day
 ```
 
 It flags any session whose `createdAt` day differs from the day it is filed
