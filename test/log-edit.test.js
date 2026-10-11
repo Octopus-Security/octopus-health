@@ -151,3 +151,78 @@ test('known names: most-used first, filtered by what is typed', { skip }, async 
   assert.deepStrictEqual(all.map(n => n.name), ['Bench Press', 'Pull-up']);
   assert.deepStrictEqual((await knownNames(db, 'pull')).map(n => n.name), ['Pull-up']);
 });
+
+// ── POST /sessions/from-text — the model passes the message, code reads it ────
+
+const REAL = 'chest fly Machine:\n100lb x 10\n\nBench press 45lb bar:\n50+bar x 10\n70+bar x 10\n90+bar x 10\n\n'
+           + '10 pull ups\n\n10 leg raises\n\n10 bicep curls ea side 30 lbs\n\nIs the full session right now for today so far\n\n719981';
+
+test('from-text: the 2026-10-11 message logs as written, chatter and 2FA code ignored', { skip }, async () => {
+  const user = userFor('text_real');
+  const r = await svc(user, 'POST', '/sessions/from-text', { text: REAL });
+  assert.strictEqual(r.status, 200, JSON.stringify(r.body));
+  assert.ok(r.body.sessionId, JSON.stringify(r.body));
+  assert.deepStrictEqual(r.body.ignored, ['Is the full session right now for today so far', '719981']);
+
+  const db = getDatabase(user); await db.sequelize.sync();
+  const rows = await db.WorkoutSet.findAll({ where: { sessionId: r.body.sessionId }, order: [['exerciseOrder', 'ASC'], ['setNumber', 'ASC']] });
+  assert.deepStrictEqual(rows.map(x => [x.exerciseName, x.reps, x.weight]), [
+    ['Chest Fly Machine', 10, 100],
+    ['Bench Press', 10, 95], ['Bench Press', 10, 115], ['Bench Press', 10, 135],
+    ['Pull Ups', 10, null],
+    ['Leg Raises', 10, null],
+    ['Bicep Curls', 10, 30],
+  ]);
+  assert.match(rows[1].notes, /50 \+ 45lb bar/, 'the plates-plus-bar reading is kept');
+  assert.strictEqual(rows[6].notes, 'each side');
+});
+
+test('from-text: an ambiguous name is asked ONCE — the answer is remembered', { skip }, async () => {
+  const user = userFor('text_alias');
+  await log(user, [{ exerciseName: 'Barbell Bench Press', sets: [{ reps: 5, weight: 185 }] }], { date: '2026-10-01' });
+
+  const text = 'Bench press 45lb bar:\n50+bar x 10';
+  const first = await svc(user, 'POST', '/sessions/from-text', { text });
+  assert.strictEqual(first.body.sessionId, null, 'asked, nothing saved');
+  assert.ok(first.body.needsNaming.length);
+  assert.match(first.body.message, /SAME text and names/);
+
+  const second = await svc(user, 'POST', '/sessions/from-text', { text, names: { 'Bench Press': 'Barbell Bench Press' } });
+  assert.ok(second.body.sessionId, JSON.stringify(second.body));
+  assert.strictEqual(second.body.logged[0].exerciseName, 'Barbell Bench Press');
+
+  // A later day, no names passed: the answer from before applies, no question.
+  const db = getDatabase(user); await db.sequelize.sync();
+  await db.WorkoutSession.update({ date: '2026-10-02' }, { where: { id: second.body.sessionId } });
+  const third = await svc(user, 'POST', '/sessions/from-text', { text: 'bench press 3x5 155lbs' });
+  assert.ok(third.body.sessionId, JSON.stringify(third.body));
+  assert.strictEqual(third.body.logged[0].exerciseName, 'Barbell Bench Press');
+});
+
+test('from-text: "it is a new exercise" is remembered too', { skip }, async () => {
+  const user = userFor('text_new');
+  await log(user, [{ exerciseName: 'Hanging Leg Raise', sets: [{ reps: 10 }] }], { date: '2026-10-01' });
+  const asked = await svc(user, 'POST', '/sessions/from-text', { text: '10 leg raises' });
+  assert.ok(asked.body.needsNaming && asked.body.needsNaming.length, JSON.stringify(asked.body));
+  const r = await svc(user, 'POST', '/sessions/from-text', { text: '10 leg raises', names: { 'Leg Raises': 'Leg Raises' } });
+  assert.ok(r.body.sessionId, JSON.stringify(r.body));
+  assert.strictEqual(r.body.logged[0].exerciseName, 'Leg Raises');
+});
+
+test('from-text: a line with numbers it cannot read saves NOTHING and names the line', { skip }, async () => {
+  const user = userFor('text_unread');
+  const r = await svc(user, 'POST', '/sessions/from-text', { text: '20 pull ups\n3 sets of something 4/5' });
+  assert.strictEqual(r.body.sessionId, null);
+  assert.ok(r.body.needsReading.length, JSON.stringify(r.body));
+  const db = getDatabase(user); await db.sequelize.sync();
+  assert.strictEqual(await db.WorkoutSet.count(), 0);
+});
+
+test('from-text dryRun parses and writes nothing — not even an alias', { skip }, async () => {
+  const user = userFor('text_dry');
+  const r = await svc(user, 'POST', '/sessions/from-text', { text: REAL, dryRun: true, names: { 'Bench Press': 'Barbell Bench Press' } });
+  assert.strictEqual(r.body.exercises, 5);
+  const db = getDatabase(user); await db.sequelize.sync();
+  assert.strictEqual(await db.WorkoutSet.count(), 0);
+  assert.strictEqual(await db.ExerciseAlias.count(), 0);
+});

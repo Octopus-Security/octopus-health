@@ -136,3 +136,40 @@ test('parseSets is exported and standalone-correct for a single set', () => {
   assert.deepStrictEqual(parseSets('nothing here'), []);
   assert.strictEqual(normKey('Pull-Ups'), 'pullup');
 });
+
+// ── 2026-10-11: the owner's block format, and phrasings that were confidently wrong ──
+test('block format: header line, set lines under it, +bar, ea side, chatter and a 2FA code', () => {
+  const r = parseWorkout('chest fly Machine:\n100lb x 10\n\nBench press 45lb bar:\n50+bar x 10\n70+bar x 10\n90+bar x 10\n\n'
+    + '10 pull ups\n\n10 leg raises\n\n10 bicep curls ea side 30 lbs\n\nIs the full session right now for today so far\n\n719981');
+  assert.deepStrictEqual(r.exercises.map(e => [e.name, e.sets.map(s => [s.reps, s.weight])]), [
+    ['Chest Fly Machine', [[10, 100]]],
+    ['Bench Press', [[10, 95], [10, 115], [10, 135]]],
+    ['Pull Ups', [[10, null]]],
+    ['Leg Raises', [[10, null]]],
+    ['Bicep Curls', [[10, 30]]],
+  ]);
+  assert.strictEqual(r.exercises[1].sets[0].note, '50 + 45lb bar');
+  assert.strictEqual(r.exercises[4].sets[0].note, 'each side');
+  assert.deepStrictEqual(r.unparsed, ['Is the full session right now for today so far', '719981']);
+});
+
+test('+bar without a stated bar weight assumes a 45 lb bar; a stated one wins', () => {
+  assert.strictEqual(parseWorkout('squat:\n90+bar x 5').exercises[0].sets[0].weight, 135);
+  assert.strictEqual(parseWorkout('squat 35lb bar:\n90+bar x 5').exercises[0].sets[0].weight, 125);
+});
+
+test('phrasings that used to log the WRONG numbers', () => {
+  const sh = t => parseWorkout(t).exercises.map(e => [e.name, e.sets.map(s => [s.reps, s.weight])]);
+  assert.deepStrictEqual(sh('bench 3 sets of 10 at 135'), [['Bench', [[10, 135], [10, 135], [10, 135]]]]);
+  assert.deepStrictEqual(sh('3 sets of 10 pushups'), [['Pushups', [[10, null], [10, null], [10, null]]]]);
+  assert.deepStrictEqual(sh('deadlift 225x5'), [['Deadlift', [[5, 225]]]]);
+  assert.deepStrictEqual(sh('3x10 dips'), [['Dips', [[10, null], [10, null], [10, null]]]]);
+});
+
+test('what it cannot store or read goes to unparsed, never a guess', () => {
+  for (const t of ['ran 2 miles', '3 sets of something 4/5']) {
+    const r = parseWorkout(t);
+    assert.deepStrictEqual(r.exercises, [], t);
+    assert.deepStrictEqual(r.unparsed, [t]);
+  }
+});

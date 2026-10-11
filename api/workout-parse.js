@@ -92,8 +92,15 @@ function parseSets(tail) {
 
   // sets x reps ("3x10"), else the first bare number is the rep count
   let count = 1, reps = null;
-  const nx = s.match(/(\d+)\s*x\s*(\d+)/i);
-  if (nx) { count = parseInt(nx[1], 10); reps = parseInt(nx[2], 10); s = s.replace(nx[0], ' '); }
+  const nx = s.match(/(\d+(?:\.\d+)?)\s*x\s*(\d+)/i);
+  if (nx) {
+    const a = parseFloat(nx[1]), b = parseInt(nx[2], 10);
+    // "225x5" is weight × reps, not 225 sets — nobody does twenty sets of
+    // one thing in a log line. Below 20 it is sets × reps ("3x10").
+    if (a >= 20 && weight == null) { weight = a; weightUnit = 'lbs'; reps = b; }
+    else { count = Math.round(a); reps = b; }
+    s = s.replace(nx[0], ' ');
+  }
   else {
     const r = s.match(/(\d+)/);
     if (r) { reps = parseInt(r[1], 10); s = s.replace(r[0], ' '); }
@@ -113,12 +120,34 @@ function parseSets(tail) {
   return out;
 }
 
+// Ways of saying sets and reps that the core grammar ("NxM", "@W") does not
+// read, rewritten into it. Each one was CONFIDENTLY WRONG before — the worst
+// failure for a log: "bench 3 sets of 10 at 135" logged 3 reps at 10 lb.
+const DIST_RE = /\d\s*(?:mi|miles?|km|kms|kilometers?|meters?|metres?|yds?|yards?)\b/i;
+function normalisePhrasing(s) {
+  return s
+    .replace(/(\d+)\s*sets?\s*(?:of|x)\s*(\d+)(?:\s*reps?)?/g, '$1x$2')   // 3 sets of 10 → 3x10
+    .replace(/(\d+)\s*reps?\b/g, '$1')                                     // 10 reps → 10
+    .replace(/\bat\s+(\d)/g, '@$1')                                         // at 135 → @135
+    .replace(/^(\d+x\d+(?:\s*@\s*\d+(?:\.\d+)?)?)\s+([a-z].*)$/, '$2 $1')  // 3x10 dips → dips 3x10
+    .replace(/\s+/g, ' ').trim();
+}
+
 // Parse ONE exercise clause: name + its set(s). `note` may carry a slash-style
 // descriptor ("punches/kicks/elbows/knees"). Returns null if no name is found.
 function parseClause(clause) {
   const raw = clause.trim();
   if (!raw) return null;
-  let s = raw.toLowerCase().replace(/×/g, 'x');
+  let s = normalisePhrasing(raw.toLowerCase().replace(/×/g, 'x'));
+  // Distance is not something this parser stores; "ran 2 miles" must not
+  // become 2 reps of "Ran". Unparsed → the person is asked, never guessed.
+  if (DIST_RE.test(s)) return null;
+  // "4/5" is a fraction, a score or a date — not reps and weight.
+  if (/\d\s*\/\s*\d/.test(s)) return null;
+  // "10 bicep curls ea side 30 lbs": the side words are a NOTE, not part of the
+  // name — left in, they made an exercise called "Bicep Curls Ea Side".
+  const sideNote = SIDE_RE.test(s) ? 'each side' : null;
+  s = s.replace(SIDE_RE, ' ').replace(/\s+/g, ' ').trim();
 
   // (a) leading duration → a timed set: "5 min bag work", "30 sec plank"
   let leadDuration = null;
@@ -147,8 +176,10 @@ function parseClause(clause) {
   const tail = words.slice(i).join(' ');
   let name = nameParts.join(' ').replace(/\s+/g, ' ').trim();
   if (!name) return null;                               // a set with no exercise — caller handles
+  // "sets"/"reps" left IN the name means the phrasing was not understood.
+  if (/\b(?:sets?|reps?)\b/.test(name)) return null;
 
-  const note = noteParts.length ? noteParts.join(' ').trim() : null;
+  const note = noteParts.length ? noteParts.join(' ').trim() : sideNote;
 
   // Build the sets.
   let sets = [];
@@ -201,14 +232,110 @@ function parseSegment(segment) {
   return { exercises, leftover: (failed || !exercises.length) ? segment : null };
 }
 
+// ── Block format ─────────────────────────────────────────────────────────────
+// How the owner actually writes a workout on a phone:
+//
+//   Bench press 45lb bar:        ← header: the exercise, maybe the bar
+//   50+bar x 10                  ← set lines under it, no name of their own
+//   70+bar x 10
+//
+//   chest fly Machine:
+//   100lb x 10
+//
+// Read line by line, none of the set lines has a name, so each was dropped to
+// `unparsed` and the header became a "45 lb" set of nothing. 2026-10-11.
+//
+// "N+bar" is plates PLUS the bar: the bar's weight comes from the header
+// ("45lb bar"), else 45 lb. Stored as the total load, because that is what
+// the lift is and what PRs compare; the note keeps "50 + 45lb bar" so the
+// original reading is never lost.
+
+const BAR_SPEC_RE = new RegExp(`(\\d+(?:\\.\\d+)?)\\s*(${WEIGHT_UNIT_RE})\\s*(?:olympic\\s+)?bar\\b`, 'i');
+const PLUS_BAR_RE = /(\d+(?:\.\d+)?)\s*(?:lbs?|kgs?)?\s*\+\s*(?:the\s+)?bar\b/i;
+
+/** Rewrite "50+bar x 10" as "95lbs x 10", returning the note it came from. */
+function expandPlusBar(line, bar) {
+  const m = line.match(PLUS_BAR_RE);
+  if (!m) return { line, note: null };
+  const plates = parseFloat(m[1]);
+  const total = Math.round((plates + bar.weight) * 100) / 100;
+  return {
+    line: line.replace(m[0], `${total}${bar.unit}`),
+    note: `${plates} + ${bar.weight}${bar.unit === 'kg' ? 'kg' : 'lb'} bar`,
+  };
+}
+
+/** Pure set spec, no exercise name of its own ("100lb x 10", "95lbs x 10", "3x8 @135"). */
+function isSetOnly(line) {
+  if (/^\d{5,}$/.test(line.trim())) return false;   // a pasted 2FA code is not a set of 719981 reps
+  return /\d/.test(line) && !hasNameWord(line.replace(/\bx\b/gi, ' '));
+}
+
+function parseHeaderBlock(header, setLines) {
+  let h = header.replace(/:\s*$/, '').trim();
+  const bm = h.match(BAR_SPEC_RE);
+  const bar = bm ? { weight: parseFloat(bm[1]), unit: WEIGHT_UNIT[bm[2].toLowerCase()] || 'lbs' }
+                 : { weight: 45, unit: 'lbs' };
+  if (bm) h = h.replace(bm[0], ' ').replace(/\s+/g, ' ').trim();
+
+  // The header may carry its own first set ("bicep curls 10 20lbs").
+  const own = parseClause(h);
+  const name = own ? own.name : titleCase(h.replace(SIDE_RE, ' ').replace(/[^a-z0-9 '/-]/gi, ' ').replace(/\s+/g, ' ').trim().toLowerCase());
+  if (!name || !/[a-z]{2,}/i.test(name)) return null;
+  const sideNote = SIDE_RE.test(h) ? 'each side' : null;
+
+  const sets = own ? [...own.sets] : [];
+  const bad = [];
+  for (const raw of setLines) {
+    const { line, note } = expandPlusBar(raw.replace(/×/g, 'x'), bar);
+    const got = parseSets(line);
+    if (!got.length) { bad.push(raw); continue; }
+    for (const g of got) sets.push({ ...g, note: [g.note || sideNote, note].filter(Boolean).join('; ') || null });
+  }
+  sets.forEach((st, i) => { st.setNumber = i + 1; });
+  return { exercise: sets.length ? { name, note: own ? own.note : sideNote, sets, raw: [header, ...setLines].join('\n') } : null, bad };
+}
+
 function parseWorkout(text) {
   const exercises = [];
   const unparsed = [];
   let order = 0;
-  for (const seg of splitSegments(text)) {
-    const { exercises: exs, leftover } = parseSegment(seg);
-    for (const ex of exs) { ex.order = order++; exercises.push(ex); }
-    if (leftover) unparsed.push(leftover);
+  const push = ex => { ex.order = order++; exercises.push(ex); };
+
+  const lines = String(text || '').split(/\r?\n/);
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+
+    // A header: ends in ":" or is followed by set-only lines. Its sets are the
+    // run of set-only lines that follow (blank lines between them allowed).
+    const next = [];
+    let j = i + 1;
+    while (j < lines.length) {
+      const t = lines[j].trim();
+      if (!t) { j++; continue; }
+      const probe = expandPlusBar(t, { weight: 45, unit: 'lbs' }).line;
+      if (!isSetOnly(probe)) break;
+      next.push(t); j++;
+    }
+    const looksHeader = /:\s*$/.test(line) || (next.length > 0 && hasNameWord(line.replace(BAR_SPEC_RE, ' ')));
+    if (looksHeader && (next.length || /:\s*$/.test(line))) {
+      const r = parseHeaderBlock(line, next);
+      if (r && r.exercise) {
+        push(r.exercise);
+        unparsed.push(...r.bad);
+        i = j - 1;
+        continue;
+      }
+      if (!next.length) { unparsed.push(line); continue; }
+    }
+
+    // Anything else: the original comma/"and"-aware path, one line at a time.
+    for (const seg of splitSegments(line)) {
+      const { exercises: exs, leftover } = parseSegment(seg);
+      for (const ex of exs) push(ex);
+      if (leftover) unparsed.push(leftover);
+    }
   }
   return { exercises, unparsed };
 }
@@ -255,4 +382,4 @@ function buildPreview(parsed, library) {
   });
 }
 
-module.exports = { parseWorkout, buildPreview, parseSets, parseClause, matchExercise, normKey, splitSegments };
+module.exports = { parseWorkout, expandPlusBar, buildPreview, parseSets, parseClause, matchExercise, normKey, splitSegments };

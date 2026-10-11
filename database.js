@@ -941,6 +941,16 @@ const getDatabase = (username) => {
         name: { type: DataTypes.STRING, allowNull: false },
     });
 
+    // "When I say X I mean Y" — an exercise name question answered once, kept.
+    // Added 2026-10-11 (HANDOFF item 34): "Bench press" was asked about every
+    // single time, because the answer lived only in that chat turn. `key` is
+    // exercise-names.js canonicalKey() of what was typed; `name` is the
+    // account's own exercise it means. Additive — sync() creates the table.
+    const ExerciseAlias = sequelize.define('ExerciseAlias', {
+        key:  { type: DataTypes.STRING, allowNull: false },
+        name: { type: DataTypes.STRING, allowNull: false },
+    });
+
     // Personal records — best performance per exercise over time
     const PersonalRecord = sequelize.define('PersonalRecord', {
         exerciseName: { type: DataTypes.STRING,  allowNull: false },
@@ -1190,6 +1200,7 @@ const getDatabase = (username) => {
         WorkoutSession,
         WorkoutSet,
         SessionTitle,
+        ExerciseAlias,
         TrainingPlan,
         TrainingPlanAssignment,
         WorkoutTemplate,

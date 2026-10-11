@@ -12,7 +12,8 @@ const { partition } = require('../dedupe-sets');
 const { detectPR, rebuildPRs } = require('../pr-detect');
 const { macrosForTemplate, describe, provenance } = require('../meal-template');
 const { isFinished, mealFor } = require('../meal-prep');
-const { resolveExerciseNames, questionText } = require('../exercise-names');
+const { resolveExerciseNames, questionText, canonicalKey } = require('../exercise-names');
+const { parseWorkout } = require('../workout-parse');
 const { resolveSessionTitle, titleQuestionText, seedSessionTitles } = require('../session-titles');
 
 /**
@@ -176,7 +177,7 @@ router.get('/prs/bests', requireToken, async (req, res) => {
 // Log a complete workout session with its sets. Also writes an Exercise entry
 // so the dashboard "Today's Exercise" stat updates immediately.
 // Body: { type, title, date, durationMins, effort, notes, sets: [{ exerciseName, sets: [{ reps, weight, duration, notes }] }] }
-router.post('/sessions', requireToken, async (req, res) => {
+async function logSession(req, res) {
   try {
     const { Exercise, WorkoutSession, WorkoutSet, PersonalRecord } = await getDB(req);
     const { type = 'strength', title, date, durationMins, effort, notes, sets = [], force = false, newTitle = false } = req.body;
@@ -271,10 +272,22 @@ router.post('/sessions', requireToken, async (req, res) => {
     // and `Resistance Band Face Pull` have the same shape as the pairs above and
     // are genuinely different lifts, so this asks rather than deciding.
     // See api/exercise-names.js.
+    // A name the person already answered "which did you mean?" for is
+    // rewritten before it is checked, so the question is asked once, ever.
+    const answered = new Set();   // names the person already settled — never asked again
+    if (sets.length) {
+      const aliases = await aliasMap(await getDB(req));
+      for (const s of sets) {
+        const a = s.exerciseName && aliases.get(canonicalKey(s.exerciseName));
+        if (a) { s.exerciseName = a; answered.add(a); }
+      }
+    }
+
     if (sets.length) {
       const known = await knownExerciseNames(await getDB(req));
-      const { resolved, questions } = resolveExerciseNames(
+      const { resolved, questions: asked } = resolveExerciseNames(
         sets.map(s => s.exerciseName).filter(Boolean), known);
+      const questions = asked.filter(q => !answered.has(q.exerciseName));
 
       if (questions.length) {
         // Every ambiguity, not the first one. A workout is logged as a unit, so
@@ -486,6 +499,107 @@ router.post('/sessions', requireToken, async (req, res) => {
       // So Neith can say "that's a PR" in the same breath as confirming the log.
       newPRs,
     });
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+}
+router.post('/sessions', requireToken, logSession);
+
+// ── Remembered name answers (ExerciseAlias) ────────────────────────────────────
+async function aliasMap(db) {
+  if (!db.ExerciseAlias) return new Map();
+  const rows = await db.ExerciseAlias.findAll().catch(() => []);
+  return new Map(rows.map(r => [r.key, r.name]));
+}
+
+/** Record "when I say `asked` I mean `name`" — one row per key, last answer wins. */
+async function rememberAlias(db, asked, name) {
+  const key = canonicalKey(asked);
+  // A same-name answer ("Leg Raises" → "Leg Raises") is kept too: it means
+  // "a new exercise, not one of those", and without it the question returns.
+  if (!key || !name || !db.ExerciseAlias) return;
+  const [row, created] = await db.ExerciseAlias.findOrCreate({ where: { key }, defaults: { name } });
+  if (!created && row.name !== name) { row.name = name; await row.save(); }
+}
+
+// POST /api/service/sessions/from-text
+// Body: { text, date?, type?, title?, newTitle?, force?, names?: { "<as typed>": "<meant>" } }
+//
+// The model's whole job becomes: pass the person's message through VERBATIM.
+// Everything that went wrong on 2026-10-11 across four turns and two models —
+// a read-back instead of a log, a title invented and then questioned, "50+bar"
+// carried as text, Friday's exercises pulled into Sunday — was the model
+// transcribing a workout. Copying a string is the one thing every model does
+// the same way; the parse (api/workout-parse.js) is code, so one message gives
+// one result whichever model relayed it.
+//
+// Then it goes through logSession unchanged: name questions, title questions,
+// the duplicate hold and day-merging all still apply.
+router.post('/sessions/from-text', requireToken, async (req, res) => {
+  try {
+    const db = await getDB(req);
+    const { text, date, type = 'strength', title, newTitle, force, names, dryRun } = req.body || {};
+    if (!text || !String(text).trim()) return res.status(400).json({ ok: false, error: 'text is required — the message as the person wrote it' });
+
+    // dryRun: parse only, write nothing, remember nothing. cortex asks this to
+    // decide whether the CURRENT chat message is itself a workout — one parser,
+    // here, rather than a second copy there drifting from it.
+    if (dryRun) {
+      const p = parseWorkout(String(text));
+      return res.json({ ok: true, dryRun: true, exercises: p.exercises.length,
+        read: p.exercises.map(e => ({ exerciseName: e.name, sets: e.sets })), unparsed: p.unparsed });
+    }
+
+    // Answers to an earlier "which did you mean?" — kept, so it is asked once ever.
+    if (names && typeof names === 'object') {
+      for (const [asked, meant] of Object.entries(names)) {
+        if (typeof meant === 'string' && meant.trim()) await rememberAlias(db, asked, meant.trim());
+      }
+    }
+
+    const parsed = parseWorkout(String(text));
+    // Unparsed lines with a number in them were meant to be workout and could
+    // not be read; lines with none (a question, "felt good") and a bare 2FA
+    // code are not workout at all.
+    const unread  = parsed.unparsed.filter(l => /\d/.test(l) && !/^\s*\d{5,}\s*$/.test(l));
+    const ignored = parsed.unparsed.filter(l => !unread.includes(l));
+
+    if (unread.length || !parsed.exercises.length) {
+      // Nothing written. A half-logged workout is worse than none: the person
+      // cannot tell which half made it.
+      return res.json({
+        ok: true, sessionId: null, exerciseCount: 0,
+        needsReading: unread, ignored,
+        read: parsed.exercises.map(e => ({ exerciseName: e.name, sets: e.sets })),
+        message: parsed.exercises.length
+          ? `NOTHING WAS SAVED. These lines could not be read: ${unread.map(l => `"${l}"`).join(', ')}. `
+            + 'Ask the person to rewrite just those lines (e.g. "bench 3x10 135lb", "20 pull ups"), then send the WHOLE message again.'
+          : 'NOTHING WAS SAVED — no exercise with a number was found in that text. If it was meant to be a workout, ask for it as e.g. "bench 3x10 135lb, 20 pull ups".',
+      });
+    }
+
+    const aliases = await aliasMap(db);
+    const sets = parsed.exercises.map(e => ({
+      exerciseName: aliases.get(canonicalKey(e.name)) || e.name,
+      sets: e.sets.map(x => ({ reps: x.reps, weight: x.weight, weightUnit: x.weightUnit || 'lbs', duration: x.duration, notes: x.note || undefined })),
+    }));
+
+    req.body = { type, title, date, newTitle, force, sets };
+    // Hand logSession's reply back with what was read, so the caller can show
+    // the person their own numbers as the database will hold them.
+    const json = res.json.bind(res);
+    res.json = body => {
+      const out = { ...body, read: sets, ignored };
+      // The structured path says "re-send using the names chosen"; here the
+      // text stays as typed and the answers travel beside it, which is also
+      // what lets them be remembered.
+      if (body && body.needsNaming && body.needsNaming.length) {
+        out.message = 'NOTHING WAS SAVED. Ask which exercise is meant for each of these — ALL in one message: '
+          + body.needsNaming.map(q => `"${q.asked || q.exerciseName}" → ${(q.candidates || []).join(' or ')}`).join('; ')
+          + '. Then call again with the SAME text and names: { "<as typed>": "<the one picked>" }. '
+          + 'The answer is remembered, so it is asked only once.';
+      }
+      return json(out);
+    };
+    return logSession(req, res);
   } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
 });
 
