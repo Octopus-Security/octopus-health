@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title><%= title %></title>
   <link rel="stylesheet" href="<%= asset('/theme.css') %>">
   <style>
@@ -66,6 +66,28 @@
     .builder-ex-card { display:flex; align-items:center; justify-content:space-between; padding:8px 12px; background:#0d0d0d; border:1px solid #2a2a2a; border-radius:8px; margin-bottom:6px; }
     .builder-ex-name { font-size:0.88rem; font-weight:500; color:#e8e8e8; }
     .builder-ex-meta { font-size:0.72rem; color:#666; margin-top:1px; }
+
+    /* ── Phone ─────────────────────────────────────────────────────────────
+       Modals become bottom sheets (thumb reach, keyboard pushes them up rather
+       than off-screen), tap targets reach ~44px, category tabs scroll sideways
+       instead of wrapping into five rows, and inputs stay at 16px so iOS does
+       not zoom on focus. */
+    @media (max-width:640px) {
+      .modal-overlay.open { align-items:flex-end; }
+      .modal { width:100%; max-height:92vh; border-radius:14px 14px 0 0; padding:18px 16px calc(18px + env(safe-area-inset-bottom)); }
+      .modal .ex-list { max-height:45vh !important; }
+      .cat-tabs { flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:4px; }
+      .cat-tab { flex-shrink:0; padding:7px 13px; }
+      .ex-list li { padding:12px; }
+      .set-row { grid-template-columns:28px 1fr 1fr 44px; padding:8px 12px; }
+      .set-input { padding:9px 8px; font-size:16px; }
+      .search-input { font-size:16px; }
+      .btn-del-set { min-height:40px; font-size:1.1rem; }
+      .btn-add-set { padding:12px; }
+      .effort-btn { padding:12px 4px; }
+      .session-timer { font-size:1.6rem; }
+      .rest-banner { left:12px; right:12px; bottom:calc(12px + env(safe-area-inset-bottom)); justify-content:space-between; }
+    }
   </style>
 </head>
 <body>
@@ -414,10 +436,17 @@ let builderSelectedCat = '';
   if (sessionId) await resumeSession();
 })();
 
+// Names already in THIS account's log, most-used first. The picker used to
+// search only the built-in library, so a name logged every week never came up
+// and got retyped a new way — which health's name resolver then has to ask about.
+let knownExercises = [];
 async function loadExerciseLibrary() {
-  const r = await fetch('/workout/api/exercises');
-  const j = await r.json();
-  if (j.success) allExercises = j.data;
+  const [r, k] = await Promise.all([
+    fetch('/workout/api/exercises').then(x => x.json()).catch(() => ({})),
+    fetch('/workout/api/known-names').then(x => x.json()).catch(() => ({})),
+  ]);
+  if (r.success) allExercises = r.data;
+  if (k.ok) knownExercises = k.names;
   renderExerciseList('');
 }
 
@@ -525,16 +554,35 @@ function filterExercises() {
 function renderExerciseList(q) {
   const list = document.getElementById('ex-list');
   if (!list) return;
+  const esc = v => String(v == null ? '' : v).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
   let filtered = allExercises;
   if (selectedCat) filtered = filtered.filter(e => e.category === selectedCat);
   if (q) filtered = filtered.filter(e => e.name.toLowerCase().includes(q));
-  list.innerHTML = filtered.slice(0,40).map(e =>
-    `<li onclick="pickExercise(${e.id},'${e.name.replace(/'/g,"\\'")}','${e.category}')">
-      <div class="ex-name">${e.name}</div>
-      <div class="ex-tags">${e.equipment} · ${(e.primaryMuscles||[]).slice(0,3).join(', ')}</div>
-    </li>`
-  ).join('');
+  // Yours first (not under a category tab — logged names carry none), then the
+  // library minus anything already shown.
+  const mine = selectedCat ? [] : knownExercises.filter(n => !q || n.name.toLowerCase().includes(q)).slice(0, 8);
+  const seen = new Set(mine.map(n => n.name.toLowerCase()));
+  const libIdx = new Map(allExercises.map(e => [e.name.toLowerCase(), e.id]));
+  list.innerHTML =
+    mine.map(n =>
+      `<li data-id="${libIdx.get(n.name.toLowerCase()) ?? ''}" data-name="${esc(n.name)}">
+        <div class="ex-name">${esc(n.name)}</div>
+        <div class="ex-tags">⭐ yours · ${n.sets} set${n.sets == 1 ? '' : 's'} logged${n.last ? ' · last ' + esc(n.last) : ''}</div>
+      </li>`).join('') +
+    filtered.filter(e => !seen.has(e.name.toLowerCase())).slice(0, 40).map(e =>
+      `<li data-id="${e.id}" data-name="${esc(e.name)}">
+        <div class="ex-name">${esc(e.name)}</div>
+        <div class="ex-tags">${esc(e.equipment)} · ${esc((e.primaryMuscles||[]).slice(0,3).join(', '))}</div>
+      </li>`).join('') +
+    (q && !mine.some(n => n.name.toLowerCase() === q) && !filtered.some(e => e.name.toLowerCase() === q)
+      ? `<li data-id="" data-name="${esc(document.getElementById('ex-search').value.trim())}"><div class="ex-name">＋ Add “${esc(document.getElementById('ex-search').value.trim())}”</div><div class="ex-tags">new exercise</div></li>`
+      : '');
 }
+
+document.getElementById('ex-list').addEventListener('click', e => {
+  const li = e.target.closest('li[data-name]');
+  if (li) pickExercise(li.dataset.id ? Number(li.dataset.id) : null, li.dataset.name);
+});
 
 function pickExercise(id, name) {
   addExerciseToSession(id, name);

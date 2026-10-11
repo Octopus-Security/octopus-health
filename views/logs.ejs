@@ -3,105 +3,358 @@
 <head>
     <meta charset="UTF-8">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title><%= title %></title>
     <link rel="stylesheet" href="<%= asset('/theme.css') %>">
     <style>
       .log-card { background:#0d0d0d; border:1px solid #2a2a2a; border-radius:10px; margin-bottom:14px; overflow:hidden; }
-      .log-head { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px 16px; background:#141414; border-bottom:1px solid #1e1e1e; }
+      .log-head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; padding:12px 14px; background:#141414; border-bottom:1px solid #1e1e1e; }
       .log-date { font-size:0.78rem; color:#666; }
-      .log-title { font-weight:600; color:#e8e8e8; font-size:1rem; }
+      .log-title { font-weight:600; color:#e8e8e8; font-size:1rem; overflow-wrap:anywhere; }
       .log-meta { font-size:0.75rem; color:#666; margin-top:2px; }
-      .log-body { padding:10px 16px 14px; }
-      .log-ex { margin-bottom:10px; }
-      .log-ex-name { font-weight:600; color:#e8e8e8; font-size:0.9rem; margin-bottom:3px; }
-      .log-sets { width:100%; font-size:0.82rem; border-collapse:collapse; }
-      .log-sets td { padding:4px 10px 4px 0; }
-      .log-sets tr { border-top:1px solid #171717; }
-      .log-sets .h td { color:#555; font-size:0.72rem; border:none; }
-      .del-btn { background:none; border:1px solid #3a2020; color:#a05050; border-radius:6px; cursor:pointer; font-size:0.72rem; padding:4px 9px; }
-      .del-btn:hover { background:#241414; color:#e07070; }
-      .filter-row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:16px; }
-      .filter-row a { font-size:0.8rem; padding:5px 12px; border-radius:16px; border:1px solid #2a2a2a; color:#888; text-decoration:none; }
+      .log-notes { font-size:0.8rem; color:#888; margin-top:4px; white-space:pre-wrap; }
+      .log-body { padding:6px 14px 12px; }
+      .log-ex { margin:10px 0 4px; }
+      .log-ex-head { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+      .log-ex-name { font-weight:600; color:#e8e8e8; font-size:0.92rem; overflow-wrap:anywhere; }
+      .set-row { display:grid; grid-template-columns:2.2em 1fr 1fr; gap:8px; align-items:center; width:100%;
+                 background:none; border:none; border-top:1px solid #171717; padding:10px 2px; min-height:44px;
+                 color:#ccc; font-size:0.88rem; text-align:left; cursor:pointer; font-family:inherit; }
+      .set-row:hover, .set-row:focus-visible { background:#121812; outline:none; }
+      .set-row .n { color:#555; }
+      .set-row .note { grid-column:2 / -1; color:#777; font-size:0.78rem; }
+      .head-actions { display:flex; gap:6px; flex-shrink:0; }
+      .mini { background:none; border:1px solid #2a2a2a; color:#999; border-radius:6px; cursor:pointer;
+              font-size:0.78rem; padding:8px 11px; min-height:36px; font-family:inherit; }
+      .mini:hover { color:#e8e8e8; border-color:#444; }
+      .mini.danger { border-color:#3a2020; color:#a05050; }
+      .mini.danger:hover { background:#241414; color:#e07070; }
+      .mini.go { border-color:#1f4a2e; color:#2ecc71; }
+      .add-row { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+      .filter-row { display:flex; gap:8px; overflow-x:auto; -webkit-overflow-scrolling:touch; align-items:center; margin-bottom:16px; padding-bottom:4px; }
+      .filter-row a { flex-shrink:0; font-size:0.8rem; padding:7px 13px; border-radius:16px; border:1px solid #2a2a2a; color:#888; text-decoration:none; }
       .filter-row a.on { background:#1a2a1a; border-color:#2ecc71; color:#2ecc71; }
+      .page-head { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:16px; flex-wrap:wrap; }
+
+      /* Edit sheet: a bottom sheet on a phone, a centred dialog on a wide screen. */
+      .sheet-bg { position:fixed; inset:0; background:rgba(0,0,0,.6); display:none; z-index:50; }
+      .sheet-bg.open { display:flex; align-items:flex-end; justify-content:center; }
+      .sheet { background:#111; border:1px solid #2a2a2a; border-radius:14px 14px 0 0; width:100%; max-width:520px;
+               max-height:92vh; overflow-y:auto; padding:18px 16px calc(18px + env(safe-area-inset-bottom)); }
+      @media (min-width:641px) { .sheet-bg.open { align-items:center; } .sheet { border-radius:14px; } }
+      .sheet h3 { margin:0 0 12px; font-size:1.05rem; }
+      .sheet label { display:block; font-size:0.75rem; color:#777; margin:10px 0 4px; }
+      .sheet input, .sheet select, .sheet textarea { width:100%; box-sizing:border-box; background:#0a0a0a; color:#e8e8e8;
+               border:1px solid #2a2a2a; border-radius:8px; padding:11px 12px; font-size:16px; font-family:inherit; }
+      .sheet .grid3 { display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; }
+      .sheet .grid3 label { margin-top:0; }
+      .sheet .btns { display:flex; gap:8px; margin-top:16px; }
+      .sheet .btns button { flex:1; min-height:46px; }
+      .sheet .err { color:#e07070; font-size:0.82rem; margin-top:10px; min-height:1em; }
+      .suggest { list-style:none; margin:4px 0 0; padding:0; border:1px solid #222; border-radius:8px; max-height:220px; overflow-y:auto; }
+      .suggest:empty { display:none; }
+      .suggest li { padding:11px 12px; border-top:1px solid #1a1a1a; cursor:pointer; display:flex; justify-content:space-between; gap:8px; }
+      .suggest li:first-child { border-top:none; }
+      .suggest li:hover, .suggest li.on { background:#142014; }
+      .suggest .cnt { color:#666; font-size:0.75rem; flex-shrink:0; }
     </style>
 </head>
 <body>
     <%- include('partials/nav') %>
 
-    <div class="container" style="padding-top:24px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+    <div class="container" style="padding-top:20px">
+      <div class="page-head">
         <h2 style="margin:0">📒 Workout Logs</h2>
         <a href="/workout" class="btn">＋ Log a workout</a>
       </div>
 
       <div class="filter-row">
-        <span style="color:#555;font-size:0.78rem">Filter:</span>
+        <span style="color:#555;font-size:0.78rem;flex-shrink:0">Filter:</span>
         <a href="/logs" class="<%= filterType === 'all' ? 'on' : '' %>">All</a>
         <% types.forEach(t => { %>
           <a href="/logs?type=<%= encodeURIComponent(t) %>" class="<%= filterType === t ? 'on' : '' %>"><%= t %></a>
         <% }) %>
       </div>
 
-      <% if (!sessions.length) { %>
-        <div style="text-align:center;padding:60px 20px;color:#555">
-          No workouts logged yet. Head to <a href="/workout" style="color:#2ecc71">the logger</a> and use ⚡ Quick log.
-        </div>
-      <% } else { %>
-        <% sessions.forEach(s => { %>
-          <div class="log-card" id="log-<%= s.id %>">
-            <div class="log-head">
-              <div>
-                <div class="log-date"><%= s.date %><% if (s.status === 'active') { %> · <span style="color:#b0902e">in progress</span><% } %></div>
-                <div class="log-title"><%= s.title || (s.type ? s.type.charAt(0).toUpperCase() + s.type.slice(1) : 'Workout') %></div>
-                <div class="log-meta">
-                  <%= s.exercises.length %> exercise<%= s.exercises.length === 1 ? '' : 's' %> · <%= s.setCount %> set<%= s.setCount === 1 ? '' : 's' %>
-                  <% if (s.duration) { %> · <%= s.duration %> min<% } %>
-                  <% if (s.effort) { %> · RPE <%= '★'.repeat(s.effort) %><% } %>
-                </div>
-              </div>
-              <div style="display:flex;align-items:center;gap:8px">
-                <span class="tag tag-<%= s.type %>"><%= s.type %></span>
-                <button class="del-btn" onclick="deleteSession(<%= s.id %>)">Delete</button>
-              </div>
-            </div>
-            <div class="log-body">
-              <% if (!s.exercises.length) { %>
-                <div style="color:#555;font-size:0.85rem">No sets recorded.</div>
-              <% } %>
-              <% s.exercises.forEach(ex => { %>
-                <div class="log-ex">
-                  <div class="log-ex-name"><%= ex.name %></div>
-                  <table class="log-sets">
-                    <tr class="h"><td>Set</td><td>Reps / Time</td><td>Weight</td><td>Notes</td></tr>
-                    <% ex.sets.forEach((st, i) => { %>
-                      <tr>
-                        <td style="color:#555"><%= st.setNumber || (i + 1) %></td>
-                        <td style="color:#ccc"><%= st.duration ? (st.duration >= 60 ? (st.duration / 60) + ' min' : st.duration + 's') : (st.reps != null ? st.reps : '—') %></td>
-                        <td style="color:#ccc"><%= st.weight != null ? st.weight + (st.weightUnit || 'lbs') : 'BW' %></td>
-                        <td style="color:#777"><%= st.notes || '' %></td>
-                      </tr>
-                    <% }) %>
-                  </table>
-                </div>
-              <% }) %>
-            </div>
-          </div>
-        <% }) %>
-        <div style="color:#444;font-size:0.75rem;text-align:center;margin-top:8px">Showing your most recent sessions.</div>
-      <% } %>
+      <div id="logs"></div>
+      <div id="empty" hidden style="text-align:center;padding:60px 20px;color:#555">
+        No workouts logged yet. Head to <a href="/workout" style="color:#2ecc71">the logger</a> and use ⚡ Quick log.
+      </div>
+      <div id="foot" style="color:#444;font-size:0.75rem;text-align:center;margin-top:8px">Tap a set to fix it. Showing your most recent sessions.</div>
+    </div>
+
+    <div class="sheet-bg" id="sheet-bg" onclick="if (event.target === this) closeSheet()">
+      <div class="sheet" role="dialog" aria-modal="true" id="sheet"></div>
     </div>
 
     <script>
-      async function deleteSession(id) {
-        if (!confirm('Delete this whole workout and its sets? This cannot be undone.')) return;
-        try {
-          const res = await fetch('/workout/api/session/' + id, { method: 'DELETE' });
-          const d = await res.json();
-          if (d && d.success) { const el = document.getElementById('log-' + id); if (el) el.remove(); }
-          else alert('Could not delete.');
-        } catch (e) { alert('Could not reach the server.'); }
+      // Rendered from one JSON copy so a card can be redrawn after an edit
+      // without a page reload — one template, not a server one and a client one.
+      let SESSIONS = <%- JSON.stringify(sessions).replace(/</g, '\\u003c') %>;
+      const TYPES = ['strength', 'conditioning', 'mma', 'bjj', 'muay_thai', 'recovery'];
+
+      const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+      const cap = s => s ? s.charAt(0).toUpperCase() + s.slice(1).replace(/_/g, ' ') : 'Workout';
+      const fmtTime = d => d >= 60 ? (Math.round(d / 6) / 10) + ' min' : d + 's';
+
+      function setText(st) {
+        const work = st.duration ? fmtTime(st.duration) : (st.reps != null ? st.reps + ' reps' : '—');
+        const load = st.weight != null ? st.weight + ' ' + (st.weightUnit || 'lbs') : 'BW';
+        return { work, load };
       }
+
+      function cardHTML(s) {
+        const sets = s.exercises.reduce((n, e) => n + e.sets.length, 0);
+        return `
+          <div class="log-head">
+            <div style="min-width:0">
+              <div class="log-date">${esc(s.date)}${s.status === 'active' ? ' · <span style="color:#b0902e">in progress</span>' : ''}</div>
+              <div class="log-title">${esc(s.title || cap(s.type))}</div>
+              <div class="log-meta">${s.exercises.length} exercise${s.exercises.length === 1 ? '' : 's'} · ${sets} set${sets === 1 ? '' : 's'}${s.duration ? ' · ' + s.duration + ' min' : ''}${s.effort ? ' · ' + '★'.repeat(s.effort) : ''} · <span class="tag tag-${esc(s.type)}">${esc(s.type)}</span></div>
+              ${s.notes ? `<div class="log-notes">${esc(s.notes)}</div>` : ''}
+            </div>
+            <div class="head-actions">
+              <button class="mini" onclick="editSession(${s.id})">Edit</button>
+            </div>
+          </div>
+          <div class="log-body">
+            ${s.exercises.length ? '' : '<div style="color:#555;font-size:0.85rem;padding:8px 0">No sets recorded.</div>'}
+            ${s.exercises.map(ex => `
+              <div class="log-ex">
+                <div class="log-ex-head">
+                  <div class="log-ex-name">${esc(ex.name)}</div>
+                  <button class="mini" onclick="renameEx(${s.id}, ${esc(JSON.stringify(ex.name))})">Rename</button>
+                </div>
+                ${ex.sets.map((st, i) => { const t = setText(st); return `
+                  <button class="set-row" onclick="editSet(${s.id}, ${st.id})">
+                    <span class="n">${st.setNumber || i + 1}</span><span>${esc(t.work)}</span><span>${esc(t.load)}</span>
+                    ${st.notes ? `<span class="note">${esc(st.notes)}</span>` : ''}
+                  </button>`; }).join('')}
+                <div class="add-row"><button class="mini go" onclick="addSet(${s.id}, ${esc(JSON.stringify(ex.name))})">＋ Set</button></div>
+              </div>`).join('')}
+            <div class="add-row"><button class="mini go" onclick="addSet(${s.id}, '')">＋ Exercise</button></div>
+          </div>`;
+      }
+
+      function render() {
+        const root = document.getElementById('logs');
+        root.innerHTML = SESSIONS.map(s => `<div class="log-card" id="log-${s.id}">${cardHTML(s)}</div>`).join('');
+        document.getElementById('empty').hidden = SESSIONS.length > 0;
+        document.getElementById('foot').hidden = SESSIONS.length === 0;
+      }
+
+      // The API returns flat sets; the page groups them the way /logs does — by exerciseOrder.
+      function group(session) {
+        const by = new Map();
+        for (const st of session.sets || []) {
+          if (!by.has(st.exerciseOrder)) by.set(st.exerciseOrder, { name: st.exerciseName, order: st.exerciseOrder, sets: [] });
+          by.get(st.exerciseOrder).sets.push(st);
+        }
+        const out = { ...session, exercises: [...by.values()] };
+        delete out.sets;
+        return out;
+      }
+
+      async function refresh(id) {
+        const r = await api('GET', '/logs/api/session/' + id);
+        const i = SESSIONS.findIndex(s => s.id === id);
+        if (!r.ok) { if (i >= 0) SESSIONS.splice(i, 1); }
+        else if (i >= 0) SESSIONS[i] = group(r.session);
+        render();
+      }
+
+      async function api(method, url, body) {
+        try {
+          const res = await fetch(url, {
+            method, headers: body ? { 'Content-Type': 'application/json' } : {},
+            body: body ? JSON.stringify(body) : undefined,
+          });
+          return await res.json();
+        } catch { return { ok: false, error: 'Could not reach the server.' }; }
+      }
+
+      // ── The sheet ──────────────────────────────────────────────────────────
+      function openSheet(html) {
+        document.getElementById('sheet').innerHTML = html;
+        document.getElementById('sheet-bg').classList.add('open');
+        document.body.style.overflow = 'hidden';
+      }
+      function closeSheet() {
+        document.getElementById('sheet-bg').classList.remove('open');
+        document.body.style.overflow = '';
+      }
+      document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
+      const val = id => document.getElementById(id).value;
+      const showErr = msg => { document.getElementById('sheet-err').textContent = msg || 'Something went wrong.'; };
+
+      const findSession = id => SESSIONS.find(s => s.id === id);
+      const findSet = (sid, setId) => findSession(sid).exercises.flatMap(e => e.sets).find(st => st.id === setId);
+
+      // Set fields shared by edit and add. Time is entered in seconds — the unit stored.
+      const setFields = st => `
+        <div class="grid3" style="margin-top:10px">
+          <div><label for="f-reps">Reps</label><input id="f-reps" type="number" inputmode="numeric" min="0" value="${st.reps ?? ''}"></div>
+          <div><label for="f-weight">Weight</label><input id="f-weight" type="number" inputmode="decimal" min="0" step="any" value="${st.weight ?? ''}" placeholder="BW"></div>
+          <div><label for="f-unit">Unit</label><select id="f-unit">
+            <option ${st.weightUnit !== 'kg' ? 'selected' : ''}>lbs</option><option ${st.weightUnit === 'kg' ? 'selected' : ''}>kg</option></select></div>
+        </div>
+        <label for="f-dur">Time (seconds, for timed sets)</label>
+        <input id="f-dur" type="number" inputmode="numeric" min="0" value="${st.duration ?? ''}">
+        <label for="f-notes">Notes</label>
+        <input id="f-notes" type="text" value="${esc(st.notes || '')}">`;
+      const readSetFields = () => ({
+        reps: val('f-reps'), weight: val('f-weight'), weightUnit: val('f-unit'),
+        duration: val('f-dur'), notes: val('f-notes'),
+      });
+
+      function editSet(sid, setId) {
+        const st = findSet(sid, setId);
+        openSheet(`
+          <h3>${esc(st.exerciseName)} — set ${st.setNumber}</h3>
+          ${setFields(st)}
+          <div class="err" id="sheet-err"></div>
+          <div class="btns">
+            <button class="mini danger" onclick="delSet(${sid}, ${setId})">Delete set</button>
+            <button class="btn btn-green" onclick="saveSet(${sid}, ${setId})">Save</button>
+          </div>`);
+      }
+      async function saveSet(sid, setId) {
+        const r = await api('PATCH', '/logs/api/set/' + setId, readSetFields());
+        if (!r.ok) return showErr(r.error);
+        closeSheet(); refresh(sid);
+      }
+      async function delSet(sid, setId) {
+        if (!confirm('Delete this set?')) return;
+        const r = await api('DELETE', '/logs/api/set/' + setId);
+        if (!r.ok) return showErr(r.error);
+        closeSheet(); refresh(sid);
+      }
+
+      function addSet(sid, name) {
+        const known = name ? findSession(sid).exercises.find(e => e.name === name) : null;
+        const prev = known ? known.sets[known.sets.length - 1] : {};
+        openSheet(`
+          <h3>${name ? 'Add a set — ' + esc(name) : 'Add an exercise'}</h3>
+          ${name ? `<input type="hidden" id="f-name" value="${esc(name)}">` : `
+            <label for="f-name">Exercise</label>
+            <input id="f-name" type="text" autocomplete="off" autocapitalize="words" placeholder="Start typing — your exercises come up first">
+            <ul class="suggest" id="f-suggest" role="listbox"></ul>`}
+          ${setFields({ reps: prev.reps, weight: prev.weight, weightUnit: prev.weightUnit, duration: prev.duration })}
+          <div class="err" id="sheet-err"></div>
+          <div class="btns">
+            <button class="mini" onclick="closeSheet()">Cancel</button>
+            <button class="btn btn-green" onclick="saveNewSet(${sid})">Add</button>
+          </div>`);
+        if (!name) wireSuggest('f-name', 'f-suggest');
+      }
+      async function saveNewSet(sid) {
+        const exerciseName = val('f-name').trim();
+        if (!exerciseName) return showErr('Name the exercise.');
+        const r = await api('POST', '/logs/api/session/' + sid + '/sets', { exerciseName, ...readSetFields() });
+        if (!r.ok) return showErr(r.error);
+        closeSheet(); refresh(sid);
+      }
+
+      function renameEx(sid, from) {
+        openSheet(`
+          <h3>Rename “${esc(from)}”</h3>
+          <label for="f-name">Every set of it in this workout becomes</label>
+          <input id="f-name" type="text" autocomplete="off" autocapitalize="words" value="${esc(from)}">
+          <ul class="suggest" id="f-suggest" role="listbox"></ul>
+          <div class="err" id="sheet-err"></div>
+          <div class="btns">
+            <button class="mini" onclick="closeSheet()">Cancel</button>
+            <button class="btn btn-green" onclick="saveRename(${sid}, ${esc(JSON.stringify(from))})">Rename</button>
+          </div>`);
+        wireSuggest('f-name', 'f-suggest');
+      }
+      async function saveRename(sid, from) {
+        const r = await api('POST', '/logs/api/session/' + sid + '/rename', { from, to: val('f-name') });
+        if (!r.ok) return showErr(r.error);
+        closeSheet(); refresh(sid);
+      }
+
+      function editSession(sid) {
+        const s = findSession(sid);
+        openSheet(`
+          <h3>Edit workout</h3>
+          <label for="f-date">Date</label>
+          <input id="f-date" type="date" value="${esc(s.date)}">
+          <label for="f-title">Title</label>
+          <input id="f-title" type="text" value="${esc(s.title || '')}" placeholder="${esc(cap(s.type))}">
+          <label for="f-type">Type</label>
+          <select id="f-type">${TYPES.map(t => `<option value="${t}" ${t === s.type ? 'selected' : ''}>${cap(t)}</option>`).join('')}</select>
+          <div class="grid3" style="grid-template-columns:1fr 1fr;margin-top:10px">
+            <div><label for="f-min">Minutes</label><input id="f-min" type="number" inputmode="numeric" min="0" value="${s.duration ?? ''}"></div>
+            <div><label for="f-eff">Effort 1–5</label><input id="f-eff" type="number" inputmode="numeric" min="1" max="5" value="${s.effort ?? ''}"></div>
+          </div>
+          <label for="f-snotes">Notes</label>
+          <textarea id="f-snotes" rows="3">${esc(s.notes || '')}</textarea>
+          <div class="err" id="sheet-err"></div>
+          <div class="btns">
+            <button class="mini danger" onclick="delSession(${sid})">Delete workout</button>
+            <button class="btn btn-green" onclick="saveSession(${sid})">Save</button>
+          </div>`);
+      }
+      async function saveSession(sid) {
+        const r = await api('PATCH', '/logs/api/session/' + sid, {
+          date: val('f-date'), title: val('f-title'), type: val('f-type'),
+          duration: val('f-min'), effort: val('f-eff'), notes: val('f-snotes'),
+        });
+        if (!r.ok) return showErr(r.error);
+        closeSheet(); refresh(sid);
+      }
+      async function delSession(sid) {
+        if (!confirm('Delete this whole workout and its sets? This cannot be undone.')) return;
+        const r = await api('DELETE', '/logs/api/session/' + sid);
+        if (!r.ok) return showErr(r.error);
+        closeSheet();
+        SESSIONS = SESSIONS.filter(s => s.id !== sid);
+        render();
+      }
+
+      // ── Known exercise names, as you type ──────────────────────────────────
+      // Loaded once per page; the names already in YOUR log, most-used first,
+      // so "Chest Fly Machine" is offered instead of retyped a new way.
+      let KNOWN = null;
+      async function knownNames() {
+        if (KNOWN) return KNOWN;
+        const r = await api('GET', '/workout/api/known-names');
+        KNOWN = r.ok ? r.names : [];
+        return KNOWN;
+      }
+      function wireSuggest(inputId, listId) {
+        const input = document.getElementById(inputId), list = document.getElementById(listId);
+        let active = -1, shown = [];
+        const draw = async () => {
+          const q = input.value.trim().toLowerCase();
+          const names = await knownNames();
+          shown = (q ? names.filter(n => n.name.toLowerCase().includes(q)) : names)
+            .filter(n => n.name.toLowerCase() !== q).slice(0, 8);
+          active = -1;
+          list.innerHTML = shown.map((n, i) =>
+            `<li role="option" data-i="${i}"><span>${esc(n.name)}</span><span class="cnt">${n.sets} set${n.sets == 1 ? '' : 's'}</span></li>`).join('');
+        };
+        const pick = i => { input.value = shown[i].name; list.innerHTML = ''; };
+        input.addEventListener('input', draw);
+        input.addEventListener('focus', draw);
+        input.addEventListener('keydown', e => {
+          if (!shown.length) return;
+          if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+            e.preventDefault();
+            active = (active + (e.key === 'ArrowDown' ? 1 : -1) + shown.length) % shown.length;
+            [...list.children].forEach((li, i) => li.classList.toggle('on', i === active));
+          } else if (e.key === 'Enter' && active >= 0) { e.preventDefault(); pick(active); }
+        });
+        // mousedown, not click: it fires before the input's blur, on touch as well.
+        list.addEventListener('mousedown', e => {
+          const li = e.target.closest('li'); if (!li) return;
+          e.preventDefault(); pick(Number(li.dataset.i));
+        });
+        setTimeout(() => input.focus(), 50);
+      }
+
+      render();
     </script>
 </body>
 </html>

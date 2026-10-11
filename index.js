@@ -307,6 +307,9 @@ app.get('/', requireLogin, async (req, res) => {
 
 // Skill tree, fitness tests, treadmill test, weekly benchmarks (api/web-fitness.js).
 require('./api/web-fitness')(app, { requireLogin, getDatabase });
+// Correcting the log in place: edit/delete a set, retitle or redate a session,
+// add a set, rename an exercise, and known-name suggestions (api/web-log-edit.js).
+require('./api/web-log-edit')(app, { requireLogin, getDatabase });
 
 app.get('/tools', requireLogin, (req, res) => {
     res.render('tools', { title: 'Tools', user: req.user });
@@ -1110,7 +1113,7 @@ app.get('/logs', requireLogin, async (req, res) => {
         const sets = await WorkoutSet.findAll({ where: { sessionId: s.id }, order: [['exerciseOrder', 'ASC'], ['setNumber', 'ASC']] });
         const byOrder = new Map();   // group sets into exercises by their exerciseOrder
         for (const st of sets) {
-            if (!byOrder.has(st.exerciseOrder)) byOrder.set(st.exerciseOrder, { name: st.exerciseName, sets: [] });
+            if (!byOrder.has(st.exerciseOrder)) byOrder.set(st.exerciseOrder, { name: st.exerciseName, order: st.exerciseOrder, sets: [] });
             byOrder.get(st.exerciseOrder).sets.push(st.toJSON());
         }
         return { ...s.toJSON(), exercises: [...byOrder.values()], setCount: sets.length };

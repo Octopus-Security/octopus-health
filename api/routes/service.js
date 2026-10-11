@@ -514,7 +514,7 @@ router.get('/sessions', requireToken, async (req, res) => {
     }
 
     const rows = await sequelize.query(
-      `SELECT sessionId, exerciseName, exerciseOrder, setNumber, reps, weight, weightUnit, duration, notes
+      `SELECT id, sessionId, exerciseName, exerciseOrder, setNumber, reps, weight, weightUnit, duration, notes
          FROM WorkoutSets WHERE sessionId IN (:ids)
         ORDER BY sessionId ASC, exerciseOrder ASC, setNumber ASC`,
       { replacements: { ids: sessions.map(s => s.id) }, type: QueryTypes.SELECT },
@@ -526,7 +526,8 @@ router.get('/sessions', requireToken, async (req, res) => {
       for (const r of mine) {
         let ex = byExercise.find(e => e.exerciseName === r.exerciseName);
         if (!ex) { ex = { exerciseName: r.exerciseName, sets: [] }; byExercise.push(ex); }
-        ex.sets.push({ reps: r.reps, weight: r.weight, unit: r.weightUnit, duration: r.duration, notes: r.notes });
+        // `id` lets a caller correct THIS set (PATCH /sets/:id) — additive field.
+        ex.sets.push({ id: r.id, setNumber: r.setNumber, reps: r.reps, weight: r.weight, unit: r.weightUnit, duration: r.duration, notes: r.notes });
       }
       return {
         id: s.id, date: s.date, type: s.type, title: s.title,
@@ -538,6 +539,28 @@ router.get('/sessions', requireToken, async (req, res) => {
     res.json({ ok: true, from, to, today: todayET, sessions: out });
   } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
 });
+
+// ── Correcting the log (api/log-edit.js) ──────────────────────────────────────
+// The same operations the Logs page has, for cortex: until 2026-10-11 a wrong
+// log could only be fixed from chat by deleting the day. The account is
+// X-Service-User's own database, so an id from someone else's is a 404.
+const LogEdit = require('../log-edit');
+const editRoute = fn => async (req, res) => {
+  try {
+    const r = await fn(await getDB(req), req);
+    res.status(r.ok ? 200 : (r.status || 400)).json(r);
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+};
+router.get('/known-names', requireToken, editRoute(async (db, req) =>
+  ({ ok: true, names: await require('../web-log-edit').knownNames(db, req.query.q) })));
+router.get('/sessions/:id', requireToken, editRoute((db, req) => LogEdit.getSession(db, req.params.id)));
+router.patch('/sessions/:id', requireToken, editRoute((db, req) => LogEdit.editSession(db, req.params.id, req.body || {})));
+router.delete('/sessions/:id', requireToken, editRoute((db, req) => LogEdit.deleteSession(db, req.params.id)));
+router.post('/sessions/:id/sets', requireToken, editRoute((db, req) => LogEdit.addSet(db, req.params.id, req.body || {})));
+router.post('/sessions/:id/rename', requireToken,
+  editRoute((db, req) => LogEdit.renameExercise(db, req.params.id, (req.body || {}).from, (req.body || {}).to)));
+router.patch('/sets/:id', requireToken, editRoute((db, req) => LogEdit.editSet(db, req.params.id, req.body || {})));
+router.delete('/sets/:id', requireToken, editRoute((db, req) => LogEdit.deleteSet(db, req.params.id)));
 
 // GET /api/service/logged-today
 // Did the default account log any training today (ET)? Counts finished
