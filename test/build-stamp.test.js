@@ -182,7 +182,10 @@ test('the index view renders with a stamped stylesheet', () => {
   const ejs = require('ejs');
   const src = fs.readFileSync(path.join(root, 'views', 'index.ejs'), 'utf8');
   const head = src.slice(0, src.indexOf('</head>'));
-  const out  = ejs.render(head, { asset, title: 'probe' }, { async: false });
+  // filename is needed now that the head pulls in partials/favicon.ejs via
+  // include() — ejs resolves a relative include against it.
+  const out  = ejs.render(head, { asset, title: 'probe' },
+    { async: false, filename: path.join(root, 'views', 'index.ejs') });
   assert.match(out, /href="\/theme\.css\?v=[0-9a-f]{8}"/,
     'the real template did not come out with a versioned stylesheet');
 });
