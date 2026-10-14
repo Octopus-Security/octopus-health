@@ -182,31 +182,56 @@ test('from-text: an ambiguous name is asked ONCE — the answer is remembered', 
   await log(user, [{ exerciseName: 'Barbell Bench Press', sets: [{ reps: 5, weight: 185 }] }], { date: '2026-10-01' });
 
   const text = 'Bench press 45lb bar:\n50+bar x 10';
+  // 2026-10-14: this used to refuse the write. It is now SAVED under the name
+  // as typed, and the question comes back as advice — under `namingAsk`, not
+  // `needsNaming`, which still means "nothing was saved" to every caller.
   const first = await svc(user, 'POST', '/sessions/from-text', { text });
-  assert.strictEqual(first.body.sessionId, null, 'asked, nothing saved');
-  assert.ok(first.body.needsNaming.length);
-  assert.match(first.body.message, /SAME text and names/);
+  assert.ok(first.body.sessionId, 'the workout is saved on the FIRST call');
+  assert.ok(!first.body.needsNaming, 'not under the key that means nothing was saved');
+  assert.ok(first.body.namingAsk && first.body.namingAsk.length, JSON.stringify(first.body));
+  assert.strictEqual(first.body.logged[0].exerciseName, 'Bench Press', 'as typed');
 
-  const second = await svc(user, 'POST', '/sessions/from-text', { text, names: { 'Bench Press': 'Barbell Bench Press' } });
-  assert.ok(second.body.sessionId, JSON.stringify(second.body));
-  assert.strictEqual(second.body.logged[0].exerciseName, 'Barbell Bench Press');
-
-  // A later day, no names passed: the answer from before applies, no question.
+  // The answer is a RENAME, which is also what records the alias.
+  const { renameExercise } = require('../api/log-edit');
   const db = getDatabase(user); await db.sequelize.sync();
-  await db.WorkoutSession.update({ date: '2026-10-02' }, { where: { id: second.body.sessionId } });
+  const r = await renameExercise(db, first.body.sessionId, 'Bench Press', 'Barbell Bench Press');
+  assert.strictEqual(r.renamed, 1, JSON.stringify(r));
+
+  // A later day, no names passed: the answer applies, and nothing is asked.
+  await db.WorkoutSession.update({ date: '2026-10-02' }, { where: { id: first.body.sessionId } });
   const third = await svc(user, 'POST', '/sessions/from-text', { text: 'bench press 3x5 155lbs' });
   assert.ok(third.body.sessionId, JSON.stringify(third.body));
   assert.strictEqual(third.body.logged[0].exerciseName, 'Barbell Bench Press');
+  assert.ok(!third.body.namingAsk, 'asked once, ever');
 });
 
 test('from-text: "it is a new exercise" is remembered too', { skip }, async () => {
   const user = userFor('text_new');
   await log(user, [{ exerciseName: 'Hanging Leg Raise', sets: [{ reps: 10 }] }], { date: '2026-10-01' });
   const asked = await svc(user, 'POST', '/sessions/from-text', { text: '10 leg raises' });
-  assert.ok(asked.body.needsNaming && asked.body.needsNaming.length, JSON.stringify(asked.body));
-  const r = await svc(user, 'POST', '/sessions/from-text', { text: '10 leg raises', names: { 'Leg Raises': 'Leg Raises' } });
-  assert.ok(r.body.sessionId, JSON.stringify(r.body));
-  assert.strictEqual(r.body.logged[0].exerciseName, 'Leg Raises');
+  assert.ok(asked.body.sessionId, 'saved, not refused');
+  assert.ok(asked.body.namingAsk && asked.body.namingAsk.length, JSON.stringify(asked.body));
+  assert.strictEqual(asked.body.logged[0].exerciseName, 'Leg Raises');
+
+  // "it is a new exercise, leave it" is still an answer, and `names` is still
+  // the channel — mapping the name to itself. Without that being remembered the
+  // question returns every time he writes it the same way.
+  //
+  // Note what re-sending the SAME text now does: the first call saved it, so
+  // the duplicate hold catches the second and NOTHING is written again. That is
+  // correct, and it is why answering a question about an already-saved session
+  // is a RENAME (api/log-edit.js renameExercise, which records the alias
+  // itself) rather than a re-send. `names` here still does its other job —
+  // the alias is recorded before the parse, so it applies from now on.
+  const held = await svc(user, 'POST', '/sessions/from-text', { text: '10 leg raises', names: { 'Leg Raises': 'Leg Raises' } });
+  assert.strictEqual(held.body.sessionId, null, 'held as a duplicate, not written twice');
+  assert.ok(held.body.needsConfirm.length, JSON.stringify(held.body));
+
+  // ...and the answer sticks: a different set of the same exercise asks nothing.
+  const later = await svc(user, 'POST', '/sessions/from-text', { text: '25 leg raises' });
+  assert.ok(later.body.sessionId, JSON.stringify(later.body));
+  assert.ok(!later.body.namingAsk, 'settled, so no longer asked');
+  assert.strictEqual(later.body.logged[0].exerciseName, 'Leg Raises');
 });
 
 test('from-text: a line with numbers it cannot read saves NOTHING and names the line', { skip }, async () => {
