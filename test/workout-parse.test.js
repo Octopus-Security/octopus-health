@@ -242,3 +242,76 @@ test('plumbing, separators and out-of-range numbers are not exercises', () => {
   assert.deepStrictEqual(parseSets('2026-10-14'), []);
   assert.deepStrictEqual(parseWorkout('date: 2026-10-14').exercises, []);
 });
+
+// ── 2026-10-14, later: a leg day written the way the owner actually writes one ──
+//
+// Four more phrasings, and three of them were storing or dropping real numbers:
+// "10 x Deep squats" named the exercise `X Deep Squats With`, "Bar = 45 lbs"
+// became an exercise called `Bar =` holding 45 lb, "90lb + bar" inline logged
+// 90 for a 135 lb lift, and a `Shoulder press` block whose set lines ended in
+// "dumbbells" was dropped whole. Both `X` names then went out as "which did you
+// mean?" questions about the letter x, and nothing was saved.
+test('the owner\'s leg day, verbatim', () => {
+  const r = parseWorkout([
+    'Leg extension:', '10 x 50lbs', '10 x 70lbs', '10 x 100lbs', '',
+    'Leg curl:', '10 x 50lbs', '10 x 70lbs', '',
+    '10 x Deep squats with 70lb', '',
+    'Bar = 45 lbs', '10 x Barbell back squats 90lb + bar x 10', '',
+    'Shoulder press ', '10 x 40lb dumbbells ', '10 x 40lb dumbbells', '',
+    '5 pull ups', '5 L sit pull ups', '', '15 dips',
+  ].join('\n'));
+  assert.deepStrictEqual(r.exercises.map(e => [e.name, e.sets.map(s => [s.reps, s.weight])]), [
+    ['Leg Extension',        [[10, 50], [10, 70], [10, 100]]],
+    ['Leg Curl',             [[10, 50], [10, 70]]],
+    ['Deep Squats',          [[10, 70]]],
+    ['Barbell Back Squats',  [[10, 135]]],
+    ['Shoulder Press',       [[10, 40], [10, 40]]],
+    ['Pull Ups',             [[5, null]]],
+    ['L Sit Pull Ups',       [[5, null]]],
+    ['Dips',                 [[15, null]]],
+  ]);
+  assert.deepStrictEqual(r.unparsed, []);
+  // The inline +bar keeps its reading, exactly as the block form does.
+  assert.strictEqual(r.exercises[3].sets[0].note, '90 + 45lb bar');
+});
+
+test('"N x name" is N reps of that exercise, not an exercise called X', () => {
+  const sh = t => parseWorkout(t).exercises.map(e => [e.name, e.sets.map(s => [s.reps, s.weight])]);
+  assert.deepStrictEqual(sh('10 x Deep squats with 70lb'), [['Deep Squats', [[10, 70]]]]);
+  assert.deepStrictEqual(sh('5 x pull ups'), [['Pull Ups', [[5, null]]]]);
+  // "with"/"holding" introduce the load and are not part of the movement.
+  assert.deepStrictEqual(sh('10 goblet squats holding 50lb'), [['Goblet Squats', [[10, 50]]]]);
+  // The plain form still works and still wins where there is no x.
+  assert.deepStrictEqual(sh('20 pull ups'), [['Pull Ups', [[20, null]]]]);
+});
+
+test('an inline "+ bar" is expanded, like the block form', () => {
+  const sets = t => parseWorkout(t).exercises[0].sets.map(s => [s.reps, s.weight, s.note]);
+  assert.deepStrictEqual(sets('10 x Barbell back squats 90lb + bar x 10'), [[10, 135, '90 + 45lb bar']]);
+  assert.deepStrictEqual(sets('bench 135 + bar x 5'), [[5, 180, '135 + 45lb bar']]);
+});
+
+test('"Bar = 45 lbs" declares the bar for the lines below it and logs nothing', () => {
+  // Consumed, NOT unparsed: it has a number in it, and service.js refuses to
+  // save a workout with an unread numeric line, so leaving it there would
+  // reject the whole message.
+  const r = parseWorkout('Bar = 35 lbs\nBack squat:\n90+bar x 5');
+  assert.deepStrictEqual(r.exercises.map(e => [e.name, e.sets.map(s => [s.reps, s.weight])]),
+    [['Back Squat', [[5, 125]]]]);
+  assert.deepStrictEqual(r.unparsed, []);
+  // A bar named in the HEADER still wins over one declared earlier.
+  assert.strictEqual(parseWorkout('Bar = 35 lbs\nsquat 45lb bar:\n90+bar x 5')
+    .exercises[0].sets[0].weight, 135);
+  // And it is never an exercise of its own.
+  assert.deepStrictEqual(parseWorkout('Bar = 45 lbs').exercises, []);
+  assert.deepStrictEqual(parseWorkout('Bar = 45 lbs').unparsed, []);
+});
+
+test('a set line may end in an equipment word without naming an exercise', () => {
+  const sets = t => parseWorkout(t).exercises[0].sets.map(s => [s.reps, s.weight]);
+  assert.deepStrictEqual(sets('Shoulder press:\n10 x 40lb dumbbells\n10 x 40lb dumbbells'),
+    [[10, 40], [10, 40]]);
+  // But a line with a real movement word in it is still its own exercise.
+  const r = parseWorkout('Shoulder press:\n10 x 40lb dumbbells\n10 dumbbell curls 25lbs');
+  assert.deepStrictEqual(r.exercises.map(e => e.name), ['Shoulder Press', 'Dumbbell Curls']);
+});

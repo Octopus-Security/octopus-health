@@ -191,7 +191,7 @@ function normalisePhrasing(s) {
 
 // Parse ONE exercise clause: name + its set(s). `note` may carry a slash-style
 // descriptor ("punches/kicks/elbows/knees"). Returns null if no name is found.
-function parseClause(clause) {
+function parseClause(clause, bar = { weight: 45, unit: 'lbs' }) {
   const raw = clause.trim();
   if (!raw) return null;
   if (TOOL_ECHO_RE.test(raw)) return null;            // `log_workout_text — text: …`
@@ -211,10 +211,15 @@ function parseClause(clause) {
   let m = s.match(new RegExp(`^(\\d+(?:\\.\\d+)?)\\s*(${DUR_UNIT_RE})\\b`, 'i'));
   if (m) { leadDuration = Math.round(parseFloat(m[1]) * (DUR_SEC[m[2].toLowerCase()] || 1)); s = s.slice(m[0].length).trim(); }
 
-  // (b) leading reps before a name: "20 pull ups"
+  // (b) leading reps before a name: "20 pull ups", and "10 x Deep squats".
+  // The owner writes the `x` form freely (2026-10-14: "10 x Deep squats with
+  // 70lb", "10 x Barbell back squats 90lb + bar x 10"). Without the `x` branch
+  // the separator was taken as the start of the name, giving exercises called
+  // `X Deep Squats With` and `X Barbell Back Squats` — both of which then went
+  // out as "which did you mean?" questions about the letter x.
   let leadReps = null;
   if (leadDuration == null) {
-    const lr = s.match(/^(\d+)\s+(?=[a-z])/);
+    const lr = s.match(/^(\d+)\s*x\s+(?=[a-z])/i) || s.match(/^(\d+)\s+(?=[a-z])/);
     if (lr) { leadReps = parseInt(lr[1], 10); s = s.slice(lr[0].length).trim(); }
   }
 
@@ -227,10 +232,19 @@ function parseClause(clause) {
   for (; i < words.length; i++) {
     const w = words[i];
     if (/\d/.test(w) || /^x\d/i.test(w) || w.startsWith('@')) break;   // a set spec begins
+    // "with" introduces the load, it is not part of the movement: "deep squats
+    // with 70lb" named an exercise `Deep Squats With`.
+    if (/^(?:with|holding|using)$/i.test(w)) break;
     if (w.includes('/')) { noteParts = words.slice(i); i = words.length; break; }
     nameParts.push(w);
   }
-  const tail = words.slice(i).join(' ');
+  // "+bar" is not only a BLOCK thing: "10 x Barbell back squats 90lb + bar x 10"
+  // is one line, and reading it without expanding the bar logged 90 lb for a
+  // 135 lb lift — a wrong number, silently, which is the worst outcome here.
+  const rawTail = words.slice(i).join(' ');
+  const expanded = expandPlusBar(rawTail, bar);
+  const tail = expanded.line;
+  const barNote = expanded.note;
   let name = nameParts.join(' ').replace(/\s+/g, ' ').trim();
   if (!name) return null;                               // a set with no exercise — caller handles
   // One letter is not an exercise. `10 x 90 + bar, date: 2026-10-14` split on
@@ -241,7 +255,8 @@ function parseClause(clause) {
   // "sets"/"reps" left IN the name means the phrasing was not understood.
   if (/\b(?:sets?|reps?)\b/.test(name)) return null;
 
-  const note = noteParts.length ? noteParts.join(' ').trim() : sideNote;
+  const note = [noteParts.length ? noteParts.join(' ').trim() : sideNote, barNote]
+    .filter(Boolean).join('; ') || null;
 
   // Build the sets.
   let sets = [];
@@ -266,7 +281,7 @@ function parseClause(clause) {
 // Parse a segment, which may hold several "and"/"&"-joined pieces: the first is
 // the exercise; each following piece is either another SET (pure numbers) or a
 // NEW exercise (has a name word).
-function parseSegment(segment) {
+function parseSegment(segment, bar = { weight: 45, unit: 'lbs' }) {
   const pieces = segment.split(/\s+(?:and|&|then|plus)\s+/i).map(p => p.trim()).filter(Boolean);
   if (!pieces.length) return { exercises: [], leftover: segment };
 
@@ -283,7 +298,7 @@ function parseSegment(segment) {
       else failed = true;
       continue;
     }
-    const parsed = parseClause(piece);
+    const parsed = parseClause(piece, bar);
     if (!parsed) { failed = true; continue; }
     exercises.push(parsed);
     current = parsed;
@@ -327,22 +342,39 @@ function expandPlusBar(line, bar) {
   };
 }
 
+// A line that DECLARES the bar for the lines after it, rather than logging a
+// set: "Bar = 45 lbs". 2026-10-14 it became an exercise called `Bar =` holding
+// 45 lb and no reps, and the "+bar" line below it was read without it — so the
+// declaration was both junk data AND useless. It is consumed, never unparsed:
+// it has a number in it, and service.js treats an unread numeric line as reason
+// to save NOTHING, so leaving it in `unparsed` would reject the whole workout.
+const BAR_DECL_RE = new RegExp(`^(?:the\\s+)?bar\\s*[:=]\\s*(\\d+(?:\\.\\d+)?)\\s*(${WEIGHT_UNIT_RE})?\\.?$`, 'i');
+
+// Equipment nouns that can TRAIL a set line without naming an exercise:
+// "10 x 40lb dumbbells" is a set of shoulder press, not an exercise called
+// dumbbells. Stripped only for the is-this-a-set-line question — a line like
+// "10 dumbbell curls" still has "curls" left and stays an exercise.
+const EQUIP_NOUN_RE = /\b(?:dumbbells?|dbs?|kettlebells?|kbs?|barbells?|bars?|plates?|bands?|machines?|cables?|weights?|total|per side|each|hand|hands)\b/gi;
+
 /** Pure set spec, no exercise name of its own ("100lb x 10", "95lbs x 10", "3x8 @135"). */
 function isSetOnly(line) {
   if (/^\d{5,}$/.test(line.trim())) return false;   // a pasted 2FA code is not a set of 719981 reps
-  return /\d/.test(line) && !hasNameWord(line.replace(/\bx\b/gi, ' '));
+  const stripped = line.replace(/\bx\b/gi, ' ').replace(EQUIP_NOUN_RE, ' ');
+  return /\d/.test(line) && !hasNameWord(stripped);
 }
 
-function parseHeaderBlock(header, setLines) {
+function parseHeaderBlock(header, setLines, declaredBar = { weight: 45, unit: 'lbs' }) {
   let h = header.replace(/:\s*$/, '').trim();
   if (TOOL_ECHO_RE.test(h)) return null;
   const bm = h.match(BAR_SPEC_RE);
+  // A bar named in the HEADER wins over one declared earlier in the message,
+  // which wins over the 45 lb assumption.
   const bar = bm ? { weight: parseFloat(bm[1]), unit: WEIGHT_UNIT[bm[2].toLowerCase()] || 'lbs' }
-                 : { weight: 45, unit: 'lbs' };
+                 : declaredBar;
   if (bm) h = h.replace(bm[0], ' ').replace(/\s+/g, ' ').trim();
 
   // The header may carry its own first set ("bicep curls 10 20lbs").
-  const own = parseClause(h);
+  const own = parseClause(h, bar);
   const name = own ? own.name : titleCase(h.replace(SIDE_RE, ' ').replace(/[^a-z0-9 '/-]/gi, ' ').replace(/\s+/g, ' ').trim().toLowerCase());
   if (!name || !/[a-z]{2,}/i.test(name)) return null;
   // The fallback name is whatever words the header had left after the bar spec,
@@ -372,9 +404,17 @@ function parseWorkout(text) {
   const push = ex => { ex.order = order++; exercises.push(ex); };
 
   const lines = String(text || '').split(/\r?\n/);
+  // The bar in force for "+bar", until a line declares another one.
+  let bar = { weight: 45, unit: 'lbs' };
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
     if (!line) continue;
+
+    const decl = line.match(BAR_DECL_RE);
+    if (decl) {
+      bar = { weight: parseFloat(decl[1]), unit: WEIGHT_UNIT[(decl[2] || 'lbs').toLowerCase()] || 'lbs' };
+      continue;                                       // consumed, not unread
+    }
 
     // A header: ends in ":" or is followed by set-only lines. Its sets are the
     // run of set-only lines that follow (blank lines between them allowed).
@@ -383,13 +423,18 @@ function parseWorkout(text) {
     while (j < lines.length) {
       const t = lines[j].trim();
       if (!t) { j++; continue; }
-      const probe = expandPlusBar(t, { weight: 45, unit: 'lbs' }).line;
+      // A bar declaration is not a set of the block above it. "bar" is one of
+      // the equipment nouns isSetOnly strips, so "Bar = 45 lbs" looked like a
+      // pure set spec and was swallowed as a second, repless 45 lb set of the
+      // exercise before it — while the declaration itself never ran.
+      if (BAR_DECL_RE.test(t)) break;
+      const probe = expandPlusBar(t, bar).line;
       if (!isSetOnly(probe)) break;
       next.push(t); j++;
     }
     const looksHeader = /:\s*$/.test(line) || (next.length > 0 && hasNameWord(line.replace(BAR_SPEC_RE, ' ')));
     if (looksHeader && (next.length || /:\s*$/.test(line))) {
-      const r = parseHeaderBlock(line, next);
+      const r = parseHeaderBlock(line, next, bar);
       if (r && r.exercise) {
         push(r.exercise);
         unparsed.push(...r.bad);
@@ -401,7 +446,7 @@ function parseWorkout(text) {
 
     // Anything else: the original comma/"and"-aware path, one line at a time.
     for (const seg of splitSegments(line)) {
-      const { exercises: exs, leftover } = parseSegment(seg);
+      const { exercises: exs, leftover } = parseSegment(seg, bar);
       for (const ex of exs) push(ex);
       if (leftover) unparsed.push(leftover);
     }
