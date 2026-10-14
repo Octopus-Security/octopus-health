@@ -180,7 +180,10 @@ router.get('/prs/bests', requireToken, async (req, res) => {
 async function logSession(req, res) {
   try {
     const { Exercise, WorkoutSession, WorkoutSet, PersonalRecord } = await getDB(req);
-    const { type = 'strength', title, date, durationMins, effort, notes, sets = [], force = false, newTitle = false } = req.body;
+    // `newTitle` is still ACCEPTED in the body and ignored: a title no longer
+    // needs confirming, and cortex deploys separately, so an older one still
+    // sending it must not be an error.
+    const { type = 'strength', title, date, durationMins, effort, notes, sets = [], force = false } = req.body;
 
     // Resolve the day this session belongs to.
     //
@@ -207,21 +210,33 @@ async function logSession(req, res) {
       today = asked;
     }
 
-    // ── Is the title one this account already uses? ──────────────────────────
+    // ── The title, which is never a reason to refuse a workout ───────────────
     //
-    // The user's own instruction: "it should use known titles, if one isn't
-    // known it should ask to add them to the db." Checked before anything is
-    // written, same as the exercise-name question below — the Logs page shows
-    // this as the session's headline, and once it diverges ("Strength" beside
-    // "strength day" beside a single exercise name standing in for the whole
-    // session) there is no good place downstream to fix it.
+    // This used to ask, and refuse to write anything, whenever a title was not
+    // already in the account's list. It cost FOUR DAYS of training: the log's
+    // last entry was 2026-10-10 and 10-11 through 10-14 were all reported in
+    // chat, parsed correctly, and thrown away at this gate. On 10-11 the owner
+    // was asked for a title three times in one session; on 10-14 "Leg Day"
+    // produced the question, he answered it, and the answer arrived alongside a
+    // naming question that discarded the workout again.
     //
-    // No title at all is NOT an error: that keeps today's fallback (the
-    // session's `type` stands in for the title on the Logs page) untouched.
-    // See api/session-titles.js for why "unknown" is one bucket here, unlike
-    // the exercise-name check's ambiguous/new split — a title with nothing
-    // close is still asked about, because the whole point is to keep this
-    // list short and curated rather than letting it grow a new entry per typo.
+    // The title question was modelled on the exercise-name question below, and
+    // that was the mistake — they are not the same kind of question. A split
+    // exercise name splits a lift's HISTORY, so a 205 lb bench and a 185 lb
+    // bench stop being comparable and neither is the record; that is worth
+    // blocking a write for. A title is a headline on a card, the Logs page
+    // already leads with the DATE, and sessions are grouped by day regardless —
+    // so a messy title costs nothing a later edit cannot fix, and the Logs page
+    // has had a Title field all along.
+    //
+    // So: a title given is used, and added to the known list if it is new. The
+    // list still exists and still curates the account's own spelling — "pull"
+    // resolves to the seeded "Pull" — it just no longer has a veto.
+    //
+    // cortex cannot send one at all now (its two log tools dropped the
+    // parameter), which is what fixes this for chat logging without waiting on
+    // a health deploy. This half is for every OTHER caller: the web quick-log,
+    // and anything written later.
     let resolvedTitle = null;
     if (title != null && String(title).trim() !== '') {
       const titleDb = await getDB(req);
@@ -229,30 +244,13 @@ async function logSession(req, res) {
       const knownTitles = (await titleDb.SessionTitle.findAll({ attributes: ['name'] })).map(t => t.name);
       const asked = String(title).trim();
       const r = resolveSessionTitle(asked, knownTitles);
-
-      if (r.status === 'unknown' && !newTitle) {
-        return res.json({
-          ok: true, sessionId: null, date: today, exerciseCount: 0,
-          needsTitle: { title: asked, candidates: r.candidates },
-          question: titleQuestionText(asked, r.candidates),
-          message: 'NOTHING WAS SAVED. That title does not match one already in use. '
-            + (r.candidates.length
-                ? 'Ask whether one of the candidates is meant, or whether it is a genuinely new title.'
-                : 'Ask whether it is a genuinely new title to add.')
-            + ' Re-send the whole workout — with the chosen title, or with the same title and '
-            + 'newTitle: true to add it — once he has answered. Do not guess and do not log '
-            + 'the workout under a bare type in the meantime.',
-        });
-      }
-
-      if (r.status === 'unknown') {
-        // newTitle: true — he confirmed this is a genuinely new title.
+      if (r.status === 'known') {
+        resolvedTitle = r.name;                 // the account's own spelling/case
+      } else {
         // findOrCreate rather than create: two requests racing on the same
         // brand-new title (a slow reply, re-sent) must not create two rows.
         const [row] = await titleDb.SessionTitle.findOrCreate({ where: { name: asked } });
         resolvedTitle = row.name;
-      } else {
-        resolvedTitle = r.name; // known — use the account's own spelling/case
       }
     }
 
@@ -521,7 +519,8 @@ async function rememberAlias(db, asked, name) {
 }
 
 // POST /api/service/sessions/from-text
-// Body: { text, date?, type?, title?, newTitle?, force?, names?: { "<as typed>": "<meant>" } }
+// Body: { text, date?, type?, title?, force?, names?: { "<as typed>": "<meant>" } }
+// (`newTitle` is accepted and ignored — see logSession.)
 //
 // The model's whole job becomes: pass the person's message through VERBATIM.
 // Everything that went wrong on 2026-10-11 across four turns and two models —
@@ -536,7 +535,7 @@ async function rememberAlias(db, asked, name) {
 router.post('/sessions/from-text', requireToken, async (req, res) => {
   try {
     const db = await getDB(req);
-    const { text, date, type = 'strength', title, newTitle, force, names, dryRun } = req.body || {};
+    const { text, date, type = 'strength', title, force, names, dryRun } = req.body || {};
     if (!text || !String(text).trim()) return res.status(400).json({ ok: false, error: 'text is required — the message as the person wrote it' });
 
     // dryRun: parse only, write nothing, remember nothing. cortex asks this to
@@ -582,7 +581,7 @@ router.post('/sessions/from-text', requireToken, async (req, res) => {
       sets: e.sets.map(x => ({ reps: x.reps, weight: x.weight, weightUnit: x.weightUnit || 'lbs', duration: x.duration, notes: x.note || undefined })),
     }));
 
-    req.body = { type, title, date, newTitle, force, sets };
+    req.body = { type, title, date, force, sets };
     // Hand logSession's reply back with what was read, so the caller can show
     // the person their own numbers as the database will hold them.
     const json = res.json.bind(res);

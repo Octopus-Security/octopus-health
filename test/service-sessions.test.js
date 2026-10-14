@@ -188,7 +188,14 @@ test('the dashboard Exercise row is one per day, not one per call', { skip }, as
   assert.strictEqual(await db.Exercise.count({ where: { date: r1.body.date } }), 1);
 });
 
-test('needsTitle: an unknown title with a close match returns candidates and writes nothing', { skip }, async () => {
+// ── 2026-10-14: the title question is gone, and these replace its three tests ──
+//
+// It cost four days. The log's last entry was 2026-10-10; 10-11 to 10-14 were
+// all reported in chat, parsed correctly, and discarded at this gate. The
+// question was modelled on the exercise-name question, and that was the error —
+// a split exercise NAME splits a lift's history and is worth refusing a write
+// for; a title is a headline on a card whose page already leads with the date.
+test('an unknown title is ADDED and the workout is written, not refused', async () => {
   const user = userFor('title_a');
 
   const r = await post(user, {
@@ -196,59 +203,39 @@ test('needsTitle: an unknown title with a close match returns candidates and wri
     sets: [{ exerciseName: 'Leg Press', sets: [{ reps: 10, weight: 200 }] }],
   });
 
-  assert.strictEqual(r.status, 200);
-  assert.strictEqual(r.body.sessionId, null, 'NOTHING was saved');
-  assert.ok(r.body.needsTitle, 'asked about the title');
-  assert.strictEqual(r.body.needsTitle.title, 'Legz');
-  assert.ok(r.body.needsTitle.candidates.includes('Legs'), 'the close seeded default is offered');
-  assert.match(r.body.message, /NOTHING WAS SAVED/);
-
-  // The positive control for this half: under the old behaviour, a title was
-  // whatever got passed, with no check at all — this would have written a
-  // session titled "Legz" directly. If the needsTitle branch is ever removed,
-  // THIS assertion is what catches it.
-  const db = getDatabase(user);
-  await db.sequelize.sync();
-  assert.strictEqual(await db.WorkoutSession.count(), 0, 'no session exists yet');
-  assert.ok(!(await db.SessionTitle.findOne({ where: { name: 'Legz' } })), 'the unconfirmed title was never added');
-});
-
-test('needsTitle: an unknown title with NO close match still asks, not silently logs', { skip }, async () => {
-  const user = userFor('title_b');
-
-  const r = await post(user, {
-    type: 'strength', title: 'Zyzzyx Day',
-    sets: [{ exerciseName: 'Leg Press', sets: [{ reps: 10, weight: 200 }] }],
-  });
-
-  assert.strictEqual(r.body.sessionId, null);
-  assert.ok(r.body.needsTitle);
-  assert.deepStrictEqual(r.body.needsTitle.candidates, [], 'nothing resembles it, and it is still asked about');
-});
-
-test('newTitle: true adds the title once and proceeds with the write', { skip }, async () => {
-  const user = userFor('title_c');
-
-  const asked = await post(user, {
-    type: 'strength', title: 'Legz',
-    sets: [{ exerciseName: 'Leg Press', sets: [{ reps: 10, weight: 200 }] }],
-  });
-  assert.ok(asked.body.needsTitle, 'sanity: this title is unknown before confirming');
-
-  const r = await post(user, {
-    type: 'strength', title: 'Legz', newTitle: true,
-    sets: [{ exerciseName: 'Leg Press', sets: [{ reps: 10, weight: 200 }] }],
-  });
-
-  assert.strictEqual(r.status, 200);
-  assert.ok(r.body.sessionId, 'written this time');
-  assert.strictEqual(r.body.logged[0].exerciseName, 'Leg Press');
-
+  assert.ok(!r.body.needsTitle, 'a title is never a question now');
+  assert.ok(r.body.sessionId, 'the workout was written on the FIRST call');
   const db = getDatabase(user);
   await db.sequelize.sync();
   const session = await db.WorkoutSession.findByPk(r.body.sessionId);
   assert.strictEqual(session.title, 'Legz');
-  assert.ok(await db.SessionTitle.findOne({ where: { name: 'Legz' } }), 'the new title was added to the known list');
+  assert.ok(await db.SessionTitle.findOne({ where: { name: 'Legz' } }),
+    'and it joined the known list, so the list still curates spelling');
+});
+
+test('an unknown title with nothing resembling it is also just written', async () => {
+  const user = userFor('title_b');
+  const r = await post(user, {
+    type: 'strength', title: 'Zyzzyx Day',
+    sets: [{ exerciseName: 'Leg Press', sets: [{ reps: 10, weight: 200 }] }],
+  });
+  assert.ok(!r.body.needsTitle);
+  assert.ok(r.body.sessionId);
+});
+
+test('newTitle is accepted and ignored, so an older cortex still works', async () => {
+  // cortex and health deploy separately, and cortex's log tools dropped the
+  // parameter — but a deployed one may still be sending it.
+  const user = userFor('title_c');
+  const r = await post(user, {
+    type: 'strength', title: 'Legz', newTitle: true,
+    sets: [{ exerciseName: 'Leg Press', sets: [{ reps: 10, weight: 200 }] }],
+  });
+  assert.strictEqual(r.status, 200);
+  assert.ok(r.body.sessionId, 'written, not refused');
+  const db = getDatabase(user);
+  await db.sequelize.sync();
+  assert.strictEqual((await db.WorkoutSession.findByPk(r.body.sessionId)).title, 'Legz');
 });
 
 test('a known title (seeded default) resolves silently, no question asked', { skip }, async () => {
