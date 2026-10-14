@@ -22,8 +22,7 @@ const { test } = require('node:test');
 const assert   = require('node:assert');
 
 const {
-  canonicalKey, baseKey, resolveExerciseName, resolveExerciseNames, questionText,
-} = require('../api/exercise-names');
+  canonicalKey, baseKey, resolveExerciseName, resolveExerciseNames, questionText, qualifies } = require('../api/exercise-names');
 
 // The account AFTER the duplicates were merged, which is the state this guard
 // is meant to hold. Note what that implies and why the order mattered: an exact
@@ -131,4 +130,35 @@ test('the question names every ambiguity and says nothing was saved', () => {
   assert.equal(questionText([]), null);
   // Single ambiguity still reads as a sentence rather than a bulleted list of one.
   assert.doesNotMatch(questionText([{ exerciseName: 'Bench Press', candidates: ['Barbell Bench Press'] }]), /•/);
+});
+
+// ── 2026-10-14: the question that listed 23 exercises and could not be answered ──
+test('a one-letter fragment is ambiguous against nothing', () => {
+  // The real list, from the account. Every one of them contains the letter x,
+  // so `kk.includes('x')` made every one of them a candidate for an exercise
+  // the parser had mistakenly called "X" — and the owner was asked to choose.
+  const xs = [
+    'Ankle Dorsiflexion Wall Drill', 'Banded Ankle Dorsiflexion', 'Box Jump',
+    'Deep Hip External Rotation PAILs', 'Elbow Flexion/Extension', 'Explosive Pull-up',
+    'Finger Extension Stretch', 'Foam Roll Hip Flexors', 'Half-Kneeling Hip Flexor Stretch',
+    'Heavy Bag — Boxing Combos', 'Hip Flexor / Psoas Release', 'Hip Flexor CARS',
+    'Leg Extension', 'Overhead Tricep Extension', 'Pad Work — Boxing',
+    'Resistance Band Tricep Extension', 'Seated Hip Internal/External Rotation',
+    'Shadow Boxing', 'Shadow Boxing — Muay Thai', 'Standing Hip Flexor PAILs/RAILs',
+    'Terminal Knee Extension (TKE)', 'Thoracic Extension over Roller', 'Wrist Flexor Stretch',
+  ];
+  const r = resolveExerciseName('X', xs);
+  assert.deepStrictEqual(r.candidates, []);
+  assert.notEqual(r.status, 'ambiguous', 'a question with 23 options is not a question');
+});
+
+test('containment is on word boundaries, not anywhere in the string', () => {
+  // What the rule is FOR, and must keep doing.
+  assert.equal(resolveExerciseName('Incline Bench Press', ['Bench Press']).status, 'ambiguous');
+  assert.equal(resolveExerciseName('Ring Dips', ['Dips']).status, 'ambiguous');
+  assert.equal(resolveExerciseName('Front Squat', ['Squat']).status, 'ambiguous');
+  // What it must stop doing: matching a word fragment mid-word.
+  assert.equal(qualifies('box jump', 'x'), false);
+  assert.equal(qualifies('shadow boxing', 'box'), false, '"box" is inside "boxing", not a word of it');
+  assert.equal(qualifies('bench press', 'bench'), true);
 });
