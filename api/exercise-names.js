@@ -93,6 +93,28 @@ function editDistance(a, b) {
   return prev[n];
 }
 
+/**
+ * Does one name QUALIFY the other — `Incline Bench Press` against `Bench Press`,
+ * `Ring Dips` against `Dips`?
+ *
+ * Containment on WORD BOUNDARIES, never a bare substring. 2026-10-14: a parse
+ * slip handed this an exercise called `X`, and `kk.includes('x')` made every one
+ * of the account's 23 names containing the letter x a candidate — Box Jump,
+ * Shadow Boxing, Thoracic Extension over Roller. The question that reached the
+ * owner listed all 23 and was unanswerable, and nothing was saved.
+ *
+ * A one-character fragment is also rejected outright: it is not a qualified
+ * version of anything. That is belt-and-braces — the parser should never emit
+ * such a name (api/workout-parse.js now refuses to), and the word boundary
+ * alone already kills the explosion — but this is the half that decides whether
+ * a question is ANSWERABLE, so it does not rely on the other half being right.
+ */
+function qualifies(a, b) {
+  const [short, long] = a.length <= b.length ? [a, b] : [b, a];
+  if (short.length < 2) return false;
+  return ` ${long} `.includes(` ${short} `);
+}
+
 /** A typo, not a different exercise. Strict: `Leg Press` and `Leg Curl` are not this. */
 function looksLikeTypo(a, b) {
   if (a.length < 6 || b.length < 6) return false;   // short names differ for real
@@ -121,7 +143,7 @@ function resolveExerciseName(input, knownNames = []) {
   const candidates = knownNames.filter(k => {
     const kk = canonicalKey(k);
     if (baseKey(k) === base) return true;               // same movement, different kit
-    if (kk.includes(key) || key.includes(kk)) return true; // one qualifies the other
+    if (qualifies(kk, key)) return true;                // one qualifies the other
     return looksLikeTypo(kk, key);
   });
 
@@ -177,7 +199,7 @@ function questionText(questions) {
 }
 
 module.exports = {
-  normalise, canonicalKey, baseKey, editDistance,
+  normalise, canonicalKey, baseKey, editDistance, qualifies,
   resolveExerciseName, resolveExerciseNames, questionText,
   EQUIPMENT,
 };

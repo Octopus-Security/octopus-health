@@ -44,6 +44,31 @@ const WEIGHT_UNIT_RE = 'lbs?|pounds?|kgs?|kilos?';
 const DUR_UNIT_RE    = 'secs?|seconds?|mins?|minutes?|hrs?|hours?';
 const SIDE_RE = /\b(?:each side|per side|both sides|e\/s|ea side)\b/i;
 
+// A snake_case identifier is the agent's own plumbing quoted back, not an
+// exercise. 2026-10-14: a declined approval card was pasted into the chat to
+// approve it, cortex preferred the live message over the model's copy (it is
+// supposed to — the model cannot then drop a line), and this parser read
+// `• log_workout_text — text: Bench press 45lb bar:` as an exercise called
+// `Log Workout Text Text Bench Press`. No exercise name contains an underscore;
+// cortex no longer sends this, and this is the second lock on the same door.
+const TOOL_ECHO_RE = /[a-z]+_[a-z_]+/i;
+
+// Sanity bounds. The same paste put `date: 2026-10-14` through as 2026 reps at
+// 10 lb — one `res.json` away from a set nobody could have done sitting in the
+// history forever. A number this far out is a misread line, not data, so the
+// line goes UNREAD and is asked about. Never stored, never rounded into range.
+const REPS_LIMIT = 500;
+const WEIGHT_LIMIT = 2000;
+
+// Which half of a unit-less `A x B` is the load, on a line that is ONE set.
+//   GYM_WEIGHT_MIN — at or above this a number can be a load; below it, on a
+//                    single set, it is a rep count.
+//   REPS_PLAUSIBLE — above this it cannot be a rep count at all.
+// Exactly one candidate load → that is the weight. Neither or both → the line
+// is genuinely ambiguous and goes unread.
+const GYM_WEIGHT_MIN = 20;
+const REPS_PLAUSIBLE = 30;
+
 // Split the whole message into top-level segments. Commas, semicolons, newlines
 // and list bullets separate exercises; "and"/"&"/"then" are handled INSIDE a
 // segment, because they join sets of ONE exercise as often as they join two
@@ -69,9 +94,25 @@ function hasNameWord(frag) {
   return /[a-z]{2,}/i.test(stripped);
 }
 
+/**
+ * For a unit-less `A x B` on a single set, which number is the load?
+ * Returns [reps, weight], or null when it genuinely cannot be told:
+ *   10 x 50 → [10, 50]      50 x 10 → [10, 50]      1 x 140 → [1, 140]
+ *   25 x 135 → [25, 135]    3 x 10  → null          30 x 25 → null
+ */
+function pickLoad(a, b) {
+  if (a > REPS_PLAUSIBLE && b <= REPS_PLAUSIBLE) return [b, a];
+  if (b > REPS_PLAUSIBLE && a <= REPS_PLAUSIBLE) return [a, b];
+  if (a >= GYM_WEIGHT_MIN && b < GYM_WEIGHT_MIN) return [b, a];
+  if (b >= GYM_WEIGHT_MIN && a < GYM_WEIGHT_MIN) return [a, b];
+  return null;
+}
+
 // Parse the numeric tail of a clause (everything after the exercise name) into
-// one or more sets. Returns [] when there is nothing loggable.
-function parseSets(tail) {
+// one or more sets. `opts.oneSet` marks a set LINE under a block header, where
+// the line is one set and `NxM` cannot mean sets × reps. Returns [] when there
+// is nothing loggable, or when the numbers cannot be read with confidence.
+function parseSets(tail, opts = {}) {
   let s = ` ${String(tail || '').toLowerCase()} `;
   const note = SIDE_RE.test(s) ? 'each side' : null;
   s = s.replace(SIDE_RE, ' ');
@@ -95,9 +136,21 @@ function parseSets(tail) {
   const nx = s.match(/(\d+(?:\.\d+)?)\s*x\s*(\d+)/i);
   if (nx) {
     const a = parseFloat(nx[1]), b = parseInt(nx[2], 10);
+    if (opts.oneSet && weight == null) {
+      // A set LINE under a header IS one set, so `a` cannot be a set count —
+      // and the owner writes the two numbers in BOTH orders: `50+bar x 10` on
+      // 2026-10-11 and `10 x 50 + bar` on 2026-10-14. Position therefore says
+      // nothing about which is the load, and reading `10 x 50` as the inline
+      // grammar does gave TEN SETS OF FIFTY REPS. Size is the only honest
+      // signal, and where size cannot tell either, the line is not guessed.
+      const load = pickLoad(a, b);
+      if (!load) return [];
+      [reps, weight] = load;
+      weightUnit = 'lbs';
+    }
     // "225x5" is weight × reps, not 225 sets — nobody does twenty sets of
     // one thing in a log line. Below 20 it is sets × reps ("3x10").
-    if (a >= 20 && weight == null) { weight = a; weightUnit = 'lbs'; reps = b; }
+    else if (a >= 20 && weight == null) { weight = a; weightUnit = 'lbs'; reps = b; }
     else { count = Math.round(a); reps = b; }
     s = s.replace(nx[0], ' ');
   }
@@ -113,7 +166,10 @@ function parseSets(tail) {
   }
 
   if (reps == null && weight == null && duration == null) return [];   // nothing loggable
+  if (reps   != null && (!Number.isFinite(reps)   || reps   < 1 || reps   > REPS_LIMIT))   return [];
+  if (weight != null && (!Number.isFinite(weight) || weight < 0 || weight > WEIGHT_LIMIT)) return [];
   if (!Number.isFinite(count) || count < 1 || count > 50) count = 1;
+  if (opts.oneSet) count = 1;                       // one line, one set — by definition
 
   const out = [];
   for (let i = 0; i < count; i++) out.push({ reps, weight, weightUnit: weight != null ? weightUnit : null, duration, note });
@@ -138,6 +194,7 @@ function normalisePhrasing(s) {
 function parseClause(clause) {
   const raw = clause.trim();
   if (!raw) return null;
+  if (TOOL_ECHO_RE.test(raw)) return null;            // `log_workout_text — text: …`
   let s = normalisePhrasing(raw.toLowerCase().replace(/×/g, 'x'));
   // Distance is not something this parser stores; "ran 2 miles" must not
   // become 2 reps of "Ran". Unparsed → the person is asked, never guessed.
@@ -176,6 +233,11 @@ function parseClause(clause) {
   const tail = words.slice(i).join(' ');
   let name = nameParts.join(' ').replace(/\s+/g, ' ').trim();
   if (!name) return null;                               // a set with no exercise — caller handles
+  // One letter is not an exercise. `10 x 90 + bar, date: 2026-10-14` split on
+  // its comma, orphaning `10 x 90 + bar` from the tail that followed it; the
+  // leading `10` was taken as reps and the separator `x` became the name. That
+  // `X` then matched all 23 of the account's names containing the letter.
+  if (!/[a-z]{2,}/i.test(name)) return null;
   // "sets"/"reps" left IN the name means the phrasing was not understood.
   if (/\b(?:sets?|reps?)\b/.test(name)) return null;
 
@@ -273,6 +335,7 @@ function isSetOnly(line) {
 
 function parseHeaderBlock(header, setLines) {
   let h = header.replace(/:\s*$/, '').trim();
+  if (TOOL_ECHO_RE.test(h)) return null;
   const bm = h.match(BAR_SPEC_RE);
   const bar = bm ? { weight: parseFloat(bm[1]), unit: WEIGHT_UNIT[bm[2].toLowerCase()] || 'lbs' }
                  : { weight: 45, unit: 'lbs' };
@@ -282,13 +345,19 @@ function parseHeaderBlock(header, setLines) {
   const own = parseClause(h);
   const name = own ? own.name : titleCase(h.replace(SIDE_RE, ' ').replace(/[^a-z0-9 '/-]/gi, ' ').replace(/\s+/g, ' ').trim().toLowerCase());
   if (!name || !/[a-z]{2,}/i.test(name)) return null;
+  // The fallback name is whatever words the header had left after the bar spec,
+  // so it is the one path that can name an exercise after a SET. With the tool
+  // echo above rejected, `10 x 50 + bar` was promoted to a header of its own and
+  // became an exercise called `10 X 50 Bar`. A header parseClause could not read
+  // AND that still carries a number was not a header.
+  if (!own && /\d/.test(name)) return null;
   const sideNote = SIDE_RE.test(h) ? 'each side' : null;
 
   const sets = own ? [...own.sets] : [];
   const bad = [];
   for (const raw of setLines) {
     const { line, note } = expandPlusBar(raw.replace(/×/g, 'x'), bar);
-    const got = parseSets(line);
+    const got = parseSets(line, { oneSet: true });
     if (!got.length) { bad.push(raw); continue; }
     for (const g of got) sets.push({ ...g, note: [g.note || sideNote, note].filter(Boolean).join('; ') || null });
   }
@@ -382,4 +451,4 @@ function buildPreview(parsed, library) {
   });
 }
 
-module.exports = { parseWorkout, expandPlusBar, buildPreview, parseSets, parseClause, matchExercise, normKey, splitSegments };
+module.exports = { parseWorkout, expandPlusBar, buildPreview, parseSets, parseClause, matchExercise, normKey, splitSegments, pickLoad };

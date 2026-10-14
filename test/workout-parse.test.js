@@ -2,7 +2,7 @@
 
 const { test } = require('node:test');
 const assert = require('node:assert');
-const { parseWorkout, buildPreview, parseSets, matchExercise, normKey } = require('../api/workout-parse');
+const { parseWorkout, buildPreview, parseSets, parseClause, matchExercise, normKey, pickLoad } = require('../api/workout-parse');
 
 // Compact view: [name, [[reps, weight, weightUnit, duration, note], ...]]
 const shape = r => r.exercises.map(e => [e.name, e.sets.map(s => [s.reps, s.weight, s.weightUnit, s.duration, s.note])]);
@@ -172,4 +172,73 @@ test('what it cannot store or read goes to unparsed, never a guess', () => {
     assert.deepStrictEqual(r.exercises, [], t);
     assert.deepStrictEqual(r.unparsed, [t]);
   }
+});
+
+// ── 2026-10-14: the day a declined approval card was pasted back in to approve it ──
+//
+// The owner's message was clean. cortex preferred the LIVE chat message over the
+// model's copy (it is supposed to — that is what stops a model dropping a line),
+// and the live message was the owner re-sending the card: "Neith wanted to: •
+// log_workout_text — text: Bench press 45lb bar: …, date: 2026-10-14, type:
+// strength / ⌛ No response — not run. / Please log". Every guard downstream then
+// did its job on the wrong input. cortex no longer substitutes a quoted card;
+// these are the locks on this side of that door.
+
+test('the owner\'s own reps-first block: 10 x 50 + bar is TEN reps, not ten sets', () => {
+  const r = parseWorkout('Bench press 45lb bar:\n10 x 50 + bar \n10 x 90 + bar \n1 x 140 + bar\n10 x 90 + bar');
+  assert.deepStrictEqual(r.exercises.map(e => [e.name, e.sets.map(s => [s.reps, s.weight])]), [
+    ['Bench Press', [[10, 95], [10, 135], [1, 185], [10, 135]]],
+  ]);
+  assert.deepStrictEqual(r.unparsed, []);
+});
+
+test('a unit-less NxM set line reads the same both ways round', () => {
+  const sets = t => parseWorkout(t).exercises[0].sets.map(s => [s.reps, s.weight]);
+  // reps first (2026-10-14) and weight first (2026-10-11) are the same person.
+  assert.deepStrictEqual(sets('dumbbell curl:\n10 x 25\n10 x 30'), [[10, 25], [10, 30]]);
+  assert.deepStrictEqual(sets('chest fly machine:\n50 x 10\n70 x 10'), [[10, 50], [10, 70]]);
+  // Before this, "10 x 25" under a header logged TEN SETS OF TWENTY-FIVE REPS.
+  assert.strictEqual(parseWorkout('dumbbell curl:\n10 x 25').exercises[0].sets.length, 1);
+});
+
+test('a set line whose numbers could be either goes unread, never guessed', () => {
+  // "3 x 10" on a line that is one set: 3 reps at 10 lb, or 10 reps at 3 lb?
+  // Nothing in the text says, so nothing is written and the person is asked.
+  const r = parseWorkout('curls:\n3 x 10\n30 x 25');
+  assert.deepStrictEqual(r.exercises, []);
+  assert.deepStrictEqual(r.unparsed, ['curls:', '3 x 10', '30 x 25']);
+  // An explicit unit removes the ambiguity entirely, and still works.
+  assert.deepStrictEqual(parseWorkout('curls:\n3 x 10 lbs').exercises[0].sets.map(s => [s.reps, s.weight]),
+    [[3, 10]]);
+});
+
+test('pickLoad: exactly one candidate load, or nothing', () => {
+  assert.deepStrictEqual(pickLoad(10, 50), [10, 50]);
+  assert.deepStrictEqual(pickLoad(50, 10), [10, 50]);
+  assert.deepStrictEqual(pickLoad(1, 140), [1, 140]);
+  assert.deepStrictEqual(pickLoad(25, 135), [25, 135]);
+  assert.strictEqual(pickLoad(3, 10), null);     // both too small to be a load
+  assert.strictEqual(pickLoad(30, 25), null);    // both could be either
+});
+
+test('a pasted approval card logs NOTHING, and says every line is unread', () => {
+  const card = 'Neith wanted to:\n• log_workout_text — text: Bench press 45lb bar:\n'
+    + '10 x 50 + bar \n10 x 90 + bar \n1 x 140 + bar\n10 x 90 + bar, date: 2026-10-14, type: strength\n\n'
+    + '⌛ No response — not run.\n\nPlease log';
+  const r = parseWorkout(card);
+  // Not one exercise: not "Log Workout Text Text Bench Press", not "10 X 50 Bar",
+  // not "Date:" at 2026 reps, and above all not an exercise called "X".
+  assert.deepStrictEqual(r.exercises, []);
+  assert.ok(r.unparsed.length > 0, 'the lines are reported unread, not silently dropped');
+});
+
+test('plumbing, separators and out-of-range numbers are not exercises', () => {
+  // A snake_case identifier is the agent quoting itself.
+  assert.deepStrictEqual(parseWorkout('log_workout_text — text: bench press 3x10 135lbs').exercises, []);
+  // "x" is a separator. It became an exercise name, and then matched all 23 of
+  // the account's names containing the letter x.
+  assert.deepStrictEqual(parseClause('x 90'), null);
+  // "date: 2026-10-14" parsed as 2026 reps at 10 lb.
+  assert.deepStrictEqual(parseSets('2026-10-14'), []);
+  assert.deepStrictEqual(parseWorkout('date: 2026-10-14').exercises, []);
 });
