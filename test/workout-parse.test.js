@@ -311,6 +311,18 @@ test('a set line may end in an equipment word without naming an exercise', () =>
   const sets = t => parseWorkout(t).exercises[0].sets.map(s => [s.reps, s.weight]);
   assert.deepStrictEqual(sets('Shoulder press:\n10 x 40lb dumbbells\n10 x 40lb dumbbells'),
     [[10, 40], [10, 40]]);
+  // REGRESSION, caught before it shipped: stripping "each" as an equipment word
+  // ran BEFORE SIDE_RE, leaving the word "side" behind — which reads as a name,
+  // so the whole block went unread. The version this replaced got it right.
+  const side = parseWorkout('Shoulder press:\n10 x 40lbs each side\n10 x 50lbs each side');
+  assert.deepStrictEqual(side.exercises.map(e => [e.name, e.sets.map(x => [x.reps, x.weight, x.note])]),
+    [['Shoulder Press', [[10, 40, 'each side'], [10, 50, 'each side']]]]);
+  assert.deepStrictEqual(side.unparsed, []);
+  // "each hand" is the same claim about the same set, and was carrying no note
+  // at all — so nothing recorded that 40 meant 40 PER HAND.
+  assert.deepStrictEqual(sets('Shoulder press:\n10 x 40lb each hand'), [[10, 40]]);
+  assert.strictEqual(parseWorkout('Shoulder press:\n10 x 40lb each hand').exercises[0].sets[0].note,
+    'each side');
   // But a line with a real movement word in it is still its own exercise.
   const r = parseWorkout('Shoulder press:\n10 x 40lb dumbbells\n10 dumbbell curls 25lbs');
   assert.deepStrictEqual(r.exercises.map(e => e.name), ['Shoulder Press', 'Dumbbell Curls']);

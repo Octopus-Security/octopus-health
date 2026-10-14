@@ -42,7 +42,10 @@ const DUR_SEC = {
 };
 const WEIGHT_UNIT_RE = 'lbs?|pounds?|kgs?|kilos?';
 const DUR_UNIT_RE    = 'secs?|seconds?|mins?|minutes?|hrs?|hours?';
-const SIDE_RE = /\b(?:each side|per side|both sides|e\/s|ea side)\b/i;
+// Per-limb phrasing, which becomes the note "each side" however it was written.
+// "each hand" was missing, so "10 x 40lb each hand" logged 40 with no note and
+// nothing recorded that it was 40 PER HAND (2026-10-14).
+const SIDE_RE = /\b(?:each|per|ea|both)\s+(?:sides?|hands?|arms?|legs?)\b|\be\/s\b/i;
 
 // A snake_case identifier is the agent's own plumbing quoted back, not an
 // exercise. 2026-10-14: a declined approval card was pasted into the chat to
@@ -354,12 +357,16 @@ const BAR_DECL_RE = new RegExp(`^(?:the\\s+)?bar\\s*[:=]\\s*(\\d+(?:\\.\\d+)?)\\
 // "10 x 40lb dumbbells" is a set of shoulder press, not an exercise called
 // dumbbells. Stripped only for the is-this-a-set-line question — a line like
 // "10 dumbbell curls" still has "curls" left and stays an exercise.
-const EQUIP_NOUN_RE = /\b(?:dumbbells?|dbs?|kettlebells?|kbs?|barbells?|bars?|plates?|bands?|machines?|cables?|weights?|total|per side|each|hand|hands)\b/gi;
+const EQUIP_NOUN_RE = /\b(?:dumbbells?|dbs?|kettlebells?|kbs?|barbells?|bars?|plates?|bands?|machines?|cables?|weights?|total|each|hands?|sides?)\b/gi;
 
 /** Pure set spec, no exercise name of its own ("100lb x 10", "95lbs x 10", "3x8 @135"). */
 function isSetOnly(line) {
   if (/^\d{5,}$/.test(line.trim())) return false;   // a pasted 2FA code is not a set of 719981 reps
-  const stripped = line.replace(/\bx\b/gi, ' ').replace(EQUIP_NOUN_RE, ' ');
+  // SIDE_RE FIRST. Stripping "each" ahead of it broke "10 x 40lbs each side"
+  // into a line still carrying the word "side", which reads as a name — so the
+  // whole Shoulder press block went unread by the very change meant to rescue
+  // it, and the version this replaced handled it correctly.
+  const stripped = line.replace(/\bx\b/gi, ' ').replace(SIDE_RE, ' ').replace(EQUIP_NOUN_RE, ' ');
   return /\d/.test(line) && !hasNameWord(stripped);
 }
 
