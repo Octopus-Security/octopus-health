@@ -357,3 +357,29 @@ test('a date line labels the message, it does not destroy it', () => {
   const w = parseWorkout('log this for last Sunday the eleventh, not today\n10 dips');
   assert.deepStrictEqual(w.exercises.map(e => e.name), ['Dips']);
 });
+
+test('"with"/"holding" ends the name only when a LOAD follows', () => {
+  const sh = t => parseWorkout(t).exercises.map(e => [e.name, e.sets.map(s => [s.reps, s.weight])]);
+  // A weight: the word introduces the load and is not part of the movement.
+  assert.deepStrictEqual(sh('10 x Deep squats with 70lb'), [['Deep Squats', [[10, 70]]]]);
+  assert.deepStrictEqual(sh('10 goblet squats holding 50lb'), [['Goblet Squats', [[10, 50]]]]);
+  // A POSITION: the same word, and breaking on it produced an exercise called
+  // "Pull Ups While" (2026-10-14 — "I did pull ups while holding an L sit").
+  assert.deepStrictEqual(sh('5 pull ups while holding an L sit'),
+    [['Pull Ups While Holding An L Sit', [[5, null]]]]);
+  // The short form he should use in a log line, unchanged.
+  assert.deepStrictEqual(sh('5 L sit pull ups'), [['L Sit Pull Ups', [[5, null]]]]);
+});
+
+test('a bar named in words is the bar\'s weight, inline and as a set line', () => {
+  const sets = t => parseWorkout(t).exercises[0].sets.map(s => [s.reps, s.weight, s.note]);
+  // It used to stay in the name — "Squats With The Bar", carrying no weight.
+  assert.deepStrictEqual(sets('10 squats with the bar'), [[10, 45, 'just the 45lb bar']]);
+  assert.deepStrictEqual(sets('10 squats with just the bar'), [[10, 45, 'just the 45lb bar']]);
+  // Same sources as "+bar": a declared bar beats the 45 lb assumption...
+  assert.deepStrictEqual(sets('Bar = 35 lbs\n10 squats with the bar'), [[10, 35, 'just the 35lb bar']]);
+  // ...and a header bar beats both, mixed with the "+bar" form in one block.
+  assert.deepStrictEqual(parseWorkout('bench press 45lb bar:\n10 with the bar\n50+bar x 10')
+    .exercises[0].sets.map(s => [s.reps, s.weight]), [[10, 45], [10, 95]]);
+  assert.deepStrictEqual(parseWorkout('bench press 45lb bar:\n10 with the bar\n50+bar x 10').unparsed, []);
+});
