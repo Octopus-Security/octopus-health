@@ -272,6 +272,7 @@ async function logSession(req, res) {
     // See api/exercise-names.js.
     // A name the person already answered "which did you mean?" for is
     // rewritten before it is checked, so the question is asked once, ever.
+    let namingAsk = null;         // ambiguous names: asked AFTER the write, see below
     const answered = new Set();   // names the person already settled — never asked again
     if (sets.length) {
       const aliases = await aliasMap(await getDB(req));
@@ -287,26 +288,40 @@ async function logSession(req, res) {
         sets.map(s => s.exerciseName).filter(Boolean), known);
       const questions = asked.filter(q => !answered.has(q.exerciseName));
 
-      if (questions.length) {
-        // Every ambiguity, not the first one. A workout is logged as a unit, so
-        // answering them one per round trip would leave a half-logged session
-        // and no clear account of which half.
-        return res.json({
-          ok: true, sessionId: null, date: today, exerciseCount: 0,
-          needsNaming: questions,
-          question: questionText(questions),
-          message: 'NOTHING WAS SAVED. '
-            + (questions.length === 1
-                ? 'One exercise name looks like something already logged under a different name.'
-                : `${questions.length} exercise names look like things already logged under different names.`)
-            + ' Ask which is meant — ALL of them, in one message — then re-send the whole '
-            + 'workout using the names chosen. Do not guess, do not pick the closest, and do '
-            + 'not log the unambiguous exercises on their own.',
-        });
-      }
+      // ── An ambiguous name is now a FOLLOW-UP, not a refusal ──────────────
+      //
+      // This used to return `sessionId: null` and write nothing. It was the
+      // last gate of that shape, and on 2026-10-14 it is what discarded a leg
+      // day the owner had already re-sent twice — "Bar =", "X", and "L Sit Pull
+      // Ups" were enough to throw away nine exercises he really did.
+      //
+      // The reasoning above is still right: a split name splits a lift's
+      // HISTORY, and that is worth asking about. What was wrong was the price.
+      // Losing the session is the more expensive error, and it is the
+      // irrecoverable one — the training happened once, while a name is
+      // fixable for as long as the row exists (api/log-edit.js renames an
+      // exercise within a session, the Logs page does it, and the answer is
+      // remembered as an alias so the question is asked once ever).
+      //
+      // The owner's own words, deciding this: "I will forget to give the
+      // correct name sometimes" — so the common case is not a typo to catch,
+      // it is a name that needs tidying later. Tidying later is cheap.
+      //
+      // So: write it under the name AS TYPED, and hand the questions back for
+      // the caller to ask afterwards.
+      //
+      // Reported under a NEW key. `needsNaming` meant "nothing was saved" to
+      // every existing caller, and cortex deploys separately — reusing the key
+      // for an advisory would make a deployed cortex announce that a workout it
+      // just saved was discarded. An older cortex seeing only `namingAsk`
+      // ignores it and correctly reports what was logged, which is the right
+      // way to fail. (This is the same trap the `needsConfirm`/`skipped` alias
+      // and the needsTitle `.length` note below were both written about.)
+      namingAsk = questions.length ? questions : null;
 
       // Write under the name the account already uses, so today's sets join
-      // their own history instead of starting a second one beside it.
+      // their own history instead of starting a second one beside it. An
+      // ambiguous name is not in `resolved`, so it keeps the typed spelling.
       for (const s of sets) {
         const name = resolved.get(s.exerciseName);
         if (name) s.exerciseName = name;
@@ -496,6 +511,15 @@ async function logSession(req, res) {
         : null,
       // So Neith can say "that's a PR" in the same breath as confirming the log.
       newPRs,
+      // Names that resemble something already in the log, written as typed and
+      // asked about AFTER the fact. Advisory: the workout IS saved. A caller
+      // that does not know this key ignores it and reports the log correctly.
+      namingAsk,
+      namingQuestion: namingAsk
+        ? questionText(namingAsk).replace(' Nothing has been saved yet.', '')
+            .replace('\nAnswer each one. Nothing has been saved yet.', '')
+          + ` These are LOGGED under the names as typed${namingAsk.length === 1 ? '' : ''} — answer and they will be renamed.`
+        : null,
     });
   } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
 }

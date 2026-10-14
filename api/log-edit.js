@@ -1,5 +1,7 @@
 'use strict';
 
+const { canonicalKey } = require('./exercise-names');
+
 /**
  * Correcting a workout that is already in the log.
  *
@@ -189,7 +191,22 @@ async function renameExercise(db, sessionId, from, to) {
   const hit = sets.filter(x => x.exerciseName.toLowerCase() === String(from || '').trim().toLowerCase());
   if (!hit.length) return notFound(`exercise "${from}" in that session`);
   for (const x of hit) { x.exerciseName = name; await x.save(); }
-  return { ok: true, renamed: hit.length, from: String(from).trim(), to: name };
+  // A rename IS the answer to "which did you mean?", so remember it.
+  //
+  // From 2026-10-14 an ambiguous name no longer refuses the workout: it is
+  // logged under the name as typed and asked about afterwards, and this is
+  // where the answer lands. Without recording the alias the rename would fix
+  // one session and the same question would come back the next time he wrote
+  // the name the same way — which is the loop the question was built to avoid.
+  // Best-effort: a failure here must never cost a rename that already worked.
+  const alias = canonicalKey(String(from || ''));
+  if (alias && db.ExerciseAlias) {
+    try {
+      const [row, created] = await db.ExerciseAlias.findOrCreate({ where: { key: alias }, defaults: { name } });
+      if (!created && row.name !== name) { row.name = name; await row.save(); }
+    } catch { /* the rename stands regardless */ }
+  }
+  return { ok: true, renamed: hit.length, from: String(from).trim(), to: name, remembered: Boolean(alias) };
 }
 
 module.exports = {
