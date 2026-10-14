@@ -85,9 +85,14 @@ test('mixed loggable + prose: log the loggable, surface the rest for the user', 
 });
 
 test('empty / whitespace input yields nothing, no throw', () => {
-  assert.deepStrictEqual(parseWorkout(''),   { exercises: [], unparsed: [] });
-  assert.deepStrictEqual(parseWorkout('   '), { exercises: [], unparsed: [] });
-  assert.deepStrictEqual(parseWorkout(null), { exercises: [], unparsed: [] });
+  // `dates` is additive (2026-10-14): what a date LINE in the text said, for a
+  // caller that wants it. Asserted by exact shape on purpose — a new field
+  // appearing here should make someone look, since `unparsed` growing a
+  // sibling is how a caller silently stops reading half the answer.
+  const empty = { exercises: [], unparsed: [], dates: [] };
+  assert.deepStrictEqual(parseWorkout(''),    empty);
+  assert.deepStrictEqual(parseWorkout('   '), empty);
+  assert.deepStrictEqual(parseWorkout(null),  empty);
 });
 
 // ── Library matching is exact-after-normalise: loose on spaces/hyphens/plurals,
@@ -326,4 +331,29 @@ test('a set line may end in an equipment word without naming an exercise', () =>
   // But a line with a real movement word in it is still its own exercise.
   const r = parseWorkout('Shoulder press:\n10 x 40lb dumbbells\n10 dumbbell curls 25lbs');
   assert.deepStrictEqual(r.exercises.map(e => e.name), ['Shoulder Press', 'Dumbbell Curls']);
+});
+
+test('a date line labels the message, it does not destroy it', () => {
+  // Writing the date at the top is the obvious thing to do, and it silently
+  // refused the whole workout: the line landed in `unparsed`, and
+  // routes/service.js treats ANY unread line containing a number as reason to
+  // save nothing. Found 2026-10-14 while writing two catch-up messages —
+  // "Log for 2026-10-11:" killed all five exercises under it.
+  for (const prefix of ['Log for 2026-10-11:', '2026-10-11', '10/11', 'for 10/11/26',
+                        'logging this for 2026-10-11']) {
+    const r = parseWorkout(`${prefix}\nchest fly Machine:\n100lb x 10\n\n10 pull ups`);
+    assert.deepStrictEqual(r.exercises.map(e => e.name), ['Chest Fly Machine', 'Pull Ups'], prefix);
+    // The killer condition, asserted exactly as service.js computes it.
+    const unread = r.unparsed.filter(l => /\d/.test(l) && !/^\s*\d{5,}\s*$/.test(l));
+    assert.deepStrictEqual(unread, [], `${prefix} must not be an unread numeric line`);
+    assert.ok(r.dates.length, 'and what it said is handed back');
+  }
+  // It reports, it does not decide: the caller owns the date.
+  assert.deepStrictEqual(parseWorkout('2026-10-11\n10 dips').dates, ['2026-10-11']);
+  // A set line that merely contains a slash or a number is still a set.
+  assert.deepStrictEqual(parseWorkout('Curls:\n10 x 25lbs').exercises[0].sets.length, 1);
+  assert.deepStrictEqual(parseWorkout('3 sets of something 4/5').unparsed, ['3 sets of something 4/5']);
+  // And the digit-free phrasing that was the workaround still works.
+  const w = parseWorkout('log this for last Sunday the eleventh, not today\n10 dips');
+  assert.deepStrictEqual(w.exercises.map(e => e.name), ['Dips']);
 });

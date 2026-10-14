@@ -351,6 +351,19 @@ function expandPlusBar(line, bar) {
 // declaration was both junk data AND useless. It is consumed, never unparsed:
 // it has a number in it, and service.js treats an unread numeric line as reason
 // to save NOTHING, so leaving it in `unparsed` would reject the whole workout.
+// A line that says which DAY the message is about, rather than logging a set:
+// "Log for 2026-10-11:", "2026-10-11", "10/11", "for 10/11/26". Consumed and
+// reported, never stored as a set and never left in `unparsed` — a leftover
+// line with a number in it makes service.js refuse the WHOLE workout, so
+// writing the date at the top (the obvious thing to do) silently destroyed the
+// message it was labelling. Found 2026-10-14 while writing out two catch-up
+// messages; `Log for 2026-10-11:` killed all five exercises under it.
+//
+// The parse does not decide the date — the caller does, from `date`. This only
+// stops the line being mistaken for training, and hands back what it read so a
+// caller can use it.
+const DATE_DECL_RE = /^(?:log(?:ging)?\s+)?(?:this\s+)?(?:for\s+|on\s+)?(\d{4}-\d{2}-\d{2}|\d{1,2}\/\d{1,2}(?:\/\d{2,4})?)\s*:?\.?$/i;
+
 const BAR_DECL_RE = new RegExp(`^(?:the\\s+)?bar\\s*[:=]\\s*(\\d+(?:\\.\\d+)?)\\s*(${WEIGHT_UNIT_RE})?\\.?$`, 'i');
 
 // Equipment nouns that can TRAIL a set line without naming an exercise:
@@ -413,9 +426,13 @@ function parseWorkout(text) {
   const lines = String(text || '').split(/\r?\n/);
   // The bar in force for "+bar", until a line declares another one.
   let bar = { weight: 45, unit: 'lbs' };
+  const datesSeen = [];
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
     if (!line) continue;
+
+    const dateDecl = line.match(DATE_DECL_RE);
+    if (dateDecl) { datesSeen.push(dateDecl[1]); continue; }   // consumed, not unread
 
     const decl = line.match(BAR_DECL_RE);
     if (decl) {
@@ -458,7 +475,8 @@ function parseWorkout(text) {
       if (leftover) unparsed.push(leftover);
     }
   }
-  return { exercises, unparsed };
+  // `dates` is what the text SAID, not a decision. The caller owns the date.
+  return { exercises, unparsed, dates: datesSeen };
 }
 
 // ── Exercise-library matching (pure; the route passes the library) ─────────────
