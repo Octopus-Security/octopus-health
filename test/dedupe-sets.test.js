@@ -29,7 +29,7 @@
 
 const { test } = require('node:test');
 const assert   = require('node:assert');
-const { partition, fingerprint } = require('../api/dedupe-sets');
+const { partition, fingerprint, hasLoad } = require('../api/dedupe-sets');
 
 const TODAY = '2026-08-12';
 const AUG5  = '2026-08-05';
@@ -135,4 +135,40 @@ test('fingerprint ignores name case and surrounding space', () => {
     fingerprint({ exerciseName: '  Goblet Squat ', sets: [{ reps: 10, weight: 40 }] }),
     fingerprint({ exerciseName: 'goblet squat',    sets: [{ reps: 10, weight: 40 }] }),
   );
+});
+
+// ── 2026-10-14: a hold on every session is a hold nobody reads ───────────────
+test('repeat bodyweight work on a LATER day is training, not a replay', () => {
+  const recent = [
+    { sessionId: 1, date: '2026-10-09', exerciseName: 'Pull-up',     reps: 10, weight: null, duration: null, setNumber: 1 },
+    { sessionId: 1, date: '2026-10-09', exerciseName: 'Bench Press', reps: 10, weight: 135,  duration: null, setNumber: 1 },
+  ];
+  const submitted = [
+    { exerciseName: 'Pull-up',     sets: [{ reps: 10 }] },
+    { exerciseName: 'Bench Press', sets: [{ reps: 10, weight: 135 }] },
+  ];
+
+  // Logging Sunday's session held Pull-up because 10 of them were logged on the
+  // 9th. Of course they were — he does them most sessions, and over the 10-day
+  // window every bodyweight staple collides every single time. A question asked
+  // on every session gets answered carelessly, and that is how he came to be
+  // told two exercises were logged when they were not.
+  const later = partition(submitted, recent, '2026-10-11');
+  assert.deepStrictEqual(later.keep.map(e => e.exerciseName), ['Pull-up']);
+  assert.deepStrictEqual(later.needsConfirm.map(e => e.exerciseName), ['Bench Press'],
+    'the same WEIGHTS on another day is still worth a look');
+
+  // The two cases the guard is good at are untouched.
+  const same = partition(submitted, recent, '2026-10-09');
+  assert.deepStrictEqual(same.keep, [], 'a genuine double-send holds whatever the exercise');
+  assert.deepStrictEqual(same.needsConfirm.map(e => e.exerciseName), ['Pull-up', 'Bench Press']);
+});
+
+test('hasLoad: a clock counts as a load, bare reps do not', () => {
+  assert.strictEqual(hasLoad({ sets: [{ reps: 10 }] }), false);
+  assert.strictEqual(hasLoad({ sets: [{ reps: 10, weight: 135 }] }), true);
+  assert.strictEqual(hasLoad({ sets: [{ duration: 300 }] }), true, 'a 5-min bag round is not a bodyweight staple');
+  // One loaded set among bare ones is still loaded — a top set matching exactly
+  // is the signal this guard exists for.
+  assert.strictEqual(hasLoad({ sets: [{ reps: 10 }, { reps: 1, weight: 225 }] }), true);
 });

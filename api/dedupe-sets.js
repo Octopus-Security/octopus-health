@@ -37,6 +37,23 @@
  * exercise becomes a yes/no, and `force: true` writes it.
  */
 
+/**
+ * Does this exercise carry a LOAD — a weight or a clock?
+ *
+ * Pure reps and nothing else ("10 pull ups", "15 dips", "10 leg raises") is the
+ * shape that collides constantly and says least when it does. That is the
+ * warm-up problem this file's own history describes, one step further on: a
+ * bodyweight staple is byte-identical every session BY DESIGN, so "identical"
+ * carries no information about whether it is a replay.
+ *
+ * A weighted or timed set is different. Matching every set's weight exactly
+ * against an earlier day is a real signal — that is the "nobody hits 295x10
+ * twice in a fortnight by accident" case, and it stays a question.
+ */
+function hasLoad(exercise) {
+  return (exercise.sets || []).some(s => s.weight != null || s.duration != null);
+}
+
 /** Compact, comparable form of one exercise: name + every set's numbers. */
 function fingerprint(exercise) {
   const name = String(exercise.exerciseName || '').trim().toLowerCase();
@@ -97,6 +114,27 @@ function partition(submitted, recentSets, today) {
 
     const when = seen.get(fp);
     if (when) {
+      // ── Repeat training on a LATER day is not a replay ───────────────────
+      //
+      // 2026-10-14: logging Sunday's session held `Pull-up` and
+      // `Hanging Leg Raise` because 10 reps of each were already logged on the
+      // 9th. Of course they were — he does them most sessions. Over a 10-day
+      // window every bodyweight staple he trains collides every single time,
+      // so every session arrives with a yes/no attached.
+      //
+      // That is not a harmless question. It is the mechanism by which he was
+      // told two exercises had been logged when they had not: Neith read the
+      // hold, said "keeping the 11th as the single entry", and then listed both
+      // as saved. A question asked on every session gets answered carelessly —
+      // by a person and by a model.
+      //
+      // So a collision on a DIFFERENT date, for an exercise with no weight and
+      // no clock, is just training and is written. The guard keeps the two
+      // cases it is actually good at:
+      //   • the same date  — a genuine double-send, whatever the exercise;
+      //   • a LOADED match — same weights on another day, which is worth a look.
+      if (when !== today && !hasLoad(ex)) { keep.push(ex); continue; }
+
       needsConfirm.push({
         exerciseName: ex.exerciseName,
         why: when === today
@@ -113,4 +151,4 @@ function partition(submitted, recentSets, today) {
   return { keep, needsConfirm };
 }
 
-module.exports = { fingerprint, partition };
+module.exports = { fingerprint, partition, hasLoad };

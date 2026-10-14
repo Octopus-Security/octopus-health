@@ -235,19 +235,34 @@ function parseClause(clause, bar = { weight: 45, unit: 'lbs' }) {
   for (; i < words.length; i++) {
     const w = words[i];
     if (/\d/.test(w) || /^x\d/i.test(w) || w.startsWith('@')) break;   // a set spec begins
-    // "with" introduces the load, it is not part of the movement: "deep squats
-    // with 70lb" named an exercise `Deep Squats With`.
-    if (/^(?:with|holding|using)$/i.test(w)) break;
+    // "with" introduces the LOAD, and is not part of the movement: "deep squats
+    // with 70lb" named an exercise `Deep Squats With`. Only when a number
+    // actually follows, though — "pull ups while holding an L sit" broke at
+    // `holding` and produced an exercise called `Pull Ups While` (2026-10-14).
+    // Both readings are the same word; what distinguishes them is whether the
+    // thing being held is a weight or a position.
+    if (/^(?:with|holding|using)$/i.test(w)
+        && (/\d/.test(words[i + 1] || '')                                  // "with 70lb"
+            || BAR_ONLY_RE.test(words.slice(i + 1).join(' ')))) break;     // "with just the bar"
+
     if (w.includes('/')) { noteParts = words.slice(i); i = words.length; break; }
     nameParts.push(w);
   }
   // "+bar" is not only a BLOCK thing: "10 x Barbell back squats 90lb + bar x 10"
   // is one line, and reading it without expanding the bar logged 90 lb for a
   // 135 lb lift — a wrong number, silently, which is the worst outcome here.
-  const rawTail = words.slice(i).join(' ');
+  let rawTail = words.slice(i).join(' ');
+  let barOnlyNote = null;
+  // Drop the "with"/"holding" that introduced it, then a bar-only tail becomes
+  // the bar's weight.
+  const bareTail = rawTail.replace(/^(?:with|holding|using)\s+/i, '');
+  if (BAR_ONLY_RE.test(bareTail)) {
+    rawTail = `${bar.weight}${bar.unit}`;
+    barOnlyNote = `just the ${bar.weight}${bar.unit === 'kg' ? 'kg' : 'lb'} bar`;
+  }
   const expanded = expandPlusBar(rawTail, bar);
   const tail = expanded.line;
-  const barNote = expanded.note;
+  const barNote = expanded.note || barOnlyNote;
   let name = nameParts.join(' ').replace(/\s+/g, ' ').trim();
   if (!name) return null;                               // a set with no exercise — caller handles
   // One letter is not an exercise. `10 x 90 + bar, date: 2026-10-14` split on
@@ -330,8 +345,28 @@ function parseSegment(segment, bar = { weight: 45, unit: 'lbs' }) {
 // the lift is and what PRs compare; the note keeps "50 + 45lb bar" so the
 // original reading is never lost.
 
+// "squats with just the bar" — the load IS the bar, with no plates named. Its
+// weight comes from the same place "+bar" gets it: the header, a "Bar = N lbs"
+// line, or the 45 lb assumption. Before this the words stayed in the name and
+// made an exercise called `Squats With The Bar` carrying no weight at all.
+const BAR_ONLY_RE = /^(?:just\s+)?(?:the\s+)?(?:empty\s+)?bars?$/i;
+
 const BAR_SPEC_RE = new RegExp(`(\\d+(?:\\.\\d+)?)\\s*(${WEIGHT_UNIT_RE})\\s*(?:olympic\\s+)?bar\\b`, 'i');
 const PLUS_BAR_RE = /(\d+(?:\.\d+)?)\s*(?:lbs?|kgs?)?\s*\+\s*(?:the\s+)?bar\b/i;
+
+/**
+ * Rewrite a bar named in WORDS as its weight: "10 with the bar" -> "10 45lbs".
+ * Separate from expandPlusBar, which needs plates and a "+". Returns the line
+ * unchanged when there is no such phrase.
+ */
+function expandBarWords(line, bar) {
+  const m = String(line).match(/\b(?:with|holding|using)\s+(?:just\s+)?(?:the\s+)?(?:empty\s+)?bars?\b/i);
+  if (!m) return { line, note: null };
+  return {
+    line: line.replace(m[0], ` ${bar.weight}${bar.unit} `).replace(/\s+/g, ' ').trim(),
+    note: `just the ${bar.weight}${bar.unit === 'kg' ? 'kg' : 'lb'} bar`,
+  };
+}
 
 /** Rewrite "50+bar x 10" as "95lbs x 10", returning the note it came from. */
 function expandPlusBar(line, bar) {
@@ -379,7 +414,10 @@ function isSetOnly(line) {
   // into a line still carrying the word "side", which reads as a name — so the
   // whole Shoulder press block went unread by the very change meant to rescue
   // it, and the version this replaced handled it correctly.
-  const stripped = line.replace(/\bx\b/gi, ' ').replace(SIDE_RE, ' ').replace(EQUIP_NOUN_RE, ' ');
+  const stripped = line.replace(/\bx\b/gi, ' ').replace(SIDE_RE, ' ')
+    // "10 with the bar" is a set, not an exercise called "with the".
+    .replace(/\b(?:with|holding|using|just|the|an?|empty|of)\b/gi, ' ')
+    .replace(EQUIP_NOUN_RE, ' ');
   return /\d/.test(line) && !hasNameWord(stripped);
 }
 
@@ -408,10 +446,11 @@ function parseHeaderBlock(header, setLines, declaredBar = { weight: 45, unit: 'l
   const sets = own ? [...own.sets] : [];
   const bad = [];
   for (const raw of setLines) {
-    const { line, note } = expandPlusBar(raw.replace(/×/g, 'x'), bar);
+    const words_ = expandBarWords(raw.replace(/×/g, 'x'), bar);
+    const { line, note } = expandPlusBar(words_.line, bar);
     const got = parseSets(line, { oneSet: true });
     if (!got.length) { bad.push(raw); continue; }
-    for (const g of got) sets.push({ ...g, note: [g.note || sideNote, note].filter(Boolean).join('; ') || null });
+    for (const g of got) sets.push({ ...g, note: [g.note || sideNote, note || words_.note].filter(Boolean).join('; ') || null });
   }
   sets.forEach((st, i) => { st.setNumber = i + 1; });
   return { exercise: sets.length ? { name, note: own ? own.note : sideNote, sets, raw: [header, ...setLines].join('\n') } : null, bad };
@@ -452,7 +491,7 @@ function parseWorkout(text) {
       // pure set spec and was swallowed as a second, repless 45 lb set of the
       // exercise before it — while the declaration itself never ran.
       if (BAR_DECL_RE.test(t)) break;
-      const probe = expandPlusBar(t, bar).line;
+      const probe = expandPlusBar(expandBarWords(t, bar).line, bar).line;
       if (!isSetOnly(probe)) break;
       next.push(t); j++;
     }
@@ -521,4 +560,4 @@ function buildPreview(parsed, library) {
   });
 }
 
-module.exports = { parseWorkout, expandPlusBar, buildPreview, parseSets, parseClause, matchExercise, normKey, splitSegments, pickLoad };
+module.exports = { parseWorkout, expandPlusBar, expandBarWords, buildPreview, parseSets, parseClause, matchExercise, normKey, splitSegments, pickLoad };
