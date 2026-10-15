@@ -409,3 +409,26 @@ test('a block flattened onto one line is asked about, never read as sets x reps'
   assert.deepStrictEqual(shape(parseWorkout('bench 3x10 @135')), [['Bench', [[10, 135, 'lbs', null, null], [10, 135, 'lbs', null, null], [10, 135, 'lbs', null, null]]]]);
   assert.deepStrictEqual(shape(parseWorkout('squat 5x5 225')).map(e => e[1].length), [5]);
 });
+
+test('set lines read the phrasings the inline grammar already reads', () => {
+  const sets = b => { const r = parseWorkout('Incline press:\n' + b); return r.unparsed.length ? 'UNREAD' : r.exercises[0].sets.map(s => [s.reps, s.weight]); };
+  assert.deepStrictEqual(sets('12 reps 40lb'), [[12, 40]]);
+  assert.deepStrictEqual(sets('10 reps @ 50lb'), [[10, 50]]);
+  assert.deepStrictEqual(sets('10x30lb DBs'), [[10, 30]]);
+  assert.deepStrictEqual(sets('10 x 25lb ez bar'), [[10, 25]]);
+  assert.deepStrictEqual(sets('10 x 135 on the bar'), [[10, 135]]);
+  assert.deepStrictEqual(sets('15 x bodyweight'), [[15, null]]);
+  // A named load plus NxM is sets × reps; forcing it to one set lost two.
+  assert.deepStrictEqual(sets('3x8 @135'), [[8, 135], [8, 135], [8, 135]]);
+  assert.deepStrictEqual(sets('3 sets of 10 @ 135'), [[10, 135], [10, 135], [10, 135]]);
+  // Without one, still one set, and still not guessed when size cannot tell.
+  assert.deepStrictEqual(sets('10 x 50'), [[10, 50]]);
+  assert.strictEqual(sets('3 x 10'), 'UNREAD');
+});
+
+test('inline: "30s" after NxM is not guessed, and a trailing colon is not part of the name', () => {
+  // Was TEN SETS OF THIRTY REPS.
+  assert.deepStrictEqual(parseWorkout('hammer curls 10 x 30s').exercises, []);
+  assert.deepStrictEqual(shape(parseWorkout('Dumbbell bicep curls: 10 x 25lb')),
+    [['Dumbbell Bicep Curls', [[10, 25, 'lbs', null, null]]]]);
+});

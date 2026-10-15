@@ -139,8 +139,13 @@ function parseSets(tail, opts = {}) {
     if (at) { weight = parseFloat(at[1]); weightUnit = 'lbs'; s = s.replace(at[0], ' '); }
   }
 
+  // "hammer curls 10 x 30s" is 30 lb dumbbells to the person who wrote it and
+  // was TEN SETS OF THIRTY REPS to this parser; it can also mean 30 seconds.
+  // Inline, where `A x B` would be sets × reps, the trailing "s" is not guessed.
+  if (!opts.oneSet && /\d\s*x\s*\d+s\b/.test(s)) return [];
+
   // sets x reps ("3x10"), else the first bare number is the rep count
-  let count = 1, reps = null;
+  let count = 1, reps = null, explicitSets = false;
   const nx = s.match(/(\d+(?:\.\d+)?)\s*x\s*(\d+)/i);
   if (nx) {
     const a = parseFloat(nx[1]), b = parseInt(nx[2], 10);
@@ -159,7 +164,7 @@ function parseSets(tail, opts = {}) {
     // "225x5" is weight × reps, not 225 sets — nobody does twenty sets of
     // one thing in a log line. Below 20 it is sets × reps ("3x10").
     else if (a >= 20 && weight == null) { weight = a; weightUnit = 'lbs'; reps = b; }
-    else { count = Math.round(a); reps = b; }
+    else { count = Math.round(a); reps = b; explicitSets = weight != null; }
     s = s.replace(nx[0], ' ');
   }
   else {
@@ -182,7 +187,11 @@ function parseSets(tail, opts = {}) {
   if (reps   != null && (!Number.isFinite(reps)   || reps   < 1 || reps   > REPS_LIMIT))   return [];
   if (weight != null && (!Number.isFinite(weight) || weight < 0 || weight > WEIGHT_LIMIT)) return [];
   if (!Number.isFinite(count) || count < 1 || count > 50) count = 1;
-  if (opts.oneSet) count = 1;                       // one line, one set — by definition
+  // One line, one set — unless the load was named AND two more numbers remain:
+  // "3x8 @135" under a header is three sets of eight, and forcing it to one
+  // silently dropped two sets. Without a named load `A x B` stays one set,
+  // which is what pickLoad above relies on.
+  if (opts.oneSet && !explicitSets) count = 1;
 
   const out = [];
   for (let i = 0; i < count; i++) out.push({ reps, weight, weightUnit: weight != null ? weightUnit : null, duration, note });
@@ -273,7 +282,9 @@ function parseClause(clause, bar = { weight: 45, unit: 'lbs' }) {
   const expanded = expandPlusBar(rawTail, bar);
   const tail = expanded.line;
   const barNote = expanded.note || barOnlyNote;
-  let name = nameParts.join(' ').replace(/\s+/g, ' ').trim();
+  // "Dumbbell bicep curls: 10 x 25lb" named an exercise `Dumbbell Bicep Curls:`,
+  // which no library entry matches, so every such line raised a name question.
+  let name = nameParts.join(' ').replace(/\s+/g, ' ').replace(/[\s:=\-–—]+$/, '').trim();
   if (!name) return null;                               // a set with no exercise — caller handles
   // One letter is not an exercise. `10 x 90 + bar, date: 2026-10-14` split on
   // its comma, orphaning `10 x 90 + bar` from the tail that followed it; the
@@ -415,7 +426,7 @@ const BAR_DECL_RE = new RegExp(`^(?:the\\s+)?bar\\s*[:=]\\s*(\\d+(?:\\.\\d+)?)\\
 // "10 x 40lb dumbbells" is a set of shoulder press, not an exercise called
 // dumbbells. Stripped only for the is-this-a-set-line question — a line like
 // "10 dumbbell curls" still has "curls" left and stays an exercise.
-const EQUIP_NOUN_RE = /\b(?:pairs?|dumbbells?|dbs?|kettlebells?|kbs?|barbells?|bars?|plates?|bands?|machines?|cables?|weights?|total|each|hands?|sides?)\b/gi;
+const EQUIP_NOUN_RE = /\b(?:bodyweight|bw|ez|pairs?|dumbbells?|dbs?|kettlebells?|kbs?|barbells?|bars?|plates?|bands?|machines?|cables?|weights?|total|each|hands?|sides?)\b/gi;
 
 /** Pure set spec, no exercise name of its own ("100lb x 10", "95lbs x 10", "3x8 @135"). */
 function isSetOnly(line) {
@@ -424,9 +435,11 @@ function isSetOnly(line) {
   // into a line still carrying the word "side", which reads as a name — so the
   // whole Shoulder press block went unread by the very change meant to rescue
   // it, and the version this replaced handled it correctly.
-  const stripped = line.replace(/\bx\b/gi, ' ').replace(SIDE_RE, ' ')
+  // "10x30lb" has no word boundary around the x, so "lb" survived as a name.
+  const stripped = line.replace(/(\d)\s*x\s*(\d)/gi, '$1 x $2').replace(/\bx\b/gi, ' ').replace(SIDE_RE, ' ')
+    .replace(/\b(?:reps?|sets?)\b/gi, ' ')
     // "10 with the bar" is a set, not an exercise called "with the".
-    .replace(/\b(?:with|holding|using|just|the|an?|empty|of)\b/gi, ' ')
+    .replace(/\b(?:with|holding|using|just|the|an?|empty|of|on)\b/gi, ' ')
     .replace(EQUIP_NOUN_RE, ' ');
   return /\d/.test(line) && !hasNameWord(stripped);
 }
@@ -458,7 +471,9 @@ function parseHeaderBlock(header, setLines, declaredBar = { weight: 45, unit: 'l
   for (const raw of setLines) {
     const words_ = expandBarWords(raw.replace(/×/g, 'x'), bar);
     const { line, note } = expandPlusBar(words_.line, bar);
-    const got = parseSets(line, { oneSet: true });
+    // The phrasings the inline grammar already reads ("12 reps 40lb", "10 reps
+    // at 50") were unread as set lines, because only parseClause normalised.
+    const got = parseSets(normalisePhrasing(line.toLowerCase()), { oneSet: true });
     if (!got.length) { bad.push(raw); continue; }
     for (const g of got) sets.push({ ...g, note: [g.note || sideNote, note || words_.note].filter(Boolean).join('; ') || null });
   }
