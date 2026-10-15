@@ -383,3 +383,29 @@ test('a bar named in words is the bar\'s weight, inline and as a set line', () =
     .exercises[0].sets.map(s => [s.reps, s.weight]), [[10, 45], [10, 95]]);
   assert.deepStrictEqual(parseWorkout('bench press 45lb bar:\n10 with the bar\n50+bar x 10').unparsed, []);
 });
+
+test('"pair of dumbbells" on a set line is per-hand load, not an exercise name', () => {
+  // 2026-10-15, verbatim. Every set line went unread, so the owner was asked to
+  // rewrite a workout he had written correctly — three times.
+  const msg = 'Dumbbell incline chest press:\n10 x 35lb pair of dumbbells \n10 x 45lb pair of dumbbells \n' +
+              '10 x 50lb pair of dumbbells \n\nBicep curls:\n10 x 25lb pair of dumbbells';
+  const r = parseWorkout(msg);
+  assert.deepStrictEqual(r.unparsed, []);
+  assert.deepStrictEqual(shape(r), [
+    ['Dumbbell Incline Chest Press', [[10, 35, 'lbs', null, 'each side'], [10, 45, 'lbs', null, 'each side'], [10, 50, 'lbs', null, 'each side']]],
+    ['Bicep Curls', [[10, 25, 'lbs', null, 'each side']]],
+  ]);
+  // Inline, as he re-sent it.
+  assert.deepStrictEqual(shape(parseWorkout('Bicep curls 10 x 25lb pair of dumbbells')),
+    [['Bicep Curls', [[10, 25, 'lbs', null, 'each side']]]]);
+});
+
+test('a block flattened onto one line is asked about, never read as sets x reps', () => {
+  // Read before this as TEN SETS OF FORTY-FIVE REPS at 35 lb.
+  const r = parseWorkout('Dumbbell incline chest press: 10 x 35lb pair of dumbbells  10 x 45lb pair of dumbbells  10 x 50lb pair of dumbbells');
+  assert.deepStrictEqual(r.exercises, []);
+  assert.strictEqual(r.unparsed.length, 1);
+  // The inline grammar it must not disturb.
+  assert.deepStrictEqual(shape(parseWorkout('bench 3x10 @135')), [['Bench', [[10, 135, 'lbs', null, null], [10, 135, 'lbs', null, null], [10, 135, 'lbs', null, null]]]]);
+  assert.deepStrictEqual(shape(parseWorkout('squat 5x5 225')).map(e => e[1].length), [5]);
+});

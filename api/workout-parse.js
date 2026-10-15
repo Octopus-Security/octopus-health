@@ -46,6 +46,11 @@ const DUR_UNIT_RE    = 'secs?|seconds?|mins?|minutes?|hrs?|hours?';
 // "each hand" was missing, so "10 x 40lb each hand" logged 40 with no note and
 // nothing recorded that it was 40 PER HAND (2026-10-14).
 const SIDE_RE = /\b(?:each|per|ea|both)\s+(?:sides?|hands?|arms?|legs?)\b|\be\/s\b/i;
+// "10 x 35lb pair of dumbbells" is 35 in EACH hand — the same fact as "each
+// hand", said with the equipment instead of the limb. 2026-10-15: the words
+// were read as an exercise name, so every set line of an incline press block
+// went unread and the owner was asked to rewrite a workout he wrote correctly.
+const PAIR_RE = /\bpairs?(?:\s+of)?\b/i;
 
 // A snake_case identifier is the agent's own plumbing quoted back, not an
 // exercise. 2026-10-14: a declined approval card was pasted into the chat to
@@ -117,8 +122,8 @@ function pickLoad(a, b) {
 // is nothing loggable, or when the numbers cannot be read with confidence.
 function parseSets(tail, opts = {}) {
   let s = ` ${String(tail || '').toLowerCase()} `;
-  const note = SIDE_RE.test(s) ? 'each side' : null;
-  s = s.replace(SIDE_RE, ' ');
+  const note = SIDE_RE.test(s) || PAIR_RE.test(s) ? 'each side' : null;
+  s = s.replace(SIDE_RE, ' ').replace(PAIR_RE, ' ');
 
   // timed set: "30 sec", "2 min" — pulled first so its number is not read as reps
   let duration = null;
@@ -169,6 +174,11 @@ function parseSets(tail, opts = {}) {
   }
 
   if (reps == null && weight == null && duration == null) return [];   // nothing loggable
+  // A number nothing above consumed means the tail held more than one set's
+  // worth of numbers, and which belongs to what is a guess. A block flattened
+  // onto one line — "press: 10 x 35lb  10 x 45lb  10 x 50lb" — read the SECOND
+  // set's `10 x 45` as ten sets of forty-five reps (2026-10-15). Unread, asked.
+  if (/\d/.test(s)) return [];
   if (reps   != null && (!Number.isFinite(reps)   || reps   < 1 || reps   > REPS_LIMIT))   return [];
   if (weight != null && (!Number.isFinite(weight) || weight < 0 || weight > WEIGHT_LIMIT)) return [];
   if (!Number.isFinite(count) || count < 1 || count > 50) count = 1;
@@ -405,7 +415,7 @@ const BAR_DECL_RE = new RegExp(`^(?:the\\s+)?bar\\s*[:=]\\s*(\\d+(?:\\.\\d+)?)\\
 // "10 x 40lb dumbbells" is a set of shoulder press, not an exercise called
 // dumbbells. Stripped only for the is-this-a-set-line question — a line like
 // "10 dumbbell curls" still has "curls" left and stays an exercise.
-const EQUIP_NOUN_RE = /\b(?:dumbbells?|dbs?|kettlebells?|kbs?|barbells?|bars?|plates?|bands?|machines?|cables?|weights?|total|each|hands?|sides?)\b/gi;
+const EQUIP_NOUN_RE = /\b(?:pairs?|dumbbells?|dbs?|kettlebells?|kbs?|barbells?|bars?|plates?|bands?|machines?|cables?|weights?|total|each|hands?|sides?)\b/gi;
 
 /** Pure set spec, no exercise name of its own ("100lb x 10", "95lbs x 10", "3x8 @135"). */
 function isSetOnly(line) {
