@@ -1,0 +1,34 @@
+<%
+  const dsLib = (typeof exerciseLibrary !== 'undefined' ? exerciseLibrary : [])
+    .filter(function (e) { return e.category === 'recovery'; })
+    .map(function (e) { return { id: e.id, name: e.name }; });
+%>
+<section class="ds card" id="ds-root" aria-labelledby="ds-heading">
+  <div class="ds-head">
+    <div>
+      <h2 id="ds-heading">My daily stretches</h2>
+      <p class="ds-sub"><span id="ds-title"></span> <span class="ds-total" id="ds-total"></span></p>
+    </div>
+    <a class="btn" href="/body">Body map</a>
+  </div>
+  <p class="ds-note" id="ds-default" hidden>This is the starter set. Change anything and it becomes your own list.</p>
+  <p class="ds-msg" id="ds-msg" role="status" aria-live="polite"></p>
+  <ol class="ds-list" id="ds-list"><li class="ds-empty">Loading...</li></ol>
+
+  <div class="ds-block">
+    <h3>Load a preset</h3>
+    <div class="ds-preset-row">
+      <select id="ds-preset" aria-label="Preset"></select>
+      <label class="ds-radio"><input type="radio" name="ds-mode" value="add" checked> Add to my list (skip duplicates)</label>
+      <label class="ds-radio"><input type="radio" name="ds-mode" value="replace"> Replace my list</label>
+      <button type="button" class="btn" id="ds-load">Load preset</button>
+    </div>
+  </div>
+
+  <details class="ds-block">
+    <summary>Add a stretch</summary>
+    <input type="search" id="ds-search" class="ds-search" placeholder="Search stretches" aria-label="Search stretches">
+    <ul class="ds-lib" id="ds-lib"></ul>
+  </details>
+  <script type="application/json" id="ds-library"><%- JSON.stringify(dsLib).replace(/</g, '\\u003c') %></script>
+</section>

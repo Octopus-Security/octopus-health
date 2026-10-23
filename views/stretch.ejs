@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= title %></title>
   <link rel="stylesheet" href="<%= asset('/theme.css') %>">
+  <link rel="stylesheet" href="<%= asset('/daily-stretches.css') %>">
   <script src="<%= asset('/stick-figure.js') %>" defer></script>
   <style>
     .stretch-grid { display:grid; grid-template-columns: 1fr 360px; gap:20px; }
@@ -75,6 +76,7 @@
 <%- include('partials/nav') %>
 
 <div class="container" style="padding-top:24px">
+  <%- include('partials/daily-stretches') %>
   <div class="stretch-grid">
     <div>
       <div class="builder-shell">
@@ -182,6 +184,7 @@
   </div>
 </div>
 
+<script src="<%= asset('/js/daily-stretches.js') %>"></script>
 <script>
 const EXERCISE_LIBRARY = <%- JSON.stringify(exerciseLibrary) %>;
 let routineItems = [];

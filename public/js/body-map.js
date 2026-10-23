@@ -32,7 +32,7 @@
     return bits.join(' - ');
   }
 
-  function fill(listId, countId, items, emptyText) {
+  function fill(listId, countId, items, emptyText, withDaily) {
     var ul = $(listId); ul.textContent = '';
     $(countId).textContent = '(' + items.length + ')';
     if (!items.length) {
@@ -46,6 +46,7 @@
       li.appendChild(a);
       var m = fmt(e);
       if (m) { var s = document.createElement('span'); s.className = 'bm-meta'; s.textContent = m; li.appendChild(s); }
+      if (withDaily && window.DailyStretches) li.appendChild(window.DailyStretches.toggleButton(e));
       ul.appendChild(li);
     });
   }
@@ -74,7 +75,7 @@
         $('bm-sub').textContent = kind === 'joint'
           ? 'Mobility work and exercises for the muscles that cross this joint.'
           : (d.target.joints && d.target.joints.length ? 'Crosses: ' + d.target.joints.map(function (j) { return j.replace(/_/g, ' '); }).join(', ') : '');
-        fill('bm-stretches', 'bm-n-stretch', d.stretches, 'No stretches for this yet.');
+        fill('bm-stretches', 'bm-n-stretch', d.stretches, 'No stretches for this yet.', true);
         fill('bm-primary', 'bm-n-primary', d.primary, 'None.');
         fill('bm-secondary', 'bm-n-secondary', d.secondary, 'None.');
         panel.scrollTop = 0;
@@ -85,6 +86,8 @@
         $('bm-sub').textContent = 'Try again in a moment.';
       });
   }
+
+  if (window.DailyStretches) window.DailyStretches.load().catch(function () { /* toggles just read 'add' until it loads */ });
 
   document.querySelectorAll('[data-kind][data-id]').forEach(function (el) {
     el.addEventListener('click', function () { select(el.getAttribute('data-kind'), el.getAttribute('data-id')); });

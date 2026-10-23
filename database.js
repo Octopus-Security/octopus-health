@@ -796,6 +796,62 @@ const SEED_EXERCISE_PLANS = [
       { name: 'Upper Trap Stretch',               sets: 2, reps: null, duration: 30, notes: 'Neck. Ear toward shoulder, once each side.' },
     ],
   },
+  // ── Daily-stretch presets ────────────────────────────────────────────────
+  // Starting points for the user's "daily stretches" list (api/daily-stretches.js).
+  // Loading one COPIES its items into the user's own list, so editing the list
+  // never changes these. `sets` is holds, 2 = once each side, 1 = a single hold.
+  // Every name must exist in SEED_EXERCISES (a test enforces it).
+  {
+    name: 'Desk Worker Posture Stretch',
+    type: 'stretch',
+    description: 'For a day spent sitting: neck, chest, upper back and the hip flexors that shorten in a chair. About 5 minutes.',
+    items: [
+      { name: 'Upper Trap Stretch',               sets: 2, reps: null, duration: 30, notes: 'Neck.' },
+      { name: 'Levator Scapulae Stretch',         sets: 2, reps: null, duration: 30, notes: 'Neck and shoulder blade.' },
+      { name: 'Doorway Chest Stretch',            sets: 2, reps: null, duration: 30, notes: 'Chest.' },
+      { name: 'Thoracic Open Book',               sets: 2, reps: null, duration: 30, notes: 'Upper back.' },
+      { name: 'Half-Kneeling Hip Flexor Stretch', sets: 2, reps: null, duration: 30, notes: 'Hip flexors.' },
+    ],
+  },
+  {
+    name: 'Hips & Lower Body Stretch (BJJ)',
+    type: 'stretch',
+    description: 'Hip flexors, piriformis, adductors, hamstrings and glutes: the range guard work and passing ask for. About 8 minutes.',
+    items: [
+      { name: 'Half-Kneeling Hip Flexor Stretch', sets: 2, reps: null, duration: 45, notes: 'Hip flexors.' },
+      { name: 'Supine Piriformis Stretch',        sets: 2, reps: null, duration: 45, notes: 'Piriformis.' },
+      { name: 'Frog Stretch',                     sets: 1, reps: null, duration: 45, notes: 'Adductors. One hold.' },
+      { name: 'Butterfly Stretch',                sets: 1, reps: null, duration: 45, notes: 'Adductors. One hold.' },
+      { name: 'Supine Hamstring Stretch',         sets: 2, reps: null, duration: 45, notes: 'Hamstrings.' },
+      { name: 'Pigeon Stretch',                   sets: 2, reps: null, duration: 45, notes: 'Glutes.' },
+    ],
+  },
+  {
+    name: 'Upper Body & Shoulders Stretch',
+    type: 'stretch',
+    description: 'Chest, shoulders, arms, wrists and lats, for after pressing, pulling or gripping. About 7 minutes.',
+    items: [
+      { name: 'Doorway Chest Stretch',            sets: 2, reps: null, duration: 30, notes: 'Chest.' },
+      { name: 'Cross-Body Shoulder Stretch',      sets: 2, reps: null, duration: 30, notes: 'Rear shoulder.' },
+      { name: 'Sleeper Stretch',                  sets: 2, reps: null, duration: 45, notes: 'Shoulder rotation. Gentle pressure only.' },
+      { name: 'Overhead Triceps Stretch',         sets: 2, reps: null, duration: 30, notes: 'Triceps.' },
+      { name: 'Wall Biceps Stretch',              sets: 2, reps: null, duration: 30, notes: 'Biceps.' },
+      { name: 'Doorway Wrist Stretch',            sets: 2, reps: null, duration: 30, notes: 'Forearms and wrists.' },
+      { name: "Child's Pose",                     sets: 1, reps: null, duration: 45, notes: 'Lats. One hold.' },
+    ],
+  },
+  {
+    name: 'Quick 5 Minute Stretch',
+    type: 'stretch',
+    description: 'Five holds of 30 seconds a side that cover the tightest places. When there is only five minutes.',
+    items: [
+      { name: 'Half-Kneeling Hip Flexor Stretch', sets: 2, reps: null, duration: 30, notes: 'Hips.' },
+      { name: 'Supine Hamstring Stretch',         sets: 2, reps: null, duration: 30, notes: 'Hamstrings.' },
+      { name: 'Doorway Chest Stretch',            sets: 2, reps: null, duration: 30, notes: 'Chest.' },
+      { name: 'Thoracic Open Book',               sets: 2, reps: null, duration: 30, notes: 'Upper back.' },
+      { name: 'Upper Trap Stretch',               sets: 2, reps: null, duration: 30, notes: 'Neck.' },
+    ],
+  },
 ];
 
 // ── Per-user database factory ─────────────────────────────────────────────────

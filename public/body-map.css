@@ -1,22 +1,9 @@
-/* Body map. Dark by default to match the rest of the app; light when the OS asks. */
+/* Body map. Dark only, like the rest of the app (it has no light theme to follow). */
 .bm {
   --bm-fill: #2a3a44; --bm-fill-hover: #3b6a86; --bm-fill-sel: #2ecc71;
   --bm-stroke: #0d0d0d; --bm-head: #1c1c1c; --bm-joint: rgba(230,126,34,.35); --bm-joint-line: #e67e22;
   --bm-text: #d4d4d4; --bm-muted: #888; --bm-surface: #111; --bm-border: #2a2a2a; --bm-accent: #2ecc71;
   --bm-focus: #7fcbff;
-}
-@media (prefers-color-scheme: light) {
-  .bm {
-    --bm-fill: #c7d5df; --bm-fill-hover: #8fb7d1; --bm-fill-sel: #27ae60;
-    --bm-stroke: #ffffff; --bm-head: #e6e6e6; --bm-joint: rgba(211,84,0,.28); --bm-joint-line: #d35400;
-    --bm-text: #1d1d1d; --bm-muted: #5a5a5a; --bm-surface: #f6f6f4; --bm-border: #cfcfcf; --bm-accent: #1e8449;
-    --bm-focus: #0b5cad;
-  }
-  /* the page behind stays the app's dark; only the cards go light, so text outside them is untouched */
-  .bm .card { background: var(--bm-surface); border-color: var(--bm-border); }
-  .bm .card h3, .bm .card h4, .bm .card p, .bm .card li, .bm .card span { color: var(--bm-text); }
-  .bm .card .bm-sub, .bm .card .bm-count, .bm .card .bm-meta, .bm .card .bm-none, .bm .card .bm-extra h3 { color: var(--bm-muted); }
-  .bm .card .bm-list a { color: var(--bm-accent); }
 }
 .bm { max-width: 1200px; }
 .bm-head h2 { margin-bottom: 8px; }
@@ -48,7 +35,9 @@
 .bm-panel h4 { margin: 16px 0 6px; font-size: 0.85rem; }
 .bm-sub, .bm-count { color: var(--bm-muted); font-size: 0.8rem; font-weight: 400; }
 .bm-list { list-style: none; padding: 0; }
-.bm-list li { padding: 6px 0; border-bottom: 1px solid var(--bm-border); font-size: 0.88rem; }
+.bm-list li { padding: 6px 0; border-bottom: 1px solid var(--bm-border); font-size: 0.88rem; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 8px; align-items: center; }
+.bm-list li .ds-toggle { grid-column: 2; grid-row: 1 / span 2; }
+.bm-list li.bm-none { display: block; }
 .bm-list a { color: var(--bm-accent); text-decoration: none; }
 .bm-list a:hover { text-decoration: underline; }
 .bm-meta { display: block; color: var(--bm-muted); font-size: 0.74rem; }
