@@ -1203,6 +1203,25 @@ router.get('/plans/today', requireToken, async (req, res) => {
   } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
 });
 
+// ── Daily stretches (service side — cortex's morning message) ────────────────
+//
+// The acting account's own daily stretch list (api/daily-stretches.js). Scoped by
+// getDB(req), i.e. by X-Service-User, like every route here. An empty list is an
+// answer ({ items: [] }), not an error: cortex leaves the section out.
+
+// GET /api/service/stretches/daily → { ok, name, totalMinutes, items, url }
+router.get('/stretches/daily', requireToken, async (req, res) => {
+  try {
+    const db = await getDB(req);
+    const ds = require('../daily-stretches');
+    // An account that has never opened the web UI has no seeded starter plan yet.
+    // Seeding is additive and idempotent; skipped once the person has a list of
+    // their own, so an emptied list stays empty.
+    if (!(await ds.ownPlan(db))) await db.seedData().catch(() => {});
+    res.json({ ok: true, ...(await ds.serviceView(db)) });
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+
 // Skill tree, fitness tests, weekly benchmarks. Mounted here so they share this
 // router's token + X-Service-User guards and getDB(); see fitness-service.js.
 require('./fitness-service')(router, getDB);

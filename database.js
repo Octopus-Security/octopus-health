@@ -316,6 +316,19 @@ const SEED_EXERCISES = [
   { name: 'Chin Tuck',                      category: 'recovery', equipment: 'none', primaryMuscles: ['neck','upper_back'],          secondaryMuscles: [],                          instructions: 'Gently pull chin straight back (not down). Hold 5s, repeat 10x. Corrects forward head posture — common from grappling and device use. Use it throughout the day.', videoUrl: 'https://www.youtube.com/watch?v=W0RGrH5Zq8A', mediaUrl: null, defaultSets: 3, defaultReps: 10, defaultDuration: null },
   { name: 'Lumbar Decompression Hang',      category: 'recovery', equipment: 'bodyweight', primaryMuscles: ['lower_back','lats'],      secondaryMuscles: ['shoulders'],              instructions: 'Dead hang from pull-up bar, feet slightly off floor. Relax everything below shoulders. Breathe slowly. Decompresses lumbar spine after heavy training. Even 30s helps.', videoUrl: 'https://www.youtube.com/watch?v=jk8WBNL1P74', mediaUrl: null, defaultSets: 2, defaultReps: null, defaultDuration: 30 },
   { name: 'Scorpion Stretch',               category: 'recovery', equipment: 'none', primaryMuscles: ['thoracic_spine','hip_flexors','chest'], secondaryMuscles: ['shoulders','hips'], instructions: 'Lie face down, swing one leg over to opposite side reaching for the ground. Arms out flat. Rotational stretch for thoracic spine and hip flexors simultaneously.', videoUrl: 'https://www.youtube.com/watch?v=Q5JBAD3Yz-k', mediaUrl: null, defaultSets: 2, defaultReps: 8, defaultDuration: null },
+  // Static holds added for the body map: muscles/joints that had no stretch, or only a drill
+  { name: "Cobra Stretch", category: 'recovery', equipment: 'none', primaryMuscles: ['abs'], secondaryMuscles: ['hip_flexors','chest'], instructions: "Lie face down, hands under shoulders. Press the chest up, keeping hips on the floor, until you feel a stretch along the front of the abdomen. Breathe slowly; stop short of any pinch in the lower back. Hold 30s.", videoUrl: null, mediaUrl: null, defaultSets: 2, defaultReps: null, defaultDuration: 30 },
+  { name: "Standing Side Bend Stretch", category: 'recovery', equipment: 'none', primaryMuscles: ['obliques','lats'], secondaryMuscles: ['lower_back'], instructions: "Stand tall, one arm overhead. Lean sideways from the waist without twisting or leaning forward, reaching over the top. Hold 30s each side.", videoUrl: null, mediaUrl: null, defaultSets: 2, defaultReps: null, defaultDuration: 30 },
+  { name: "Seated Spinal Twist", category: 'recovery', equipment: 'none', primaryMuscles: ['obliques','lower_back'], secondaryMuscles: ['glutes','thoracic_spine'], instructions: "Sit with legs extended, cross one foot over the opposite knee. Hug the knee with the opposite elbow and rotate toward the bent knee, sitting tall. Hold 30s each side.", videoUrl: null, mediaUrl: null, defaultSets: 2, defaultReps: null, defaultDuration: 30 },
+  { name: "Wall Biceps Stretch", category: 'recovery', equipment: 'none', primaryMuscles: ['biceps'], secondaryMuscles: ['chest','front_delts'], instructions: "Stand side-on to a wall, palm flat on it at shoulder height, fingers pointing back. Slowly turn the body away until you feel the front of the upper arm stretch. Hold 30s each side.", videoUrl: null, mediaUrl: null, defaultSets: 2, defaultReps: null, defaultDuration: 30 },
+  { name: "Overhead Triceps Stretch", category: 'recovery', equipment: 'none', primaryMuscles: ['triceps'], secondaryMuscles: ['lats','rear_delts'], instructions: "Raise one arm, bend the elbow and drop the hand behind the head. Use the other hand to ease the elbow back and slightly in. Hold 30s each side.", videoUrl: null, mediaUrl: null, defaultSets: 2, defaultReps: null, defaultDuration: 30 },
+  { name: "Supine Hamstring Stretch", category: 'recovery', equipment: 'none', primaryMuscles: ['hamstrings'], secondaryMuscles: ['calves'], instructions: "Lie on your back, loop a strap or towel around one foot and raise the straight leg until the back of the thigh stretches. Keep the other leg flat and the lower back relaxed. Hold 30s each side.", videoUrl: null, mediaUrl: null, defaultSets: 2, defaultReps: null, defaultDuration: 30 },
+  { name: "Standing Calf Stretch (Wall)", category: 'recovery', equipment: 'none', primaryMuscles: ['calves'], secondaryMuscles: ['hamstrings'], instructions: "Hands on a wall, one foot back with the heel down and the knee straight. Lean in until the calf stretches. Hold 30s each side.", videoUrl: null, mediaUrl: null, defaultSets: 2, defaultReps: null, defaultDuration: 30 },
+  { name: "Wall Calf Stretch (Bent Knee)", category: 'recovery', equipment: 'none', primaryMuscles: ['calves'], secondaryMuscles: ['ankles'], instructions: "Same position as the wall calf stretch, then soften the back knee while keeping the heel down to reach the deeper soleus. Hold 30s each side.", videoUrl: null, mediaUrl: null, defaultSets: 2, defaultReps: null, defaultDuration: 30 },
+  { name: "Standing Quad Stretch", category: 'recovery', equipment: 'none', primaryMuscles: ['quads'], secondaryMuscles: ['hip_flexors'], instructions: "Stand holding a wall for balance. Bend one knee and hold the ankle behind you, knees together, tucking the pelvis slightly. Hold 30s each side.", videoUrl: null, mediaUrl: null, defaultSets: 2, defaultReps: null, defaultDuration: 30 },
+  { name: "Behind-the-Back Chest Opener", category: 'recovery', equipment: 'none', primaryMuscles: ['chest','front_delts'], secondaryMuscles: ['biceps'], instructions: "Stand tall, clasp the hands behind the back (or hold a towel), straighten the arms and lift them slightly while opening the chest. Hold 30s.", videoUrl: null, mediaUrl: null, defaultSets: 2, defaultReps: null, defaultDuration: 30 },
+  { name: "Standing Crossover IT Band Stretch", category: 'recovery', equipment: 'none', primaryMuscles: ['it_band'], secondaryMuscles: ['glutes','quads'], instructions: "Stand with one leg crossed behind the other, lean the hips toward the side of the rear leg and reach the same-side arm overhead. Hold 30s each side.", videoUrl: null, mediaUrl: null, defaultSets: 2, defaultReps: null, defaultDuration: 30 },
+  { name: "Downward Dog", category: 'recovery', equipment: 'none', primaryMuscles: ['hamstrings','calves'], secondaryMuscles: ['shoulders','lats'], instructions: "From hands and knees, lift the hips up and back into an inverted V. Press the floor away, heels reaching down, spine long. Hold 30s.", videoUrl: null, mediaUrl: null, defaultSets: 2, defaultReps: null, defaultDuration: 30 },
 ];
 
 // ── Workout templates — seeded once, editable via the health app UI ──────────
@@ -762,6 +775,85 @@ const SEED_PLANS = [
   },
 ];
 
+// ── Starter stretching plan (ExercisePlan) ────────────────────────────────────
+// For someone who has never stretched consistently: 8 holds, one per side where it
+// matters, about 10 minutes with the changeovers. Items name exercises; exerciseId
+// is looked up per account at seed time because ids differ between databases.
+// `sets` is the number of holds (2 = once each side); `duration` is seconds per hold.
+const SEED_EXERCISE_PLANS = [
+  {
+    name: 'Daily Starter Stretch (10 min)',
+    type: 'stretch',
+    description: 'Eight easy holds for hips, hamstrings, chest, shoulders, upper back, calves and neck. Hold each for 30 seconds, once on each side, breathing slowly. Mild stretch only: it should never hurt. Do it every day, after a walk or a workout, or just before bed.',
+    items: [
+      { name: 'Half-Kneeling Hip Flexor Stretch', sets: 2, reps: null, duration: 30, notes: 'Hips. Once each side.' },
+      { name: 'Supine Hamstring Stretch',         sets: 2, reps: null, duration: 30, notes: 'Hamstrings. Once each side; a towel works as a strap.' },
+      { name: 'Supine Piriformis Stretch',        sets: 2, reps: null, duration: 30, notes: 'Hips and glutes. Once each side.' },
+      { name: 'Doorway Chest Stretch',            sets: 2, reps: null, duration: 30, notes: 'Chest. Once each side.' },
+      { name: 'Cross-Body Shoulder Stretch',      sets: 2, reps: null, duration: 30, notes: 'Shoulders. Once each side.' },
+      { name: 'Thoracic Open Book',               sets: 2, reps: null, duration: 30, notes: 'Upper back. Slow rotation, hold at the end. Once each side.' },
+      { name: 'Standing Calf Stretch (Wall)',     sets: 2, reps: null, duration: 30, notes: 'Calves. Heel down, once each side.' },
+      { name: 'Upper Trap Stretch',               sets: 2, reps: null, duration: 30, notes: 'Neck. Ear toward shoulder, once each side.' },
+    ],
+  },
+  // ── Daily-stretch presets ────────────────────────────────────────────────
+  // Starting points for the user's "daily stretches" list (api/daily-stretches.js).
+  // Loading one COPIES its items into the user's own list, so editing the list
+  // never changes these. `sets` is holds, 2 = once each side, 1 = a single hold.
+  // Every name must exist in SEED_EXERCISES (a test enforces it).
+  {
+    name: 'Desk Worker Posture Stretch',
+    type: 'stretch',
+    description: 'For a day spent sitting: neck, chest, upper back and the hip flexors that shorten in a chair. About 5 minutes.',
+    items: [
+      { name: 'Upper Trap Stretch',               sets: 2, reps: null, duration: 30, notes: 'Neck.' },
+      { name: 'Levator Scapulae Stretch',         sets: 2, reps: null, duration: 30, notes: 'Neck and shoulder blade.' },
+      { name: 'Doorway Chest Stretch',            sets: 2, reps: null, duration: 30, notes: 'Chest.' },
+      { name: 'Thoracic Open Book',               sets: 2, reps: null, duration: 30, notes: 'Upper back.' },
+      { name: 'Half-Kneeling Hip Flexor Stretch', sets: 2, reps: null, duration: 30, notes: 'Hip flexors.' },
+    ],
+  },
+  {
+    name: 'Hips & Lower Body Stretch (BJJ)',
+    type: 'stretch',
+    description: 'Hip flexors, piriformis, adductors, hamstrings and glutes: the range guard work and passing ask for. About 8 minutes.',
+    items: [
+      { name: 'Half-Kneeling Hip Flexor Stretch', sets: 2, reps: null, duration: 45, notes: 'Hip flexors.' },
+      { name: 'Supine Piriformis Stretch',        sets: 2, reps: null, duration: 45, notes: 'Piriformis.' },
+      { name: 'Frog Stretch',                     sets: 1, reps: null, duration: 45, notes: 'Adductors. One hold.' },
+      { name: 'Butterfly Stretch',                sets: 1, reps: null, duration: 45, notes: 'Adductors. One hold.' },
+      { name: 'Supine Hamstring Stretch',         sets: 2, reps: null, duration: 45, notes: 'Hamstrings.' },
+      { name: 'Pigeon Stretch',                   sets: 2, reps: null, duration: 45, notes: 'Glutes.' },
+    ],
+  },
+  {
+    name: 'Upper Body & Shoulders Stretch',
+    type: 'stretch',
+    description: 'Chest, shoulders, arms, wrists and lats, for after pressing, pulling or gripping. About 7 minutes.',
+    items: [
+      { name: 'Doorway Chest Stretch',            sets: 2, reps: null, duration: 30, notes: 'Chest.' },
+      { name: 'Cross-Body Shoulder Stretch',      sets: 2, reps: null, duration: 30, notes: 'Rear shoulder.' },
+      { name: 'Sleeper Stretch',                  sets: 2, reps: null, duration: 45, notes: 'Shoulder rotation. Gentle pressure only.' },
+      { name: 'Overhead Triceps Stretch',         sets: 2, reps: null, duration: 30, notes: 'Triceps.' },
+      { name: 'Wall Biceps Stretch',              sets: 2, reps: null, duration: 30, notes: 'Biceps.' },
+      { name: 'Doorway Wrist Stretch',            sets: 2, reps: null, duration: 30, notes: 'Forearms and wrists.' },
+      { name: "Child's Pose",                     sets: 1, reps: null, duration: 45, notes: 'Lats. One hold.' },
+    ],
+  },
+  {
+    name: 'Quick 5 Minute Stretch',
+    type: 'stretch',
+    description: 'Five holds of 30 seconds a side that cover the tightest places. When there is only five minutes.',
+    items: [
+      { name: 'Half-Kneeling Hip Flexor Stretch', sets: 2, reps: null, duration: 30, notes: 'Hips.' },
+      { name: 'Supine Hamstring Stretch',         sets: 2, reps: null, duration: 30, notes: 'Hamstrings.' },
+      { name: 'Doorway Chest Stretch',            sets: 2, reps: null, duration: 30, notes: 'Chest.' },
+      { name: 'Thoracic Open Book',               sets: 2, reps: null, duration: 30, notes: 'Upper back.' },
+      { name: 'Upper Trap Stretch',               sets: 2, reps: null, duration: 30, notes: 'Neck.' },
+    ],
+  },
+];
+
 // ── Per-user database factory ─────────────────────────────────────────────────
 
 const getDatabase = (username) => {
@@ -1148,6 +1240,20 @@ const getDatabase = (username) => {
             }
         }
 
+        // Starter exercise plans: additive by name, and never overwritten (ExercisePlan has
+        // no isCustom flag, so a plan the user has edited or renamed must be left alone).
+        // Runs after the exercise merge above so every item can be matched to its id.
+        const idByName = new Map((await ExerciseDefinition.findAll({ attributes: ['id', 'name'] })).map(e => [e.name, e.id]));
+        for (const p of SEED_EXERCISE_PLANS) {
+            await ExercisePlan.findOrCreate({
+                where: { name: p.name },
+                defaults: {
+                    name: p.name, type: p.type, description: p.description,
+                    items: JSON.stringify(p.items.map(i => ({ exerciseId: idByName.get(i.name) ?? null, ...i }))),
+                },
+            });
+        }
+
         // Seed workout templates — additive by slug stored in name field
         const existingTemplateNames = new Set(
             (await WorkoutTemplate.findAll({ attributes: ['name'] })).map(t => t.name)
@@ -1220,3 +1326,6 @@ const getDatabase = (username) => {
 };
 
 module.exports = getDatabase;
+// Exposed for tests and the coverage report; the factory stays the default export.
+module.exports.SEED_EXERCISES = SEED_EXERCISES;
+module.exports.SEED_EXERCISE_PLANS = SEED_EXERCISE_PLANS;

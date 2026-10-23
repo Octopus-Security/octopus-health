@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= title %></title>
   <link rel="stylesheet" href="<%= asset('/theme.css') %>">
+  <link rel="stylesheet" href="<%= asset('/daily-stretches.css') %>">
   <script src="<%= asset('/stick-figure.js') %>" defer></script>
   <style>
     .stretch-grid { display:grid; grid-template-columns: 1fr 360px; gap:20px; }
@@ -75,6 +76,7 @@
 <%- include('partials/nav') %>
 
 <div class="container" style="padding-top:24px">
+  <%- include('partials/daily-stretches') %>
   <div class="stretch-grid">
     <div>
       <div class="builder-shell">
@@ -83,7 +85,8 @@
             <h2 style="margin:0">🧘 Stretch Builder</h2>
             <p style="margin-top:6px;color:#777">Build warmups, cooldowns, or standalone stretching flows with exercise cards.</p>
           </div>
-          <button class="btn" onclick="resetBuilder()">New Routine</button>
+          <div style="display:flex;gap:8px;flex-wrap:wrap"><a href="/body" class="btn">Body map</a>
+          <button class="btn" onclick="resetBuilder()">New Routine</button></div>
         </div>
 
         <div style="display:grid;grid-template-columns:1fr 180px;gap:12px;margin-top:16px">
@@ -181,6 +184,7 @@
   </div>
 </div>
 
+<script src="<%= asset('/js/daily-stretches.js') %>"></script>
 <script>
 const EXERCISE_LIBRARY = <%- JSON.stringify(exerciseLibrary) %>;
 let routineItems = [];

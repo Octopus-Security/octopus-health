@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <%- include('partials/favicon') %>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="<%= asset('/theme.css') %>">
+  <link rel="stylesheet" href="<%= asset('/body-map.css') %>">
+  <link rel="stylesheet" href="<%= asset('/daily-stretches.css') %>">
+</head>
+<body>
+<%- include('partials/nav') %>
+<%
+  const MUSCLES = {}; vocab.muscles.forEach(function (m) { MUSCLES[m.id] = m; });
+  const JOINTS = {};  vocab.joints.forEach(function (j) { JOINTS[j.id] = j; });
+  // group a view's polygons by id so left and right (or the several pieces of one
+  // muscle) are ONE focusable control
+  function grouped(list) {
+    const out = [], seen = {};
+    list.forEach(function (s) {
+      if (!seen[s.id]) { seen[s.id] = { id: s.id, items: [] }; out.push(seen[s.id]); }
+      seen[s.id].items.push(s);
+    });
+    return out;
+  }
+  const views = [{ key: 'front', label: 'Front' }, { key: 'back', label: 'Back' }];
+%>
+<div class="container bm" data-msg-root>
+  <div class="bm-head">
+    <h2>Body map</h2>
+    <p class="bm-lede">Tap a muscle or a joint to see stretches and exercises for it.
+      New to stretching? Start with <a href="/plan-maker">Daily Starter Stretch (10 min)</a>.</p>
+    <p class="bm-links"><a href="/library">Exercise library</a> · <a href="/stretch">Stretch builder</a> · <a href="/stretch#ds-root">My daily stretches</a> · <a href="/plans">Plans</a></p>
+  </div>
+
+  <div class="bm-layout">
+    <section class="bm-figure card" aria-label="Body diagram">
+      <div class="bm-toggle" role="group" aria-label="Body view">
+        <% views.forEach(function (v, i) { %>
+          <button type="button" class="bm-view-btn" data-view="<%= v.key %>" aria-pressed="<%= i === 0 ? 'true' : 'false' %>"><%= v.label %></button>
+        <% }) %>
+      </div>
+
+      <% views.forEach(function (v, i) { const g = geometry[v.key]; %>
+        <svg class="bm-svg" data-view="<%= v.key %>" viewBox="<%= geometry.viewBox %>" role="group" aria-label="<%= v.label %> view" <%= i === 0 ? '' : 'hidden' %>>
+          <% g.shapes.filter(function (s) { return s.id === '@head'; }).forEach(function (s) { %>
+            <polygon class="bm-head" points="<%= s.points %>" aria-hidden="true"/>
+          <% }) %>
+          <% grouped(g.shapes.filter(function (s) { return s.id !== '@head' && s.id !== '@knee'; })).forEach(function (grp) {
+               const m = MUSCLES[grp.id]; %>
+            <g class="bm-part" data-kind="muscle" data-id="<%= grp.id %>" role="button" tabindex="0" aria-pressed="false"
+               aria-label="<%= m.name %> (muscle). Show stretches and exercises."><title><%= m.name %></title>
+              <% grp.items.forEach(function (s) { %><polygon points="<%= s.points %>"/><% }) %>
+            </g>
+          <% }) %>
+          <% const knees = g.shapes.filter(function (s) { return s.id === '@knee'; }); if (knees.length) { %>
+            <g class="bm-part bm-joint" data-kind="joint" data-id="knee" role="button" tabindex="0" aria-pressed="false"
+               aria-label="Knee (joint). Show mobility work and exercises."><title>Knee</title>
+              <% knees.forEach(function (s) { %><polygon points="<%= s.points %>"/><% }) %>
+            </g>
+          <% } %>
+          <% grouped(g.joints).forEach(function (grp) { const j = JOINTS[grp.id]; %>
+            <g class="bm-part bm-joint bm-dot" data-kind="joint" data-id="<%= grp.id %>" role="button" tabindex="0" aria-pressed="false"
+               aria-label="<%= j.name %> (joint). Show mobility work and exercises."><title><%= j.name %></title>
+              <% grp.items.forEach(function (c) { %><circle cx="<%= c.cx %>" cy="<%= c.cy %>" r="<%= c.r %>"/><% }) %>
+            </g>
+          <% }) %>
+        </svg>
+      <% }) %>
+
+      <div class="bm-extra">
+        <h3>Joints</h3>
+        <div class="bm-chips" id="bm-joint-chips">
+          <% vocab.joints.forEach(function (j) { %>
+            <button type="button" class="bm-chip" data-kind="joint" data-id="<%= j.id %>" aria-pressed="false"><%= j.name %></button>
+          <% }) %>
+        </div>
+        <h3>Deeper muscles (not drawn)</h3>
+        <div class="bm-chips">
+          <% vocab.muscles.filter(function (m) { return !m.drawn; }).forEach(function (m) { %>
+            <button type="button" class="bm-chip" data-kind="muscle" data-id="<%= m.id %>" aria-pressed="false"><%= m.name %></button>
+          <% }) %>
+        </div>
+      </div>
+    </section>
+
+    <aside class="bm-panel card" id="bm-panel" aria-live="polite" aria-label="Stretches and exercises" data-open="false">
+      <button type="button" class="bm-close" id="bm-close" aria-label="Close panel">Close</button>
+      <div id="bm-empty"><p>Pick a muscle or joint on the figure.</p></div>
+      <div id="bm-result" hidden>
+        <h3 id="bm-title"></h3>
+        <p class="bm-sub" id="bm-sub"></p>
+        <h4>Stretches <span class="bm-count" id="bm-n-stretch"></span></h4>
+        <ul class="bm-list" id="bm-stretches"></ul>
+        <h4>Exercises: primary <span class="bm-count" id="bm-n-primary"></span></h4>
+        <ul class="bm-list" id="bm-primary"></ul>
+        <h4>Exercises: secondary <span class="bm-count" id="bm-n-secondary"></span></h4>
+        <ul class="bm-list" id="bm-secondary"></ul>
+      </div>
+    </aside>
+  </div>
+</div>
+<script src="<%= asset('/js/daily-stretches.js') %>"></script>
+<script src="<%= asset('/js/body-map.js') %>"></script>
+</body>
+</html>

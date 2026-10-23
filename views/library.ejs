@@ -161,7 +161,10 @@
 <div class="container" style="padding-top:24px">
   <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px">
     <h2 style="margin:0">📚 <%= title %></h2>
-    <button onclick="document.getElementById('add-modal').classList.add('open')" class="btn">+ Custom Exercise</button>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <a href="/body" class="btn">Body map</a>
+      <button onclick="document.getElementById('add-modal').classList.add('open')" class="btn">+ Custom Exercise</button>
+    </div>
   </div>
 
   <div class="filter-bar">
@@ -476,7 +479,17 @@ function initStickFigures() {
   });
 }
 
+// Deep link from the body map: /library?ex=<id> narrows to that exercise and opens its instructions.
+(function () {
+  var id = parseInt(new URLSearchParams(location.search).get('ex'), 10);
+  var hit = id ? ALL_EXERCISES.find(function (e) { return e.id === id; }) : null;
+  if (hit) document.getElementById('search-input').value = hit.name;
+})();
 filterExercises();
+(function () {
+  var id = parseInt(new URLSearchParams(location.search).get('ex'), 10);
+  if (id && document.getElementById('instr-wrap-' + id)) toggleInstructions(id);
+})();
 </script>
 </body>
 </html>

@@ -1,0 +1,33 @@
+/* Daily stretches. Dark, like the rest of the app. */
+.ds { margin-bottom: 20px; }
+.ds-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+.ds h2 { margin: 0 0 4px; color: #e8e8e8; }
+.ds h3 { font-size: 0.9rem; color: #e8e8e8; margin: 0 0 8px; }
+.ds-sub { color: #999; font-size: 0.85rem; margin: 0 0 10px; }
+.ds-total { color: #2ecc71; font-weight: 600; margin-left: 6px; }
+.ds-note { color: #999; font-size: 0.82rem; margin: 0 0 8px; }
+.ds-msg { min-height: 1.1em; color: #2ecc71; font-size: 0.82rem; margin: 0 0 6px; }
+.ds-msg.ds-bad { color: #ff7b72; }
+.ds-list, .ds-lib { list-style: none; margin: 0 0 12px; padding: 0; }
+.ds-row, .ds-libitem { display: flex; align-items: center; gap: 10px; background: #0d0d0d; border: 1px solid #252525; border-radius: 10px; padding: 8px 12px; margin-bottom: 6px; flex-wrap: wrap; }
+.ds-name { flex: 1 1 180px; color: #e8e8e8; font-size: 0.9rem; font-weight: 500; }
+.ds-field { display: inline-flex; align-items: center; gap: 4px; color: #999; font-size: 0.8rem; }
+.ds-hold { width: 70px; background: #0d0d0d; border: 1px solid #2a2a2a; border-radius: 6px; padding: 6px 8px; color: #e8e8e8; }
+.ds-sides, #ds-preset, .ds-search { background: #0d0d0d; border: 1px solid #2a2a2a; border-radius: 6px; padding: 6px 8px; color: #e8e8e8; }
+.ds-search { width: 100%; margin: 10px 0; padding: 9px 12px; }
+.ds-ctl { display: inline-flex; gap: 4px; }
+.ds-icon { min-width: 34px; padding: 6px 8px; background: #151515; border: 1px solid #2a2a2a; border-radius: 6px; color: #ccc; cursor: pointer; }
+.ds-icon:hover:not(:disabled) { border-color: #2ecc71; color: #2ecc71; }
+.ds-icon:disabled { opacity: 0.35; cursor: default; }
+.ds-remove:hover:not(:disabled) { border-color: #ff7b72; color: #ff7b72; }
+.ds-empty { color: #777; font-size: 0.88rem; padding: 8px 0; }
+.ds-block { margin-top: 14px; border-top: 1px solid #1e1e1e; padding-top: 12px; }
+.ds-block summary { cursor: pointer; color: #e8e8e8; font-weight: 600; font-size: 0.9rem; }
+.ds-preset-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.ds-radio { color: #bbb; font-size: 0.82rem; }
+.ds-lib { max-height: 320px; overflow-y: auto; }
+.ds-toggle { padding: 4px 12px; font-size: 0.78rem; background: transparent; color: #bbb; border: 1px solid #2f2f2f; border-radius: 16px; cursor: pointer; white-space: nowrap; }
+.ds-toggle:hover:not(:disabled) { border-color: #2ecc71; color: #2ecc71; }
+.ds-toggle[aria-pressed="true"] { background: #12301d; color: #2ecc71; border-color: #2ecc71; }
+.ds-toggle:disabled { opacity: 0.6; cursor: default; }
+.ds button:focus-visible, .ds select:focus-visible, .ds input:focus-visible, .ds summary:focus-visible, .bm-list .ds-toggle:focus-visible { outline: 2px solid #7fcbff; outline-offset: 2px; }
