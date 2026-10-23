@@ -1,0 +1,72 @@
+/* Body map. Dark by default to match the rest of the app; light when the OS asks. */
+.bm {
+  --bm-fill: #2a3a44; --bm-fill-hover: #3b6a86; --bm-fill-sel: #2ecc71;
+  --bm-stroke: #0d0d0d; --bm-head: #1c1c1c; --bm-joint: rgba(230,126,34,.35); --bm-joint-line: #e67e22;
+  --bm-text: #d4d4d4; --bm-muted: #888; --bm-surface: #111; --bm-border: #2a2a2a; --bm-accent: #2ecc71;
+  --bm-focus: #7fcbff;
+}
+@media (prefers-color-scheme: light) {
+  .bm {
+    --bm-fill: #c7d5df; --bm-fill-hover: #8fb7d1; --bm-fill-sel: #27ae60;
+    --bm-stroke: #ffffff; --bm-head: #e6e6e6; --bm-joint: rgba(211,84,0,.28); --bm-joint-line: #d35400;
+    --bm-text: #1d1d1d; --bm-muted: #5a5a5a; --bm-surface: #f6f6f4; --bm-border: #cfcfcf; --bm-accent: #1e8449;
+    --bm-focus: #0b5cad;
+  }
+  /* the page behind stays the app's dark; only the cards go light, so text outside them is untouched */
+  .bm .card { background: var(--bm-surface); border-color: var(--bm-border); }
+  .bm .card h3, .bm .card h4, .bm .card p, .bm .card li, .bm .card span { color: var(--bm-text); }
+  .bm .card .bm-sub, .bm .card .bm-count, .bm .card .bm-meta, .bm .card .bm-none, .bm .card .bm-extra h3 { color: var(--bm-muted); }
+  .bm .card .bm-list a { color: var(--bm-accent); }
+}
+.bm { max-width: 1200px; }
+.bm-head h2 { margin-bottom: 8px; }
+.bm-lede { color: var(--bm-muted); margin-bottom: 6px; }
+.bm-links { font-size: 0.85rem; margin-bottom: 14px; }
+.bm-layout { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 20px; align-items: start; }
+.bm-figure { margin-bottom: 0; }
+.bm-toggle { display: flex; gap: 8px; justify-content: center; margin-bottom: 12px; }
+.bm-view-btn { padding: 6px 18px; background: transparent; color: var(--bm-muted); border: 1px solid var(--bm-border); }
+.bm-view-btn[aria-pressed="true"] { color: var(--bm-accent); border-color: var(--bm-accent); }
+.bm-svg { display: block; width: 100%; max-width: 360px; max-height: 70vh; margin: 0 auto; }
+.bm-head { fill: var(--bm-head); stroke: var(--bm-stroke); stroke-width: 3; }
+.bm-part { cursor: pointer; outline: none; }
+.bm-part polygon { fill: var(--bm-fill); stroke: var(--bm-stroke); stroke-width: 3; transition: fill .12s; }
+.bm-part:hover polygon, .bm-part:focus polygon { fill: var(--bm-fill-hover); }
+.bm-part:focus-visible polygon, .bm-part:focus-visible circle { stroke: var(--bm-focus); stroke-width: 8; }
+.bm-part[aria-pressed="true"] polygon { fill: var(--bm-fill-sel); }
+.bm-dot circle { fill: var(--bm-joint); stroke: var(--bm-joint-line); stroke-width: 4; transition: fill .12s; }
+.bm-dot:hover circle, .bm-dot:focus circle { fill: var(--bm-joint-line); }
+.bm-dot[aria-pressed="true"] circle { fill: var(--bm-joint-line); stroke: var(--bm-text); }
+.bm-part.bm-joint:not(.bm-dot) polygon { stroke: var(--bm-joint-line); stroke-width: 5; }
+.bm-extra h3 { font-size: 0.8rem; color: var(--bm-muted); margin: 14px 0 6px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+.bm-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.bm-chip { padding: 5px 12px; font-size: 0.78rem; background: transparent; color: var(--bm-text); border: 1px solid var(--bm-border); border-radius: 16px; }
+.bm-chip[aria-pressed="true"] { color: var(--bm-accent); border-color: var(--bm-accent); }
+.bm button:focus-visible, .bm a:focus-visible { outline: 2px solid var(--bm-focus); outline-offset: 2px; }
+.bm-panel { position: sticky; top: 12px; margin-bottom: 0; max-height: calc(100vh - 24px); overflow-y: auto; }
+.bm-panel h3 { margin-bottom: 4px; }
+.bm-panel h4 { margin: 16px 0 6px; font-size: 0.85rem; }
+.bm-sub, .bm-count { color: var(--bm-muted); font-size: 0.8rem; font-weight: 400; }
+.bm-list { list-style: none; padding: 0; }
+.bm-list li { padding: 6px 0; border-bottom: 1px solid var(--bm-border); font-size: 0.88rem; }
+.bm-list a { color: var(--bm-accent); text-decoration: none; }
+.bm-list a:hover { text-decoration: underline; }
+.bm-meta { display: block; color: var(--bm-muted); font-size: 0.74rem; }
+.bm-none { color: var(--bm-muted); font-size: 0.82rem; padding: 4px 0; }
+.bm-close { display: none; float: right; padding: 4px 12px; font-size: 0.8rem; }
+
+/* Phones: the panel becomes a bottom sheet and the figure keeps the whole width. */
+@media (max-width: 800px) {
+  .bm { padding: 12px; }
+  .bm-layout { grid-template-columns: minmax(0, 1fr); }
+  .bm-figure.card { padding: 14px; }
+  .bm-svg { max-height: 60vh; }
+  .bm-panel {
+    position: fixed; left: 0; right: 0; bottom: 0; top: auto; z-index: 50;
+    max-height: 55vh; border-radius: 14px 14px 0 0; margin: 0; padding: 16px;
+    transform: translateY(105%); transition: transform .2s ease; box-shadow: 0 -6px 24px rgba(0,0,0,.45);
+  }
+  .bm-panel[data-open="true"] { transform: translateY(0); }
+  .bm-close { display: inline-block; }
+}
+@media (prefers-reduced-motion: reduce) { .bm-panel, .bm-part polygon, .bm-dot circle { transition: none; } }
