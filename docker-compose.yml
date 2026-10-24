@@ -10,7 +10,7 @@ services:
     container_name: octopus_health_tracker
     restart: always
     ports:
-      - "3002:3000"
+      - "127.0.0.1:3002:3000"
     volumes:
       - health_data:/usr/src/app/data
     environment:
