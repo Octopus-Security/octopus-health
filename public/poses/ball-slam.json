@@ -1,0 +1,11 @@
+{
+ "version": 2,
+ "title": "Ball Slam",
+ "view": "side",
+ "hold": "ball",
+ "highlight": ["shoulderL","spine","hipL"],
+ "frames": [
+  {"duration":900,"label":"Up on the toes, ball overhead","anchor":{"joint":"toeL","x":48,"y":91.5},"pose":{"torso":183,"head":182,"upperArmL":172,"forearmL":172,"upperArmR":172,"forearmR":172,"thighL":0,"shinL":0,"footL":25,"thighR":0,"shinR":0,"footR":25,"arch":0}},
+  {"duration":300,"label":"Slam it down","ease":"ease-in","anchor":{"joint":"ankleL","x":48,"y":90},"pose":{"torso":112,"head":122,"upperArmL":1.3,"forearmL":59.5,"upperArmR":1.3,"forearmR":59.5,"thighL":80,"shinL":-35,"footL":90,"thighR":80,"shinR":-35,"footR":90,"arch":0}}
+ ]
+}

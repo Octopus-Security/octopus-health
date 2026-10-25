@@ -1,0 +1,11 @@
+{
+ "version": 2,
+ "title": "Hollow Body Hold",
+ "view": "side",
+ "highlight": ["spine","hipL"],
+ "frames": [
+  {"duration":1200,"label":"Hollow hold","pose":{"root":{"x":55,"y":87},"torso":-112,"head":-106,"upperArmL":-147,"forearmL":-142,"upperArmR":-147,"forearmR":-142,"thighL":112,"shinL":112,"footL":142,"thighR":112,"shinR":112,"footR":142,"arch":18}},
+  {"duration":1200,"label":"Rock back","pose":{"root":{"x":57,"y":87},"torso":-120,"head":-114,"upperArmL":-155,"forearmL":-150,"upperArmR":-155,"forearmR":-150,"thighL":120,"shinL":120,"footL":150,"thighR":120,"shinR":120,"footR":150,"arch":18}},
+  {"duration":1200,"label":"Rock forward","pose":{"root":{"x":53,"y":87},"torso":-106,"head":-100,"upperArmL":-141,"forearmL":-136,"upperArmR":-141,"forearmR":-136,"thighL":106,"shinL":106,"footL":136,"thighR":106,"shinR":106,"footR":136,"arch":18}}
+ ]
+}

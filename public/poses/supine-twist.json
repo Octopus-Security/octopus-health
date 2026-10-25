@@ -1,0 +1,73 @@
+{
+ "version": 2,
+ "title": "Supine Twist",
+ "view": "side",
+ "highlight": [
+  "spine",
+  "hipL",
+  "hipR"
+ ],
+ "frames": [
+  {
+   "duration": 1800,
+   "label": "Knees bent together",
+   "pose": {
+    "root": {
+     "x": 52,
+     "y": 87
+    },
+    "torso": -90,
+    "head": -88,
+    "upperArmL": 90,
+    "forearmL": 90,
+    "upperArmR": 90,
+    "forearmR": 90,
+    "thighL": 135,
+    "shinL": 45,
+    "footL": 135,
+    "thighR": 135,
+    "shinR": 45,
+    "footR": 135
+   }
+  },
+  {
+   "duration": 2400,
+   "label": "Drop the knees to the right",
+   "pose": {
+    "head": -100,
+    "thighL": 100,
+    "shinL": 75,
+    "footL": 160,
+    "thighR": 112,
+    "shinR": 62,
+    "footR": 150
+   }
+  },
+  {
+   "duration": 1800,
+   "label": "Bring them back to centre",
+   "pose": {
+    "head": -88,
+    "thighL": 135,
+    "shinL": 45,
+    "footL": 135,
+    "thighR": 135,
+    "shinR": 45,
+    "footR": 135
+   }
+  },
+  {
+   "duration": 2400,
+   "label": "Drop the knees to the left",
+   "pose": {
+    "head": -95,
+    "thighL": 112,
+    "shinL": 62,
+    "footL": 150,
+    "thighR": 100,
+    "shinR": 75,
+    "footR": 160
+   }
+  }
+ ]
+}

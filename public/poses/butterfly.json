@@ -1,0 +1,57 @@
+{
+ "version": 2,
+ "title": "Butterfly Stretch",
+ "view": "front",
+ "highlight": [
+  "hipL",
+  "hipR",
+  "kneeL",
+  "kneeR"
+ ],
+ "frames": [
+  {
+   "duration": 2200,
+   "label": "Knees up",
+   "pose": {
+    "root": {
+     "x": 50,
+     "y": 86
+    },
+    "torso": 180,
+    "head": 180,
+    "upperArmL": 22,
+    "forearmL": -30,
+    "upperArmR": -22,
+    "forearmR": 30,
+    "thighL": 120,
+    "shinL": -70,
+    "footL": 0,
+    "thighR": -120,
+    "shinR": 70,
+    "footR": 0
+   }
+  },
+  {
+   "duration": 2200,
+   "label": "Knees toward the floor",
+   "pose": {
+    "root": {
+     "x": 50,
+     "y": 84
+    },
+    "torso": 180,
+    "head": 180,
+    "upperArmL": 7,
+    "forearmL": -14,
+    "upperArmR": -7,
+    "forearmR": 14,
+    "thighL": 80,
+    "shinL": -85,
+    "thighR": -80,
+    "shinR": 85,
+    "footL": 180,
+    "footR": 180
+   }
+  }
+ ]
+}

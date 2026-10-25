@@ -1,0 +1,57 @@
+{
+ "version": 2,
+ "title": "Lying leg curl",
+ "view": "side",
+ "props": [
+  {
+   "type": "box",
+   "x": 24,
+   "y": 78,
+   "w": 66,
+   "h": 14
+  }
+ ],
+ "grounded": false,
+ "highlight": [
+  "kneeL",
+  "kneeR"
+ ],
+ "frames": [
+  {
+   "duration": 900,
+   "label": "Legs straight",
+   "pose": {
+    "torso": 90,
+    "head": 92,
+    "thighL": -90,
+    "shinL": -90,
+    "footL": -60,
+    "upperArmL": -90,
+    "forearmL": -90,
+    "thighR": -90,
+    "shinR": -90,
+    "footR": -60,
+    "upperArmR": -90,
+    "forearmR": -90,
+    "root": {
+     "x": 48,
+     "y": 73
+    }
+   }
+  },
+  {
+   "duration": 900,
+   "label": "Heels to glutes",
+   "pose": {
+    "shinL": -210,
+    "footL": -180,
+    "shinR": -210,
+    "footR": -180,
+    "root": {
+     "x": 48,
+     "y": 73
+    }
+   }
+  }
+ ]
+}

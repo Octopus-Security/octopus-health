@@ -1,0 +1,121 @@
+{
+ "version": 2,
+ "title": "Jump squat",
+ "view": "side",
+ "anchor": {
+  "joint": "ankleL",
+  "x": 50,
+  "y": 90
+ },
+ "highlight": [
+  "kneeL",
+  "hipL"
+ ],
+ "frames": [
+  {
+   "duration": 500,
+   "label": "Load",
+   "pose": {
+    "torso": 140,
+    "head": 150,
+    "thighL": 85,
+    "shinL": -30,
+    "footL": 90,
+    "upperArmL": -45,
+    "forearmL": -25,
+    "thighR": 85,
+    "shinR": -30,
+    "footR": 90,
+    "upperArmR": -45,
+    "forearmR": -25
+   }
+  },
+  {
+   "duration": 220,
+   "label": "Explode",
+   "ease": "ease-in",
+   "anchor": {
+    "joint": "toeL",
+    "x": 52.4,
+    "y": 90.3
+   },
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "thighL": 0,
+    "shinL": 0,
+    "footL": 20,
+    "upperArmL": 110,
+    "forearmL": 115,
+    "thighR": 0,
+    "shinR": 0,
+    "footR": 20,
+    "upperArmR": 110,
+    "forearmR": 115
+   }
+  },
+  {
+   "duration": 450,
+   "label": "Air",
+   "ease": "ease-out",
+   "air": true,
+   "pose": {
+    "torso": 182,
+    "head": 182,
+    "thighL": 4,
+    "footL": 30,
+    "thighR": -3,
+    "shinR": 3,
+    "footR": 30,
+    "root": {
+     "x": 50,
+     "y": 38.5
+    }
+   }
+  },
+  {
+   "duration": 200,
+   "label": "Touch down",
+   "ease": "ease-in",
+   "anchor": {
+    "joint": "ankleL",
+    "x": 50,
+    "y": 90
+   },
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "thighL": 0,
+    "footL": 90,
+    "upperArmL": 95,
+    "forearmL": 100,
+    "thighR": 0,
+    "shinR": 0,
+    "footR": 90,
+    "upperArmR": 95,
+    "forearmR": 100
+   }
+  },
+  {
+   "duration": 450,
+   "label": "Land soft",
+   "anchor": {
+    "joint": "ankleL",
+    "x": 50,
+    "y": 90
+   },
+   "pose": {
+    "torso": 142,
+    "head": 152,
+    "thighL": 85,
+    "shinL": -30,
+    "upperArmL": 70,
+    "forearmL": 80,
+    "thighR": 85,
+    "shinR": -30,
+    "upperArmR": 70,
+    "forearmR": 80
+   }
+  }
+ ]
+}

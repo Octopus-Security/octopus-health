@@ -1,0 +1,10 @@
+{
+ "version": 2,
+ "title": "Side Plank",
+ "view": "front",
+ "highlight": ["spine","hipL"],
+ "frames": [
+  {"duration":1400,"label":"Hips high, straight line","anchor":{"joint":"ankleL","x":11,"y":89.3},"pose":{"torso":104.6,"head":129.6,"upperArmL":0,"forearmL":-91.1,"upperArmR":170,"forearmR":170,"thighL":-75.4,"shinL":-75.4,"footL":-90,"thighR":-89.5,"shinR":-47.3,"footR":-90,"arch":0}},
+  {"duration":1400,"label":"Dip the hips","anchor":{"joint":"ankleL","x":11,"y":89.3},"pose":{"torso":116.5,"head":141.5,"upperArmL":1.9,"forearmL":-91.6,"upperArmR":160,"forearmR":160,"thighL":-84.4,"shinL":-84.4,"footL":-90,"thighR":-108.9,"shinR":-48.2,"footR":-90,"arch":0}}
+ ]
+}

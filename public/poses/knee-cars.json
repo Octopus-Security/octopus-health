@@ -1,0 +1,61 @@
+{
+ "version": 2,
+ "title": "Knee CARs",
+ "view": "side",
+ "anchor": {
+  "joint": "ankleL",
+  "x": 50,
+  "y": 90
+ },
+ "highlight": [
+  "kneeR",
+  "hipR"
+ ],
+ "frames": [
+  {
+   "duration": 1500,
+   "label": "Knee up, shin hanging",
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "upperArmL": 60,
+    "forearmL": 70,
+    "upperArmR": 60,
+    "forearmR": 70,
+    "thighL": 0,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": 85,
+    "shinR": 5,
+    "footR": 95
+   }
+  },
+  {
+   "duration": 2000,
+   "label": "Open the knee, shin swings out",
+   "pose": {
+    "thighR": 70,
+    "shinR": 35,
+    "footR": 125
+   }
+  },
+  {
+   "duration": 2000,
+   "label": "Straighten the knee",
+   "pose": {
+    "thighR": 85,
+    "shinR": 75,
+    "footR": 165
+   }
+  },
+  {
+   "duration": 2000,
+   "label": "Fold back in",
+   "pose": {
+    "thighR": 85,
+    "shinR": 5,
+    "footR": 95
+   }
+  }
+ ]
+}

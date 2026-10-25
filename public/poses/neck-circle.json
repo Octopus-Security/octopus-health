@@ -1,0 +1,3 @@
+{
+ "version": 2, "title": "Neck Circles", "view": "side", "anchor": { "joint": "ankleL", "x": 50, "y": 90 }, "highlight": [ "neck" ], "frames": [ { "duration": 1600, "label": "Chin to chest", "pose": { "torso": 180, "head": 122, "upperArmL": 0, "forearmL": 0, "upperArmR": 0, "forearmR": 0, "thighL": 0, "shinL": 0, "footL": 90, "thighR": 0, "shinR": 0, "footR": 90 } }, { "duration": 1600, "label": "Neutral", "pose": { "head": 180 } }, { "duration": 1800, "label": "Look up", "pose": { "head": 238 } }, { "duration": 1600, "label": "Neutral", "pose": { "head": 180 } } ]
+}

@@ -1,0 +1,63 @@
+{
+  "version": 2,
+  "title": "Wall Slide",
+  "view": "front",
+  "highlight": [
+    "shoulderL",
+    "shoulderR"
+  ],
+  "frames": [
+    {
+      "duration": 1200,
+      "label": "W — elbows and hands on the wall",
+      "pose": {
+        "root": {
+          "x": 50,
+          "y": 50
+        },
+        "torso": 180,
+        "head": 180,
+        "upperArmL": 30,
+        "forearmL": 160,
+        "upperArmR": -30,
+        "forearmR": -160,
+        "thighL": 0,
+        "shinL": 0,
+        "footL": 90,
+        "thighR": 0,
+        "shinR": 0,
+        "footR": -90
+      }
+    },
+    {
+      "duration": 1500,
+      "label": "Slide up",
+      "pose": {
+        "upperArmL": 100,
+        "forearmL": 140,
+        "upperArmR": -100,
+        "forearmR": -140
+      }
+    },
+    {
+      "duration": 1500,
+      "label": "Y — reach overhead",
+      "pose": {
+        "upperArmL": 160,
+        "forearmL": 160,
+        "upperArmR": -160,
+        "forearmR": -160
+      }
+    },
+    {
+      "duration": 1500,
+      "label": "Slide down",
+      "pose": {
+        "upperArmL": 100,
+        "forearmL": 140,
+        "upperArmR": -100,
+        "forearmR": -140
+      }
+    }
+  ]
+}

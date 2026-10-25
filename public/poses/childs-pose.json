@@ -1,0 +1,54 @@
+{
+ "version": 2,
+ "title": "Child's Pose",
+ "view": "side",
+ "anchor": {
+  "joint": "kneeL",
+  "x": 30,
+  "y": 89.5
+ },
+ "pins": [
+  "handL",
+  "handR"
+ ],
+ "highlight": [
+  "spine",
+  "hipL"
+ ],
+ "frames": [
+  {
+   "duration": 2800,
+   "label": "Sit back to the heels",
+   "pose": {
+    "torso": 95,
+    "arch": 14,
+    "head": 55,
+    "upperArmL": 60,
+    "forearmL": 87,
+    "upperArmR": 60,
+    "forearmR": 87,
+    "thighL": 75,
+    "shinL": -90,
+    "footL": -72,
+    "thighR": 75,
+    "shinR": -90,
+    "footR": -72
+   }
+  },
+  {
+   "duration": 2400,
+   "label": "Rock forward",
+   "pose": {
+    "torso": 90,
+    "arch": 8,
+    "head": 70,
+    "upperArmL": 48,
+    "forearmL": 90,
+    "upperArmR": 48,
+    "forearmR": 90,
+    "thighL": 62,
+    "thighR": 62
+   }
+  }
+ ]
+}

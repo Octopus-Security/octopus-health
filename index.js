@@ -51,7 +51,8 @@ function getActiveTab(requestPath) {
     // returned 'exercises' for it, so BOTH nav links lit up and only cleared
     // when you clicked something else entirely.
     if (requestPath.startsWith('/plan-maker')) return 'plan-maker';
-    if (requestPath.startsWith('/exercises') || requestPath.startsWith('/library') || requestPath.startsWith('/body') || requestPath.startsWith('/exercise') || requestPath.startsWith('/workout')) return 'exercises';
+    if (requestPath.startsWith('/exercises') || requestPath.startsWith('/library') || requestPath.startsWith('/exercise') || requestPath.startsWith('/workout')) return 'exercises';
+    if (requestPath === '/body' || requestPath.startsWith('/body/') || requestPath.startsWith('/body?')) return 'body';
     if (requestPath.startsWith('/stretch') || requestPath.startsWith('/routines')) return 'stretch';
     // '/meal-templates' is listed on its own because it does NOT start with
     // '/meals' — the hyphen is not an 's'. Relying on a shared prefix here is the

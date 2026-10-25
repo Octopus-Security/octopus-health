@@ -1,0 +1,70 @@
+{
+ "version": 2,
+ "title": "Kettlebell swing",
+ "view": "side",
+ "anchor": {
+  "joint": "ankleL",
+  "x": 50,
+  "y": 90
+ },
+ "hold": "kettlebell",
+ "highlight": [
+  "hipL",
+  "spine"
+ ],
+ "frames": [
+  {
+   "duration": 420,
+   "label": "Hike: bell between the legs",
+   "ease": "ease-out",
+   "pose": {
+    "torso": 120,
+    "head": 140,
+    "thighL": 63.2,
+    "shinL": -2.4,
+    "footL": 90,
+    "upperArmL": -61.7,
+    "forearmL": -7.3,
+    "thighR": 63.2,
+    "shinR": -2.4,
+    "footR": 90,
+    "upperArmR": -61.7,
+    "forearmR": -7.3
+   }
+  },
+  {
+   "duration": 600,
+   "label": "Snap: bell at chest height",
+   "ease": "ease-in-out",
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "thighL": 1.3,
+    "shinL": -1.3,
+    "upperArmL": 80,
+    "forearmL": 80,
+    "thighR": 1.3,
+    "shinR": -1.3,
+    "upperArmR": 80,
+    "forearmR": 80
+   }
+  },
+  {
+   "duration": 450,
+   "label": "Fall and hinge",
+   "ease": "ease-in",
+   "pose": {
+    "torso": 148,
+    "head": 160,
+    "thighL": 45.1,
+    "shinL": -6.2,
+    "upperArmL": 40,
+    "forearmL": 45,
+    "thighR": 45.1,
+    "shinR": -6.2,
+    "upperArmR": 40,
+    "forearmR": 45
+   }
+  }
+ ]
+}

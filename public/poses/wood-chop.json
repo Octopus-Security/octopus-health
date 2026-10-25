@@ -1,0 +1,11 @@
+{
+ "version": 2,
+ "title": "Wood Chop",
+ "view": "front",
+ "hold": "ball",
+ "highlight": ["spine","shoulderL","shoulderR"],
+ "frames": [
+  {"duration":900,"label":"High over one shoulder","pins":["ankleL","ankleR"],"pose":{"root":{"x":50,"y":51},"torso":174,"head":176,"upperArmL":102.4,"forearmL":-155.8,"upperArmR":101.3,"forearmR":162.9,"thighL":21.5,"shinL":-6.6,"footL":90,"thighR":-12.4,"shinR":-2.1,"footR":-90,"arch":0}},
+  {"duration":700,"label":"Chop to the opposite hip","pose":{"root":{"x":49,"y":59},"torso":192,"head":188,"upperArmL":-18,"forearmL":-15.7,"upperArmR":-4.7,"forearmR":-2.1,"thighL":46.2,"shinL":-24.6,"footL":90,"thighR":-48.7,"shinR":33.1,"footR":-90,"arch":0}}
+ ]
+}

@@ -1,0 +1,101 @@
+{
+ "version": 2,
+ "title": "Run in place",
+ "view": "side",
+ "highlight": [
+  "hipL",
+  "kneeL",
+  "hipR",
+  "kneeR"
+ ],
+ "frames": [
+  {
+   "duration": 220,
+   "label": "Right knee drive",
+   "ease": "linear",
+   "pose": {
+    "torso": 170,
+    "head": 175,
+    "thighL": -32,
+    "shinL": -45,
+    "footL": 45,
+    "upperArmL": 55,
+    "forearmL": 150,
+    "thighR": 85,
+    "shinR": -5,
+    "footR": 70,
+    "upperArmR": -55,
+    "forearmR": 50,
+    "root": {
+     "x": 50,
+     "y": 53.9
+    }
+   }
+  },
+  {
+   "duration": 160,
+   "label": "Air",
+   "ease": "linear",
+   "air": true,
+   "pose": {
+    "thighL": -38,
+    "shinL": -85,
+    "footL": 30,
+    "upperArmL": 30,
+    "forearmL": 100,
+    "thighR": 55,
+    "shinR": -30,
+    "footR": 80,
+    "upperArmR": -30,
+    "forearmR": 60,
+    "root": {
+     "x": 50,
+     "y": 40
+    }
+   }
+  },
+  {
+   "duration": 220,
+   "label": "Left knee drive",
+   "ease": "linear",
+   "pose": {
+    "thighL": 85,
+    "shinL": -5,
+    "footL": 70,
+    "upperArmL": -55,
+    "forearmL": 50,
+    "thighR": -32,
+    "shinR": -45,
+    "footR": 45,
+    "upperArmR": 55,
+    "forearmR": 150,
+    "root": {
+     "x": 50,
+     "y": 53.9
+    }
+   }
+  },
+  {
+   "duration": 160,
+   "label": "Air",
+   "ease": "linear",
+   "air": true,
+   "pose": {
+    "thighL": 55,
+    "shinL": -30,
+    "footL": 80,
+    "upperArmL": -30,
+    "forearmL": 60,
+    "thighR": -38,
+    "shinR": -85,
+    "footR": 30,
+    "upperArmR": 30,
+    "forearmR": 100,
+    "root": {
+     "x": 50,
+     "y": 40
+    }
+   }
+  }
+ ]
+}

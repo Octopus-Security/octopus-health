@@ -1,50 +1,72 @@
 {
-  "title": "Seated Stretch (Pigeon / Butterfly / 90-90)",
-  "loop": true,
-  "frames": [
-    {
-      "duration": 2200,
-      "ease": "ease-in-out",
-      "label": "Seated Upright",
-      "joints": {
-        "head":      { "x": 50, "y": 30 },
-        "neck":      { "x": 50, "y": 37 },
-        "spine":     { "x": 50, "y": 60 },
-        "shoulderL": { "x": 57, "y": 43 },
-        "shoulderR": { "x": 43, "y": 43 },
-        "elbowL":    { "x": 60, "y": 56 },
-        "elbowR":    { "x": 40, "y": 56 },
-        "handL":     { "x": 60, "y": 70 },
-        "handR":     { "x": 40, "y": 70 },
-        "hipL":      { "x": 53, "y": 75 },
-        "hipR":      { "x": 47, "y": 75 },
-        "kneeL":     { "x": 30, "y": 80 },
-        "kneeR":     { "x": 70, "y": 80 },
-        "footL":     { "x": 22, "y": 92 },
-        "footR":     { "x": 88, "y": 92 }
-      }
+ "version": 2,
+ "title": "Seated Forward Fold",
+ "view": "side",
+ "highlight": [
+  "hipL",
+  "spine"
+ ],
+ "frames": [
+  {
+   "duration": 1500,
+   "label": "Sit tall, legs long",
+   "pose": {
+    "root": {
+     "x": 30,
+     "y": 87
     },
-    {
-      "duration": 2800,
-      "ease": "ease-in-out",
-      "label": "Fold Forward",
-      "joints": {
-        "head":      { "x": 50, "y": 58 },
-        "neck":      { "x": 50, "y": 63 },
-        "spine":     { "x": 50, "y": 70 },
-        "shoulderL": { "x": 56, "y": 67 },
-        "shoulderR": { "x": 44, "y": 67 },
-        "elbowL":    { "x": 56, "y": 76 },
-        "elbowR":    { "x": 44, "y": 76 },
-        "handL":     { "x": 54, "y": 84 },
-        "handR":     { "x": 46, "y": 84 },
-        "hipL":      { "x": 53, "y": 76 },
-        "hipR":      { "x": 47, "y": 76 },
-        "kneeL":     { "x": 30, "y": 82 },
-        "kneeR":     { "x": 70, "y": 82 },
-        "footL":     { "x": 22, "y": 92 },
-        "footR":     { "x": 88, "y": 92 }
-      }
-    }
-  ]
+    "torso": 180,
+    "head": 180,
+    "upperArmL": 0,
+    "forearmL": 0,
+    "upperArmR": 0,
+    "forearmR": 0,
+    "thighL": 90,
+    "shinL": 90,
+    "footL": 180,
+    "thighR": 90,
+    "shinR": 90,
+    "footR": 180
+   }
+  },
+  {
+   "duration": 2600,
+   "label": "Reach toward the toes",
+   "pose": {
+    "torso": 118,
+    "arch": 10,
+    "head": 110,
+    "upperArmL": 16,
+    "forearmL": 122,
+    "upperArmR": 16,
+    "forearmR": 122
+   }
+  },
+  {
+   "duration": 2000,
+   "label": "Fold, hold",
+   "pose": {
+    "torso": 110,
+    "arch": 18,
+    "head": 95,
+    "upperArmL": 14,
+    "forearmL": 128,
+    "upperArmR": 14,
+    "forearmR": 128
+   }
+  },
+  {
+   "duration": 2400,
+   "label": "Sit back up",
+   "pose": {
+    "torso": 150,
+    "arch": 4,
+    "head": 145,
+    "upperArmL": 40,
+    "forearmL": 50,
+    "upperArmR": 40,
+    "forearmR": 50
+   }
+  }
+ ]
 }

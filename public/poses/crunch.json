@@ -1,0 +1,10 @@
+{
+ "version": 2,
+ "title": "Crunch",
+ "view": "side",
+ "highlight": ["spine"],
+ "frames": [
+  {"duration":1000,"label":"Lying, hands at temples","pose":{"root":{"x":50,"y":87},"torso":-90,"head":-88,"upperArmL":200,"forearmL":-20,"upperArmR":200,"forearmR":-20,"thighL":135,"shinL":37,"footL":90,"thighR":135,"shinR":37,"footR":90,"arch":0}},
+  {"duration":900,"label":"Curl the shoulders up","pose":{"root":{"x":50,"y":87},"torso":-120,"head":-112,"upperArmL":172,"forearmL":-50,"upperArmR":172,"forearmR":-50,"thighL":135,"shinL":37,"footL":90,"thighR":135,"shinR":37,"footR":90,"arch":22}}
+ ]
+}

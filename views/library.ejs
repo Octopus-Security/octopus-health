@@ -7,6 +7,7 @@
   <title><%= title %></title>
   <link rel="stylesheet" href="<%= asset('/theme.css') %>">
   <script src="<%= asset('/stick-figure.js') %>" defer></script>
+  <script src="<%= asset('/pose-map.js') %>"></script>
   <style>
     .filter-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; align-items:center; }
     .filter-bar input { flex:1; min-width:180px; background:#0d0d0d; border:1px solid #2a2a2a; border-radius:8px; padding:8px 14px; color:#e8e8e8; font-size:0.9rem; }
@@ -273,69 +274,9 @@
 <script>
 const ALL_EXERCISES = <%- JSON.stringify(exercises) %>;
 
-// Map exercise names to pose keys (loaded from /poses/<key>.json)
-const POSE_MAP = {
-  // Lunge / hip flexor / kneeling stretches
-  "World's Greatest Stretch":          'lunge',
-  "Couch Stretch":                     'lunge',
-  "Half-Kneeling Hip Flexor Stretch":  'lunge',
-  "Standing Hip Flexor PAILs/RAILs":   'lunge',
-  "Lizard Stretch":                    'lunge',
-  "Walking Lunge":                     'lunge',
-  "Reverse Lunge":                     'lunge',
-  "Bulgarian Split Squat":             'lunge',
-  // Squat / wide stance
-  "Frog Stretch":                      'squat',
-  "Sumo Squat":                        'squat',
-  "Goblet Squat":                      'squat',
-  "Back Squat":                        'squat',
-  "Front Squat":                       'squat',
-  "Bodyweight Squat":                  'squat',
-  "Air Squat":                         'squat',
-  "Squat":                             'squat',
-  // Seated floor stretches (folded legs)
-  "Butterfly Stretch":                 'seated-fold',
-  "Pigeon Stretch":                    'seated-fold',
-  "Supine Piriformis Stretch":         'seated-fold',
-  "Seated Forward Fold":               'seated-fold',
-  "90/90 Hip Stretch":                 'seated-fold',
-  // Quadruped (hands+knees) stretches
-  "Cat-Cow":                           'quadruped',
-  "Cat Cow":                           'quadruped',
-  "Bird Dog":                          'quadruped',
-  "Thoracic Open Book":                'quadruped',
-  "Thread the Needle":                 'quadruped',
-  // Standing forward fold / hamstring
-  "Standing Forward Fold":             'fold',
-  "Toe Touch":                         'fold',
-  "Standing Hamstring Stretch":        'fold',
-  "Hamstring Stretch":                 'fold',
-  // Side bend / overhead reach (lat, shoulder, side body)
-  "Lat Stretch on Pull-up Bar":        'side-bend',
-  "Overhead Banded Shoulder Stretch":  'side-bend',
-  "Standing Side Bend":                'side-bend',
-  "Doorway Chest Stretch":             'side-bend',
-  "Bretzel Stretch":                   'side-bend',
-  // Standing / breathing (default for many)
-  "Standing Figure-4 Stretch":         'stand',
-  "Cross-Body Shoulder Stretch":       'stand',
-  "Sleeper Stretch":                   'stand',
-  "Prone Shoulder ER Stretch":         'stand',
-  "Doorway Wrist Stretch":             'stand',
-  "Walk + Deep Breathing":             'stand',
-  "Deep Breathing":                    'stand',
-  "Box Breathing":                     'stand',
-  "Shadow Boxing":                     'stand',
-  "Jumping Jacks":                     'stand',
-  "High Knees":                        'stand',
-  "Arm Circles":                       'stand',
-};
-
-// Returns pose key for an exercise — by name, then default by category
+// Which animation each card shows: one shared rule set, public/pose-map.js.
 function poseForExercise(e) {
-  if (POSE_MAP[e.name]) return POSE_MAP[e.name];
-  if (e.category === 'recovery') return 'stand';
-  return null;
+  return typeof PoseMap !== 'undefined' ? PoseMap.keyFor(e.name, e.category) : null;
 }
 
 const _sfPlayers = {};

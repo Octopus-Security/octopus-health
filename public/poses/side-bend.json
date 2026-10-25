@@ -1,50 +1,68 @@
 {
-  "title": "Side Bend / Reach",
-  "loop": true,
-  "frames": [
-    {
-      "duration": 2000,
-      "ease": "ease-in-out",
-      "label": "Arms Up",
-      "joints": {
-        "head":      { "x": 50, "y": 10 },
-        "neck":      { "x": 50, "y": 17 },
-        "spine":     { "x": 50, "y": 46 },
-        "shoulderL": { "x": 57, "y": 23 },
-        "shoulderR": { "x": 43, "y": 23 },
-        "elbowL":    { "x": 60, "y": 10 },
-        "elbowR":    { "x": 40, "y": 10 },
-        "handL":     { "x": 58, "y": -3 },
-        "handR":     { "x": 42, "y": -3 },
-        "hipL":      { "x": 53, "y": 53 },
-        "hipR":      { "x": 47, "y": 53 },
-        "kneeL":     { "x": 54, "y": 71 },
-        "kneeR":     { "x": 46, "y": 71 },
-        "footL":     { "x": 55, "y": 92 },
-        "footR":     { "x": 45, "y": 92 }
-      }
+ "version": 2,
+ "title": "Side Bend",
+ "view": "front",
+ "highlight": [
+  "spine"
+ ],
+ "frames": [
+  {
+   "duration": 1500,
+   "label": "Reach tall",
+   "pose": {
+    "root": {
+     "x": 50,
+     "y": 50
     },
-    {
-      "duration": 2400,
-      "ease": "ease-in-out",
-      "label": "Side Bend",
-      "joints": {
-        "head":      { "x": 38, "y": 14 },
-        "neck":      { "x": 40, "y": 20 },
-        "spine":     { "x": 48, "y": 47 },
-        "shoulderL": { "x": 49, "y": 25 },
-        "shoulderR": { "x": 35, "y": 24 },
-        "elbowL":    { "x": 60, "y": 16 },
-        "elbowR":    { "x": 28, "y": 14 },
-        "handL":     { "x": 64, "y": 4 },
-        "handR":     { "x": 24, "y": 0 },
-        "hipL":      { "x": 55, "y": 53 },
-        "hipR":      { "x": 49, "y": 53 },
-        "kneeL":     { "x": 56, "y": 71 },
-        "kneeR":     { "x": 47, "y": 71 },
-        "footL":     { "x": 57, "y": 92 },
-        "footR":     { "x": 46, "y": 92 }
-      }
-    }
-  ]
+    "torso": 180,
+    "head": 180,
+    "upperArmL": 190,
+    "forearmL": 190,
+    "upperArmR": 170,
+    "forearmR": 170,
+    "thighL": 0,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": 0,
+    "shinR": 0,
+    "footR": -90
+   }
+  },
+  {
+   "duration": 2500,
+   "label": "Lean right",
+   "pose": {
+    "torso": 160,
+    "head": 160,
+    "upperArmL": 170,
+    "forearmL": 170,
+    "upperArmR": 150,
+    "forearmR": 150
+   }
+  },
+  {
+   "duration": 1500,
+   "label": "Reach tall",
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "upperArmL": 190,
+    "forearmL": 190,
+    "upperArmR": 170,
+    "forearmR": 170
+   }
+  },
+  {
+   "duration": 2500,
+   "label": "Lean left",
+   "pose": {
+    "torso": 200,
+    "head": 200,
+    "upperArmL": 210,
+    "forearmL": 210,
+    "upperArmR": 190,
+    "forearmR": 190
+   }
+  }
+ ]
 }

@@ -1,0 +1,54 @@
+{
+ "version": 2,
+ "title": "Foam Roll",
+ "view": "side",
+ "anchor": {
+  "joint": "ankleL",
+  "x": 83,
+  "y": 90
+ },
+ "highlight": [
+  "spine"
+ ],
+ "props": [
+  {
+   "type": "roller",
+   "x": 35,
+   "y": 86,
+   "r": 7
+  }
+ ],
+ "frames": [
+  {
+   "duration": 1800,
+   "label": "Roller under the upper back",
+   "pose": {
+    "torso": -82,
+    "head": -90,
+    "thighL": 90,
+    "shinL": 20,
+    "footL": 110,
+    "thighR": 90,
+    "shinR": 20,
+    "footR": 110,
+    "upperArmL": 120,
+    "forearmL": 170,
+    "upperArmR": 120,
+    "forearmR": 170
+   }
+  },
+  {
+   "duration": 2200,
+   "label": "Roll toward the hips",
+   "pose": {
+    "torso": -80,
+    "thighL": 80,
+    "shinL": 50,
+    "footL": 140,
+    "thighR": 80,
+    "shinR": 50,
+    "footR": 140
+   }
+  }
+ ]
+}

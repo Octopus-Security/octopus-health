@@ -1,0 +1,12 @@
+{
+ "version": 2,
+ "title": "Hanging Leg Raise",
+ "view": "side",
+ "props": [{"type":"bar","x1":26,"y1":-6,"x2":58,"y2":-6}],
+ "grounded": false,
+ "highlight": ["hipL","spine"],
+ "frames": [
+  {"duration":1100,"label":"Dead hang","anchor":{"joint":"handL","x":42,"y":-6},"pose":{"torso":180,"head":180,"upperArmL":180,"forearmL":180,"upperArmR":180,"forearmR":180,"thighL":20,"shinL":-20,"footL":90,"thighR":20,"shinR":-20,"footR":90,"arch":0}},
+  {"duration":1500,"label":"Legs to horizontal","anchor":{"joint":"handL","x":42,"y":-6},"pose":{"torso":170,"head":172,"upperArmL":180,"forearmL":180,"upperArmR":180,"forearmR":180,"thighL":92,"shinL":92,"footL":140,"thighR":92,"shinR":92,"footR":140,"arch":0}}
+ ]
+}

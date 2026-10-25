@@ -1,0 +1,65 @@
+{
+  "version": 2,
+  "title": "Inverted Row",
+  "view": "side",
+  "anchor": {
+    "joint": "ankleL",
+    "x": 90,
+    "y": 88
+  },
+  "pins": [
+    "handL",
+    "handR"
+  ],
+  "props": [
+    {
+      "type": "bar",
+      "x1": 8,
+      "y1": 55,
+      "x2": 34,
+      "y2": 55
+    }
+  ],
+  "highlight": [
+    "shoulderL",
+    "elbowL"
+  ],
+  "frames": [
+    {
+      "duration": 1200,
+      "label": "Hang under bar",
+      "pose": {
+        "torso": -93,
+        "head": -95,
+        "thighL": 87,
+        "shinL": 87,
+        "footL": 180,
+        "thighR": 87,
+        "shinR": 87,
+        "footR": 180,
+        "upperArmL": 177.8,
+        "forearmL": -179.3,
+        "upperArmR": 177.8,
+        "forearmR": -179.3
+      }
+    },
+    {
+      "duration": 1000,
+      "label": "Chest to bar",
+      "pose": {
+        "torso": -109,
+        "head": -112,
+        "thighL": 71,
+        "shinL": 71,
+        "footL": 180,
+        "thighR": 71,
+        "shinR": 71,
+        "footR": 180,
+        "upperArmL": 134.6,
+        "forearmL": -88.7,
+        "upperArmR": 134.6,
+        "forearmR": -88.7
+      }
+    }
+  ]
+}
