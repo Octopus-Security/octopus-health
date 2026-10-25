@@ -1,0 +1,83 @@
+{
+ "version": 2,
+ "title": "Deadlift",
+ "view": "side",
+ "anchor": {
+  "joint": "ankleL",
+  "x": 50,
+  "y": 90
+ },
+ "hold": "barbell",
+ "highlight": [
+  "hipL",
+  "spine"
+ ],
+ "frames": [
+  {
+   "duration": 1000,
+   "label": "Set: bar at mid-shin",
+   "pose": {
+    "torso": 118,
+    "head": 135,
+    "thighL": 75.5,
+    "shinL": -1,
+    "footL": 90,
+    "upperArmL": -12.6,
+    "forearmL": -4.9,
+    "thighR": 75.5,
+    "shinR": -1,
+    "footR": 90,
+    "upperArmR": -12.6,
+    "forearmR": -4.9
+   }
+  },
+  {
+   "duration": 700,
+   "label": "Past the knee",
+   "pose": {
+    "torso": 128,
+    "head": 145,
+    "thighL": 59.2,
+    "shinL": -9.1,
+    "upperArmL": -33.2,
+    "forearmL": 6.4,
+    "thighR": 59.2,
+    "shinR": -9.1,
+    "upperArmR": -33.2,
+    "forearmR": 6.4
+   }
+  },
+  {
+   "duration": 900,
+   "label": "Lockout",
+   "pose": {
+    "torso": 181,
+    "head": 181,
+    "thighL": 1.3,
+    "shinL": -1.3,
+    "upperArmL": 1.6,
+    "forearmL": 4.6,
+    "thighR": 1.3,
+    "shinR": -1.3,
+    "upperArmR": 1.6,
+    "forearmR": 4.6
+   }
+  },
+  {
+   "duration": 700,
+   "label": "Lower",
+   "pose": {
+    "torso": 128,
+    "head": 145,
+    "thighL": 59.2,
+    "shinL": -9.1,
+    "upperArmL": -33.2,
+    "forearmL": 6.4,
+    "thighR": 59.2,
+    "shinR": -9.1,
+    "upperArmR": -33.2,
+    "forearmR": 6.4
+   }
+  }
+ ]
+}

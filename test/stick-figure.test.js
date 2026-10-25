@@ -54,7 +54,7 @@ test('every bone keeps its length throughout every animation, pins and anchors i
     const frames = SF.resolveFrames(data);
     frames.forEach((fr, i) => {
       for (let s = 0; s <= 10; s++) {
-        const pose = SF.between(fr, frames[(i + 1) % frames.length], s / 10, data.view || 'side');
+        const pose = SF.between(fr, SF.nextOf(frames, i), s / 10, data.view || 'side');
         assertConnected(SF.solve(pose, data.view || 'side'), `${f} frame ${i} t=${s / 10}`);
       }
     });

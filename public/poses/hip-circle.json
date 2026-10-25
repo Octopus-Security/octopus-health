@@ -1,0 +1,69 @@
+{
+ "version": 2,
+ "title": "Hip Circle",
+ "view": "side",
+ "anchor": {
+  "joint": "ankleL",
+  "x": 50,
+  "y": 90
+ },
+ "highlight": [
+  "hipR"
+ ],
+ "frames": [
+  {
+   "duration": 1200,
+   "label": "Stand on the left leg",
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "upperArmL": -25,
+    "forearmL": 60,
+    "upperArmR": -25,
+    "forearmR": 60,
+    "thighL": 0,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": 0,
+    "shinR": 0,
+    "footR": 90
+   }
+  },
+  {
+   "duration": 1800,
+   "label": "Knee up to hip height",
+   "pose": {
+    "thighR": 90,
+    "shinR": 0,
+    "footR": 90
+   }
+  },
+  {
+   "duration": 1800,
+   "label": "Open the knee out and round",
+   "pose": {
+    "thighR": 45,
+    "shinR": -10,
+    "footR": 80
+   }
+  },
+  {
+   "duration": 1800,
+   "label": "Sweep it behind",
+   "pose": {
+    "thighR": -15,
+    "shinR": -60,
+    "footR": 30
+   }
+  },
+  {
+   "duration": 1500,
+   "label": "Lower",
+   "pose": {
+    "thighR": 0,
+    "shinR": 0,
+    "footR": 90
+   }
+  }
+ ]
+}

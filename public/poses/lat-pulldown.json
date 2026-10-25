@@ -1,0 +1,58 @@
+{
+  "version": 2,
+  "title": "Lat Pulldown",
+  "view": "side",
+  "hold": "barbell",
+  "grounded": true,
+  "anchor": {
+    "joint": "ankleL",
+    "x": 60,
+    "y": 89
+  },
+  "props": [
+    {
+      "type": "box",
+      "x": 28,
+      "y": 74,
+      "w": 24,
+      "h": 18
+    }
+  ],
+  "highlight": [
+    "shoulderL",
+    "elbowL",
+    "spine"
+  ],
+  "frames": [
+    {
+      "duration": 1200,
+      "label": "Bar overhead",
+      "pose": {
+        "torso": 184,
+        "head": 182,
+        "upperArmL": 165,
+        "forearmL": 172,
+        "upperArmR": 165,
+        "forearmR": 172,
+        "thighL": 90,
+        "shinL": 0,
+        "footL": 90,
+        "thighR": 90,
+        "shinR": 0,
+        "footR": 90
+      }
+    },
+    {
+      "duration": 1000,
+      "label": "Pull to chest",
+      "pose": {
+        "torso": 198,
+        "head": 195,
+        "upperArmL": 5,
+        "forearmL": 140,
+        "upperArmR": 5,
+        "forearmR": 140
+      }
+    }
+  ]
+}

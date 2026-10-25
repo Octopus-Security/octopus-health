@@ -1,0 +1,58 @@
+{
+ "version": 2,
+ "title": "Pigeon Pose",
+ "view": "side",
+ "highlight": [
+  "hipL"
+ ],
+ "frames": [
+  {
+   "duration": 1800,
+   "label": "Front shin folded, hips square",
+   "pose": {
+    "root": {
+     "x": 50,
+     "y": 82
+    },
+    "torso": 155,
+    "head": 160,
+    "upperArmL": 15,
+    "forearmL": 15,
+    "upperArmR": 15,
+    "forearmR": 15,
+    "thighL": 82,
+    "shinL": -80,
+    "footL": -62,
+    "thighR": -80,
+    "shinR": -90,
+    "footR": -60
+   }
+  },
+  {
+   "duration": 3000,
+   "label": "Fold forward over the front leg",
+   "pose": {
+    "torso": 112,
+    "arch": 14,
+    "head": 95,
+    "upperArmL": -1,
+    "forearmL": 73,
+    "upperArmR": -1,
+    "forearmR": 73
+   }
+  },
+  {
+   "duration": 2000,
+   "label": "Hold the fold",
+   "pose": {
+    "torso": 100,
+    "arch": 20,
+    "head": 80,
+    "upperArmL": 5,
+    "forearmL": 95,
+    "upperArmR": 5,
+    "forearmR": 95
+   }
+  }
+ ]
+}

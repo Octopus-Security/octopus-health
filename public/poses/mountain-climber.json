@@ -1,0 +1,14 @@
+{
+ "version": 2,
+ "title": "Mountain Climber",
+ "view": "side",
+ "highlight": ["hipL","hipR","kneeL","kneeR"],
+ "frames": [
+  {"duration":150,"label":"Left knee in","anchor":{"joint":"handL","x":74,"y":88.5},"pins":["handL","handR"],"pose":{"torso":108,"head":112,"upperArmL":0,"forearmL":0,"upperArmR":0,"forearmR":0,"thighL":80,"shinL":-75,"footL":20,"thighR":-67.5,"shinR":-67.5,"footR":-10,"arch":0}},
+  {"duration":150,"anchor":{"joint":"handL","x":74,"y":88.5},"pose":{"torso":108,"head":112,"upperArmL":0,"forearmL":0,"upperArmR":0,"forearmR":0,"thighL":40,"shinL":-110,"footL":20,"thighR":-45,"shinR":-135,"footR":0,"arch":0}},
+  {"duration":150,"anchor":{"joint":"handL","x":74,"y":88.5},"pose":{"torso":108,"head":112,"upperArmL":0,"forearmL":0,"upperArmR":0,"forearmR":0,"thighL":-45,"shinL":-135,"footL":0,"thighR":40,"shinR":-110,"footR":20,"arch":0}},
+  {"duration":150,"label":"Right knee in","anchor":{"joint":"handL","x":74,"y":88.5},"pose":{"torso":108,"head":112,"upperArmL":0,"forearmL":0,"upperArmR":0,"forearmR":0,"thighL":-67.5,"shinL":-67.5,"footL":-10,"thighR":80,"shinR":-75,"footR":20,"arch":0}},
+  {"duration":150,"anchor":{"joint":"handL","x":74,"y":88.5},"pose":{"torso":108,"head":112,"upperArmL":0,"forearmL":0,"upperArmR":0,"forearmR":0,"thighL":-45,"shinL":-135,"footL":0,"thighR":40,"shinR":-110,"footR":20,"arch":0}},
+  {"duration":150,"anchor":{"joint":"handL","x":74,"y":88.5},"pose":{"torso":108,"head":112,"upperArmL":0,"forearmL":0,"upperArmR":0,"forearmR":0,"thighL":40,"shinL":-110,"footL":20,"thighR":-45,"shinR":-135,"footR":0,"arch":0}}
+ ]
+}

@@ -1,0 +1,64 @@
+{
+ "version": 2,
+ "title": "Leg press",
+ "view": "side",
+ "props": [
+  {
+   "type": "box",
+   "x": 20,
+   "y": 79,
+   "w": 28,
+   "h": 13
+  },
+  {
+   "type": "bar",
+   "x1": 32,
+   "y1": 78,
+   "x2": 6,
+   "y2": 51
+  }
+ ],
+ "grounded": false,
+ "highlight": [
+  "kneeL",
+  "hipL"
+ ],
+ "frames": [
+  {
+   "duration": 1000,
+   "label": "Knees to chest",
+   "pose": {
+    "torso": 225,
+    "head": 215,
+    "thighL": 150,
+    "shinL": 60,
+    "footL": 170,
+    "upperArmL": 48.8,
+    "forearmL": 58.4,
+    "thighR": 150,
+    "shinR": 60,
+    "footR": 170,
+    "upperArmR": 48.8,
+    "forearmR": 58.4,
+    "root": {
+     "x": 36,
+     "y": 74
+    }
+   }
+  },
+  {
+   "duration": 1000,
+   "label": "Press",
+   "pose": {
+    "thighL": 120,
+    "shinL": 115,
+    "thighR": 120,
+    "shinR": 115,
+    "root": {
+     "x": 36,
+     "y": 74
+    }
+   }
+  }
+ ]
+}

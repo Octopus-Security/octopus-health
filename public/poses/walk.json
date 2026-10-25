@@ -1,0 +1,99 @@
+{
+ "version": 2,
+ "title": "Loaded carry walk",
+ "view": "side",
+ "hold": "dumbbell",
+ "highlight": [
+  "hipL",
+  "kneeL",
+  "handL"
+ ],
+ "frames": [
+  {
+   "duration": 330,
+   "label": "Left foot lands",
+   "ease": "linear",
+   "pose": {
+    "torso": 177,
+    "head": 179,
+    "thighL": 25,
+    "shinL": 15,
+    "footL": 100,
+    "upperArmL": -20,
+    "forearmL": -8,
+    "thighR": -20,
+    "shinR": -36,
+    "footR": 55,
+    "upperArmR": 24,
+    "forearmR": 48,
+    "root": {
+     "x": 50,
+     "y": 51
+    }
+   }
+  },
+  {
+   "duration": 330,
+   "label": "Pass",
+   "ease": "linear",
+   "pose": {
+    "thighL": 0,
+    "shinL": 0,
+    "footL": 90,
+    "upperArmL": 2,
+    "forearmL": 22,
+    "thighR": 20,
+    "shinR": -32,
+    "footR": 62,
+    "upperArmR": 4,
+    "forearmR": 24,
+    "root": {
+     "x": 50,
+     "y": 50
+    }
+   }
+  },
+  {
+   "duration": 330,
+   "label": "Right foot lands",
+   "ease": "linear",
+   "pose": {
+    "thighL": -20,
+    "shinL": -36,
+    "footL": 55,
+    "upperArmL": 24,
+    "forearmL": 48,
+    "thighR": 25,
+    "shinR": 15,
+    "footR": 100,
+    "upperArmR": -20,
+    "forearmR": -8,
+    "root": {
+     "x": 50,
+     "y": 51
+    }
+   }
+  },
+  {
+   "duration": 330,
+   "label": "Pass",
+   "ease": "linear",
+   "pose": {
+    "thighL": 20,
+    "shinL": -32,
+    "footL": 62,
+    "upperArmL": 2,
+    "forearmL": 22,
+    "thighR": 0,
+    "shinR": 0,
+    "footR": 90,
+    "upperArmR": 4,
+    "forearmR": 24,
+    "root": {
+     "x": 50,
+     "y": 50
+    }
+   }
+  }
+ ]
+}

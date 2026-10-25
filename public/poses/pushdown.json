@@ -1,0 +1,44 @@
+{
+  "version": 2,
+  "title": "Triceps Pushdown",
+  "view": "side",
+  "anchor": {
+    "joint": "ankleL",
+    "x": 50,
+    "y": 90
+  },
+  "highlight": [
+    "elbowL",
+    "elbowR"
+  ],
+  "frames": [
+    {
+      "duration": 900,
+      "label": "Elbows pinned",
+      "pose": {
+        "torso": 170,
+        "head": 172,
+        "upperArmL": 3,
+        "forearmL": 82,
+        "upperArmR": 3,
+        "forearmR": 82,
+        "thighL": 10,
+        "shinL": -10,
+        "footL": 90,
+        "thighR": 10,
+        "shinR": -10,
+        "footR": 90
+      }
+    },
+    {
+      "duration": 1000,
+      "label": "Press down",
+      "pose": {
+        "upperArmL": 3,
+        "forearmL": 2,
+        "upperArmR": 3,
+        "forearmR": 2
+      }
+    }
+  ]
+}

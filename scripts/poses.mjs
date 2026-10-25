@@ -48,7 +48,7 @@ section{display:inline-block;vertical-align:top;margin:0 14px 14px 0;padding:6px
 section.bad{border-color:#e74c3c}
 h2{font-size:13px;margin:0 0 4px}small{color:#888}
 figure{display:inline-block;margin:0 2px;text-align:center}figure.mid{opacity:.55}
-svg{width:92px;height:98px;background:#1e1e28;border-radius:4px}figcaption{font-size:10px;color:#888}
+svg{width:92px;height:107px;background:#1e1e28;border-radius:4px}figcaption{font-size:10px;color:#888}
 </style>${cells.join('\n')}`);
   console.log(`wrote ${sheet} (${cells.length} poses)`);
 }

@@ -1,0 +1,51 @@
+{
+ "version": 2,
+ "title": "Lunge",
+ "view": "side",
+ "anchor": {
+  "joint": "ankleL",
+  "x": 74,
+  "y": 90
+ },
+ "pins": [
+  "ankleR"
+ ],
+ "highlight": [
+  "kneeL",
+  "hipL"
+ ],
+ "frames": [
+  {
+   "duration": 900,
+   "label": "Split stance",
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "thighL": 34.2,
+    "shinL": 31.7,
+    "footL": 90,
+    "upperArmL": 0,
+    "forearmL": 0,
+    "thighR": -4.2,
+    "shinR": -67.8,
+    "footR": 38,
+    "upperArmR": 0,
+    "forearmR": 0
+   }
+  },
+  {
+   "duration": 700,
+   "label": "Lower",
+   "pose": {
+    "thighL": 79.9,
+    "shinL": 8.4,
+    "upperArmL": 8,
+    "forearmL": 20,
+    "thighR": 1,
+    "shinR": -99.2,
+    "upperArmR": 8,
+    "forearmR": 20
+   }
+  }
+ ]
+}

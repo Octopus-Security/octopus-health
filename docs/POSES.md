@@ -52,6 +52,8 @@ Absolute degrees, `direction = (sin a, cos a)` with y pointing **down**:
 
 Write values continuously: going from 170 to 190 is fine, but 170 to −170
 spins the limb all the way round (the validator rejects a jump over 200°).
+The loop from the last frame back to the first takes the short way round, so a
+full circle can be written 0 → 90 → 180 → 270 → 360.
 
 Segments: `torso` (pelvis→neck, 30 long), `head` (neck→head centre, 10),
 `upperArmL/R` (15), `forearmL/R` (14), `thighL/R` (20), `shinL/R` (20),
@@ -88,7 +90,7 @@ sides are `upperArmL: 90, upperArmR: -90`, and feet point outwards with
   radius of 7), so "on the floor" is generous and "through the floor" is
   a real overlap.
 - A body lying full length is about 94 units long, so centre the hip at x≈50.
-- Everything stays within x 1–99 and y −9 or lower (the head radius is 7).
+- Everything stays within x 1–99 and above y −19.5 (the head radius is 7), which leaves room for arms overhead and a pull-up bar at y≈−8.
 - `"air": true` on a frame that is airborne (jumps). `"grounded": false` on an
   animation where the figure is supported off the floor (pull-up bar, dip bars).
 

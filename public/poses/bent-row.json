@@ -1,0 +1,45 @@
+{
+  "version": 2,
+  "title": "Bent-over Row",
+  "view": "side",
+  "hold": "dumbbell",
+  "anchor": {
+    "joint": "ankleL",
+    "x": 40,
+    "y": 90
+  },
+  "highlight": [
+    "shoulderL",
+    "elbowL"
+  ],
+  "frames": [
+    {
+      "duration": 1000,
+      "label": "Hang",
+      "pose": {
+        "torso": 105,
+        "head": 118,
+        "upperArmL": 5,
+        "forearmL": 5,
+        "upperArmR": 5,
+        "forearmR": 5,
+        "thighL": 30,
+        "shinL": -15,
+        "footL": 90,
+        "thighR": 30,
+        "shinR": -15,
+        "footR": 90
+      }
+    },
+    {
+      "duration": 1000,
+      "label": "Row to hips",
+      "pose": {
+        "upperArmL": -80,
+        "forearmL": 10,
+        "upperArmR": -80,
+        "forearmR": 10
+      }
+    }
+  ]
+}

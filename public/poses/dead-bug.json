@@ -1,0 +1,12 @@
+{
+ "version": 2,
+ "title": "Dead Bug",
+ "view": "side",
+ "highlight": ["spine","hipL","shoulderR"],
+ "frames": [
+  {"duration":900,"label":"Arms up, knees over hips","pose":{"root":{"x":52,"y":87},"torso":-90,"head":-88,"upperArmL":180,"forearmL":180,"upperArmR":180,"forearmR":180,"thighL":180,"shinL":90,"footL":180,"thighR":180,"shinR":90,"footR":180,"arch":0}},
+  {"duration":1500,"label":"Opposite arm and leg reach","pose":{"root":{"x":52,"y":87},"torso":-90,"head":-88,"upperArmL":180,"forearmL":180,"upperArmR":220,"forearmR":220,"thighL":100,"shinL":100,"footL":190,"thighR":180,"shinR":90,"footR":180,"arch":0}},
+  {"duration":900,"label":"Back to table-top","pose":{"root":{"x":52,"y":87},"torso":-90,"head":-88,"upperArmL":180,"forearmL":180,"upperArmR":180,"forearmR":180,"thighL":180,"shinL":90,"footL":180,"thighR":180,"shinR":90,"footR":180,"arch":0}},
+  {"duration":1500,"label":"Switch sides","pose":{"root":{"x":52,"y":87},"torso":-90,"head":-88,"upperArmL":220,"forearmL":220,"upperArmR":180,"forearmR":180,"thighL":180,"shinL":90,"footL":180,"thighR":100,"shinR":100,"footR":190,"arch":0}}
+ ]
+}

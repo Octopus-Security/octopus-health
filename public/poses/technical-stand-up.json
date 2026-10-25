@@ -1,0 +1,12 @@
+{
+ "version": 2,
+ "title": "Technical Stand-Up",
+ "view": "side",
+ "highlight": ["hipL","hipR","shoulderL"],
+ "frames": [
+  {"duration":900,"label":"Seated, one hand posted","anchor":{"joint":"ankleL","x":74,"y":90},"pins":["handL"],"pose":{"torso":210,"head":205,"upperArmL":-19.2,"forearmL":23.3,"upperArmR":50,"forearmR":160,"thighL":135,"shinL":35,"footL":90,"thighR":98,"shinR":98,"footR":188,"arch":0}},
+  {"duration":700,"label":"Hips up","pins":["handL","ankleL"],"pose":{"root":{"x":56,"y":64},"torso":280,"head":262,"upperArmL":-20.7,"forearmL":66.6,"upperArmR":50,"forearmR":160,"thighL":72.5,"shinL":-3.1,"footL":90,"thighR":120,"shinR":120,"footR":200,"arch":0}},
+  {"duration":700,"label":"Swing the leg back under","pins":["ankleR"],"pose":{"root":{"x":56,"y":77},"torso":240,"head":228,"upperArmL":-11.7,"forearmL":30.1,"upperArmR":50,"forearmR":160,"thighL":110.4,"shinL":-2.1,"footL":90,"thighR":51.8,"shinR":260.3,"footR":30,"arch":0}},
+  {"duration":900,"label":"Stand into stance","anchor":{"joint":"ankleL","x":74,"y":90},"pins":["ankleR"],"pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"upperArmR":20,"forearmR":165,"thighL":12,"shinL":-4,"footL":90,"thighR":-22,"shinR":340,"footR":70,"arch":0}}
+ ]
+}

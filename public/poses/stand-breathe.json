@@ -1,0 +1,47 @@
+{
+ "version": 2,
+ "title": "Standing breath",
+ "view": "front",
+ "highlight": [
+  "shoulderL",
+  "shoulderR"
+ ],
+ "frames": [
+  {
+   "duration": 1800,
+   "label": "Exhale",
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "thighL": 3,
+    "shinL": 3,
+    "footL": 90,
+    "upperArmL": 8,
+    "forearmL": 5,
+    "thighR": -3,
+    "shinR": -3,
+    "footR": -90,
+    "upperArmR": -8,
+    "forearmR": -5,
+    "root": {
+     "x": 50,
+     "y": 50.4
+    }
+   }
+  },
+  {
+   "duration": 1800,
+   "label": "Inhale: arms up",
+   "pose": {
+    "upperArmL": 150,
+    "forearmL": 168,
+    "upperArmR": -150,
+    "forearmR": -168,
+    "root": {
+     "x": 50,
+     "y": 50.4
+    }
+   }
+  }
+ ]
+}

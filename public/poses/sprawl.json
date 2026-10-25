@@ -1,0 +1,12 @@
+{
+ "version": 2,
+ "title": "Sprawl",
+ "view": "side",
+ "highlight": ["hipL","hipR","spine"],
+ "frames": [
+  {"duration":500,"label":"Fight stance","anchor":{"joint":"ankleL","x":56,"y":90},"pins":["ankleL","ankleR"],"pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"upperArmR":20,"forearmR":165,"thighL":12,"shinL":-4,"footL":90,"thighR":-22,"shinR":-20,"footR":70,"arch":0}},
+  {"duration":220,"label":"Hips drop, legs kick back","pins":[],"pose":{"root":{"x":46,"y":74},"torso":108,"head":118,"upperArmL":-45.9,"forearmL":17.7,"upperArmR":-45.9,"forearmR":17.7,"thighL":-45,"shinL":-100,"footL":5,"thighR":-45,"shinR":-100,"footR":5,"arch":0}},
+  {"duration":700,"label":"Sprawl, chest low, hands posting","pins":["handL","handR"],"pose":{"root":{"x":44,"y":83.5},"torso":112,"head":115,"upperArmL":-65.3,"forearmL":44.5,"upperArmR":-65.3,"forearmR":44.5,"thighL":-86,"shinL":-88,"footL":-12,"thighR":-86,"shinR":-88,"footR":-12,"arch":0}},
+  {"duration":350,"label":"Feet under, pop up","anchor":{"joint":"ankleL","x":46,"y":88.5},"pins":["ankleR"],"pose":{"torso":105,"head":118,"upperArmL":-25.8,"forearmL":50.5,"upperArmR":-25.8,"forearmR":50.5,"thighL":-260,"shinL":-25,"footL":90,"thighR":-257,"shinR":-20,"footR":90,"arch":0}}
+ ]
+}

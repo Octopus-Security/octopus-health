@@ -15,6 +15,8 @@
  *   0 = straight down, 90 = forward (the way the figure faces), 180 = straight
  *   up, -90 = backward. Values past ±180 are fine (torso 200 = leaning back);
  *   frames interpolate the numbers as written, so write 190 → 170, never 190 → -170.
+ *   The loop back from the last frame to the first takes the short way round, so
+ *   an arm circle can run 0 → 90 → 180 → 270 → 360 and loop cleanly.
  *   In view "front" the figure faces the viewer and +90 is screen-right, which is
  *   the figure's LEFT side (L limbs hang on screen-right).
  *
@@ -56,7 +58,7 @@
   var FLOOR_Y = 92;            // standing ankles sit at y=90
   var SHOULDER_HALF = 8;       // front view only
   var HIP_HALF = 5;            // front view only
-  var VIEWBOX = '0 -10 100 106';
+  var VIEWBOX = '0 -20 100 116';   // headroom for arms overhead and a pull-up bar
 
   var ANGLES = ['torso', 'head', 'upperArmL', 'forearmL', 'upperArmR', 'forearmR',
     'thighL', 'shinL', 'footL', 'thighR', 'shinR', 'footR'];
@@ -178,6 +180,19 @@
     return r;
   }
 
+  // The frame after i. Looping back to frame 0, each angle is shifted by whole
+  // turns to sit nearest the last frame's, so a full circle does not unwind.
+  function nextOf(frames, i) {
+    var ni = (i + 1) % frames.length;
+    if (ni !== 0) return frames[ni];
+    var last = frames[i].pose, f0 = frames[0], p = {};
+    for (var k in f0.pose) p[k] = f0.pose[k];
+    ANGLES.forEach(function (k) { p[k] = last[k] + norm(f0.pose[k] - last[k]); });
+    var w = {}; for (var j in f0) w[j] = f0[j];
+    w.pose = p;
+    return w;
+  }
+
   // ── rules ────────────────────────────────────────────────────────────────
   var SURFACE = FLOOR_Y + 1.5;          // where the floor line is drawn
   // how far each joint's drawing extends below the joint (half a stroke, or the head)
@@ -222,7 +237,7 @@
     frames.forEach(function (fr, i) {
       var ni = (i + 1) % frames.length;
       if (ni === 0 && data.loop === false) return;
-      var nx = frames[ni], p = fr.pose;
+      var nx = nextOf(frames, i), p = fr.pose;
       ANGLES.forEach(function (k) {
         var d = Math.abs(nx.pose[k] - p[k]);
         if (d > 200) errs.push('frame ' + i + '→' + ni + ': ' + k + ' swings ' + d.toFixed(0) + '° — write angles continuously (190, not -170)');
@@ -242,7 +257,7 @@
         JOINTS.forEach(function (n) {
           var pt = jt[n], edge = pt.y + RADIUS[n];
           if (pt.x - (n === 'head' ? HEAD_R : 0) < 1 || pt.x + (n === 'head' ? HEAD_R : 0) > 99) note(worst, at, n, 'leaves the frame sideways', Math.abs(pt.x - 50), 'x=' + pt.x.toFixed(1), pct);
-          if (pt.y - (n === 'head' ? HEAD_R : 0) < -9.5) note(worst, at, n, 'leaves the top of the frame', -pt.y, 'y=' + pt.y.toFixed(1), pct);
+          if (pt.y - (n === 'head' ? HEAD_R : 0) < -19.5) note(worst, at, n, 'leaves the top of the frame', -pt.y, 'y=' + pt.y.toFixed(1), pct);
           if (edge > SURFACE + 1.5) note(worst, at, n, 'goes through the floor', edge, 'bottom edge ' + edge.toFixed(1) + ', floor surface ' + SURFACE, pct);
           lowest = Math.max(lowest, edge);
         });
@@ -428,7 +443,7 @@
         if (ni === 0 && !this.loop) { this.pause(); return; }
         this._fi = ni; cur = this.frames[ni];
       }
-      var next = this.frames[(this._fi + 1) % this.frames.length];
+      var next = nextOf(this.frames, this._fi);
       var t = easeValue(this._elapsed / cur.duration, cur.ease);
       this._render(between(cur, next, t, this.view), t < 0.5 ? cur.highlight : next.highlight);
     }
@@ -453,11 +468,11 @@
   // A static SVG of one moment — the contact sheet uses it. t is the fraction
   // of the way from frameIndex to the next frame.
   function svgFor(data, frameIndex, t) {
-    var frames = resolveFrames(data), a = frames[frameIndex || 0], b = frames[((frameIndex || 0) + 1) % frames.length];
+    var frames = resolveFrames(data), a = frames[frameIndex || 0], b = nextOf(frames, frameIndex || 0);
     var pose = t ? between(a, b, t, data.view || 'side') : a.pose;
     return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="' + VIEWBOX + '">' + figureHTML(pose, drawOpts(data), a.highlight) + '</svg>';
   }
 
   return { Player: Player, validate: validate, solve: solve, resolveFrames: resolveFrames, between: between,
-    svgFor: svgFor, LEN: LEN, ANGLES: ANGLES, JOINTS: JOINTS, FLOOR_Y: FLOOR_Y };
+    nextOf: nextOf, svgFor: svgFor, LEN: LEN, ANGLES: ANGLES, JOINTS: JOINTS, FLOOR_Y: FLOOR_Y };
 }));

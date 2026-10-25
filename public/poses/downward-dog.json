@@ -1,0 +1,66 @@
+{
+  "version": 2,
+  "title": "Downward Dog",
+  "view": "side",
+  "pins": [
+    "handL",
+    "handR"
+  ],
+  "anchor": {
+    "joint": "toeR",
+    "x": 22,
+    "y": 91.5
+  },
+  "highlight": [
+    "kneeL",
+    "kneeR"
+  ],
+  "frames": [
+    {
+      "duration": 1400,
+      "label": "Left knee bends",
+      "anchor": {
+        "joint": "toeR",
+        "x": 22,
+        "y": 91.5
+      },
+      "pose": {
+        "torso": 70,
+        "head": 98,
+        "thighL": -8,
+        "shinL": -45,
+        "footL": 30,
+        "thighR": -20,
+        "shinR": -20,
+        "footR": 60,
+        "upperArmL": -10.5,
+        "forearmL": 14.1,
+        "upperArmR": -10.5,
+        "forearmR": 14.1
+      }
+    },
+    {
+      "duration": 1400,
+      "label": "Right knee bends",
+      "anchor": {
+        "joint": "toeL",
+        "x": 22,
+        "y": 91.5
+      },
+      "pose": {
+        "torso": 70,
+        "head": 98,
+        "thighR": -8,
+        "shinR": -45,
+        "footR": 30,
+        "thighL": -20,
+        "shinL": -20,
+        "footL": 60,
+        "upperArmL": -10.5,
+        "forearmL": 14.1,
+        "upperArmR": -10.5,
+        "forearmR": 14.1
+      }
+    }
+  ]
+}

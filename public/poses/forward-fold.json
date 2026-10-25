@@ -1,0 +1,85 @@
+{
+ "version": 2,
+ "title": "Standing Forward Fold",
+ "view": "side",
+ "anchor": {
+  "joint": "ankleL",
+  "x": 50,
+  "y": 90
+ },
+ "highlight": [
+  "hipL",
+  "spine"
+ ],
+ "frames": [
+  {
+   "duration": 1500,
+   "label": "Stand tall",
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "upperArmL": 0,
+    "forearmL": 0,
+    "upperArmR": 0,
+    "forearmR": 0,
+    "thighL": 0,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": 0,
+    "shinR": 0,
+    "footR": 90
+   }
+  },
+  {
+   "duration": 2400,
+   "label": "Hinge, soft knees",
+   "pose": {
+    "torso": 100,
+    "arch": 8,
+    "head": 95,
+    "upperArmL": 10,
+    "forearmL": 15,
+    "upperArmR": 10,
+    "forearmR": 15,
+    "thighL": 15,
+    "shinL": 5,
+    "thighR": 15,
+    "shinR": 5
+   }
+  },
+  {
+   "duration": 2500,
+   "label": "Hang, hands to the floor",
+   "pose": {
+    "torso": 35,
+    "arch": 18,
+    "head": 10,
+    "upperArmL": -33,
+    "forearmL": 87,
+    "upperArmR": -33,
+    "forearmR": 87,
+    "thighL": 20,
+    "shinL": 5,
+    "thighR": 20,
+    "shinR": 5
+   }
+  },
+  {
+   "duration": 2400,
+   "label": "Roll up, one vertebra at a time",
+   "pose": {
+    "torso": 125,
+    "arch": 12,
+    "head": 115,
+    "upperArmL": 5,
+    "forearmL": 15,
+    "upperArmR": 5,
+    "forearmR": 15,
+    "thighL": 15,
+    "shinL": 5,
+    "thighR": 15,
+    "shinR": 5
+   }
+  }
+ ]
+}

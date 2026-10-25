@@ -1,0 +1,68 @@
+{
+ "version": 2,
+ "title": "Side Bend",
+ "view": "front",
+ "highlight": [
+  "spine"
+ ],
+ "frames": [
+  {
+   "duration": 1500,
+   "label": "Reach tall",
+   "pose": {
+    "root": {
+     "x": 50,
+     "y": 50
+    },
+    "torso": 180,
+    "head": 180,
+    "upperArmL": 190,
+    "forearmL": 190,
+    "upperArmR": 170,
+    "forearmR": 170,
+    "thighL": 0,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": 0,
+    "shinR": 0,
+    "footR": -90
+   }
+  },
+  {
+   "duration": 2500,
+   "label": "Lean right",
+   "pose": {
+    "torso": 160,
+    "head": 160,
+    "upperArmL": 170,
+    "forearmL": 170,
+    "upperArmR": 150,
+    "forearmR": 150
+   }
+  },
+  {
+   "duration": 1500,
+   "label": "Reach tall",
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "upperArmL": 190,
+    "forearmL": 190,
+    "upperArmR": 170,
+    "forearmR": 170
+   }
+  },
+  {
+   "duration": 2500,
+   "label": "Lean left",
+   "pose": {
+    "torso": 200,
+    "head": 200,
+    "upperArmL": 210,
+    "forearmL": 210,
+    "upperArmR": 190,
+    "forearmR": 190
+   }
+  }
+ ]
+}

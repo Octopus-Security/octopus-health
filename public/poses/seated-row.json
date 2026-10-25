@@ -1,0 +1,47 @@
+{
+  "version": 2,
+  "title": "Seated Row",
+  "view": "side",
+  "anchor": {
+    "joint": "hip",
+    "x": 30,
+    "y": 87
+  },
+  "highlight": [
+    "shoulderL",
+    "elbowL",
+    "spine"
+  ],
+  "frames": [
+    {
+      "duration": 1100,
+      "label": "Reach",
+      "pose": {
+        "torso": 160,
+        "head": 165,
+        "upperArmL": 85,
+        "forearmL": 88,
+        "upperArmR": 85,
+        "forearmR": 88,
+        "thighL": 90,
+        "shinL": 86,
+        "footL": 180,
+        "thighR": 90,
+        "shinR": 86,
+        "footR": 180
+      }
+    },
+    {
+      "duration": 1000,
+      "label": "Pull to ribs",
+      "pose": {
+        "torso": 185,
+        "head": 182,
+        "upperArmL": -30,
+        "forearmL": 90,
+        "upperArmR": -30,
+        "forearmR": 90
+      }
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+{
+ "version": 2,
+ "title": "Hip thrust",
+ "view": "side",
+ "anchor": {
+  "joint": "ankleL",
+  "x": 72,
+  "y": 90
+ },
+ "hold": "barbell",
+ "props": [
+  {
+   "type": "box",
+   "x": 3,
+   "y": 72,
+   "w": 24,
+   "h": 20
+  }
+ ],
+ "grounded": true,
+ "highlight": [
+  "hipL",
+  "hipR"
+ ],
+ "frames": [
+  {
+   "duration": 1000,
+   "label": "Hips low",
+   "pose": {
+    "torso": -118,
+    "head": -128,
+    "thighL": 124.6,
+    "shinL": 14.6,
+    "footL": 90,
+    "upperArmL": 68.5,
+    "forearmL": 75.2,
+    "thighR": 124.6,
+    "shinR": 14.6,
+    "footR": 90,
+    "upperArmR": 68.5,
+    "forearmR": 75.2
+   }
+  },
+  {
+   "duration": 900,
+   "label": "Drive: knee-hip-shoulder in line",
+   "pose": {
+    "torso": -100,
+    "head": -112,
+    "thighL": 89.7,
+    "shinL": 5.7,
+    "upperArmL": 88.2,
+    "forearmL": 91,
+    "thighR": 89.7,
+    "shinR": 5.7,
+    "upperArmR": 88.2,
+    "forearmR": 91
+   }
+  }
+ ]
+}

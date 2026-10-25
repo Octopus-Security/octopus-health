@@ -1,0 +1,46 @@
+{
+ "version": 2,
+ "title": "Deep squat hold",
+ "view": "side",
+ "anchor": {
+  "joint": "ankleL",
+  "x": 50,
+  "y": 90
+ },
+ "highlight": [
+  "hipL",
+  "kneeL"
+ ],
+ "frames": [
+  {
+   "duration": 1800,
+   "label": "Weight back",
+   "pose": {
+    "torso": 142,
+    "head": 155,
+    "thighL": 105,
+    "shinL": -32,
+    "footL": 90,
+    "upperArmL": 3,
+    "forearmL": 150,
+    "thighR": 105,
+    "shinR": -32,
+    "footR": 90,
+    "upperArmR": 3,
+    "forearmR": 150
+   }
+  },
+  {
+   "duration": 1800,
+   "label": "Rock forward",
+   "pose": {
+    "torso": 152,
+    "head": 160,
+    "thighL": 114,
+    "shinL": -46,
+    "thighR": 114,
+    "shinR": -46
+   }
+  }
+ ]
+}

@@ -1,0 +1,53 @@
+{
+ "version": 2,
+ "title": "Ankle Circle",
+ "view": "side",
+ "highlight": [
+  "ankleL"
+ ],
+ "frames": [
+  {
+   "duration": 1500,
+   "label": "Point the toes",
+   "pose": {
+    "torso": 200,
+    "head": 195,
+    "upperArmL": 0,
+    "forearmL": 0,
+    "upperArmR": 0,
+    "forearmR": 0,
+    "thighL": 90,
+    "shinL": 90,
+    "footL": 108,
+    "thighR": 90,
+    "shinR": 90,
+    "footR": 180,
+    "root": {
+     "x": 22,
+     "y": 87
+    }
+   }
+  },
+  {
+   "duration": 1200,
+   "label": "Neutral",
+   "pose": {
+    "footL": 160
+   }
+  },
+  {
+   "duration": 1800,
+   "label": "Flex \u2014 toes to shin",
+   "pose": {
+    "footL": 212
+   }
+  },
+  {
+   "duration": 1200,
+   "label": "Neutral",
+   "pose": {
+    "footL": 160
+   }
+  }
+ ]
+}
