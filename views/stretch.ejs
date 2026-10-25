@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="<%= asset('/theme.css') %>">
   <link rel="stylesheet" href="<%= asset('/daily-stretches.css') %>">
   <script src="<%= asset('/stick-figure.js') %>" defer></script>
+  <script src="<%= asset('/pose-map.js') %>"></script>
   <style>
     .stretch-grid { display:grid; grid-template-columns: 1fr 360px; gap:20px; }
     @media (max-width: 980px) { .stretch-grid { grid-template-columns: 1fr; } }
@@ -190,31 +191,10 @@ const EXERCISE_LIBRARY = <%- JSON.stringify(exerciseLibrary) %>;
 let routineItems = [];
 let pickerType = '';
 
-const POSE_MAP = {
-  "World's Greatest Stretch":'lunge', "Couch Stretch":'lunge', "Half-Kneeling Hip Flexor Stretch":'lunge',
-  "Standing Hip Flexor PAILs/RAILs":'lunge', "Lizard Stretch":'lunge', "Walking Lunge":'lunge',
-  "Reverse Lunge":'lunge', "Bulgarian Split Squat":'lunge',
-  "Frog Stretch":'squat', "Sumo Squat":'squat', "Goblet Squat":'squat', "Back Squat":'squat',
-  "Front Squat":'squat', "Bodyweight Squat":'squat', "Air Squat":'squat', "Squat":'squat',
-  "Butterfly Stretch":'seated-fold', "Pigeon Stretch":'seated-fold', "Supine Piriformis Stretch":'seated-fold',
-  "Seated Forward Fold":'seated-fold', "90/90 Hip Stretch":'seated-fold',
-  "Cat-Cow":'quadruped', "Cat Cow":'quadruped', "Bird Dog":'quadruped',
-  "Thoracic Open Book":'quadruped', "Thread the Needle":'quadruped',
-  "Standing Forward Fold":'fold', "Toe Touch":'fold', "Standing Hamstring Stretch":'fold', "Hamstring Stretch":'fold',
-  "Lat Stretch on Pull-up Bar":'side-bend', "Overhead Banded Shoulder Stretch":'side-bend',
-  "Standing Side Bend":'side-bend', "Doorway Chest Stretch":'side-bend', "Bretzel Stretch":'side-bend',
-  "Standing Figure-4 Stretch":'stand', "Cross-Body Shoulder Stretch":'stand', "Sleeper Stretch":'stand',
-  "Prone Shoulder ER Stretch":'stand', "Doorway Wrist Stretch":'stand', "Walk + Deep Breathing":'stand',
-  "Deep Breathing":'stand', "Box Breathing":'stand', "Shadow Boxing":'stand',
-  "Jumping Jacks":'stand', "High Knees":'stand', "Arm Circles":'stand',
-  "Ankle Dorsiflexion Wall Drill":'lunge',
-};
-
+// Which animation each card shows: one shared rule set, public/pose-map.js.
 function poseKeyForName(name) {
-  if (!name) return null;
-  if (POSE_MAP[name]) return POSE_MAP[name];
-  // Default fallback — most stretches are easier to follow with a generic standing animation than no animation
-  return 'stand';
+  if (!name || typeof PoseMap === 'undefined') return null;
+  return PoseMap.keyFor(name);
 }
 
 const _sfPlayers = new WeakSet();

@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "title": "Jumping Jack",
+  "view": "front",
+  "frames": [
+    { "duration": 220, "label": "Feet together",
+      "pose": { "root": { "x": 50, "y": 50 }, "torso": 180, "head": 180,
+                "upperArmL": 8, "forearmL": 5, "upperArmR": -8, "forearmR": -5,
+                "thighL": 0, "shinL": 0, "footL": 90, "thighR": 0, "shinR": 0, "footR": -90 } },
+    { "duration": 180, "air": true,
+      "pose": { "root": { "x": 50, "y": 45 }, "upperArmL": 80, "forearmL": 90, "upperArmR": -80, "forearmR": -90,
+                "thighL": 8, "shinL": 8, "thighR": -8, "shinR": -8 } },
+    { "duration": 220, "label": "Out",
+      "pose": { "root": { "x": 50, "y": 51.4 }, "upperArmL": 140, "forearmL": 155, "upperArmR": -140, "forearmR": -155,
+                "thighL": 15, "shinL": 15, "thighR": -15, "shinR": -15 } },
+    { "duration": 180, "air": true,
+      "pose": { "root": { "x": 50, "y": 45 }, "upperArmL": 80, "forearmL": 90, "upperArmR": -80, "forearmR": -90,
+                "thighL": 8, "shinL": 8, "thighR": -8, "shinR": -8 } }
+  ]
+}
