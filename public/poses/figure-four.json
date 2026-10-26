@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "title": "Standing Figure-4 Stretch",
+  "view": "side",
+  "anchor": {"joint":"ankleL","x":50,"y":90},
+  "highlight": ["hipR","kneeR"],
+  "frames": [
+    {"duration":1500,"label":"Stand on one leg","pose":{"torso":180,"head":180,"upperArmL":60,"forearmL":85,"upperArmR":0,"forearmR":0,"thighL":0,"shinL":0,"footL":90,"thighR":0,"shinR":0,"footR":90}},
+    {"duration":1800,"label":"Cross the ankle over the knee","pose":{"torso":170,"head":172,"upperArmL":60,"forearmL":85,"upperArmR":0,"forearmR":0,"thighL":15,"shinL":-5,"footL":90,"thighR":79,"shinR":-51,"footR":39}},
+    {"duration":2800,"label":"Sit the hips back","pose":{"torso":150,"head":155,"upperArmL":60,"forearmL":85,"upperArmR":0,"forearmR":0,"thighL":50,"shinL":-10,"footL":90,"thighR":120,"shinR":-9,"footR":81}}
+  ]
+}

@@ -1,0 +1,25 @@
+/* Exercise demo sheet: the stick-figure animation and how-to for one exercise.
+   Centred card on a desktop, bottom sheet on a phone. Uses theme.css colours/spacing. */
+.sd-overlay { position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.82); padding: var(--space-4); }
+.sd-sheet { background: #111; border: 1px solid #222; border-radius: 14px; width: min(480px, 100%); max-height: 90vh; max-height: 90dvh; overflow-y: auto; padding: var(--space-4); display: flex; flex-direction: column; gap: var(--space-3); box-shadow: 0 10px 40px rgba(0,0,0,.6); }
+.sd-top { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-3); }
+.sd-title { margin: 0; font-size: 1.05rem; color: #e8e8e8; }
+.sd-close { min-width: var(--tap); min-height: var(--tap); padding: 0 var(--space-3); background: #151515; color: #ccc; border: 1px solid #2a2a2a; font-size: 1.2rem; line-height: 1; flex: none; }
+.sd-close:hover { border-color: #2ecc71; color: #2ecc71; }
+.sd-media { height: 220px; background: linear-gradient(135deg, #111 0%, #0a0a0a 100%); border: 1px solid #1a1a1a; border-radius: 10px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.sd-media .sf-container { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+.sd-media .sf-container svg { width: auto; height: 100%; max-width: 100%; }
+.sd-nopose { font-size: 2.2rem; opacity: 0.25; }
+.sd-how { color: #bbb; font-size: 0.88rem; line-height: 1.55; margin: 0; white-space: pre-line; }
+.sd-how.sd-muted { color: #777; }
+.sd-actions { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+.sd-actions .btn { flex: 1 1 140px; text-align: center; min-height: var(--tap); display: inline-flex; align-items: center; justify-content: center; }
+.sd-actions .btn[hidden] { display: none; }
+.sd-overlay button:focus-visible, .sd-overlay a:focus-visible { outline: 2px solid #7fcbff; outline-offset: 2px; }
+@media (max-width: 640px) {
+  .sd-overlay { align-items: flex-end; padding: 0; }
+  .sd-sheet { width: 100%; border-radius: 14px 14px 0 0; border-bottom: none; padding-bottom: calc(var(--space-4) + env(safe-area-inset-bottom, 0px)); }
+  .sd-media { height: 200px; }
+}
+/* Clickable names in lists */
+.demo-link { cursor: pointer; }

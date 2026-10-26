@@ -161,6 +161,23 @@ test('rules route the names that used to collide', () => {
     'Side Plank': 'side-plank',
     'Hanging Leg Raise': 'hanging-leg-raise',
     'Jefferson Curl': 'forward-fold',
+    'Couch Stretch': 'couch-stretch',            // not the generic hip-flexor figure
+    'Lizard Stretch': 'lizard',
+    "World's Greatest Stretch": 'worlds-greatest',
+    'Scorpion Stretch': 'scorpion',              // "Scorpion" used to fall to Cobra
+    'Frog Stretch': 'frog',
+    'Standing Figure-4 Stretch': 'figure-four',
+    'Calf Foam Roll': 'foam-roll-calf',
+    'Foam Roll Lats': 'foam-roll',
+    'Thoracic Extension over Roller': 'thoracic-extension',
+    'Levator Scapulae Stretch': 'neck-side-stretch',
+    'Chin Tuck': 'chin-tuck',
+    'Neck Isometric Holds': 'neck-isometric',
+    'Neck Circles': 'neck-circle',
+    'Wrist Flexor Stretch': 'wrist-flexor-stretch',
+    'Overhead Banded Shoulder Stretch': 'overhead-shoulder-stretch',
+    'Dumbbell Bulgarian Split Squat': 'bulgarian-split-squat',
+    'Dumbbell Lunge': 'lunge',
   };
   for (const [n, k] of Object.entries(cases)) assert.strictEqual(PM.keyFor(n), k, n);
   assert.strictEqual(PM.keyFor('Something New', 'muay_thai'), 'fight-stance');

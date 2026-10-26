@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "title": "Overhead Triceps Stretch",
+  "view": "side",
+  "anchor": {"joint":"ankleL","x":50,"y":90},
+  "highlight": ["elbowL","shoulderL"],
+  "frames": [
+    {"duration":1400,"label":"Stand tall","pose":{"torso":180,"head":180,"upperArmL":0,"forearmL":0,"upperArmR":0,"forearmR":0,"thighL":0,"shinL":0,"footL":90,"thighR":0,"shinR":0,"footR":90}},
+    {"duration":2000,"label":"Elbow up, hand down your back","pose":{"torso":178,"head":180,"upperArmL":-113,"forearmL":50,"upperArmR":0,"forearmR":0,"thighL":0,"shinL":0,"footL":90,"thighR":0,"shinR":0,"footR":90}},
+    {"duration":2600,"label":"Other hand eases the elbow back","pose":{"torso":178,"head":180,"upperArmL":-113,"forearmL":50,"upperArmR":-165,"forearmR":-52,"thighL":0,"shinL":0,"footL":90,"thighR":0,"shinR":0,"footR":90}}
+  ]
+}

@@ -291,6 +291,13 @@ function mount(app, { requireLogin, getDatabase }) {
   app.get('/stretch/api/daily', requireLogin, handler(async (db) => ({
     daily: await view(db), presets: await listPresets(db),
   })));
+  // The demo sheet's how-to: one exercise by id, else by name (a plan item may have no id).
+  app.get('/stretch/api/demo', requireLogin, handler(async (db, u, b, req) => {
+    const id = Number(req.query.id), name = String(req.query.name || '').trim().toLowerCase();
+    const defs = await db.ExerciseDefinition.findAll({ attributes: ['id', 'name', 'category', 'instructions', 'videoUrl'] });
+    const def = (Number.isInteger(id) && defs.find(e => e.id === id)) || (name && defs.find(e => e.name.trim().toLowerCase() === name)) || null;
+    return { exercise: def && { id: def.id, name: def.name, category: def.category, instructions: def.instructions || null, videoUrl: def.videoUrl || null } };
+  }));
   app.post('/stretch/api/daily/add', requireLogin, handler((db, u, b) => addStretch(db, u, b.exerciseId)));
   app.post('/stretch/api/daily/remove', requireLogin, handler((db, u, b) => removeStretch(db, u, b)));
   app.post('/stretch/api/daily/move', requireLogin, handler((db, u, b) => moveStretch(db, u, b, b.direction)));

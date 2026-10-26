@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "title": "Thoracic Extension over Roller",
+  "view": "side",
+  "anchor": {"joint":"ankleL","x":83,"y":90},
+  "props": [{"type":"roller","x":35,"y":86,"r":7}],
+  "highlight": ["spine"],
+  "frames": [
+    {"duration":1800,"label":"Roller mid-back, hands behind the head","pose":{"torso":-82,"head":-80,"thighL":90,"shinL":20,"footL":110,"thighR":90,"shinR":20,"footR":110,"upperArmL":120,"forearmL":170,"upperArmR":120,"forearmR":170}},
+    {"duration":2600,"label":"Let the upper back arch over it","pose":{"torso":-92,"arch":-26,"head":-120}},
+    {"duration":1800,"label":"Come back up","pose":{"torso":-82,"arch":0,"head":-80}}
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "title": "Frog Stretch",
+  "view": "side",
+  "anchor": {"joint":"kneeL","x":30,"y":89.5},
+  "pins": ["handL","handR"],
+  "highlight": ["hipL","hipR"],
+  "frames": [
+    {"duration":1600,"label":"Forearms down, knees wide","pose":{"torso":98,"head":80,"upperArmL":-5,"forearmL":53,"upperArmR":-5,"forearmR":53,"thighL":10,"shinL":-90,"footL":-72,"thighR":10,"shinR":-90,"footR":-72}},
+    {"duration":3000,"label":"Rock the hips back, hold","pose":{"torso":98,"head":80,"upperArmL":29,"forearmL":70,"upperArmR":29,"forearmR":70,"thighL":45,"shinL":-90,"footL":-72,"thighR":45,"shinR":-90,"footR":-72}},
+    {"duration":1800,"label":"Rock forward","pose":{"torso":98,"head":80,"upperArmL":-5,"forearmL":53,"upperArmR":-5,"forearmR":53,"thighL":10,"shinL":-90,"footL":-72,"thighR":10,"shinR":-90,"footR":-72}}
+  ]
+}

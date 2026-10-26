@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "title": "Happy Baby",
+  "view": "side",
+  "highlight": ["hipL","hipR"],
+  "frames": [
+    {"duration":1500,"label":"Knees up over the chest","pose":{"root":{"x":52,"y":87},"torso":-90,"head":-88,"upperArmL":142,"forearmL":145,"upperArmR":141,"forearmR":143,"thighL":215,"shinL":175,"footL":265,"thighR":215,"shinR":175,"footR":265}},
+    {"duration":3000,"label":"Draw the knees toward the armpits","pose":{"torso":-90,"head":-88,"upperArmL":119,"forearmL":192,"upperArmR":118,"forearmR":188,"thighL":235,"shinL":200,"footL":290,"thighR":235,"shinR":200,"footR":290}},
+    {"duration":1800,"label":"Ease off","pose":{"torso":-90,"head":-88,"upperArmL":142,"forearmL":145,"upperArmR":141,"forearmR":143,"thighL":215,"shinL":175,"footL":265,"thighR":215,"shinR":175,"footR":265}}
+  ]
+}

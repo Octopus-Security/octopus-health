@@ -40,8 +40,9 @@
     }
     items.forEach(function (e) {
       var li = document.createElement('li');
-      var a = document.createElement('a');
-      a.href = '/library?ex=' + encodeURIComponent(e.id);
+      var a = document.createElement(window.StretchDemo ? 'button' : 'a');
+      if (window.StretchDemo) { a.type = 'button'; window.StretchDemo.link(a, e); }
+      else a.href = '/library?ex=' + encodeURIComponent(e.id);
       a.textContent = e.name;
       li.appendChild(a);
       var m = fmt(e);

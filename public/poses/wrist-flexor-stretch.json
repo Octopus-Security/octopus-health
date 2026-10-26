@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "title": "Wrist Flexor Stretch",
+  "view": "side",
+  "anchor": {"joint":"ankleL","x":50,"y":90},
+  "highlight": ["hand","elbowL"],
+  "frames": [
+    {"duration":1400,"label":"Arms down","pose":{"torso":180,"head":180,"upperArmL":0,"forearmL":0,"upperArmR":0,"forearmR":0,"thighL":0,"shinL":0,"footL":90,"thighR":0,"shinR":0,"footR":90}},
+    {"duration":2000,"label":"Reach one arm straight out","pose":{"torso":180,"head":180,"upperArmL":88,"forearmL":88,"upperArmR":81,"forearmR":84,"thighL":0,"shinL":0,"footL":90,"thighR":0,"shinR":0,"footR":90}},
+    {"duration":2600,"label":"Pull the fingers back with the other hand","pose":{"torso":180,"head":180,"upperArmL":88,"forearmL":92,"upperArmR":83,"forearmR":86,"thighL":0,"shinL":0,"footL":90,"thighR":0,"shinR":0,"footR":90}}
+  ]
+}

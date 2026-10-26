@@ -1,3 +1,7 @@
+/* ── Spacing scale ─────────────────────────────────────────── */
+/* One vertical rhythm: a bar or button row has the SAME gap above and below it. */
+:root { --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --tap: 44px; }
+
 /* ── Reset ─────────────────────────────────────────────────── */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
