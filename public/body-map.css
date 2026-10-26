@@ -6,12 +6,12 @@
   --bm-focus: #7fcbff;
 }
 .bm { max-width: 1200px; }
-.bm-head h2 { margin-bottom: 8px; }
-.bm-lede { color: var(--bm-muted); margin-bottom: 6px; }
-.bm-links { font-size: 0.85rem; margin-bottom: 14px; }
+.bm-head h2 { margin-bottom: var(--space-2); }
+.bm-lede { color: var(--bm-muted); margin-bottom: var(--space-2); }
+.bm-links { font-size: 0.85rem; margin-bottom: var(--space-4); }
 .bm-layout { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 20px; align-items: start; }
 .bm-figure { margin-bottom: 0; }
-.bm-toggle { display: flex; gap: 8px; justify-content: center; margin-bottom: 12px; }
+.bm-toggle { display: flex; gap: 8px; justify-content: center; margin-bottom: var(--space-3); }
 .bm-view-btn { padding: 6px 18px; background: transparent; color: var(--bm-muted); border: 1px solid var(--bm-border); }
 .bm-view-btn[aria-pressed="true"] { color: var(--bm-accent); border-color: var(--bm-accent); }
 .bm-svg { display: block; width: 100%; max-width: 360px; max-height: 70vh; margin: 0 auto; }
@@ -25,24 +25,34 @@
 .bm-dot:hover circle, .bm-dot:focus circle { fill: var(--bm-joint-line); }
 .bm-dot[aria-pressed="true"] circle { fill: var(--bm-joint-line); stroke: var(--bm-text); }
 .bm-part.bm-joint:not(.bm-dot) polygon { stroke: var(--bm-joint-line); stroke-width: 5; }
-.bm-extra h3 { font-size: 0.8rem; color: var(--bm-muted); margin: 14px 0 6px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
-.bm-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.bm-extra h3 { font-size: 0.8rem; color: var(--bm-muted); margin: var(--space-4) 0 var(--space-2); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+.bm-chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
 .bm-chip { padding: 5px 12px; font-size: 0.78rem; background: transparent; color: var(--bm-text); border: 1px solid var(--bm-border); border-radius: 16px; }
 .bm-chip[aria-pressed="true"] { color: var(--bm-accent); border-color: var(--bm-accent); }
 .bm button:focus-visible, .bm a:focus-visible { outline: 2px solid var(--bm-focus); outline-offset: 2px; }
 .bm-panel { position: sticky; top: 12px; margin-bottom: 0; max-height: calc(100vh - 24px); overflow-y: auto; }
-.bm-panel h3 { margin-bottom: 4px; }
-.bm-panel h4 { margin: 16px 0 6px; font-size: 0.85rem; }
+.bm-panel h3 { margin-bottom: var(--space-1); }
+.bm-panel h4 { margin: var(--space-4) 0 var(--space-2); font-size: 0.85rem; }
 .bm-sub, .bm-count { color: var(--bm-muted); font-size: 0.8rem; font-weight: 400; }
 .bm-list { list-style: none; padding: 0; }
 .bm-list li { padding: 6px 0; border-bottom: 1px solid var(--bm-border); font-size: 0.88rem; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 8px; align-items: center; }
 .bm-list li .ds-toggle { grid-column: 2; grid-row: 1 / span 2; }
 .bm-list li.bm-none { display: block; }
-.bm-list a { color: var(--bm-accent); text-decoration: none; }
-.bm-list a:hover { text-decoration: underline; }
+.bm-list a, .bm-list .demo-link { color: var(--bm-accent); text-decoration: none; }
+.bm-list .demo-link { background: none; border: none; padding: 0; font: inherit; font-weight: 400; text-align: left; cursor: pointer; transform: none; display: inline; }
+.bm-list a:hover, .bm-list .demo-link:hover { text-decoration: underline; background: none; transform: none; }
 .bm-meta { display: block; color: var(--bm-muted); font-size: 0.74rem; }
 .bm-none { color: var(--bm-muted); font-size: 0.82rem; padding: 4px 0; }
 .bm-close { display: none; float: right; padding: 4px 12px; font-size: 0.8rem; }
+
+/* Tap targets: 44px on phones and touch screens. */
+@media (max-width: 800px), (pointer: coarse) {
+  .bm-view-btn, .bm-chip, .bm-close, .bm-list .demo-link { min-height: var(--tap); }
+  .bm-view-btn { padding: 6px 22px; }
+  .bm-chip { display: inline-flex; align-items: center; }
+  .bm-list .demo-link { display: inline-flex; align-items: center; }
+  .bm-list .ds-toggle { min-height: var(--tap); }
+}
 
 /* Phones: the panel becomes a bottom sheet and the figure keeps the whole width. */
 @media (max-width: 800px) {
