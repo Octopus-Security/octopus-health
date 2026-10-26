@@ -95,6 +95,29 @@ test('validator rejects a knee bent backwards', () => {
 test('validator rejects an elbow bent backwards', () => {
   assert.ok(SF.validate(anim({}, { upperArmL: 0, forearmL: -60 })).some((e) => /elbow.*backwards/.test(e)));
 });
+test('a knee may hyperextend by at most ~5 degrees, an elbow likewise', () => {
+  assert.deepStrictEqual(SF.validate(anim({}, { thighL: -3, shinL: 0, upperArmL: 90, forearmL: 87 })), []);
+  assert.ok(SF.validate(anim({}, { thighL: -8, shinL: 0 })).some((e) => /knee.*backwards/.test(e)));
+  assert.ok(SF.validate(anim({}, { upperArmL: 90, forearmL: 82 })).some((e) => /elbow.*backwards/.test(e)));
+});
+test('the far (R) limbs obey the hinge rule too', () => {
+  assert.ok(SF.validate(anim({}, { thighR: -20, shinR: 30 })).some((e) => /kneeR.*backwards/.test(e)));
+  assert.ok(SF.validate(anim({}, { forearmR: -60 })).some((e) => /elbowR.*backwards/.test(e)));
+});
+test('pinned limbs are solved with the anatomical bend, even when the first keyframe is straight', () => {
+  // A straight pinned leg that then folds: the IK used to copy the sign of (shin - thigh) from the first key, and
+  // 0 read as the ARM sign, so the knee was solved inside out. Same for an elbow starting straight.
+  const a = { duration: 500, pins: ['ankleR', 'handR'], anchor: { joint: 'ankleL', x: 50, y: 90 }, pose: { ...STAND } };
+  const b = { duration: 500, pins: ['ankleR', 'handR'], anchor: { joint: 'ankleL', x: 50, y: 90 },
+    pose: { ...STAND, torso: 140, head: 150, thighL: 85, shinL: -30, thighR: 85, shinR: -30, upperArmR: 40, forearmR: 100 } };
+  const frames = SF.resolveFrames({ version: 2, title: 't', frames: [a, b] });
+  for (let s = 1; s < 10; s++) {
+    const q = SF.between(frames[0], frames[1], s / 10, 'side');
+    const knee = ((q.thighR - q.shinR + 540) % 360) - 180, elbow = ((q.forearmR - q.upperArmR + 540) % 360) - 180;
+    assert.ok(knee > -5, `kneeR bent backwards (${knee.toFixed(0)}°) at t=${s / 10}`);
+    assert.ok(elbow > -5, `elbowR bent backwards (${elbow.toFixed(0)}°) at t=${s / 10}`);
+  }
+});
 test('validator rejects a figure that does not move', () => {
   assert.ok(SF.validate(anim({}, { forearmL: 3 })).some((e) => /does not move/.test(e)));
 });
@@ -118,6 +141,79 @@ test('validator rejects a floating figure unless told it is airborne', () => {
 });
 test('validator rejects an angle written discontinuously (a spin)', () => {
   assert.ok(SF.validate(anim({ upperArmL: 170, forearmL: 170 }, { upperArmL: -170, forearmL: -170 })).some((e) => /swings/.test(e)));
+});
+
+// ── tweening, holds and static poses ────────────────────────────────────────
+test('moves take the shortest way round and never unwind a full turn', () => {
+  const d = anim({ upperArmL: 170, forearmL: 175 }, { upperArmL: 190, forearmL: 200 });
+  const fr = SF.resolveFrames(d);
+  const q = SF.between(fr[0], fr[1], 0.5, 'side');
+  assert.strictEqual(q.upperArmL, 180);
+  // last frame back to the first: 350 → 10 goes through 360, not back through 180
+  const loop = SF.resolveFrames(anim({ upperArmL: 350 }, { upperArmL: 355 }));
+  loop[1].pose.upperArmL = 355; loop[0].pose.upperArmL = 10;
+  const w = SF.between(loop[1], SF.nextOf(loop, 1), 0.5, 'side');
+  assert.ok(Math.abs(w.upperArmL - 362.5) < 1e-9, 'wrap should be 355 -> 370, got ' + w.upperArmL);
+});
+
+test('playback is time-based: a key pose is held, then eased, and the loop closes smoothly', () => {
+  const d = anim({}, { upperArmL: 90, forearmL: 90 });
+  d.frames[0].hold = 200; d.frames[1].hold = 200;
+  const fr = SF.resolveFrames(d), tl = SF.timeline(fr, true);
+  assert.strictEqual(tl.total, 200 + 500 + 200 + 500);
+  const at = (ms) => SF.sampleAt(fr, tl, ms, 'side', true).pose.upperArmL;
+  assert.strictEqual(at(0), 0);
+  assert.strictEqual(at(199), 0);                         // held
+  assert.ok(Math.abs(at(200 + 250) - 45) < 1e-9);         // ease-in-out: half way at half time
+  assert.ok(at(200 + 50) < 90 * 0.1 / 1, 'eases in (slow start)');
+  assert.ok(Math.abs(at(200 + 500 + 100) - 90) < 1e-9);   // held at the far key
+  assert.ok(Math.abs(at(1400 - 1) - 0) < 0.01);            // arrives back at frame 0...
+  assert.strictEqual(at(1400), at(0));                     // ...and the cycle wraps exactly
+  // velocity is zero at the seam: both sides of the wrap are inside holds
+  assert.strictEqual(at(1400 + 100), 0);
+  // monotone through the move, no stepping: 100 samples, no jump above 3° (a stepped 4-frame tween would jump 22°)
+  let prev = at(200);
+  for (let ms = 205; ms <= 700; ms += 5) { const v = at(ms); assert.ok(v >= prev && v - prev < 3, `jump at ${ms}`); prev = v; }
+});
+
+test('a hold:0 key is a pass-through: the neighbouring moves do not stop there', () => {
+  const d = anim({}, { upperArmL: 90 });
+  d.frames[1].hold = 0; d.frames[0].hold = 0;
+  d.frames.push({ duration: 500, hold: 0, pose: { upperArmL: 180 } });
+  const fr = SF.resolveFrames(d), tl = SF.timeline(fr, true);
+  assert.strictEqual(tl.segs[0].ease, 'linear');
+  const s1 = SF.sampleAt(fr, tl, 499, 'side', true).pose.upperArmL, s2 = SF.sampleAt(fr, tl, 501, 'side', true).pose.upperArmL;
+  assert.ok(s2 - s1 > 0.1, 'still moving through the key');
+});
+
+const staticKeys = files.filter((f) => load(f.slice(0, -5)).static === true).map((f) => f.slice(0, -5));
+test('static poses: one frame, exempt from must-move, rendered without distortion', () => {
+  assert.ok(staticKeys.length >= 20, 'holds are marked static');
+  const one = (extra) => ({ version: 2, title: 't', static: true, anchor: { joint: 'ankleL', x: 50, y: 90 }, frames: [{ pose: { ...STAND, ...extra } }] });
+  assert.deepStrictEqual(SF.validate(one({})), []);                                             // positive control: no motion needed
+  assert.ok(SF.validate({ ...one({}), static: false }).length > 0);                           // the same file without the flag fails
+  assert.ok(SF.validate({ ...one({}), frames: [...one({}).frames, ...one({}).frames] }).some((e) => /exactly one frame/.test(e)));
+  for (const k of staticKeys) {
+    const d = load(k);
+    assert.deepStrictEqual(SF.validate(d), [], k);
+    assert.strictEqual(d.frames.length, 1, k + ' has more than one frame');
+    const fr = SF.resolveFrames(d), tl = SF.timeline(fr, true);
+    const first = SF.sampleAt(fr, tl, 0, d.view || 'side', true).pose;
+    for (const ms of [137, 900, 2500]) assert.deepStrictEqual(SF.sampleAt(fr, tl, ms, d.view || 'side', true).pose, first, k + ' limbs must not move');
+  }
+});
+
+test('genuine holds are static and genuine movers are not', () => {
+  for (const k of ['plank', 'side-plank', 'dead-hang', 'hollow-body', 'deep-squat-hold', 'couch-stretch', 'quad-stretch', 'pigeon', 'childs-pose', 'neck-isometric']) assert.ok(staticKeys.includes(k), k + ' is a hold');
+  for (const k of ['squat', 'lunge', 'push-up', 'roundhouse', 'jab-cross', 'burpee', 'pull-up', 'cat-cow']) assert.ok(!staticKeys.includes(k), k + ' moves');
+});
+
+test('every non-static pose genuinely moves (no pose is "static" by accident)', () => {
+  for (const f of files) {
+    const d = JSON.parse(fs.readFileSync(path.join(POSES, f), 'utf8'));
+    if (d.static) continue;
+    assert.ok(d.frames.length >= 2, f);
+  }
 });
 
 // ── exercise → pose ──────────────────────────────────────────────────────────

@@ -7,6 +7,9 @@
 //       a contact sheet: every keyframe of every pose plus the midpoint between
 //       keyframes, as static SVG. Look at it — the validator proves the figure is
 //       connected and inside its joint limits, not that it looks like the exercise.
+//       --size N       cell width in px (default 92; use 260+ to inspect a frame)
+//       --moments N    also N evenly spaced moments of the REAL playback (hold + easing), so
+//                      frames in the middle of a tween can be inspected
 //       firefox --headless --window-size 1600,4000 --screenshot out.png file://$PWD/out.html
 import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -21,6 +24,8 @@ const dir = join(here, '..', 'public', 'poses');
 const args = process.argv.slice(2);
 const sheetAt = args.indexOf('--sheet');
 const sheet = sheetAt >= 0 ? args.splice(sheetAt, 2)[1] : null;
+const flag = (name, dflt) => { const i = args.indexOf(name); return i >= 0 ? Number(args.splice(i, 2)[1]) : dflt; };
+const size = flag('--size', 92), moments = flag('--moments', 0);
 const keys = args.length ? args : readdirSync(dir).filter((f) => f.endsWith('.json')).map((f) => f.slice(0, -5)).sort();
 
 let bad = 0;
@@ -35,9 +40,16 @@ for (const key of keys) {
     const imgs = [];
     frames.forEach((fr, i) => {
       imgs.push(`<figure>${SF.svgFor(data, i)}<figcaption>${i}${fr.label ? ' ' + fr.label : ''}</figcaption></figure>`);
-      imgs.push(`<figure class="mid">${SF.svgFor(data, i, 0.5)}<figcaption>${i}½</figcaption></figure>`);
+      if (!data.static) imgs.push(`<figure class="mid">${SF.svgFor(data, i, 0.5)}<figcaption>${i}½</figcaption></figure>`);
     });
-    cells.push(`<section${errs.length ? ' class="bad"' : ''}><h2>${key} — ${data.title || ''} <small>${data.view || 'side'}${errs.length ? ' · ' + errs.length + ' problem(s)' : ''}</small></h2><div>${imgs.join('')}</div></section>`);
+    if (moments && !data.static) {
+      const total = SF.duration(data);
+      for (let m = 0; m < moments; m++) {
+        const ms = Math.round((m + 0.5) * total / moments);
+        imgs.push(`<figure class="mid">${SF.svgAt(data, ms)}<figcaption>t=${ms}ms</figcaption></figure>`);
+      }
+    }
+    cells.push(`<section${errs.length ? ' class="bad"' : ''}><h2>${key} — ${data.title || ''} <small>${data.view || 'side'}${data.static ? ' · static' : ''}${errs.length ? ' · ' + errs.length + ' problem(s)' : ''}</small></h2><div>${imgs.join('')}</div></section>`);
   }
 }
 
@@ -48,7 +60,7 @@ section{display:inline-block;vertical-align:top;margin:0 14px 14px 0;padding:6px
 section.bad{border-color:#e74c3c}
 h2{font-size:13px;margin:0 0 4px}small{color:#888}
 figure{display:inline-block;margin:0 2px;text-align:center}figure.mid{opacity:.55}
-svg{width:92px;height:107px;background:#1e1e28;border-radius:4px}figcaption{font-size:10px;color:#888}
+svg{width:${size}px;height:${Math.round(size * 1.163)}px;background:#1e1e28;border-radius:4px}figcaption{font-size:10px;color:#888}
 </style>${cells.join('\n')}`);
   console.log(`wrote ${sheet} (${cells.length} poses)`);
 }
