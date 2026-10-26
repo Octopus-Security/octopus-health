@@ -90,7 +90,11 @@
                                 | <strong>Current:</strong> <%= goal.currentValue %><%= goal.unit ? ' ' + goal.unit : '' %>
                             <% } %>
                             <% if (goal.deadline) { %>
-                                | <strong>Deadline:</strong> <%= new Date(goal.deadline).toLocaleDateString() %>
+                                <%# DATEONLY is a plain YYYY-MM-DD; new Date() would read it as UTC midnight and show the day before in ET %>
+                                | <strong>Deadline:</strong> <%= goal.deadline %>
+                                <% if (!goal.completed && goal.deadline < todayET) { %>
+                                    <span style="margin-left:6px;padding:1px 8px;border-radius:10px;background:#3a2a1a;color:#e0a060;font-size:0.85em">Deadline passed: mark it done or delete it</span>
+                                <% } %>
                             <% } %>
                         </div>
                         <% if (goal.progression) { %>
