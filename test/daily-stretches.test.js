@@ -392,3 +392,35 @@ test('the stretch page renders the daily section with only stretches in its pick
   assert.deepStrictEqual(picked.map(p => p.id), [1, 3]);
   assert.ok(html.includes('id="ds-root"') && html.includes('/js/daily-stretches.js'));
 });
+
+test('the demo route returns the how-to by id or by name, and is login-gated', { skip }, async () => {
+  const { username: u, db } = await fresh('demo');
+  const id = await idOf(db, 'Half-Kneeling Hip Flexor Stretch');
+  const byId = await web(u, 'GET', `/stretch/api/demo?id=${id}&name=x`);
+  assert.strictEqual(byId.body.exercise.name, 'Half-Kneeling Hip Flexor Stretch');
+  assert.strictEqual(byId.body.exercise.id, id);
+  const byName = await web(u, 'GET', '/stretch/api/demo?name=' + encodeURIComponent('half-kneeling hip flexor stretch'));
+  assert.strictEqual(byName.body.exercise.id, id);
+  const none = await web(u, 'GET', '/stretch/api/demo?name=nothing-like-this');
+  assert.strictEqual(none.body.exercise, null);
+  assert.strictEqual((await web(null, 'GET', '/stretch/api/demo?id=' + id)).status, 302);
+});
+
+test('the demo sheet is wired into /stretch and /body, and daily names open it', () => {
+  const read = (...p) => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
+  for (const v of ['views/stretch.ejs', 'views/body.ejs']) {
+    const html = read(v);
+    assert.match(html, /stretch-demo\.css/, v);
+    assert.match(html, /js\/stretch-demo\.js/, v);
+  }
+  assert.match(read('views/body.ejs'), /stick-figure\.js[\s\S]*pose-map\.js/);
+  assert.match(read('public/js/daily-stretches.js'), /StretchDemo\.link/);
+  assert.match(read('public/js/body-map.js'), /StretchDemo\.link/);
+});
+
+test('the head row of the daily card has the same gap below it as inside it', () => {
+  const css = fs.readFileSync(path.join(__dirname, '..', 'public', 'daily-stretches.css'), 'utf8');
+  const head = css.match(/\.ds-head \{([^}]*)\}/)[1];
+  assert.match(head, /gap: var\(--space-3\)/);
+  assert.match(head, /margin-bottom: var\(--space-3\)/);
+});
