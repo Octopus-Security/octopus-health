@@ -1,0 +1,17 @@
+{
+ "version": 2,
+ "title": "Jab – Cross – Low Kick",
+ "view": "side",
+ "highlight": [],
+ "frames": [
+  {"duration":400,"label":"Guard","anchor":{"joint":"ankleL","x":52,"y":90},"pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"thighL":12,"shinL":-4,"footL":90,"upperArmR":20,"forearmR":165,"thighR":-22,"shinR":-20,"footR":70}},
+  {"duration":220,"label":"Jab","highlight":["shoulderL","elbowL"],"anchor":{"joint":"ankleL","x":52,"y":90},"pose":{"torso":172,"head":172,"upperArmL":90,"forearmL":92,"thighL":12,"shinL":-4,"footL":90,"upperArmR":20,"forearmR":165,"thighR":-22,"shinR":-20,"footR":70}},
+  {"duration":250,"label":"Back to guard","hold":0,"highlight":[],"anchor":{"joint":"ankleL","x":52,"y":90},"pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"thighL":12,"shinL":-4,"footL":90,"upperArmR":20,"forearmR":165,"thighR":-22,"shinR":-20,"footR":70}},
+  {"duration":260,"label":"Cross","highlight":["shoulderR","elbowR"],"anchor":{"joint":"ankleL","x":52,"y":90},"pose":{"torso":165,"head":168,"upperArmL":30,"forearmL":160,"thighL":12,"shinL":-4,"footL":90,"upperArmR":88,"forearmR":90,"thighR":-22,"shinR":-20,"footR":70}},
+  {"duration":260,"label":"Rear hand returns, hips load","hold":0,"highlight":[],"anchor":{"joint":"ankleL","x":52,"y":90},"pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"thighL":12,"shinL":-4,"footL":90,"upperArmR":20,"forearmR":165,"thighR":-22,"shinR":-20,"footR":70}},
+  {"duration":240,"label":"Pivot and chamber","hold":0,"highlight":["hipR"],"anchor":{"joint":"ankleL","x":52,"y":90},"pose":{"torso":184,"head":178,"upperArmL":30,"forearmL":160,"thighL":12,"shinL":-4,"footL":90,"upperArmR":-10,"forearmR":20,"thighR":55,"shinR":-10,"footR":110}},
+  {"duration":260,"label":"Shin into the thigh (low kick)","highlight":["hipR","kneeR"],"anchor":{"joint":"ankleL","x":52,"y":90},"pose":{"torso":198,"head":188,"upperArmL":30,"forearmL":160,"thighL":12,"shinL":-4,"footL":90,"upperArmR":-25,"forearmR":5,"thighR":78,"shinR":72,"footR":150}},
+  {"duration":300,"label":"Fold back","hold":0,"highlight":[],"anchor":{"joint":"ankleL","x":52,"y":90},"pose":{"torso":184,"head":178,"upperArmL":30,"forearmL":160,"thighL":12,"shinL":-4,"footL":90,"upperArmR":-10,"forearmR":20,"thighR":40,"shinR":-30,"footR":90}},
+  {"duration":400,"label":"Guard","anchor":{"joint":"ankleL","x":52,"y":90},"pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"thighL":12,"shinL":-4,"footL":90,"upperArmR":20,"forearmR":165,"thighR":-22,"shinR":-20,"footR":70}}
+ ]
+}

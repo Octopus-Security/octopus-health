@@ -1,0 +1,11 @@
+{
+ "version": 2,
+ "title": "Dumbbell Tricep Kickback",
+ "view": "side",
+ "hold": "dumbbell",
+ "highlight": ["elbowL"],
+ "frames": [
+  {"duration":800,"label":"Elbow high, forearm hanging","anchor":{"joint":"ankleL","x":56,"y":90},"pose":{"torso":115,"head":110,"upperArmL":-95,"forearmL":0,"thighL":20,"shinL":-10,"footL":90,"upperArmR":-95,"forearmR":0,"thighR":20,"shinR":-10,"footR":90}},
+  {"duration":700,"label":"Extend back to lockout","hold":400,"anchor":{"joint":"ankleL","x":56,"y":90},"pose":{"torso":115,"head":110,"upperArmL":-95,"forearmL":-95,"thighL":20,"shinL":-10,"footL":90,"upperArmR":-95,"forearmR":-95,"thighR":20,"shinR":-10,"footR":90}}
+ ]
+}

@@ -46,6 +46,15 @@
  * joint: positive rounds the back (cat, hollow body), negative arches it (cow,
  * cobra, bridge). Side view only.
  *
+ * Optional "depth" {segment: 0.1…1} foreshortens a segment that points toward or
+ * away from the viewer (an arm swung across the body seen from above, a forearm
+ * rotating about the upper arm). It changes only the drawn length; joints are
+ * still built from their parents, and pins assume full length, so do not pin a
+ * limb whose depth is below 1.
+ *
+ * Optional "shrug" (0…5, default 0) lifts both shoulders that far toward the
+ * ears along the torso, for shrugs. The neck and head do not move.
+ *
  * Frame 0 must carry every angle; later frames inherit what they omit. validate()
  * is the rule book; test/stick-figure.test.js runs it over every pose file.
  */
@@ -94,9 +103,14 @@
 
   // Forward kinematics, always facing right (mirroring happens when drawing).
   // The only place a joint position is produced, so every bone is exactly LEN.
+  // A segment's drawn length: LEN, foreshortened by pose.depth[segment] (0.1…1) when the
+  // segment points toward or away from the viewer. Joints are still built from their parents.
+  function len(pose, seg, base) { var d = pose.depth && pose.depth[seg]; return typeof d === 'number' ? LEN[base] * d : LEN[base]; }
+  var DEPTH_KEYS = ['torso', 'upperArmL', 'forearmL', 'upperArmR', 'forearmR', 'thighL', 'shinL', 'footL', 'thighR', 'shinR', 'footR'];
+
   function solve(pose, view) {
     var hip = { x: pose.root.x, y: pose.root.y };
-    var neck = step(hip, pose.torso, LEN.torso);
+    var neck = step(hip, pose.torso, len(pose, 'torso', 'torso'));
     var j = { hip: hip, neck: neck, head: step(neck, pose.head, LEN.head) };
     var sL = neck, sR = neck, hL = hip, hR = hip;
     if (view === 'front') {
@@ -106,15 +120,19 @@
       hL = { x: hip.x - px * HIP_HALF, y: hip.y - py * HIP_HALF };
       hR = { x: hip.x + px * HIP_HALF, y: hip.y + py * HIP_HALF };
     }
+    if (pose.shrug) {   // shoulders lifted toward the ears, along the torso; the neck and head stay put
+      sL = step(sL, pose.torso, pose.shrug);
+      sR = step(sR, pose.torso, pose.shrug);
+    }
     ['L', 'R'].forEach(function (s) {
       var sh = s === 'L' ? sL : sR, hp = s === 'L' ? hL : hR;
       j['shoulder' + s] = sh;
-      j['elbow' + s] = step(sh, pose['upperArm' + s], LEN.upperArm);
-      j['hand' + s] = step(j['elbow' + s], pose['forearm' + s], LEN.forearm);
+      j['elbow' + s] = step(sh, pose['upperArm' + s], len(pose, 'upperArm' + s, 'upperArm'));
+      j['hand' + s] = step(j['elbow' + s], pose['forearm' + s], len(pose, 'forearm' + s, 'forearm'));
       j['hip' + s] = hp;
-      j['knee' + s] = step(hp, pose['thigh' + s], LEN.thigh);
-      j['ankle' + s] = step(j['knee' + s], pose['shin' + s], LEN.shin);
-      j['toe' + s] = step(j['ankle' + s], pose['foot' + s], LEN.foot);
+      j['knee' + s] = step(hp, pose['thigh' + s], len(pose, 'thigh' + s, 'thigh'));
+      j['ankle' + s] = step(j['knee' + s], pose['shin' + s], len(pose, 'shin' + s, 'shin'));
+      j['toe' + s] = step(j['ankle' + s], pose['foot' + s], len(pose, 'foot' + s, 'foot'));
     });
     return j;
   }
@@ -135,6 +153,11 @@
       if (prev) for (var k in prev.pose) p[k] = prev.pose[k];
       for (var j in src) p[j] = src[j];
       if (typeof p.arch !== 'number') p.arch = 0;
+      if (typeof p.shrug !== 'number') p.shrug = 0;
+      var dp = {}, had = false;
+      if (prev && prev.pose.depth) for (var dk in prev.pose.depth) { dp[dk] = prev.pose.depth[dk]; had = true; }
+      if (src.depth) for (var dk2 in src.depth) { dp[dk2] = src.depth[dk2]; had = true; }
+      if (had) p.depth = dp; else delete p.depth;
       var anchor = fr.anchor || (src.root ? null : (prev ? prev.anchor : data.anchor || null));
       if (src.root) anchor = null;
       p.root = anchor ? rootFor(p, anchor, view) : { x: p.root.x, y: p.root.y };
@@ -169,6 +192,15 @@
     var r = {};
     ANGLES.forEach(function (k) { r[k] = a.pose[k] + turn(a.pose[k], b.pose[k]) * t; });   // shortest way round
     r.arch = lerp(a.pose.arch, b.pose.arch, t);
+    r.shrug = lerp(a.pose.shrug || 0, b.pose.shrug || 0, t);
+    if (a.pose.depth || b.pose.depth) {
+      r.depth = {};
+      DEPTH_KEYS.forEach(function (k) {
+        var da = a.pose.depth && typeof a.pose.depth[k] === 'number' ? a.pose.depth[k] : 1;
+        var db = b.pose.depth && typeof b.pose.depth[k] === 'number' ? b.pose.depth[k] : 1;
+        if (da !== 1 || db !== 1) r.depth[k] = lerp(da, db, t);
+      });
+    }
     var plain = { x: lerp(a.pose.root.x, b.pose.root.x, t), y: lerp(a.pose.root.y, b.pose.root.y, t) };
     var ra = a.anchor ? rootFor(r, a.anchor, view) : plain;
     var rb = b.anchor ? rootFor(r, b.anchor, view) : plain;
@@ -293,6 +325,15 @@
     data.frames.forEach(function (fr, i) {
       Object.keys(fr.pose || {}).forEach(function (k) {
         if (k === 'arch') { if (!(Math.abs(fr.pose.arch) <= 45)) errs.push('frame ' + i + ': arch must be −45…45'); }
+        else if (k === 'depth') {
+          var dv = fr.pose.depth;
+          if (!dv || typeof dv !== 'object') errs.push('frame ' + i + ': depth must be an object of segment → 0.1…1');
+          else Object.keys(dv).forEach(function (sg) {
+            if (DEPTH_KEYS.indexOf(sg) < 0) errs.push('frame ' + i + ': depth "' + sg + '" is not a segment (' + DEPTH_KEYS.join(', ') + ')');
+            else if (!(dv[sg] >= 0.1 && dv[sg] <= 1)) errs.push('frame ' + i + ': depth ' + sg + ' must be 0.1…1');
+          });
+        }
+        else if (k === 'shrug') { if (!(fr.pose.shrug >= 0 && fr.pose.shrug <= 5)) errs.push('frame ' + i + ': shrug must be 0…5'); }
         else if (k !== 'root' && ANGLES.indexOf(k) < 0) errs.push('frame ' + i + ': unknown pose key "' + k + '"');
         else if (k !== 'root' && (typeof fr.pose[k] !== 'number' || !isFinite(fr.pose[k]))) errs.push('frame ' + i + ': ' + k + ' is not a number');
       });
@@ -323,7 +364,11 @@
         if (d > 180) errs.push('frame ' + i + '→' + ni + ': ' + k + ' swings ' + d.toFixed(0) + '° — write angles continuously (190, not -170); a move is always played the short way round');
         moved = Math.max(moved, d);
       });
-      moved = Math.max(moved, Math.hypot(nx.pose.root.x - p.root.x, nx.pose.root.y - p.root.y) * 4);
+      moved = Math.max(moved, Math.hypot(nx.pose.root.x - p.root.x, nx.pose.root.y - p.root.y) * 4, Math.abs((nx.pose.shrug || 0) - (p.shrug || 0)) * 4);
+      DEPTH_KEYS.forEach(function (k) {
+        var a = p.depth && typeof p.depth[k] === 'number' ? p.depth[k] : 1, b = nx.pose.depth && typeof nx.pose.depth[k] === 'number' ? nx.pose.depth[k] : 1;
+        moved = Math.max(moved, Math.abs(a - b) * 40);
+      });
 
       // Check the in-betweens as well as the keyframes: a pose can be legal at
       // both ends and still pass through the floor on the way. Floor checks use
@@ -394,7 +439,8 @@
     var c = pal.prop, mid = { x: (jt.handL.x + jt.handR.x) / 2, y: (jt.handL.y + jt.handR.y) / 2 };
     switch (hold) {
       case 'dumbbell':
-        return ['L', 'R'].map(function (s) {
+      case 'dumbbellL':   // one hand only (single-arm rows): the near hand
+        return (hold === 'dumbbellL' ? ['L'] : ['L', 'R']).map(function (s) {
           var h = jt['hand' + s];
           return view === 'front'
             ? '<rect x="' + f(h.x - 5) + '" y="' + f(h.y - 1.5) + '" width="10" height="3" rx="1" fill="' + c + '"/>'
@@ -406,7 +452,11 @@
             '<rect x="' + f(mid.x - 30) + '" y="' + f(mid.y - 7) + '" width="4" height="14" rx="1" fill="' + c + '"/>' +
             '<rect x="' + f(mid.x + 26) + '" y="' + f(mid.y - 7) + '" width="4" height="14" rx="1" fill="' + c + '"/>'
           : circ(mid, 8, 'none', ' stroke="' + c + '" stroke-width="3"') + circ(mid, 1.6, c);
-      case 'kettlebell': return circ({ x: mid.x, y: mid.y + 4 }, 4.2, c) + circ(mid, 2, 'none', ' stroke="' + c + '" stroke-width="1.5"');
+      case 'kettlebell':
+      case 'kettlebellL': {   // kettlebellL: in the near hand only (Turkish get-up)
+        var at = hold === 'kettlebellL' ? jt.handL : mid;
+        return circ({ x: at.x, y: at.y + 4 }, 4.2, c) + circ(at, 2, 'none', ' stroke="' + c + '" stroke-width="1.5"');
+      }
       case 'ball':       return circ(mid, 6, c, ' opacity="0.9"');
       default:           return '';
     }

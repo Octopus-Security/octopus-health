@@ -1,0 +1,12 @@
+{
+ "version": 2,
+ "title": "Seated Spine Rotation",
+ "view": "side",
+ "highlight": ["spine"],
+ "frames": [
+  {"duration":900,"label":"Seated tall, hands behind the head","anchor":{"joint":"hip","x":46,"y":77.1},"pose":{"torso":180,"head":180,"upperArmL":180,"forearmL":335,"thighL":78,"shinL":-82,"footL":-10,"upperArmR":180,"forearmR":335,"thighR":78,"shinR":-82,"footR":-10}},
+  {"duration":1000,"label":"Rotate one way","hold":500,"anchor":{"joint":"hip","x":46,"y":77.1},"pose":{"torso":180,"head":180,"upperArmL":135,"forearmL":285,"thighL":78,"shinL":-82,"footL":-10,"upperArmR":225,"forearmR":345,"thighR":78,"shinR":-82,"footR":-10}},
+  {"duration":900,"label":"Back to centre","anchor":{"joint":"hip","x":46,"y":77.1},"pose":{"torso":180,"head":180,"upperArmL":180,"forearmL":335,"thighL":78,"shinL":-82,"footL":-10,"upperArmR":180,"forearmR":335,"thighR":78,"shinR":-82,"footR":-10}},
+  {"duration":1000,"label":"Rotate the other way","hold":500,"anchor":{"joint":"hip","x":46,"y":77.1},"pose":{"torso":180,"head":180,"upperArmL":225,"forearmL":345,"thighL":78,"shinL":-82,"footL":-10,"upperArmR":135,"forearmR":285,"thighR":78,"shinR":-82,"footR":-10}}
+ ]
+}

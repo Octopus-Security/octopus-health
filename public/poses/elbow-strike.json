@@ -1,3 +1,12 @@
 {
- "version": 2, "title": "Elbow Strike", "view": "side", "anchor": { "joint": "ankleL", "x": 56, "y": 90 }, "highlight": [ "shoulderR", "elbowR" ], "frames": [ { "duration": 450, "label": "Guard", "pose": { "torso": 172, "head": 172, "upperArmL": 30, "forearmL": 160, "upperArmR": 20, "forearmR": 165, "thighL": 12, "shinL": -4, "footL": 90, "thighR": -22, "shinR": -20, "footR": 70 } }, { "duration": 220, "label": "Load", "highlight": [ "shoulderR" ], "pose": { "torso": 174, "head": 174, "upperArmR": 50, "forearmR": 200 } }, { "duration": 240, "label": "Elbow across", "highlight": [ "shoulderR", "elbowR" ], "pose": { "torso": 164, "head": 168, "upperArmR": 92, "forearmR": 252 } }, { "duration": 450, "label": "Back to guard", "highlight": [], "pose": { "torso": 172, "head": 172, "upperArmL": 30, "forearmL": 160, "upperArmR": 20, "forearmR": 165, "thighL": 12, "shinL": -4, "footL": 90, "thighR": -22, "shinR": -20, "footR": 70 } } ]
+ "version": 2,
+ "title": "Elbow Strike",
+ "view": "side",
+ "highlight": ["shoulderL","elbowL"],
+ "frames": [
+  {"duration":450,"label":"Guard","anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"thighL":12,"shinL":-4,"footL":90,"upperArmR":20,"forearmR":165,"thighR":-22,"shinR":-20,"footR":70}},
+  {"duration":260,"label":"Load: elbow drawn back, hips turned","anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":178,"head":176,"upperArmL":-40,"forearmL":110,"thighL":12,"shinL":-4,"footL":90,"upperArmR":20,"forearmR":165,"thighR":-22,"shinR":-20,"footR":70}},
+  {"duration":240,"label":"Swing the elbow through at head height","hold":250,"anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":166,"head":170,"upperArmL":96,"forearmL":250,"thighL":12,"shinL":-4,"footL":90,"upperArmR":20,"forearmR":165,"thighR":-28,"shinR":-36,"footR":50}},
+  {"duration":450,"label":"Back to guard","anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"thighL":12,"shinL":-4,"footL":90,"upperArmR":20,"forearmR":165,"thighR":-22,"shinR":-20,"footR":70}}
+ ]
 }

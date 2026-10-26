@@ -2,13 +2,13 @@
  "version": 2,
  "title": "Assault bike",
  "view": "side",
- "props": [{"type": "box", "x": 31, "y": 69, "w": 15, "h": 4}, {"type": "bar", "x1": 38, "y1": 73, "x2": 38, "y2": 92}, {"type": "roller", "x": 56, "y": 78, "r": 9}, {"type": "bar", "x1": 62, "y1": 92, "x2": 69, "y2": 50}, {"type": "bar", "x1": 66, "y1": 48, "x2": 78, "y2": 48}],
+ "props": [{"type":"box","x":31,"y":69,"w":15,"h":4},{"type":"bar","x1":38,"y1":73,"x2":38,"y2":92},{"type":"roller","x":56,"y":78,"r":9},{"type":"bar","x1":62,"y1":92,"x2":69,"y2":50},{"type":"bar","x1":66,"y1":48,"x2":78,"y2":48}],
  "grounded": false,
- "highlight": ["kneeL", "kneeR", "elbowL", "elbowR"],
+ "highlight": ["kneeL","kneeR","elbowL","elbowR"],
  "frames": [
-  {"duration":250,"label":"Left pedal down, right arm pushes","ease":"linear","pose":{"torso":165,"head":170,"thighL":81.1,"shinL":-5.1,"footL":80,"upperArmL":24.8,"forearmL":84.4,"thighR":136.6,"shinR":12.3,"footR":80,"upperArmR":67.3,"forearmR":70.2,"root":{"x":38,"y":64}}},
+  {"duration":250,"label":"Left pedal down, right arm pushes","ease":"linear","pose":{"torso":165,"head":170,"thighL":81.1,"shinL":-5.1,"footL":80,"upperArmL":24.8,"forearmL":84.4,"thighR":136.6,"shinR":12.3,"footR":80,"upperArmR":67.3,"forearmR":70.2,"root":{"x":38,"y":64}},"hold":0},
   {"duration":250,"ease":"linear","pose":{"thighL":98.1,"shinL":-32.7,"upperArmL":43.9,"forearmL":81.1,"thighR":103.1,"shinR":22.1,"upperArmR":43.9,"forearmR":81.1,"root":{"x":38,"y":64}},"hold":0},
-  {"duration":250,"label":"Right pedal down, left arm pushes","ease":"linear","pose":{"thighL":136.6,"shinL":12.3,"upperArmL":67.3,"forearmL":70.2,"thighR":81.1,"shinR":-5.1,"upperArmR":24.8,"forearmR":84.4,"root":{"x":38,"y":64}}},
+  {"duration":250,"label":"Right pedal down, left arm pushes","ease":"linear","pose":{"thighL":136.6,"shinL":12.3,"upperArmL":67.3,"forearmL":70.2,"thighR":81.1,"shinR":-5.1,"upperArmR":24.8,"forearmR":84.4,"root":{"x":38,"y":64}},"hold":0},
   {"duration":250,"ease":"linear","pose":{"thighL":103.1,"shinL":22.1,"upperArmL":43.9,"forearmL":81.1,"thighR":98.1,"shinR":-32.7,"upperArmR":43.9,"forearmR":81.1,"root":{"x":38,"y":64}},"hold":0}
  ]
 }

@@ -47,6 +47,27 @@ cannot be written any more.
   step between two keys is at most 180° (the validator rejects more): what you write
   is what plays.
 
+### Continuous movements: pass-through keys (rolls, circles, strides)
+
+A key with the default hold makes the figure ease to a full stop there. That is right for
+the end of a punch or the top of a lift, and wrong in the middle of a roll or a circle: the
+forward roll had nine keys and halted nine times per rep, which read as slow and jerky next
+to a punch. **In a movement that does not stop, every middle key is `"hold": 0`**; only the
+real pauses (the start position, the top of a rep) keep a hold.
+`test/stick-figure.test.js` ("continuous movements do not stop at every key") checks the
+rolls, circles and strides.
+
+### Depth and shrug (things a flat side view cannot otherwise show)
+
+- `"depth": {"upperArmL": 0.3, ...}` on a frame foreshortens that segment (0.1…1) because it
+  points toward or away from the viewer. Use it when the movement is a rotation the 2D view
+  would otherwise hide: the open book's arm reaching toward the viewer, the sleeper stretch's
+  upper arm pointing at the viewer so the forearm's rotation shows in the picture plane, the
+  knee going out sideways in quadruped hip CARs. Joints are still built from their parents, so
+  limbs cannot detach. Depth inherits like angles and interpolates between keys; pins assume
+  full length, so do not pin a limb whose depth is below 1.
+- `"shrug": 0…5` on a pose lifts both shoulders toward the ears (shrugs).
+
 ### Static poses (holds)
 
 A pose that is held still (plank, side plank, dead hang, wall sit, hollow hold, a held
@@ -122,7 +143,7 @@ sides are `upperArmL: 90, upperArmR: -90`, and feet point outwards with
 
 ### Equipment
 
-- `hold`: `dumbbell`, `barbell`, `kettlebell`, `ball`. These are drawn at the
+- `hold`: `dumbbell`, `dumbbellL` (near hand only, for single-arm work), `barbell`, `kettlebell`, `kettlebellL` (near hand only), `ball`. These are drawn at the
   hands and move with them.
 - `props` are fixed scenery: `bar {x1,y1,x2,y2}`, `box {x,y,w,h}` (a bench, a
   seat, a plyo box), `ball {x,y,r}`, `roller {x,y,r}`, `wall {x}`.
@@ -162,6 +183,34 @@ because a pose can be legal at both ends and bend the wrong way between them (a 
 swung the long way round, or a pinned limb solved with the wrong bend). Pins always bend
 the anatomical way: the IK takes the sign from the limb, never from the keyframe. Front
 view is exempt: a knee bends into the screen there and a 2D drawing cannot show it.
+
+## Generating poses from a spec (the easier way)
+
+Typing absolute angles is how limbs ended up subtly wrong. `scripts/pose-gen.cjs` takes a
+spec in joint terms (hip flexion 90, knee flexion 120, chin tucked 30) relative to the torso,
+so the limbs stay consistent as the torso rotates through a roll, and it can put the lowest
+point on the floor (`ground: {joint, x}`) or solve a planted hand or foot with IK
+(`ik: {ankleL: {x, y}}`). The specs for the poses added on 2026-10-26 are in
+`scripts/pose-specs/`; regenerate one with
+
+```sh
+node scripts/pose-gen.cjs scripts/pose-specs/back-roll.cjs
+node scripts/pose-ground.cjs back-roll      # rolls and floor work only: see below
+node scripts/poses.mjs back-roll            # then LOOK at --sheet / --moments
+```
+
+`pose-ground.cjs` samples every move and, wherever the body would sink into the floor
+between keys, inserts a pass-through key anchored on whatever touches the floor at that
+moment. Run it after `pose-gen` for back-roll, granby-roll, inversion, turtle, double-leg,
+hip-bump and turkish-get-up (it edits the JSON in place, so always run the pair together).
+
+## Known approximations (2D, one figure, no partner)
+
+Partner techniques (chokes, passes, sweeps) share the generic `guard` / `grappling-base`
+figures; the elbow and knee variants share `elbow-strike` / `knee-strike` apart from the
+upward elbow; Decline Dumbbell Press uses the flat bench; Rear Delt Fly uses the front-view
+fly; Concentration Curl uses the standing curl; Seated Spine Rotation is shown side-on as
+one elbow forward and one back. Everything else has a figure of its own.
 
 ## Checking your work
 
