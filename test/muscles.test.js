@@ -8,6 +8,7 @@
  * Run: node --test test/muscles.test.js
  */
 
+require('./helpers/data-dir');
 const { test, before, after } = require('node:test');
 const assert = require('node:assert');
 const fs = require('node:fs');
@@ -238,7 +239,7 @@ before(async () => {
 });
 after(() => {
   if (server) server.close();
-  for (const n of [A, B]) try { fs.unlinkSync(path.join(__dirname, '..', 'data', `${n}_health.sqlite`)); } catch { /* none */ }
+  for (const n of [A, B]) try { fs.unlinkSync(path.join(process.env.DATA_DIR, `${n}_health.sqlite`)); } catch { /* none */ }
 });
 
 const get = (user, p) => fetch(base + p, { redirect: 'manual', headers: user ? { 'x-test-user': user } : {} })

@@ -13,6 +13,7 @@
  * Run: node --test test/fitness-routes.test.js
  */
 
+require('./helpers/data-dir');
 const { test, before, after } = require('node:test');
 const assert = require('node:assert');
 const fs = require('node:fs');
@@ -48,7 +49,7 @@ before(async () => {
 });
 after(() => {
   if (server) server.close();
-  for (const n of [A, Bu]) try { fs.unlinkSync(path.join(__dirname, '..', 'data', `${n}_health.sqlite`)); } catch { /* none */ }
+  for (const n of [A, Bu]) try { fs.unlinkSync(path.join(process.env.DATA_DIR, `${n}_health.sqlite`)); } catch { /* none */ }
 });
 
 const svc = (user, method, p, body, token = 'test-token') => fetch(base + '/api/service' + p, {
@@ -136,7 +137,7 @@ test('service API: reminder check/ack with a given clock; never creates a databa
   const ghost = `${stamp}_ghost`;
   const g = await svc(ghost, 'GET', '/benchmarks/reminder/check');
   assert.deepStrictEqual([g.status, g.body.action], [200, 'none']);
-  assert.ok(!fs.existsSync(path.join(__dirname, '..', 'data', `${ghost}_health.sqlite`)), 'check did not create a file');
+  assert.ok(!fs.existsSync(path.join(process.env.DATA_DIR, `${ghost}_health.sqlite`)), 'check did not create a file');
   await svc(A, 'PUT', '/benchmarks/day', { day: 'saturday' });
   await svc(A, 'PUT', '/benchmarks/reminder', { enabled: true, day: 'saturday', time: '9am', tz: 'America/New_York' });
   const when = '2026-10-17T13:30:00Z';    // Saturday 09:30 New York

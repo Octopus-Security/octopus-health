@@ -80,7 +80,7 @@ function getPeriodisationPhase(competitionDate) {
 
 
 // Ensure data directory exists
-const dataDir = path.join(__dirname, 'data');
+const dataDir = require('./lib/dataDir')();
 if (!fs.existsSync(dataDir)) {
     fs.mkdirSync(dataDir, { recursive: true });
 }
