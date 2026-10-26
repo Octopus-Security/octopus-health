@@ -1,12 +1,10 @@
 {
-  "version": 2,
-  "title": "Standing Quad Stretch",
-  "view": "side",
-  "anchor": {"joint":"ankleL","x":50,"y":90},
-  "highlight": ["kneeR","hipR"],
-  "frames": [
-    {"duration":1400,"label":"Stand tall","pose":{"torso":180,"head":180,"upperArmL":0,"forearmL":0,"upperArmR":0,"forearmR":0,"thighL":0,"shinL":0,"footL":90,"thighR":0,"shinR":0,"footR":90}},
-    {"duration":2200,"label":"Heel to glute, hold the ankle","pose":{"torso":180,"head":180,"upperArmL":70,"forearmL":80,"upperArmR":-14,"forearmR":-11,"thighL":0,"shinL":0,"footL":90,"thighR":-6,"shinR":-166,"footR":210}},
-    {"duration":2800,"label":"Knees together, push the hip forward","pose":{"torso":184,"head":184,"upperArmL":70,"forearmL":80,"upperArmR":-16,"forearmR":-13,"thighL":0,"shinL":0,"footL":90,"thighR":-18,"shinR":-170,"footR":210}}
-  ]
+ "version": 2,
+ "title": "Standing Quad Stretch",
+ "static": true,
+ "view": "side",
+ "highlight": ["kneeR", "hipR"],
+ "frames": [
+  {"label":"Knees together, push the hip forward","anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":184,"head":184,"upperArmL":70,"forearmL":80,"upperArmR":-16,"forearmR":-13,"thighL":0,"shinL":0,"footL":90,"thighR":-18,"shinR":-170,"footR":210}}
+ ]
 }

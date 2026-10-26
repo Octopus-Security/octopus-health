@@ -1,12 +1,10 @@
 {
-  "version": 2,
-  "title": "Neck Side Stretch",
-  "view": "front",
-  "anchor": {"joint":"ankleL","x":50,"y":90},
-  "highlight": ["neck"],
-  "frames": [
-    {"duration":1500,"label":"Stand tall","pose":{"torso":180,"head":180,"upperArmL":4,"forearmL":0,"upperArmR":-4,"forearmR":0,"thighL":0,"shinL":0,"footL":90,"thighR":0,"shinR":0,"footR":-90}},
-    {"duration":2400,"label":"Tilt the ear toward the shoulder","pose":{"torso":180,"head":152,"upperArmL":-116,"forearmL":127,"upperArmR":-14,"forearmR":0,"thighL":0,"shinL":0,"footL":90,"thighR":0,"shinR":0,"footR":-90}},
-    {"duration":2600,"label":"Hand adds a little weight, hold","pose":{"torso":180,"head":140,"upperArmL":-119,"forearmL":117,"upperArmR":-14,"forearmR":0,"thighL":0,"shinL":0,"footL":90,"thighR":0,"shinR":0,"footR":-90}}
-  ]
+ "version": 2,
+ "title": "Neck Side Stretch",
+ "static": true,
+ "view": "front",
+ "highlight": ["neck"],
+ "frames": [
+  {"label":"Hand adds a little weight, hold","anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":180,"head":140,"upperArmL":-119,"forearmL":117,"upperArmR":-14,"forearmR":0,"thighL":0,"shinL":0,"footL":90,"thighR":0,"shinR":0,"footR":-90}}
+ ]
 }

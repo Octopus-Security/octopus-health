@@ -1,50 +1,11 @@
 {
  "version": 2,
  "title": "Doorway Chest Stretch",
+ "static": true,
  "view": "side",
- "anchor": {
-  "joint": "ankleL",
-  "x": 50,
-  "y": 90
- },
- "highlight": [
-  "shoulderL",
-  "elbowL"
- ],
- "props": [
-  {
-   "type": "wall",
-   "x": 66
-  }
- ],
+ "props": [{ "type": "wall", "x": 66 }],
+ "highlight": ["shoulderL", "elbowL"],
  "frames": [
-  {
-   "duration": 1500,
-   "label": "Forearm on the frame",
-   "pose": {
-    "torso": 180,
-    "head": 180,
-    "upperArmL": 90,
-    "forearmL": 180,
-    "upperArmR": 0,
-    "forearmR": 0,
-    "thighL": 0,
-    "shinL": 0,
-    "footL": 90,
-    "thighR": 0,
-    "shinR": 0,
-    "footR": 90
-   }
-  },
-  {
-   "duration": 2500,
-   "label": "Lean through",
-   "pose": {
-    "torso": 166,
-    "head": 166,
-    "upperArmL": 40,
-    "forearmL": 170
-   }
-  }
+  {"label":"Lean through","anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":166,"head":166,"upperArmL":40,"forearmL":170,"upperArmR":0,"forearmR":0,"thighL":0,"shinL":0,"footL":90,"thighR":0,"shinR":0,"footR":90}}
  ]
 }

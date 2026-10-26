@@ -1,12 +1,11 @@
 {
-  "version": 2,
-  "title": "Wall Calf Stretch",
-  "view": "side",
-  "anchor": {"joint":"ankleR","x":30,"y":90},
-  "props": [{"type":"wall","x":70}],
-  "highlight": ["ankleR","kneeR"],
-  "frames": [
-    {"duration":1500,"label":"Hands on the wall, back heel down","pose":{"torso":170,"head":170,"upperArmL":60,"forearmL":97,"upperArmR":59,"forearmR":93,"thighL":14,"shinL":12,"footL":90,"thighR":-10,"shinR":-10,"footR":90}},
-    {"duration":2600,"label":"Lean in, back leg straight","pose":{"torso":155,"head":155,"upperArmL":22,"forearmL":164,"upperArmR":16,"forearmR":158,"thighL":34,"shinL":-11,"footL":90,"thighR":-25,"shinR":-25,"footR":90}}
-  ]
+ "version": 2,
+ "title": "Wall Calf Stretch",
+ "static": true,
+ "view": "side",
+ "props": [{ "type": "wall", "x": 70 }],
+ "highlight": ["ankleR", "kneeR"],
+ "frames": [
+  {"label":"Lean in, back leg straight","anchor":{"joint":"ankleR","x":30,"y":90},"pose":{"torso":155,"head":155,"upperArmL":22,"forearmL":164,"upperArmR":16,"forearmR":158,"thighL":34,"shinL":-11,"footL":90,"thighR":-25,"shinR":-25,"footR":90}}
+ ]
 }

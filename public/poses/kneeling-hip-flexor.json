@@ -1,65 +1,10 @@
 {
  "version": 2,
  "title": "Half-Kneeling Hip Flexor Stretch",
+ "static": true,
  "view": "side",
- "anchor": {
-  "joint": "kneeR",
-  "x": 30,
-  "y": 89.5
- },
- "pins": [
-  "ankleL"
- ],
- "highlight": [
-  "hipR"
- ],
+ "highlight": ["hipR"],
  "frames": [
-  {
-   "duration": 1500,
-   "label": "Half-kneel, tall",
-   "pose": {
-    "torso": 180,
-    "head": 180,
-    "upperArmL": 0,
-    "forearmL": 25,
-    "upperArmR": 0,
-    "forearmR": 0,
-    "thighL": 90,
-    "shinL": 0,
-    "footL": 90,
-    "thighR": 0,
-    "shinR": -90,
-    "footR": -72
-   }
-  },
-  {
-   "duration": 2800,
-   "label": "Hips forward, reach up",
-   "pose": {
-    "torso": 177,
-    "head": 177,
-    "upperArmL": 0,
-    "forearmL": 25,
-    "upperArmR": 175,
-    "forearmR": 178,
-    "thighL": 90,
-    "shinL": -18,
-    "thighR": -18
-   }
-  },
-  {
-   "duration": 2000,
-   "label": "Hold",
-   "pose": {
-    "torso": 172,
-    "arch": -8,
-    "head": 172,
-    "upperArmR": 168,
-    "forearmR": 172,
-    "thighR": -24,
-    "thighL": 91,
-    "shinL": -24
-   }
-  }
+  {"label":"Hold","anchor":{"joint":"kneeR","x":30,"y":89.5},"pose":{"torso":172,"head":172,"upperArmL":0,"forearmL":25,"upperArmR":168,"forearmR":172,"thighL":91,"shinL":-24,"footL":90,"thighR":-24,"shinR":-90,"footR":-72,"arch":-8}}
  ]
 }

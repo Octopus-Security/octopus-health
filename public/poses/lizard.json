@@ -1,11 +1,10 @@
 {
-  "version": 2,
-  "title": "Lizard Stretch",
-  "view": "side",
-  "highlight": ["hipR","hipL"],
-  "frames": [
-    {"duration":1600,"label":"Deep lunge, hands inside the front foot","pose":{"root":{"x":40,"y":72},"torso":108,"head":130,"upperArmL":-29,"forearmL":20,"upperArmR":-28,"forearmR":21,"thighL":95,"shinL":6,"footL":90,"thighR":-30,"shinR":-90,"footR":-75}},
-    {"duration":3000,"label":"Sink the hips, chest low","pose":{"torso":102,"head":120,"upperArmL":-43,"forearmL":29,"upperArmR":-42,"forearmR":31,"thighL":95,"shinL":6,"footL":90,"thighR":-30,"shinR":-90,"footR":-75}},
-    {"duration":1500,"label":"Lift the chest a little","pose":{"torso":108,"head":130,"upperArmL":-29,"forearmL":20,"upperArmR":-28,"forearmR":21,"thighL":95,"shinL":6,"footL":90,"thighR":-30,"shinR":-90,"footR":-75}}
-  ]
+ "version": 2,
+ "title": "Lizard Stretch",
+ "static": true,
+ "view": "side",
+ "highlight": ["hipR", "hipL"],
+ "frames": [
+  {"label":"Sink the hips, chest low","pose":{"torso":102,"head":120,"upperArmL":-43,"forearmL":29,"upperArmR":-42,"forearmR":31,"thighL":95,"shinL":6,"footL":90,"thighR":-30,"shinR":-90,"footR":-75,"root":{"x":40,"y":72}}}
+ ]
 }
