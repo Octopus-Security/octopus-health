@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "title": "Overhead Shoulder Stretch",
+  "view": "side",
+  "anchor": {"joint":"ankleL","x":50,"y":90},
+  "highlight": ["shoulderL","shoulderR"],
+  "frames": [
+    {"duration":1600,"label":"Arms forward and up","pose":{"torso":180,"head":180,"upperArmL":150,"forearmL":150,"upperArmR":150,"forearmR":150,"thighL":0,"shinL":0,"footL":90,"thighR":0,"shinR":0,"footR":90}},
+    {"duration":2200,"label":"Straight overhead","pose":{"torso":180,"head":180,"upperArmL":182,"forearmL":182,"upperArmR":182,"forearmR":182,"thighL":0,"shinL":0,"footL":90,"thighR":0,"shinR":0,"footR":90}},
+    {"duration":2600,"label":"Press the arms back, ribs down","pose":{"torso":176,"head":176,"upperArmL":205,"forearmL":205,"upperArmR":205,"forearmR":205,"thighL":0,"shinL":0,"footL":90,"thighR":0,"shinR":0,"footR":90}}
+  ]
+}

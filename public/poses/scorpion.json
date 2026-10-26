@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "title": "Scorpion Stretch",
+  "view": "side",
+  "highlight": ["spine","hipR"],
+  "frames": [
+    {"duration":1500,"label":"Lie face down","pose":{"root":{"x":50,"y":87},"torso":90,"head":92,"upperArmL":-90,"forearmL":-90,"upperArmR":-90,"forearmR":-90,"thighL":-90,"shinL":-90,"footL":-60,"thighR":-90,"shinR":-90,"footR":-60}},
+    {"duration":2200,"label":"Bend one knee, foot to the ceiling","pose":{"thighR":-100,"shinR":-190,"footR":-170,"arch":-6}},
+    {"duration":2600,"label":"Swing the foot over, chest stays down","pose":{"thighR":-125,"shinR":-210,"footR":-190,"arch":-12,"head":100}}
+  ]
+}

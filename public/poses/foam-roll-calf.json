@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "title": "Calf Foam Roll",
+  "view": "side",
+  "props": [{"type":"roller","x":82,"y":87,"r":5}],
+  "highlight": ["ankleL","kneeL"],
+  "frames": [
+    {"duration":1800,"label":"Roller under the lower calf, hips up","pose":{"root":{"x":50,"y":70},"torso":255,"head":255,"upperArmL":-17,"forearmL":27,"upperArmR":-15,"forearmR":29,"thighL":60,"shinL":60,"footL":150,"thighR":60,"shinR":60,"footR":150}},
+    {"duration":2400,"label":"Roll toward the knee","pose":{"root":{"x":58,"y":70},"torso":255,"head":255,"upperArmL":-17,"forearmL":27,"upperArmR":-15,"forearmR":29,"thighL":60,"shinL":60,"footL":150,"thighR":60,"shinR":60,"footR":150}},
+    {"duration":2400,"label":"Roll back to the ankle","pose":{"root":{"x":50,"y":70},"torso":255,"head":255,"upperArmL":-17,"forearmL":27,"upperArmR":-15,"forearmR":29,"thighL":60,"shinL":60,"footL":150,"thighR":60,"shinR":60,"footR":150}}
+  ]
+}

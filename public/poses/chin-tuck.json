@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "title": "Chin Tuck",
+  "view": "side",
+  "anchor": {"joint":"ankleL","x":50,"y":90},
+  "highlight": ["neck"],
+  "frames": [
+    {"duration":1600,"label":"Head poked forward","pose":{"torso":180,"head":152,"upperArmL":0,"forearmL":0,"upperArmR":0,"forearmR":0,"thighL":0,"shinL":0,"footL":90,"thighR":0,"shinR":0,"footR":90}},
+    {"duration":1800,"label":"Slide the head straight back","highlight":["neck"],"pose":{"torso":180,"head":192,"upperArmL":0,"forearmL":0,"upperArmR":0,"forearmR":0,"thighL":0,"shinL":0,"footL":90,"thighR":0,"shinR":0,"footR":90}}
+  ]
+}

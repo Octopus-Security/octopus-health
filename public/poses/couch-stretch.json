@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "title": "Couch Stretch",
+  "view": "side",
+  "anchor": {"joint":"kneeR","x":30,"y":89.5},
+  "pins": ["ankleL"],
+  "props": [{"type":"wall","x":21}],
+  "highlight": ["hipR","kneeR"],
+  "frames": [
+    {"duration":1500,"label":"Half-kneel, back shin up the wall","pose":{"torso":180,"head":180,"upperArmL":0,"forearmL":25,"upperArmR":0,"forearmR":0,"thighL":90,"shinL":0,"footL":90,"thighR":0,"shinR":-165,"footR":-150}},
+    {"duration":2800,"label":"Hips forward, reach up","pose":{"torso":177,"head":177,"upperArmL":0,"forearmL":25,"upperArmR":175,"forearmR":178,"thighL":90,"shinL":-18,"footL":90,"thighR":-18,"shinR":-165,"footR":-150}},
+    {"duration":2400,"label":"Hold, ribs down","pose":{"torso":172,"head":172,"upperArmL":0,"forearmL":25,"upperArmR":168,"forearmR":172,"thighL":91,"shinL":-24,"footL":90,"thighR":-24,"shinR":-165,"footR":-150,"arch":-8}}
+  ]
+}

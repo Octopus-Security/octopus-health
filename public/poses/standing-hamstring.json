@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "title": "Standing Hamstring Stretch",
+  "view": "side",
+  "anchor": {"joint":"ankleL","x":36,"y":90},
+  "pins": ["ankleR"],
+  "props": [{"type":"box","x":64,"y":68,"w":22,"h":24}],
+  "highlight": ["kneeR","hipR"],
+  "frames": [
+    {"duration":1500,"label":"Heel on the step, toes up","pose":{"torso":180,"head":180,"upperArmL":0,"forearmL":0,"upperArmR":0,"forearmR":0,"thighL":0,"shinL":0,"footL":90,"thighR":76,"shinR":56,"footR":155}},
+    {"duration":2800,"label":"Hinge from the hips, back long","pose":{"torso":125,"head":125,"upperArmL":6,"forearmL":45,"upperArmR":6,"forearmR":45,"thighL":0,"shinL":0,"footL":90,"thighR":76,"shinR":56,"footR":155}},
+    {"duration":1800,"label":"Stand tall","pose":{"torso":180,"head":180,"upperArmL":0,"forearmL":0,"upperArmR":0,"forearmR":0,"thighL":0,"shinL":0,"footL":90,"thighR":76,"shinR":56,"footR":155}}
+  ]
+}
