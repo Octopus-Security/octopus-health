@@ -108,7 +108,7 @@ module.exports = function mount(router, getDB) {
   // opening one per linked user would litter empty databases.
   router.get('/benchmarks/reminder/check', async (req, res) => {
     try {
-      const file = path.join(__dirname, '..', '..', 'data', `${req.serviceUser}_health.sqlite`);
+      const file = path.join(require('../../lib/dataDir')(), `${req.serviceUser}_health.sqlite`);
       if (!fs.existsSync(file)) return res.json({ ok: true, action: 'none', reason: 'no data' });
       const now = req.query.now ? new Date(String(req.query.now)) : new Date();
       if (Number.isNaN(now.getTime())) return res.status(400).json({ ok: false, error: 'bad now' });

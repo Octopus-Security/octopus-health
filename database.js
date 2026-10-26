@@ -859,7 +859,7 @@ const SEED_EXERCISE_PLANS = [
 const getDatabase = (username) => {
     const sequelize = new Sequelize({
         dialect: 'sqlite',
-        storage: path.join(__dirname, 'data', `${username}_health.sqlite`),
+        storage: path.join(require('./lib/dataDir')(), `${username}_health.sqlite`),
         logging: false
     });
 

@@ -9,3 +9,12 @@ package-lock.json
 # 2026-06-23 to 2026-09-05. The image build does not need it: the Dockerfile
 # writes its own from ARG NPM_TOKEN and deletes it again.
 .npmrc
+
+# Local SQLite databases and their sidecars; production data lives on the
+# health_data volume, never in git.
+*.sqlite
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
+data/*
+!data/.gitkeep

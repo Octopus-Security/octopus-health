@@ -11,6 +11,7 @@
  * Run: node --test test/daily-stretches.test.js
  */
 
+require('./helpers/data-dir');
 const { test, before, after } = require('node:test');
 const assert = require('node:assert');
 const fs = require('node:fs');
@@ -60,7 +61,7 @@ before(async () => {
 });
 after(() => {
   if (server) server.close();
-  for (const n of used) { try { fs.unlinkSync(path.join(__dirname, '..', 'data', `${n}_health.sqlite`)); } catch { /* not created */ } }
+  for (const n of used) { try { fs.unlinkSync(path.join(process.env.DATA_DIR, `${n}_health.sqlite`)); } catch { /* not created */ } }
 });
 
 // ── Seeds ────────────────────────────────────────────────────────────────────
