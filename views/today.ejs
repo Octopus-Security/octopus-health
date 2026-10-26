@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+    <%- include('partials/favicon') %>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="<%= asset('/theme.css') %>">
+  <link rel="stylesheet" href="<%= asset('/stretch-demo.css') %>">
+  <script src="<%= asset('/stick-figure.js') %>" defer></script>
+  <script src="<%= asset('/pose-map.js') %>"></script>
+  <style>
+    .today-head { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; margin-bottom:16px; }
+    .today-label { font-size:1.25rem; font-weight:700; color:#e8e8e8; }
+    .today-meta { color:#777; font-size:0.85rem; margin-top:4px; }
+    .today-section { color:#888; font-size:0.78rem; text-transform:uppercase; letter-spacing:0.06em; margin:18px 0 8px; }
+    .today-list { list-style:none; margin:0; padding:0; }
+    .today-item { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 0; border-bottom:1px solid #1a1a1a; }
+    .today-item:last-child { border-bottom:none; }
+    .today-name { background:none; border:none; padding:0; min-height:var(--tap); text-align:left; color:#e8e8e8; font:inherit; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:8px; }
+    .today-name::before { content:'▶'; font-size:0.7rem; color:#2ecc71; flex:none; }
+    .today-name:hover { color:#2ecc71; background:none; }
+    .today-rx { color:#2ecc71; font-variant-numeric:tabular-nums; white-space:nowrap; font-size:0.9rem; }
+    .today-note { color:#777; font-size:0.78rem; margin-top:2px; font-weight:400; }
+    .today-plain { color:#bbb; font-size:0.88rem; padding:4px 0; }
+    .today-start { width:100%; min-height:var(--tap); font-size:1rem; font-weight:600; margin-top:18px; }
+    .today-hint { color:#666; font-size:0.78rem; margin-top:8px; }
+  </style>
+</head>
+<body>
+    <%- include('partials/nav') %>
+
+<div class="container">
+  <% if (!plan) { %>
+    <div class="card">
+      <h2>No workout planned for today</h2>
+      <p class="today-plain">There is no plan saved for <%= dayKey %><%= requested ? ' (' + requested + ')' : '' %>. You can still start a workout and log it as you go.</p>
+      <a class="btn" href="/workout" style="display:inline-flex;align-items:center;min-height:var(--tap);margin-top:12px">Open the workout logger</a>
+    </div>
+  <% } else { %>
+    <div class="card">
+      <div class="today-head">
+        <div>
+          <div class="today-label">🏋️ <%= plan.label %></div>
+          <div class="today-meta"><%= today %> · <%= plan.location === 'gym' ? '🏢 Gym' : '🏠 ' + plan.location.charAt(0).toUpperCase() + plan.location.slice(1) %> · tap an exercise to see how it is done</div>
+        </div>
+      </div>
+
+      <% if (plan.warmup.length) { %>
+        <div class="today-section">Warm-up</div>
+        <% plan.warmup.forEach(function (w) { %><div class="today-plain"><%= w %></div><% }) %>
+      <% } %>
+
+      <div class="today-section">Main work</div>
+      <ul class="today-list" id="today-exercises">
+        <% plan.exercises.forEach(function (ex, i) { %>
+          <li class="today-item">
+            <div>
+              <button type="button" class="today-name" data-i="<%= i %>"><%= ex.name %></button>
+              <% if (ex.note) { %><div class="today-note"><%= ex.note %></div><% } %>
+            </div>
+            <span class="today-rx"><%= ex.prescription %></span>
+          </li>
+        <% }) %>
+      </ul>
+
+      <% if (plan.cooldown.length) { %>
+        <div class="today-section">Cool-down</div>
+        <% plan.cooldown.forEach(function (w) { %><div class="today-plain"><%= w %></div><% }) %>
+      <% } %>
+
+      <button type="button" class="btn today-start" id="today-start">Start logging this workout</button>
+      <div class="today-hint">Opens the workout logger with these exercises in it. Add, change or remove any exercise or set as you go.</div>
+    </div>
+  <% } %>
+
+  <% if (stretches && stretches.items.length) { %>
+    <div class="card">
+      <h2 style="margin-bottom:6px">🧘 Stretches</h2>
+      <div class="today-meta" style="margin-bottom:6px"><%= stretches.name %> · <a href="/stretch">edit your daily stretches</a></div>
+      <ul class="today-list" id="today-stretches">
+        <% stretches.items.forEach(function (s, i) { %>
+          <li class="today-item">
+            <button type="button" class="today-name" data-s="<%= i %>"><%= s.name %></button>
+            <span class="today-rx"><%= s.holdSeconds %> s<%= s.sides === 2 ? ' each side' : '' %></span>
+          </li>
+        <% }) %>
+      </ul>
+    </div>
+  <% } %>
+</div>
+
+<script src="<%= asset('/js/stretch-demo.js') %>"></script>
+<script>
+const PLAN = <%- JSON.stringify(plan || null).replace(/</g, '\\u003c') %>;
+const STRETCHES = <%- JSON.stringify(stretches ? stretches.items : []).replace(/</g, '\\u003c') %>;
+const TODAY = <%- JSON.stringify(today) %>;
+
+document.querySelectorAll('#today-exercises .today-name').forEach(function (b) {
+  const ex = PLAN.exercises[+b.dataset.i];
+  StretchDemo.link(b, { id: ex.id, name: ex.name, category: ex.category });
+});
+document.querySelectorAll('#today-stretches .today-name').forEach(function (b) {
+  const s = STRETCHES[+b.dataset.s];
+  StretchDemo.link(b, { id: s.id, name: s.name, category: s.category || 'recovery' });
+});
+
+// Start: create the session, hand the plan to the logger, open it. The logger keeps the
+// planned exercises (with their targets) until each has a set, so a reload loses nothing.
+const startBtn = document.getElementById('today-start');
+if (startBtn) startBtn.addEventListener('click', async function () {
+  // One live session at a time: a second would be orphaned, never finished.
+  if (localStorage.getItem('activeSessionId')) {
+    if (confirm('You already have a workout in progress. Open it?')) location.href = '/workout';
+    return;
+  }
+  startBtn.disabled = true; startBtn.textContent = 'Starting…';
+  try {
+    const r = await fetch('/workout/api/session', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: PLAN.type || 'strength', title: PLAN.label, date: TODAY }) });
+    const j = await r.json();
+    if (!j.success) throw new Error('could not start');
+    const id = j.data.id;
+    localStorage.setItem('activeSessionId', id);
+    localStorage.setItem('activeSessionStart', Date.now());
+    localStorage.setItem('activeSessionPlan:' + id, JSON.stringify(PLAN.exercises.map(function (e) {
+      return { name: e.name, id: e.id, category: e.category, target: e.prescription, sets: e.sets };
+    })));
+    location.href = '/workout';
+  } catch (e) {
+    startBtn.disabled = false; startBtn.textContent = 'Start logging this workout';
+    alert('Could not start the workout. Check your connection and try again.');
+  }
+});
+</script>
+</body>
+</html>

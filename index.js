@@ -50,6 +50,7 @@ function getActiveTab(requestPath) {
     // startsWith('/plan-maker') never got a chance because the same branch
     // returned 'exercises' for it, so BOTH nav links lit up and only cleared
     // when you clicked something else entirely.
+    if (requestPath === '/today') return 'today';
     if (requestPath.startsWith('/plan-maker')) return 'plan-maker';
     if (requestPath.startsWith('/exercises') || requestPath.startsWith('/library') || requestPath.startsWith('/exercise') || requestPath.startsWith('/workout')) return 'exercises';
     if (requestPath === '/body' || requestPath.startsWith('/body/') || requestPath.startsWith('/body?')) return 'body';
@@ -1128,7 +1129,9 @@ app.post('/workout/api/session', requireLogin, async (req, res) => {
     const { WorkoutSession, sequelize } = getDatabase(req.user.username);
     await sequelize.sync();
     const { type, title, date } = req.body;
-    const session = await WorkoutSession.create({ type, title: title || null, date: date || new Date().toISOString().split('T')[0], startedAt: new Date(), status: 'active' });
+    // ET is the only clock: toISOString() is UTC, so a workout started after 8pm ET was dated tomorrow.
+    const todayET = new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
+    const session = await WorkoutSession.create({ type, title: title || null, date: date || todayET, startedAt: new Date(), status: 'active' });
     res.json({ success: true, data: session });
 });
 
@@ -1278,6 +1281,7 @@ app.get('/exercises', requireLogin, async (req, res) => {
 });
 
 require('./api/body-map')(app, { requireLogin, getDatabase });
+require('./api/today')(app, { requireLogin, getDatabase });
 require('./api/daily-stretches')(app, { requireLogin, getDatabase });
 
 app.get('/library', requireLogin, async (req, res) => {

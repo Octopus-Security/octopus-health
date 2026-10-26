@@ -6,7 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title><%= title %></title>
   <link rel="stylesheet" href="<%= asset('/theme.css') %>">
+  <link rel="stylesheet" href="<%= asset('/stretch-demo.css') %>">
+  <script src="<%= asset('/stick-figure.js') %>" defer></script>
+  <script src="<%= asset('/pose-map.js') %>"></script>
   <style>
+    .ex-demo { background:none; border:1px solid #2a3a2a; color:#2ecc71; border-radius:6px; min-width:var(--tap); min-height:32px; padding:2px 8px; font-size:0.75rem; cursor:pointer; }
+    .ex-target { color:#2ecc71; }
     .workout-grid { display: grid; grid-template-columns: 1fr 340px; gap: 20px; }
     @media(max-width:900px){ .workout-grid { grid-template-columns: 1fr; } }
     .session-header { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:16px; }
@@ -140,6 +145,7 @@
         <div id="no-session" style="text-align:center;padding:60px 20px;color:#555;font-size:0.9rem">
           No active workout. Hit <strong style="color:#2ecc71">New Workout</strong> to start logging,
           or load one of your saved workouts on the right.
+          <div style="margin-top:14px"><a href="/today" style="color:#2ecc71">See today's planned workout →</a></div>
         </div>
       </div>
 
@@ -391,13 +397,13 @@
   <div class="modal" style="width:min(480px,95vw)">
     <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px">
       <div>
-        <h3 style="margin:0" id="sd-title"></h3>
-        <div id="sd-meta" style="font-size:0.78rem;color:#666;margin-top:3px"></div>
+        <h3 style="margin:0" id="sess-title"></h3>
+        <div id="sess-meta" style="font-size:0.78rem;color:#666;margin-top:3px"></div>
       </div>
       <button onclick="document.getElementById('session-detail-modal').classList.remove('open')" style="background:none;border:none;color:#555;cursor:pointer;font-size:1.2rem;padding:0 0 0 12px">✕</button>
     </div>
     <hr style="border-color:#1e1e1e;margin:12px 0">
-    <div id="sd-body" style="max-height:60vh;overflow-y:auto"></div>
+    <div id="sess-body" style="max-height:60vh;overflow-y:auto"></div>
   </div>
 </div>
 
@@ -414,7 +420,10 @@
   <button onclick="stopRest()" style="background:none;border:none;color:#555;cursor:pointer;font-size:1.2rem;padding:0 4px">✕</button>
 </div>
 
+<script src="<%= asset('/js/stretch-demo.js') %>"></script>
 <script>
+// ET is the only clock (toISOString() is UTC: after 8pm ET it is already tomorrow).
+const todayET = () => new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
 // ── State ──────────────────────────────────────────────────────────────────
 let sessionId    = localStorage.getItem('activeSessionId') ? parseInt(localStorage.getItem('activeSessionId')) : null;
 let sessionStart = localStorage.getItem('activeSessionStart') ? parseInt(localStorage.getItem('activeSessionStart')) : null;
@@ -464,16 +473,47 @@ async function resumeSession() {
     if (!byOrder[set.exerciseOrder]) byOrder[set.exerciseOrder] = { name: set.exerciseName, id: set.exerciseId, order: set.exerciseOrder, sets: [] };
     byOrder[set.exerciseOrder].sets.push({ id: set.id, reps: set.reps, weight: set.weight, unit: set.weightUnit || 'lbs' });
   }
-  exercises = Object.values(byOrder).sort((a,b) => a.order - b.order);
+  const logged = Object.values(byOrder).sort((a,b) => a.order - b.order);
+  // Planned order first, each with its logged sets; then anything logged that was not planned.
+  const plan = loadPlan();
+  exercises = plan.map(p => {
+    const i = logged.findIndex(l => l.name === p.name);
+    const hit = i >= 0 ? logged.splice(i, 1)[0] : null;
+    return { name: p.name, id: hit ? hit.id : p.id, category: p.category, target: p.target, order: hit ? hit.order : 0, sets: hit ? hit.sets : [] };
+  }).concat(logged);
+  renumber();
   showActiveSession(s.type, s.title || s.type);
   renderExercises();
 }
 
+// A set written later takes its exercise's order as exerciseOrder (how Logs groups sets),
+// so exercises with sets keep theirs and untouched ones get fresh numbers after them.
+function renumber() {
+  const used = exercises.filter(e => e.sets.length).map(e => e.order);
+  let next = Math.max(-1, ...used) + 1;
+  exercises.forEach(e => { if (!e.sets.length) e.order = next++; });
+}
+
 function clearSession() {
+  if (sessionId) localStorage.removeItem('activeSessionPlan:' + sessionId);
   sessionId = null; sessionStart = null; exercises = [];
   localStorage.removeItem('activeSessionId');
   localStorage.removeItem('activeSessionStart');
   clearInterval(timerInterval);
+}
+
+// The exercise list of the live session, kept in this browser. Sets are on the server,
+// but an exercise with no set yet exists only here, so without this a planned workout
+// (from /today or a template) lost its untouched exercises on reload.
+function savePlan() {
+  if (!sessionId) return;
+  try {
+    localStorage.setItem('activeSessionPlan:' + sessionId,
+      JSON.stringify(exercises.map(e => ({ name: e.name, id: e.id, category: e.category || null, target: e.target || '' }))));
+  } catch { /* storage full or blocked: the logged sets are safe on the server */ }
+}
+function loadPlan() {
+  try { return JSON.parse(localStorage.getItem('activeSessionPlan:' + sessionId) || '[]') || []; } catch { return []; }
 }
 
 // ── Timer ──────────────────────────────────────────────────────────────────
@@ -503,7 +543,7 @@ document.getElementById('type-tabs').addEventListener('click', e => {
 
 async function confirmStart(preloadedExercises) {
   const title = document.getElementById('start-title').value.trim();
-  const r = await fetch('/workout/api/session', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ type: selectedType, title, date: new Date().toISOString().split('T')[0] }) });
+  const r = await fetch('/workout/api/session', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ type: selectedType, title, date: todayET() }) });
   const j = await r.json();
   if (!j.success) return;
   sessionId    = j.data.id;
@@ -516,9 +556,11 @@ async function confirmStart(preloadedExercises) {
   // Pre-load exercises from template if any
   if (preloadedExercises && preloadedExercises.length) {
     preloadedExercises.forEach((ex, i) => {
-      exercises.push({ id: ex.exerciseId || null, name: ex.exerciseName, order: i, sets: [] });
+      exercises.push({ id: ex.exerciseId || null, name: ex.exerciseName, order: i, sets: [],
+        target: ex.defaultSets ? ex.defaultSets + (ex.defaultReps ? ' × ' + ex.defaultReps : ' sets') : '' });
     });
   }
+  savePlan();
   renderExercises();
 }
 
@@ -598,8 +640,10 @@ function addCustomExercise() {
 }
 
 function addExerciseToSession(id, name) {
-  const order = exercises.length;
-  exercises.push({ id, name, order, sets: [] });
+  const lib = allExercises.find(e => e.id === id);
+  exercises.push({ id, name, order: 0, sets: [], category: lib ? lib.category : null });
+  renumber();
+  savePlan();
   renderExercises();
 }
 
@@ -611,10 +655,13 @@ function renderExercises() {
     <div class="exercise-block" id="ex-block-${ei}">
       <div class="exercise-block-header">
         <div>
-          <div class="exercise-block-name">${ex.name}</div>
-          <div class="exercise-block-meta">${ex.sets.length} set${ex.sets.length!==1?'s':''} logged</div>
+          <div class="exercise-block-name">${qlEsc(ex.name)}</div>
+          <div class="exercise-block-meta">${ex.target ? `<span class="ex-target">Target ${qlEsc(ex.target)}</span> · ` : ''}${ex.sets.length} set${ex.sets.length!==1?'s':''} logged</div>
         </div>
-        <button onclick="removeExercise(${ei})" style="background:none;border:none;color:#444;cursor:pointer;font-size:0.85rem" title="Remove">✕</button>
+        <div style="display:flex;gap:6px;align-items:center">
+          <button class="ex-demo" data-demo="${ei}" title="How to do ${qlEsc(ex.name)}">▶ How</button>
+          <button onclick="removeExercise(${ei})" style="background:none;border:none;color:#444;cursor:pointer;font-size:0.85rem;min-width:32px;min-height:32px" title="Remove">✕</button>
+        </div>
       </div>
       <div style="padding:6px 14px 0;display:grid;grid-template-columns:32px 1fr 1fr 40px;gap:6px;font-size:0.72rem;color:#555">
         <span style="text-align:center">Set</span><span>Reps</span><span>Weight</span><span></span>
@@ -636,6 +683,10 @@ function renderExercises() {
       <button class="btn-add-set" onclick="addSet(${ei})">+ Add Set</button>
     </div>
   `).join('');
+  container.querySelectorAll('[data-demo]').forEach(b => {
+    const ex = exercises[+b.dataset.demo];
+    if (window.StretchDemo) StretchDemo.link(b, { id: ex.id, name: ex.name, category: ex.category });
+  });
 }
 
 async function addSet(ei) {
@@ -655,13 +706,25 @@ async function addSet(ei) {
   }
 }
 
+// Saved as soon as it changes, through the same editor the Logs page and Neith use
+// (api/log-edit.js). It used to change only this page's memory, with a comment saying
+// "full save on finish", and finish never saved sets: a reps or weight typed into the
+// first set of an exercise never reached the database.
 async function updateSetField(ei, si, field, val) {
   const set = exercises[ei].sets[si];
   if (!set) return;
-  if (field === 'reps')   set.reps   = parseInt(val) || null;
-  if (field === 'weight') set.weight = parseFloat(val) || null;
-  if (field === 'unit')   set.unit   = val;
-  // Update persisted in memory; full save on finish
+  const body = {};
+  if (field === 'reps')   { set.reps   = parseInt(val) || null;   body.reps = set.reps; }
+  if (field === 'weight') { set.weight = parseFloat(val) || null; body.weight = set.weight; }
+  if (field === 'unit')   { set.unit   = val;                     body.weightUnit = val; }
+  if (!set.id) return;
+  try {
+    const r = await fetch('/logs/api/set/' + set.id, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || j.ok === false) throw new Error(j.error || 'HTTP ' + r.status);
+  } catch (e) {
+    alert('That change was not saved (' + e.message + '). Check your connection and enter it again.');
+  }
 }
 
 async function deleteSet(ei, si) {
@@ -674,7 +737,7 @@ async function deleteSet(ei, si) {
 function removeExercise(ei) {
   exercises[ei].sets.forEach(s => { if(s.id) fetch(`/workout/api/set/${s.id}`,{method:'DELETE'}); });
   exercises.splice(ei, 1);
-  exercises.forEach((ex, i) => ex.order = i);
+  savePlan();
   renderExercises();
 }
 
@@ -739,9 +802,9 @@ async function viewSession(id) {
   }
   const exercises = Object.values(byOrder);
   const modal = document.getElementById('session-detail-modal');
-  document.getElementById('sd-title').textContent = (s.title || s.type) + (s.duration ? ` · ${s.duration} min` : '');
-  document.getElementById('sd-meta').textContent = s.date + (s.effort ? ` · RPE ${'★'.repeat(s.effort)}` : '') + (s.notes ? ` · ${s.notes}` : '');
-  document.getElementById('sd-body').innerHTML = exercises.map(ex => `
+  document.getElementById('sess-title').textContent = (s.title || s.type) + (s.duration ? ` · ${s.duration} min` : '');
+  document.getElementById('sess-meta').textContent = s.date + (s.effort ? ` · RPE ${'★'.repeat(s.effort)}` : '') + (s.notes ? ` · ${s.notes}` : '');
+  document.getElementById('sess-body').innerHTML = exercises.map(ex => `
     <div style="margin-bottom:12px">
       <div style="font-weight:600;color:#e8e8e8;margin-bottom:4px">${ex.name}</div>
       <table style="width:100%;font-size:0.82rem;border-collapse:collapse">
