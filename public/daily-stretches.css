@@ -1,8 +1,10 @@
 /* Daily stretches. Dark, like the rest of the app. */
 .ds { margin-bottom: 20px; }
 /* The head row (title + Body map button) gets the same gap below it as between its own items,
-   so the button never sits flush against the note under it. */
-.ds-head { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-3); flex-wrap: wrap; margin-bottom: var(--space-3); }
+   so the button never sits flush against the note under it. The gap is PADDING, not margin:
+   a margin can be collapsed or zeroed by a reset or an inline style, padding cannot, and the
+   live page showed the note flush under the bar even though the margin was deployed. */
+.ds-head { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-3); flex-wrap: wrap; margin-bottom: 0; padding-bottom: var(--space-3); }
 .ds h2 { margin: 0 0 4px; color: #e8e8e8; }
 .ds h3 { font-size: 0.9rem; color: #e8e8e8; margin: 0 0 8px; }
 .ds-sub { color: #999; font-size: 0.85rem; margin: 0; }
@@ -29,6 +31,10 @@
 .ds-block { margin-top: var(--space-4); border-top: 1px solid #1e1e1e; padding-top: 12px; }
 .ds-block summary { cursor: pointer; color: #e8e8e8; font-weight: 600; font-size: 0.9rem; }
 .ds-preset-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+/* The preset names are long ("Daily Starter Stretch (10 min) - 8 stretches, 8 ..."). The select takes the
+   row and truncates inside itself; it never gets wider than its card. */
+#ds-preset { flex: 1 1 240px; min-width: 0; max-width: 100%; width: 100%; text-overflow: ellipsis; }
+.ds-search { max-width: 100%; }
 .ds-radio { color: #bbb; font-size: 0.82rem; }
 .ds-lib { max-height: 320px; overflow-y: auto; }
 .ds-toggle { padding: 4px 12px; font-size: 0.78rem; background: transparent; color: #bbb; border: 1px solid #2f2f2f; border-radius: 16px; cursor: pointer; white-space: nowrap; }
@@ -39,6 +45,7 @@
 
 /* Tap targets: 44px on phones and touch screens. */
 @media (max-width: 800px), (pointer: coarse) {
+  #ds-preset, .ds-hold, .ds-sides { font-size: 16px; }
   .ds-icon, .ds-sides, .ds-hold, #ds-preset, .ds-toggle { min-height: var(--tap); }
   .ds-icon { min-width: var(--tap); }
   .ds-ctl { gap: var(--space-2); }

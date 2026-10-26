@@ -282,7 +282,7 @@ test('rules route the names that used to collide', () => {
 
 test('Body Map is a top-level nav tab and lights up on /body', () => {
   const nav = fs.readFileSync(path.join(__dirname, '..', 'views', 'partials', 'nav.ejs'), 'utf8');
-  assert.match(nav, /href="\/body"[^>]*activeTab === 'body'/);
+  assert.match(nav, /\['body', '\/body', 'Body Map'\]/);
   const idx = fs.readFileSync(path.join(__dirname, '..', 'index.js'), 'utf8');
   assert.match(idx, /return 'body'/);
 });
