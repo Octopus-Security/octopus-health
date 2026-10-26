@@ -1,72 +1,10 @@
 {
  "version": 2,
  "title": "Seated Forward Fold",
+ "static": true,
  "view": "side",
- "highlight": [
-  "hipL",
-  "spine"
- ],
+ "highlight": ["hipL", "spine"],
  "frames": [
-  {
-   "duration": 1500,
-   "label": "Sit tall, legs long",
-   "pose": {
-    "root": {
-     "x": 30,
-     "y": 87
-    },
-    "torso": 180,
-    "head": 180,
-    "upperArmL": 0,
-    "forearmL": 0,
-    "upperArmR": 0,
-    "forearmR": 0,
-    "thighL": 90,
-    "shinL": 90,
-    "footL": 180,
-    "thighR": 90,
-    "shinR": 90,
-    "footR": 180
-   }
-  },
-  {
-   "duration": 2600,
-   "label": "Reach toward the toes",
-   "pose": {
-    "torso": 118,
-    "arch": 10,
-    "head": 110,
-    "upperArmL": 16,
-    "forearmL": 122,
-    "upperArmR": 16,
-    "forearmR": 122
-   }
-  },
-  {
-   "duration": 2000,
-   "label": "Fold, hold",
-   "pose": {
-    "torso": 110,
-    "arch": 18,
-    "head": 95,
-    "upperArmL": 14,
-    "forearmL": 128,
-    "upperArmR": 14,
-    "forearmR": 128
-   }
-  },
-  {
-   "duration": 2400,
-   "label": "Sit back up",
-   "pose": {
-    "torso": 150,
-    "arch": 4,
-    "head": 145,
-    "upperArmL": 40,
-    "forearmL": 50,
-    "upperArmR": 40,
-    "forearmR": 50
-   }
-  }
+  {"label":"Fold, hold","pose":{"torso":110,"head":95,"upperArmL":14,"forearmL":128,"upperArmR":14,"forearmR":128,"thighL":90,"shinL":90,"footL":180,"thighR":90,"shinR":90,"footR":180,"arch":18,"root":{"x":30,"y":87}}}
  ]
 }

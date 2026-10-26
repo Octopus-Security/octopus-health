@@ -1,59 +1,12 @@
 {
-  "version": 2,
-  "title": "Dead Hang",
-  "view": "side",
-  "grounded": false,
-  "anchor": {
-    "joint": "handL",
-    "x": 60,
-    "y": -3
-  },
-  "pins": [
-    "handR"
-  ],
-  "props": [
-    {
-      "type": "bar",
-      "x1": 36,
-      "y1": -3,
-      "x2": 84,
-      "y2": -3
-    }
-  ],
-  "highlight": [
-    "hand",
-    "shoulderL"
-  ],
-  "frames": [
-    {
-      "duration": 1800,
-      "label": "Hang",
-      "pose": {
-        "torso": 180,
-        "head": 180,
-        "upperArmL": 180,
-        "forearmL": 180,
-        "upperArmR": 180,
-        "forearmR": 180,
-        "thighL": 5,
-        "shinL": -85,
-        "footL": 0,
-        "thighR": 5,
-        "shinR": -85,
-        "footR": 0
-      }
-    },
-    {
-      "duration": 1800,
-      "label": "Knees up a little",
-      "pose": {
-        "torso": 190,
-        "head": 184,
-        "thighL": 45,
-        "shinL": -45,
-        "thighR": 45,
-        "shinR": -45
-      }
-    }
-  ]
+ "version": 2,
+ "title": "Dead Hang",
+ "static": true,
+ "view": "side",
+ "props": [{ "type": "bar", "x1": 36, "y1": -3, "x2": 84, "y2": -3 }],
+ "grounded": false,
+ "highlight": ["hand", "shoulderL"],
+ "frames": [
+  {"label":"Hang","anchor":{"joint":"handL","x":60,"y":-3},"pose":{"torso":180,"head":180,"upperArmL":180,"forearmL":180,"upperArmR":180,"forearmR":180,"thighL":5,"shinL":-85,"footL":0,"thighR":5,"shinR":-85,"footR":0}}
+ ]
 }

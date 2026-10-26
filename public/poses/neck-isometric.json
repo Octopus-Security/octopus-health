@@ -1,13 +1,10 @@
 {
-  "version": 2,
-  "title": "Neck Isometric Hold",
-  "view": "side",
-  "anchor": {"joint":"ankleL","x":50,"y":90},
-  "highlight": ["neck"],
-  "frames": [
-    {"duration":1500,"label":"Stand tall","pose":{"torso":180,"head":180,"upperArmL":0,"forearmL":0,"upperArmR":0,"forearmR":0,"thighL":0,"shinL":0,"footL":90,"thighR":0,"shinR":0,"footR":90}},
-    {"duration":1600,"label":"Palm on the forehead","pose":{"torso":180,"head":180,"upperArmL":95,"forearmL":-140,"upperArmR":0,"forearmR":0,"thighL":0,"shinL":0,"footL":90,"thighR":0,"shinR":0,"footR":90}},
-    {"duration":2200,"label":"Push the head into the hand, no movement","ease":"linear","pose":{"torso":180,"head":176,"upperArmL":93,"forearmL":-144,"upperArmR":0,"forearmR":0,"thighL":0,"shinL":0,"footL":90,"thighR":0,"shinR":0,"footR":90}},
-    {"duration":1600,"label":"Release","pose":{"torso":180,"head":180,"upperArmL":95,"forearmL":-140,"upperArmR":0,"forearmR":0,"thighL":0,"shinL":0,"footL":90,"thighR":0,"shinR":0,"footR":90}}
-  ]
+ "version": 2,
+ "title": "Neck Isometric Hold",
+ "static": true,
+ "view": "side",
+ "highlight": ["neck"],
+ "frames": [
+  {"label":"Palm on the forehead","anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":180,"head":180,"upperArmL":95,"forearmL":-140,"upperArmR":0,"forearmR":0,"thighL":0,"shinL":0,"footL":90,"thighR":0,"shinR":0,"footR":90}}
+ ]
 }

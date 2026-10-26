@@ -4,7 +4,7 @@
  "view": "side",
  "anchor": {
   "joint": "kneeL",
-  "x": 41.4,
+  "x": 42.2,
   "y": 88.5
  },
  "pins": [
@@ -19,7 +19,7 @@
    "label": "All fours",
    "anchor": {
     "joint": "kneeL",
-    "x": 41.4,
+    "x": 42.2,
     "y": 88.5
    },
    "pins": [
@@ -45,7 +45,7 @@
    "label": "Reach one arm and the opposite leg long",
    "anchor": {
     "joint": "kneeL",
-    "x": 41.4,
+    "x": 42.2,
     "y": 88.5
    },
    "pins": [
@@ -57,10 +57,10 @@
     "hipR"
    ],
    "pose": {
-    "upperArmL": 85,
-    "forearmL": 85,
+    "upperArmL": 75,
+    "forearmL": 75,
     "thighR": -84,
-    "shinR": -74,
+    "shinR": -84,
     "footR": -5
    }
   },
@@ -69,7 +69,7 @@
    "label": "Return, hips level",
    "anchor": {
     "joint": "kneeL",
-    "x": 41.4,
+    "x": 42.2,
     "y": 88.5
    },
    "pins": [
@@ -96,7 +96,7 @@
    "label": "Return, hips level",
    "anchor": {
     "joint": "kneeR",
-    "x": 41.4,
+    "x": 42.2,
     "y": 88.5
    },
    "pins": [
@@ -112,7 +112,7 @@
    "label": "Other side \u2014 reach long",
    "anchor": {
     "joint": "kneeR",
-    "x": 41.4,
+    "x": 42.2,
     "y": 88.5
    },
    "pins": [
@@ -124,10 +124,10 @@
     "hipL"
    ],
    "pose": {
-    "upperArmR": 85,
-    "forearmR": 85,
+    "upperArmR": 75,
+    "forearmR": 75,
     "thighL": -84,
-    "shinL": -74,
+    "shinL": -84,
     "footL": -5
    }
   },
@@ -136,7 +136,7 @@
    "label": "All fours",
    "anchor": {
     "joint": "kneeR",
-    "x": 41.4,
+    "x": 42.2,
     "y": 88.5
    },
    "pins": [

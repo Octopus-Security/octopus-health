@@ -14,9 +14,12 @@
  *   direction = (sin a, cos a) in SVG space (y grows downward), so
  *   0 = straight down, 90 = forward (the way the figure faces), 180 = straight
  *   up, -90 = backward. Values past ±180 are fine (torso 200 = leaning back);
- *   frames interpolate the numbers as written, so write 190 → 170, never 190 → -170.
- *   The loop back from the last frame to the first takes the short way round, so
- *   an arm circle can run 0 → 90 → 180 → 270 → 360 and loop cleanly.
+ *   every move takes the shortest way round, so write each step at most 180° (190 → 170,
+ *   never 190 → -170: the validator rejects it). The loop back from the last frame to
+ *   the first takes the short way round too, so an arm circle can run 0 → 90 → 180 →
+ *   270 → 360 and loop cleanly.
+ *   Playback is real time (requestAnimationFrame): each key is held `hold` ms, then
+ *   eased to the next over `duration` ms. "static": true is one held pose that never moves.
  *   In view "front" the figure faces the viewer and +90 is screen-right, which is
  *   the figure's LEFT side (L limbs hang on screen-right).
  *
@@ -55,6 +58,9 @@
 
   var LEN = { torso: 30, head: 10, upperArm: 15, forearm: 14, thigh: 20, shin: 20, foot: 7 };
   var HEAD_R = 7;
+  var HOLD_MAX = 180;          // default pause on a key pose, ms (capped; a quarter of a short move or less)
+  var BOB = 0.7;               // static poses: breathing bob, in viewBox units
+  var BOB_MS = 4200;
   var FLOOR_Y = 92;            // standing ankles sit at y=90
   var SHOULDER_HALF = 8;       // front view only
   var HIP_HALF = 5;            // front view only
@@ -73,12 +79,16 @@
   function norm(a) { a = ((a + 180) % 360 + 360) % 360 - 180; return a === -180 ? 180 : a; }
   function lerp(a, b, t) { return a + (b - a) * t; }
 
+  // Shortest signed turn from a to b. Equal to b - a whenever that is already
+  // within a half turn, so angles written continuously play exactly as written.
+  function turn(a, b) { var d = b - a; return d > 180 || d < -180 ? norm(d) : d; }
+
   function easeValue(t, type) {
     switch (type) {
       case 'linear':   return t;
       case 'ease-in':  return t * t;
       case 'ease-out': return 1 - (1 - t) * (1 - t);
-      default:         return t < 0.5 ? 2 * t * t : 1 - 2 * (1 - t) * (1 - t);   // ease-in-out
+      default:         return t * t * (3 - 2 * t);   // ease-in-out (smoothstep): zero speed at both ends
     }
   }
 
@@ -129,7 +139,8 @@
       if (src.root) anchor = null;
       p.root = anchor ? rootFor(p, anchor, view) : { x: p.root.x, y: p.root.y };
       var pins = fr.pins || (prev ? prev.pins : data.pins) || [];
-      var r = { duration: fr.duration || 1000, ease: fr.ease, label: fr.label, air: !!fr.air, anchor: anchor, pins: pins,
+      var dur = fr.duration || 1000;
+      var r = { duration: dur, hold: typeof fr.hold === 'number' ? fr.hold : Math.min(HOLD_MAX, dur * 0.2), ease: fr.ease, label: fr.label, air: !!fr.air, anchor: anchor, pins: pins,
         highlight: fr.highlight || (prev ? prev.highlight : data.highlight) || [], pose: p };
       out.push(r); prev = r;
     });
@@ -143,17 +154,20 @@
   //
   // Pins are the second contact. A pinned hand or ankle follows a straight line
   // between where it is at the two keyframes (so it stays put when those are the
-  // same) and the elbow or knee is solved to reach it, bending the same way it
-  // bends at the keyframe. A push-up anchors the toes and pins both hands.
+  // same) and the elbow or knee is solved to reach it, always bending the
+  // anatomical way (sigma in the last column: forearm-upperArm > 0 for an elbow,
+  // shin-thigh < 0 for a knee). It used to copy the sign from the first keyframe,
+  // and a straight limb there (difference 0) read as +1, the ARM sign, so a
+  // straight pinned leg that then bent was solved with its knee inside out. A push-up anchors the toes and pins both hands.
   var PIN_LIMB = {
-    handL:  ['shoulderL', 'upperArmL', 'forearmL', LEN.upperArm, LEN.forearm],
-    handR:  ['shoulderR', 'upperArmR', 'forearmR', LEN.upperArm, LEN.forearm],
-    ankleL: ['hipL', 'thighL', 'shinL', LEN.thigh, LEN.shin],
-    ankleR: ['hipR', 'thighR', 'shinR', LEN.thigh, LEN.shin],
+    handL:  ['shoulderL', 'upperArmL', 'forearmL', LEN.upperArm, LEN.forearm, 1],
+    handR:  ['shoulderR', 'upperArmR', 'forearmR', LEN.upperArm, LEN.forearm, 1],
+    ankleL: ['hipL', 'thighL', 'shinL', LEN.thigh, LEN.shin, -1],
+    ankleR: ['hipR', 'thighR', 'shinR', LEN.thigh, LEN.shin, -1],
   };
   function between(a, b, t, view) {
     var r = {};
-    ANGLES.forEach(function (k) { r[k] = lerp(a.pose[k], b.pose[k], t); });
+    ANGLES.forEach(function (k) { r[k] = a.pose[k] + turn(a.pose[k], b.pose[k]) * t; });   // shortest way round
     r.arch = lerp(a.pose.arch, b.pose.arch, t);
     var plain = { x: lerp(a.pose.root.x, b.pose.root.x, t), y: lerp(a.pose.root.y, b.pose.root.y, t) };
     var ra = a.anchor ? rootFor(r, a.anchor, view) : plain;
@@ -168,7 +182,7 @@
         var d = Math.min(Math.max(Math.hypot(dx, dy), Math.abs(la - lb) + 0.01), la + lb - 0.01);
         var alpha = Math.acos((la * la + d * d - lb * lb) / (2 * la * d)) * 180 / Math.PI;
         var dirA = Math.atan2(dx, dy) * 180 / Math.PI;
-        var sigma = norm(a.pose[L[2]] - a.pose[L[1]]) >= 0 ? 1 : -1;   // which way it bends at the keyframe
+        var sigma = L[5];   // anatomical bend direction (see PIN_LIMB), never inferred from the keyframe
         var parent = dirA - sigma * alpha;
         var elbow = step(base, parent, la);
         var child = Math.atan2(target.x - elbow.x, target.y - elbow.y) * 180 / Math.PI;
@@ -193,6 +207,41 @@
     return w;
   }
 
+  // ── timeline ─────────────────────────────────────────────────────────────
+  // Real time, not stepped frames: each key pose is held for frame.hold ms, then
+  // the figure moves to the next over frame.duration ms. A key with hold 0 is a
+  // pass-through (a circle, a stride): the two moves either side of it do not slow
+  // to a stop there, so continuous motion stays continuous. The move from the
+  // last frame back to the first is just another move, taking the short way round.
+  function segEase(frames, i, loop) {
+    var fr = frames[i];
+    if (fr.ease) return fr.ease;
+    var n = frames.length, prev = frames[(i + n - 1) % n], next = frames[(i + 1) % n];
+    var stopStart = (i === 0 && !loop) || prev.hold > 0, stopEnd = next.hold > 0;
+    return stopStart && stopEnd ? 'ease-in-out' : stopStart ? 'ease-in' : stopEnd ? 'ease-out' : 'linear';
+  }
+  function timeline(frames, loop) {
+    var t = 0, segs = frames.map(function (fr, i) {
+      var last = !loop && i === frames.length - 1;
+      var s = { start: t, hold: fr.hold, dur: last ? 0 : fr.duration, ease: last ? null : segEase(frames, i, loop) };
+      t += s.hold + s.dur;
+      return s;
+    });
+    return { segs: segs, total: t };
+  }
+  // The pose at ms into the cycle (wrapped when looping). Returns {pose, index, t, done}.
+  function sampleAt(frames, tl, ms, view, loop) {
+    var end = tl.total;
+    if (loop !== false) { ms = end > 0 ? ((ms % end) + end) % end : 0; }
+    else if (ms >= end) return { pose: frames[frames.length - 1].pose, index: frames.length - 1, t: 0, done: true };
+    var i = 0;
+    while (i < tl.segs.length - 1 && ms >= tl.segs[i + 1].start) i++;
+    var sg = tl.segs[i], local = ms - sg.start;
+    if (local < sg.hold || sg.dur <= 0) return { pose: frames[i].pose, index: i, t: 0, done: false };
+    var t = easeValue((local - sg.hold) / sg.dur, sg.ease);
+    return { pose: between(frames[i], nextOf(frames, i), t, view), index: i, t: t, done: false };
+  }
+
   // ── rules ────────────────────────────────────────────────────────────────
   var SURFACE = FLOOR_Y + 1.5;          // where the floor line is drawn
   // how far each joint's drawing extends below the joint (half a stroke, or the head)
@@ -204,6 +253,28 @@
       worst[k] = { score: score, msg: 'frame ' + at + ': ' + joint + ' ' + what + ' (' + detail + (at.indexOf('→') >= 0 ? ', worst at ' + pct + '%' : '') + ')' };
     }
   }
+  // THE HINGE RULE. A knee flexes only so the shin goes BEHIND the thigh, an
+  // elbow only so the forearm goes FORWARD of the upper arm, relative to the way
+  // the figure faces. Angles are in the figure's own frame (+90 = the way it faces)
+  // and mirroring happens only when drawing, so facing and mirroring are already
+  // accounted for: knee = thigh - shin and elbow = forearm - upperArm are positive
+  // when bent the right way. At most HYPER degrees past straight the wrong way.
+  // It is checked at every keyframe AND on the in-betweens, because IK (pins) and
+  // the angle blend can bend a joint backwards between two legal keyframes.
+  // Front view cannot show a sagittal bend (the knee bends into the screen), so it
+  // is exempt; there the limbs are only checked for the bone-length rules.
+  var HYPER = 5, FLEX_MAX = 165;
+  function hingeErrors(p, sd) {
+    var out = [];
+    var knee = norm(p['thigh' + sd] - p['shin' + sd]);
+    if (knee < -HYPER) out.push(['knee' + sd, 'bends backwards', knee, 'thigh−shin is ' + knee.toFixed(0) + '°; the shin must go behind the thigh, at most ' + HYPER + '° past straight']);
+    else if (knee > FLEX_MAX) out.push(['knee' + sd, 'bends too far', knee, 'thigh−shin is ' + knee.toFixed(0) + '°, max ' + FLEX_MAX]);
+    var elbow = norm(p['forearm' + sd] - p['upperArm' + sd]);
+    if (elbow < -HYPER) out.push(['elbow' + sd, 'bends backwards', elbow, 'forearm−upperArm is ' + elbow.toFixed(0) + '°; the forearm must go forward, at most ' + HYPER + '° past straight']);
+    else if (elbow > FLEX_MAX) out.push(['elbow' + sd, 'bends too far', elbow, 'forearm−upperArm is ' + elbow.toFixed(0) + '°, max ' + FLEX_MAX]);
+    return out;
+  }
+
   // Every problem with an animation; empty means valid.
   function validate(data) {
     var errs = [];
@@ -211,7 +282,11 @@
     var view = data.view || 'side';
     if (view !== 'side' && view !== 'front') errs.push('view must be "side" or "front"');
     if (!data.title) errs.push('title missing');
-    if (!Array.isArray(data.frames) || data.frames.length < 2) return errs.concat('needs at least 2 frames');
+    var isStatic = data.static === true;
+    if (data.static !== undefined && typeof data.static !== 'boolean') errs.push('static must be true or false');
+    if (!Array.isArray(data.frames)) return errs.concat('needs frames');
+    if (isStatic && data.frames.length !== 1) return errs.concat('a static pose is exactly one frame (it holds still; it does not move)');
+    if (!isStatic && data.frames.length < 2) return errs.concat('needs at least 2 frames (or "static": true with one)');
     var f0 = data.frames[0], p0 = f0.pose || {};
     if (!p0.root && !f0.anchor && !data.anchor) errs.push('frame 0: needs pose.root or an anchor');
     ANGLES.forEach(function (k) { if (typeof p0[k] !== 'number' || !isFinite(p0[k])) errs.push('frame 0: ' + k + ' missing'); });
@@ -226,7 +301,8 @@
       (fr.pins || (i === 0 ? data.pins : null) || []).forEach(function (pn) {
         if (!PIN_LIMB[pn]) errs.push('frame ' + i + ': pin "' + pn + '" unknown (handL, handR, ankleL, ankleR)');
       });
-      if (!(fr.duration >= 150 && fr.duration <= 10000)) errs.push('frame ' + i + ': duration must be 150–10000 ms');
+      if (fr.hold !== undefined && !(fr.hold >= 0 && fr.hold <= 5000)) errs.push('frame ' + i + ': hold must be 0–5000 ms');
+      if (!isStatic && !(fr.duration >= 150 && fr.duration <= 10000)) errs.push('frame ' + i + ': duration must be 150–10000 ms');
     });
     if (data.anchor && JOINTS.indexOf(data.anchor.joint) < 0) errs.push('anchor joint "' + data.anchor.joint + '" unknown');
     if (errs.length) return errs;
@@ -236,11 +312,15 @@
     var moved = 0;
     frames.forEach(function (fr, i) {
       var ni = (i + 1) % frames.length;
-      if (ni === 0 && data.loop === false) return;
+      if (ni === 0 && data.loop === false) {   // final key of a non-looping animation still gets the hinge rule
+        if (view === 'side') ['L', 'R'].forEach(function (sd) { hingeErrors(fr.pose, sd).forEach(function (h) { errs.push('frame ' + i + ': ' + h[0] + ' ' + h[1] + ' (' + h[3] + ')'); }); });
+        return;
+      }
       var nx = nextOf(frames, i), p = fr.pose;
       ANGLES.forEach(function (k) {
         var d = Math.abs(nx.pose[k] - p[k]);
-        if (d > 200) errs.push('frame ' + i + '→' + ni + ': ' + k + ' swings ' + d.toFixed(0) + '° — write angles continuously (190, not -170)');
+        // Players take the shortest way round, so a written jump over a half turn would play as the OTHER way.
+        if (d > 180) errs.push('frame ' + i + '→' + ni + ': ' + k + ' swings ' + d.toFixed(0) + '° — write angles continuously (190, not -170); a move is always played the short way round');
         moved = Math.max(moved, d);
       });
       moved = Math.max(moved, Math.hypot(nx.pose.root.x - p.root.x, nx.pose.root.y - p.root.y) * 4);
@@ -261,6 +341,11 @@
           if (edge > SURFACE + 1.5) note(worst, at, n, 'goes through the floor', edge, 'bottom edge ' + edge.toFixed(1) + ', floor surface ' + SURFACE, pct);
           lowest = Math.max(lowest, edge);
         });
+        if (view === 'side') {
+          ['L', 'R'].forEach(function (sd) {
+            hingeErrors(q, sd).forEach(function (h) { note(worst, at, h[0], h[1], Math.abs(h[2]), h[3], pct); });
+          });
+        }
         if (s === 0 && grounded && !fr.air && lowest < SURFACE - 3) {
           errs.push('frame ' + i + ': floating — lowest edge ' + lowest.toFixed(1) + ', floor surface ' + SURFACE + ' (anchor something to the floor, mark the frame "air": true, or set "grounded": false for a bar/bench)');
         }
@@ -269,10 +354,6 @@
 
       if (view === 'side') {
         ['L', 'R'].forEach(function (sd) {
-          var knee = norm(p['thigh' + sd] - p['shin' + sd]);
-          if (knee < -10 || knee > 165) errs.push('frame ' + i + ': knee' + sd + ' bends backwards/too far (' + knee.toFixed(0) + '°; thigh−shin must be −10…165)');
-          var elbow = norm(p['forearm' + sd] - p['upperArm' + sd]);
-          if (elbow < -10 || elbow > 165) errs.push('frame ' + i + ': elbow' + sd + ' bends backwards/too far (' + elbow.toFixed(0) + '°; forearm−upperArm must be −10…165)');
           var ankle = norm(p['foot' + sd] - p['shin' + sd]);
           if (ankle < 15 || ankle > 140) errs.push('frame ' + i + ': ankle' + sd + ' out of range (' + ankle.toFixed(0) + '°; foot−shin must be 15…140, 90 neutral)');
           var hipF = norm(180 - p.torso + p['thigh' + sd]);
@@ -282,7 +363,7 @@
       var neck = norm(p.head - p.torso);
       if (neck < -70 || neck > 70) errs.push('frame ' + i + ': neck out of range (' + neck.toFixed(0) + '°; head−torso must be ±70)');
     });
-    if (moved < 10) errs.push('does not move — biggest change between frames is ' + moved.toFixed(1) + '° (needs ≥ 10°)');
+    if (!isStatic && moved < 10) errs.push('does not move — biggest change between frames is ' + moved.toFixed(1) + '° (needs ≥ 10°)');
     return errs.filter(function (e, i) { return errs.indexOf(e) === i; });
   }
 
@@ -357,6 +438,7 @@
     var out = '';
     if (opts.floor !== false) out += '<line x1="0" y1="' + (FLOOR_Y + 1.5) + '" x2="100" y2="' + (FLOOR_Y + 1.5) + '" stroke="' + pal.floor + '" stroke-width="1.5"/>';
     (opts.props || []).forEach(function (p) { out += propHTML(p, pal); });
+    out += '<g class="sf-bob">';     // the figure only: a static pose's breathing bob moves this, not the floor or props
 
     var headHTML = line(jt.neck, jt.head, headCol, 4.5) + circ(jt.head, HEAD_R, pal.headFill, ' stroke="' + headCol + '" stroke-width="2.5"');
     if (view === 'front') {
@@ -373,7 +455,7 @@
       out += leg('R', 0.85) + arm('R', 0.85) + spine + leg('L', 1) + headHTML +
         circ(step(jt.head, fa, 3.6), 1.4, headCol) + arm('L', 1);
     }
-    out += holdHTML(opts.hold, jt, pal, view);
+    out += holdHTML(opts.hold, jt, pal, view) + '</g>';
     return opts.faceRight === false ? '<g transform="translate(100 0) scale(-1 1)">' + out + '</g>' : out;
   }
 
@@ -418,8 +500,11 @@
     this.view = data.view || 'side';
     this.frames = resolveFrames(data);
     this.loop = data.loop !== false;
+    this.static = data.static === true;
+    this.tl = timeline(this.frames, this.loop);
     this.opts = drawOpts(data, opts);
-    this._fi = 0; this._elapsed = 0; this._last = null; this._playing = false; this._visible = true;
+    this._clock = 0; this._last = null; this._playing = false; this._visible = true;
+    this._still = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('viewBox', VIEWBOX);
@@ -430,22 +515,29 @@
     container.innerHTML = '';
     container.appendChild(svg);
     this._render(this.frames[0].pose, this.frames[0].highlight);
-    if (opts.autoplay !== false) this.play();
+    if (this.static) this._bob = svg.querySelector('.sf-bob');
+    if (opts.autoplay !== false && !(this.static && this._still)) this.play();
   }
   Player.prototype._render = function (pose, hl) { this.svg.innerHTML = figureHTML(pose, this.opts, hl); };
   Player.prototype._tick = function (ts) {
     if (this._last !== null) {
-      this._elapsed += Math.min(ts - this._last, 100);
-      var cur = this.frames[this._fi];
-      while (this._elapsed >= cur.duration) {
-        this._elapsed -= cur.duration;
-        var ni = (this._fi + 1) % this.frames.length;
-        if (ni === 0 && !this.loop) { this.pause(); return; }
-        this._fi = ni; cur = this.frames[ni];
+      var dt = Math.min(ts - this._last, 100);
+      if (this.static) {
+        // One pose, drawn once. Only the whole figure's transform changes, at ~20 fps: no re-render, no limb moves.
+        if (dt < 48) return;
+        this._clock += dt;
+        if (this._bob) {
+          var y = (Math.sin(this._clock / BOB_MS * 2 * Math.PI) * 0.5 + 0.5) * BOB;
+          this._bob.setAttribute('transform', 'translate(0 ' + y.toFixed(2) + ')');
+        }
+        this._last = ts;
+        return;
       }
-      var next = nextOf(this.frames, this._fi);
-      var t = easeValue(this._elapsed / cur.duration, cur.ease);
-      this._render(between(cur, next, t, this.view), t < 0.5 ? cur.highlight : next.highlight);
+      this._clock += dt;
+      var smp = sampleAt(this.frames, this.tl, this._clock, this.view, this.loop);
+      var fr = this.frames[smp.index], nx = this.frames[(smp.index + 1) % this.frames.length];
+      this._render(smp.pose, smp.t < 0.5 ? fr.highlight : nx.highlight);
+      if (smp.done) { this.pause(); return; }
     }
     this._last = ts;
   };
@@ -473,6 +565,14 @@
     return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="' + VIEWBOX + '">' + figureHTML(pose, drawOpts(data), a.highlight) + '</svg>';
   }
 
-  return { Player: Player, validate: validate, solve: solve, resolveFrames: resolveFrames, between: between,
+  // A static SVG at an exact moment of the real playback (ms into the cycle), hold and easing included.
+  function svgAt(data, ms) {
+    var frames = resolveFrames(data), view = data.view || 'side', loop = data.loop !== false;
+    var smp = sampleAt(frames, timeline(frames, loop), ms, view, loop);
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="' + VIEWBOX + '">' + figureHTML(smp.pose, drawOpts(data), frames[smp.index].highlight) + '</svg>';
+  }
+  function duration(data) { var f = resolveFrames(data); return timeline(f, data.loop !== false).total; }
+
+  return { Player: Player, validate: validate, svgAt: svgAt, duration: duration, timeline: timeline, sampleAt: sampleAt, solve: solve, resolveFrames: resolveFrames, between: between,
     nextOf: nextOf, svgFor: svgFor, LEN: LEN, ANGLES: ANGLES, JOINTS: JOINTS, FLOOR_Y: FLOOR_Y };
 }));

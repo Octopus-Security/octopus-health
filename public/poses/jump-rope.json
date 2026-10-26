@@ -2,11 +2,11 @@
  "version": 2,
  "title": "Jump Rope",
  "view": "front",
- "highlight": ["elbowL","elbowR","ankleL","ankleR"],
+ "highlight": ["elbowL", "elbowR", "ankleL", "ankleR"],
  "frames": [
   {"duration":150,"label":"Hands low","pose":{"root":{"x":50,"y":50},"torso":180,"head":180,"upperArmL":22,"forearmL":50,"upperArmR":-22,"forearmR":-50,"thighL":1,"shinL":1,"footL":90,"thighR":-1,"shinR":-1,"footR":-90,"arch":0}},
   {"duration":160,"label":"Hop","air":true,"pose":{"root":{"x":50,"y":45},"torso":180,"head":180,"upperArmL":22,"forearmL":85,"upperArmR":-22,"forearmR":-85,"thighL":4,"shinL":-8,"footL":90,"thighR":-4,"shinR":8,"footR":-90,"arch":0}},
-  {"duration":160,"air":true,"pose":{"root":{"x":50,"y":45},"torso":180,"head":180,"upperArmL":22,"forearmL":115,"upperArmR":-22,"forearmR":-115,"thighL":4,"shinL":-8,"footL":90,"thighR":-4,"shinR":8,"footR":-90,"arch":0}},
+  {"duration":160,"air":true,"pose":{"root":{"x":50,"y":45},"torso":180,"head":180,"upperArmL":22,"forearmL":115,"upperArmR":-22,"forearmR":-115,"thighL":4,"shinL":-8,"footL":90,"thighR":-4,"shinR":8,"footR":-90,"arch":0},"hold":0},
   {"duration":150,"label":"Land","pose":{"root":{"x":50,"y":50},"torso":180,"head":180,"upperArmL":22,"forearmL":80,"upperArmR":-22,"forearmR":-80,"thighL":1,"shinL":1,"footL":90,"thighR":-1,"shinR":-1,"footR":-90,"arch":0}}
  ]
 }

@@ -1,11 +1,10 @@
 {
-  "version": 2,
-  "title": "Supine Hamstring Stretch",
-  "view": "side",
-  "highlight": ["kneeL","hipL"],
-  "frames": [
-    {"duration":1500,"label":"Lie flat","pose":{"root":{"x":52,"y":87},"torso":-90,"head":-88,"upperArmL":90,"forearmL":90,"upperArmR":90,"forearmR":90,"thighL":90,"shinL":90,"footL":180,"thighR":90,"shinR":90,"footR":180}},
-    {"duration":2200,"label":"Raise one leg, hold behind the thigh","pose":{"torso":-90,"head":-88,"upperArmL":112,"forearmL":115,"upperArmR":110,"forearmR":112,"thighL":180,"shinL":180,"footL":270,"thighR":90,"shinR":90,"footR":180}},
-    {"duration":2800,"label":"Draw it toward you, knee soft","pose":{"torso":-90,"head":-95,"upperArmL":104,"forearmL":128,"upperArmR":107,"forearmR":119,"thighL":200,"shinL":200,"footL":290,"thighR":90,"shinR":90,"footR":180}}
-  ]
+ "version": 2,
+ "title": "Supine Hamstring Stretch",
+ "static": true,
+ "view": "side",
+ "highlight": ["kneeL", "hipL"],
+ "frames": [
+  {"label":"Raise one leg, hold behind the thigh","pose":{"torso":-90,"head":-88,"upperArmL":112,"forearmL":115,"upperArmR":110,"forearmR":112,"thighL":180,"shinL":180,"footL":270,"thighR":90,"shinR":90,"footR":180,"root":{"x":52,"y":87}}}
+ ]
 }

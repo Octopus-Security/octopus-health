@@ -36,6 +36,32 @@ cannot be written any more.
   frame loops back to the first, so a two-frame file is a full rep.
 - `duration` 150–10000 ms is the time spent moving *from* this frame to the next.
   `ease`: `ease-in-out` (default), `linear`, `ease-in`, `ease-out`.
+- `hold` (ms, default 20% of `duration`, capped at 180) is how long the figure rests
+  on this key pose *before* it moves on. Playback is real time, so a key reads as a
+  key instead of the figure flicking through it. `"hold": 0` marks a **pass-through**
+  key (a circle, a stride): with no ease set, the moves on either side of it do not
+  slow to a stop there, so continuous motion stays continuous.
+- The move from the last frame back to the first is just another move. It takes the
+  short way round and is eased like the rest, so a loop has no seam.
+- Every move takes the **shortest way round** for each angle. Write angles so the
+  step between two keys is at most 180° (the validator rejects more): what you write
+  is what plays.
+
+### Static poses (holds)
+
+A pose that is held still (plank, side plank, dead hang, wall sit, hollow hold, a held
+stretch) declares `"static": true` and has **exactly one frame**. It is exempt from the
+must-move rule, shows that pose exactly as written (no limb ever changes), and the player
+adds only a subtle breathing bob of the whole figure (under 1 unit, ~4 s, nothing for
+`prefers-reduced-motion`). Do not invent a second "pose" to satisfy the must-move rule:
+that distorts the hold into something nobody does. Keep motion only where the exercise
+really moves: a stretch that is rocked into and out of, or a plank *with* shoulder taps,
+is not static.
+
+```json
+{ "version": 2, "title": "Plank", "static": true, "view": "side",
+  "frames": [ { "label": "Straight line", "anchor": { "joint": "toeL", "x": 5, "y": 91.5 }, "pose": { "...all twelve angles..." } } ] }
+```
 - `highlight`: what to colour red (`kneeL`, `hipL`, `shoulderR`, `elbowL`, `ankleL`,
   `hand`, `spine`, `neck`) — the working muscles. Per frame overrides it.
 
@@ -120,18 +146,31 @@ faces down without anything extra.
 
 ## Joint limits (side view): the validator's numbers
 
-- knee: `thigh − shin` from −10 to 165 (positive is bent)
-- elbow: `forearm − upperArm` from −10 to 165
+- knee: `thigh − shin` from **−5** to 165 (positive is bent)
+- elbow: `forearm − upperArm` from **−5** to 165
 - ankle: `foot − shin` from 15 to 140 (90 is neutral)
 - hip: `180 − torso + thigh` from −60 to 178 (0 standing, 90 sitting)
 - neck: `head − torso` within ±70
-- and every animation must move: at least one angle changes by 10° or more.
+- and every animation must move, unless it is `"static": true`: at least one angle changes by 10° or more.
+
+**The hinge rule (hard).** A knee flexes only so the shin goes *behind* the thigh; an
+elbow only so the forearm goes *forward* of the upper arm; at most 5° of hyperextension
+either way. Angles are in the figure's own frame (+90 is the way it faces) and mirroring
+(`faceRight: false`) only flips the drawing, so facing and mirroring are already
+accounted for. It is checked at every keyframe **and** at seven points along every move,
+because a pose can be legal at both ends and bend the wrong way between them (a limb
+swung the long way round, or a pinned limb solved with the wrong bend). Pins always bend
+the anatomical way: the IK takes the sign from the limb, never from the keyframe. Front
+view is exempt: a knee bends into the screen there and a 2D drawing cannot show it.
 
 ## Checking your work
 
 ```sh
 node scripts/poses.mjs squat lunge          # the rule book; exits 1 on problems
 node scripts/poses.mjs --sheet /tmp/s.html squat lunge
+node scripts/poses.mjs --sheet /tmp/s.html --size 260 --moments 8 squat   # big cells + frames from the middle of a tween
+chrome-headless-shell --no-sandbox --window-size=1500,900 --screenshot=/tmp/s.png file:///tmp/s.html
+# or:
 firefox --headless --no-remote --profile /tmp/ffp --window-size 1400,900 \
   --screenshot /tmp/s.png file:///tmp/s.html
 node --test test/stick-figure.test.js

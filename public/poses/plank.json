@@ -1,10 +1,10 @@
 {
  "version": 2,
  "title": "Plank",
+ "static": true,
  "view": "side",
- "highlight": ["spine","hipL"],
+ "highlight": ["spine", "hipL"],
  "frames": [
-  {"duration":1800,"label":"Straight line, shoulders over elbows","anchor":{"joint":"toeL","x":5,"y":91.5},"pins":["handL","handR"],"pose":{"torso":98.3,"head":104.3,"upperArmL":0,"forearmL":90,"upperArmR":0,"forearmR":90,"thighL":-81.7,"shinL":-81.7,"footL":-10,"thighR":-81.7,"shinR":-81.7,"footR":-10,"arch":0}},
-  {"duration":1800,"label":"Rock back, hips lift","anchor":{"joint":"toeL","x":5,"y":91.5},"pose":{"torso":77.2,"head":83.2,"upperArmL":13.5,"forearmL":90,"upperArmR":13.5,"forearmR":90,"thighL":-65.9,"shinL":-65.9,"footL":-10,"thighR":-65.9,"shinR":-65.9,"footR":-10,"arch":0}}
+  {"label":"Straight line, shoulders over elbows","anchor":{"joint":"toeL","x":5,"y":91.5},"pose":{"torso":98.3,"head":104.3,"upperArmL":0,"forearmL":90,"upperArmR":0,"forearmR":90,"thighL":-81.7,"shinL":-81.7,"footL":-10,"thighR":-81.7,"shinR":-81.7,"footR":-10}}
  ]
 }
