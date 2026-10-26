@@ -71,10 +71,17 @@
 
   function fmtMin(m) { return (Math.round(m * 10) / 10) + ' min'; }
 
+  // A name opens the demo sheet when it is loaded (every page that includes the partial loads it).
+  function nameNode(name, id) {
+    if (!window.StretchDemo) return el('span', 'ds-name', name);
+    var b = el('button', 'ds-name ds-demo-link', name); b.type = 'button';
+    return window.StretchDemo.link(b, { id: id, name: name });
+  }
+
   function row(it, idx, n) {
     var li = el('li', 'ds-row');
     var ref = { exerciseId: it.exerciseId, name: it.name };
-    li.appendChild(el('span', 'ds-name', it.name));
+    li.appendChild(nameNode(it.name, it.exerciseId));
     var hold = el('input', 'ds-hold'); hold.type = 'number'; hold.min = 5; hold.max = 600; hold.step = 5; hold.value = it.holdSeconds;
     hold.setAttribute('aria-label', 'Hold seconds for ' + it.name);
     hold.addEventListener('change', function () { guard(DS.update(ref, { holdSeconds: Number(hold.value) })); });
@@ -126,7 +133,7 @@
     var ul = $('ds-lib'); ul.textContent = '';
     LIB.filter(function (e) { return !q || keyOf(e.name).indexOf(q) >= 0; }).slice(0, 80).forEach(function (e) {
       var li = el('li', 'ds-libitem');
-      li.appendChild(el('span', 'ds-name', e.name));
+      li.appendChild(nameNode(e.name, e.id));
       li.appendChild(DS.toggleButton(e));
       ul.appendChild(li);
     });
