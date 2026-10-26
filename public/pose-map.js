@@ -77,7 +77,8 @@
 
     // ── BJJ ("mount" is a whole word: Mountain Climber is not a BJJ position) ──
     [/mountain climber/i, 'mountain-climber'],
-    [/footwork|shadow boxing/i, 'fight-stance'],
+    [/shadow boxing/i, 'shadow-boxing'],
+    [/footwork/i, 'fight-stance'],
     [/ab roller/i, 'rollout'],
     [/shrimp|hip escape|mount escape|side control escape|hip shift|guard retention/i, 'shrimp'],
     [/bridge and roll|hip bump/i, 'glute-bridge'],

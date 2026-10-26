@@ -1,22 +1,61 @@
-<nav>
-  <div class="container">
-    <h1>🏥 Health Tracker</h1>
-    <div class="nav-links">
-      <a href="/" class="<%= activeTab === 'dashboard' ? 'active' : '' %>">Dashboard</a>
-      <a href="/workout" class="<%= activeTab === 'workout' ? 'active' : '' %>">Workout</a>
-      <a href="/logs" class="<%= activeTab === 'logs' ? 'active' : '' %>">Logs</a>
-      <a href="/tools" class="<%= activeTab === 'tools' ? 'active' : '' %>">Tools</a>
-      <a href="/exercises" class="<%= activeTab === 'exercises' ? 'active' : '' %>">Exercises</a>
-      <a href="/plan-maker" class="<%= activeTab === 'plan-maker' ? 'active' : '' %>">Plan Maker</a>
-      <a href="/stretch" class="<%= activeTab === 'stretch' ? 'active' : '' %>">Stretch</a>
-      <a href="/body" class="<%= activeTab === 'body' ? 'active' : '' %>">Body Map</a>
-      <a href="/nutrition" class="<%= activeTab === 'nutrition' ? 'active' : '' %>">Nutrition</a>
-      <a href="/weight" class="<%= activeTab === 'weight' ? 'active' : '' %>">Weight</a>
-      <a href="/goals" class="<%= activeTab === 'goals' ? 'active' : '' %>">Goals</a>
-      <a href="/plans" class="<%= activeTab === 'plans' ? 'active' : '' %>">Plans</a>
-      <a href="/competitions" class="<%= activeTab === 'competitions' ? 'active' : '' %>">Competition</a>
-      <a href="/stats" class="<%= activeTab === 'stats' ? 'active' : '' %>">Stats</a>
-      <a href="/logout">Logout<% if (user?.username) { %> (<%= user.username %>)<% } %></a>
+<%
+  /* One source for the links: the desktop row, the mobile panel and the "current page" label all read it. */
+  const navGroups = [
+    { label: 'Training', items: [
+      ['workout', '/workout', 'Workout'], ['logs', '/logs', 'Logs'], ['exercises', '/exercises', 'Exercises'],
+      ['plan-maker', '/plan-maker', 'Plan Maker'], ['plans', '/plans', 'Plans'], ['stretch', '/stretch', 'Stretch'],
+      ['body', '/body', 'Body Map'] ] },
+    { label: 'Body', items: [
+      ['nutrition', '/nutrition', 'Nutrition'], ['weight', '/weight', 'Weight'], ['goals', '/goals', 'Goals'],
+      ['stats', '/stats', 'Stats'] ] },
+    { label: 'Other', items: [
+      ['dashboard', '/', 'Dashboard'], ['tools', '/tools', 'Tools'], ['competitions', '/competitions', 'Competition'] ] },
+  ];
+  let navCurrent = '';
+  navGroups.forEach(function (g) { g.items.forEach(function (i) { if (i[0] === activeTab) navCurrent = i[2]; }); });
+%>
+<nav class="site-nav" id="site-nav" aria-label="Main">
+  <div class="container nav-bar">
+    <h1 class="nav-title"><a href="/">🏥 <span>Health Tracker</span></a></h1>
+    <% if (navCurrent) { %><span class="nav-current" aria-hidden="true"><%= navCurrent %></span><% } %>
+    <%# Works with no JS: a checkbox drives :checked. JS swaps in a real button that carries aria-expanded. %>
+    <input type="checkbox" id="nav-check" class="nav-check" aria-label="Menu" aria-controls="nav-panel">
+    <label for="nav-check" class="nav-toggle nav-toggle-label"><span aria-hidden="true">☰</span> Menu</label>
+    <button type="button" class="nav-toggle nav-toggle-btn" aria-expanded="false" aria-controls="nav-panel" hidden><span aria-hidden="true">☰</span> Menu</button>
+    <div class="nav-panel" id="nav-panel">
+      <% navGroups.forEach(function (g) { %>
+      <div class="nav-group" role="group" aria-label="<%= g.label %>">
+        <p class="nav-group-label"><%= g.label %></p>
+        <div class="nav-grid">
+          <% g.items.forEach(function (i) { %>
+          <a href="<%= i[1] %>" class="<%= activeTab === i[0] ? 'active' : '' %>"<% if (activeTab === i[0]) { %> aria-current="page"<% } %>><%= i[2] %></a>
+          <% }) %>
+        </div>
+      </div>
+      <% }) %>
+      <div class="nav-group nav-logout">
+        <a href="/logout">Logout<% if (user && user.username) { %> <span class="nav-user">(<%= user.username %>)</span><% } %></a>
+      </div>
     </div>
   </div>
 </nav>
+<script>
+(function () {
+  var nav = document.getElementById('site-nav');
+  if (!nav) return;
+  var check = nav.querySelector('.nav-check'), btn = nav.querySelector('.nav-toggle-btn');
+  if (!check || !btn) return;
+  nav.classList.add('nav-js');
+  btn.hidden = false;
+  function set(open, refocus) {
+    check.checked = open;
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (!open && refocus) btn.focus();
+  }
+  btn.addEventListener('click', function () { set(!check.checked); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && check.checked) set(false, true); });
+  nav.querySelectorAll('.nav-panel a').forEach(function (a) { a.addEventListener('click', function () { set(false); }); });
+  document.addEventListener('click', function (e) { if (check.checked && !nav.contains(e.target)) set(false); });
+  if (window.matchMedia) window.matchMedia('(min-width: 801px)').addEventListener('change', function () { set(false); });
+})();
+</script>

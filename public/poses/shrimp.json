@@ -1,3 +1,21 @@
 {
- "version": 2, "title": "Shrimp (Hip Escape)", "view": "side", "highlight": [ "hipL", "hipR" ], "frames": [ { "duration": 700, "label": "Set — feet planted", "pose": { "torso": -90, "head": -88, "upperArmL": 150, "forearmL": 175, "upperArmR": 140, "forearmR": 175, "thighL": 135, "shinL": 25, "footL": 115, "thighR": 135, "shinR": 25, "footR": 115, "root": { "x": 62, "y": 87 } } }, { "duration": 500, "label": "Push off the feet, hips up", "highlight": [ "hipL", "hipR", "kneeL" ], "pose": { "thighL": 110, "shinL": 41, "footL": 131, "thighR": 110, "shinR": 41, "footR": 131, "torso": -82, "head": -84, "upperArmL": 160, "upperArmR": 150, "root": { "x": 52.7, "y": 82 } } }, { "duration": 500, "label": "Slide the hips back", "pose": { "thighL": 120, "shinL": 46, "footL": 136, "thighR": 120, "shinR": 46, "footR": 136, "torso": -90, "head": -88, "upperArmL": 150, "upperArmR": 140, "root": { "x": 52.7, "y": 87 } } }, { "duration": 600, "label": "Reset", "highlight": [], "pose": { "thighL": 135, "shinL": 25, "footL": 115, "thighR": 135, "shinR": 25, "footR": 115, "root": { "x": 62, "y": 87 } } } ]
+  "version": 2,
+  "title": "Shrimp (Hip Escape)",
+  "view": "side",
+  "highlight": ["hipL", "hipR"],
+  "frames": [
+    { "duration": 700, "label": "On your back, feet planted, hands framing",
+      "pose": { "torso": -90, "head": -88, "upperArmL": 125, "forearmL": 200, "upperArmR": 110, "forearmR": 195,
+                "thighL": 135, "shinL": 25, "footL": 115, "thighR": 135, "shinR": 25, "footR": 115,
+                "root": { "x": 62, "y": 86.5 } } },
+    { "duration": 500, "label": "Push off the feet: bridge the hips up", "highlight": ["hipL", "hipR", "kneeL"],
+      "pose": { "torso": -75, "head": -80, "thighL": 105, "shinL": 8, "footL": 100, "thighR": 105, "shinR": 8, "footR": 100,
+                "root": { "x": 62.4, "y": 76 } } },
+    { "duration": 600, "label": "Drive the hips away, back toward the head", "highlight": ["hipL", "hipR", "kneeL"],
+      "pose": { "torso": -90, "head": -92, "thighL": 115, "shinL": 55, "footL": 135, "thighR": 115, "shinR": 55, "footR": 135,
+                "root": { "x": 50, "y": 85.5 } } },
+    { "duration": 600, "label": "Pull the heels back in, reset", "highlight": [],
+      "pose": { "thighL": 135, "shinL": 25, "footL": 115, "thighR": 135, "shinR": 25, "footR": 115,
+                "root": { "x": 50, "y": 85.5 } } }
+  ]
 }

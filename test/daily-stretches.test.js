@@ -422,5 +422,5 @@ test('the head row of the daily card has the same gap below it as inside it', ()
   const css = fs.readFileSync(path.join(__dirname, '..', 'public', 'daily-stretches.css'), 'utf8');
   const head = css.match(/\.ds-head \{([^}]*)\}/)[1];
   assert.match(head, /gap: var\(--space-3\)/);
-  assert.match(head, /margin-bottom: var\(--space-3\)/);
+  assert.match(head, /padding-bottom: var\(--space-3\)/);
 });

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
     <%- include('partials/favicon') %>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title><%= title %></title>
   <link rel="stylesheet" href="<%= asset('/theme.css') %>">
   <link rel="stylesheet" href="<%= asset('/daily-stretches.css') %>">
@@ -87,7 +87,7 @@
             <h2 style="margin:0">🧘 Stretch Builder</h2>
             <p style="margin-top:6px;color:#777">Build warmups, cooldowns, or standalone stretching flows with exercise cards.</p>
           </div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap"><a href="/body" class="btn">Body map</a>
+          <div class="btn-row"><a href="/body" class="btn">Body map</a>
           <button class="btn" onclick="resetBuilder()">New Routine</button></div>
         </div>
 

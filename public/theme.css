@@ -6,31 +6,83 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 /* ── Base ──────────────────────────────────────────────────── */
+/* Estate layout rules (octopus-kit docs/layout.md): html AND body take the background
+   (overscroll paints html); body clips sideways overflow as a safety net; dvh so a phone's
+   collapsing toolbar does not leave a grey bar; words stay whole. */
+html { background: #0d0d0d; }
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
     background: #0d0d0d;
     color: #d4d4d4;
     min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: clip;
+    overflow-wrap: break-word;
+    hyphens: manual;
 }
+img, video, svg { max-width: 100%; }
+img, video { height: auto; }
+pre { overflow-x: auto; max-width: 100%; }
+code, kbd { overflow-wrap: anywhere; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
 
 h1, h2, h3 { color: #e8e8e8; }
 p { color: #aaa; }
 strong { color: #d4d4d4; }
 
 /* ── Nav ───────────────────────────────────────────────────── */
-nav {
+/* Desktop (above 800px): one tidy row of links. Mobile: title + current page + a Menu button
+   that opens a full-width two-column panel. The panel is driven by a checkbox, so it works with
+   no JS; nav.ejs swaps in a real <button aria-expanded> when JS is present. */
+nav.site-nav {
     background: #111;
     border-bottom: 1px solid #1e1e1e;
-    padding: 15px 20px;
+    padding: 12px 20px;
+    position: relative;
+    z-index: 50;
 }
-nav .container {
+nav .nav-bar {
     max-width: 1200px;
     margin: 0 auto;
+    padding: 0;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap;
+    gap: var(--space-3);
 }
+.nav-check {
+    position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; pointer-events: none;
+}
+.nav-toggle, .nav-current { display: none; }
+nav .nav-title { white-space: nowrap; font-size: 18px; line-height: 1.2; margin: 0; flex: 0 0 auto; }
+nav .nav-title a { color: #e8e8e8; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; padding: 0; border: 0; }
+nav .nav-title a:hover { text-decoration: none; color: #e8e8e8; }
+nav .nav-panel {
+    display: flex; flex: 1 1 auto; justify-content: flex-end; align-items: center;
+    flex-wrap: wrap; gap: 2px;
+}
+nav .nav-group, nav .nav-grid { display: contents; }
+nav .nav-group-label { display: none; }
+nav .nav-logout { margin-left: var(--space-2); padding-left: var(--space-3); border-left: 1px solid #252525; display: block; }
+nav a {
+    color: #aaa;
+    text-decoration: none;
+    padding: 6px 8px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    transition: background 0.2s, color 0.2s;
+}
+nav a:hover { background: #1a1a1a; color: #2ecc71; text-decoration: none; }
+nav a.active, nav a[aria-current="page"] {
+    background: #162d1e;
+    color: #2ecc71;
+    border-color: #2a5c3a;
+}
+nav .nav-user { color: #777; margin-left: 4px; }
+.nav-check:focus-visible ~ .nav-toggle-label,
+nav .nav-toggle:focus-visible,
+nav a:focus-visible { outline: 2px solid #7fcbff; outline-offset: 2px; }
+
 /* Content links.
  *
  * There was no bare `a` rule at all — only `nav a` and `.toggle-link a` — so any
@@ -58,22 +110,6 @@ a:hover, a:focus-visible {
 a:visited { color: #2ecc71; }
 a:visited:hover { color: #5df59a; }
 
-nav h1 { font-size: 24px; color: #e8e8e8; }
-nav .nav-links { display: flex; gap: 10px; flex-wrap: wrap; }
-nav a {
-    color: #aaa;
-    text-decoration: none;
-    padding: 7px 14px;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    transition: background 0.2s, color 0.2s;
-}
-nav a:hover { background: #1a1a1a; color: #2ecc71; }
-nav a.active {
-    background: #162d1e;
-    color: #2ecc71;
-    border: 1px solid #2a5c3a;
-}
 
 /* ── Layout ────────────────────────────────────────────────── */
 .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
@@ -124,6 +160,8 @@ nav a.active {
 label { margin-bottom: 5px; color: #999; font-weight: 500; font-size: 0.9rem; }
 
 input, select, textarea {
+    max-width: 100%;
+    min-width: 0;
     padding: 10px 12px;
     background: #161616;
     border: 1px solid #252525;
@@ -138,6 +176,12 @@ input:focus, select:focus, textarea:focus {
     border-color: #2ecc71;
 }
 select option { background: #161616; }
+/* Long option text truncates inside the control instead of widening it. */
+select { text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+/* Flex/grid children default to min-width:auto, which lets a wide select or input push
+   the whole row past the viewport. */
+.form-grid > *, .form-group, .fx-row > *, .ds-preset-row > * { min-width: 0; }
+.form-group > input, .form-group > select, .form-group > textarea { width: 100%; }
 
 /* ── Buttons ───────────────────────────────────────────────── */
 button, .btn {
@@ -152,7 +196,11 @@ button, .btn {
     transition: background 0.2s, border-color 0.2s, transform 0.15s;
     text-decoration: none;
     display: inline-block;
+    max-width: 100%;
+    text-align: center;
 }
+/* A row of buttons. Full width on a phone so every button row matches. */
+.btn-row { display: flex; gap: var(--space-2); flex-wrap: wrap; }
 button:hover, .btn:hover {
     background: #1e4028;
     border-color: #2ecc71;
@@ -504,16 +552,14 @@ body.login-page {
 /* ── Mobile / responsive ───────────────────────────────────────── */
 @media (max-width: 640px) {
     .container { padding: 12px; }
-    nav { padding: 10px 12px; }
-    nav h1 { font-size: 18px; }
-    nav a { padding: 6px 10px; font-size: 0.85rem; }
-
     .card { overflow-x: auto; -webkit-overflow-scrolling: touch; }
     table { min-width: 500px; }
 
     .card { padding: 16px; }
 
     .btn, button[type="submit"] { width: 100%; justify-content: center; }
+    .btn-row { width: 100%; flex: 1 1 100%; }
+    .btn-row > .btn, .btn-row > button { flex: 1 1 100%; width: 100%; }
 
     .login-container { padding: 24px 18px; }
     .login-container h1 { font-size: 22px; margin-bottom: 20px; }
@@ -561,3 +607,56 @@ body.login-page {
 .container input[type="radio"], .container input[type="checkbox"] { width: auto; padding: 0; appearance: auto; -webkit-appearance: auto; accent-color: #2ecc71; background: transparent; }
 #sched th { text-transform: none; letter-spacing: 0; font-size: 0.8rem; }
 #sched th:first-child, #sched td:first-child { width: 4rem; }
+
+
+/* ── Mobile nav (800px and below) ─────────────────────────────── */
+@media (max-width: 800px) {
+    nav.site-nav { padding: 8px 16px; }
+    nav .nav-bar { flex-wrap: nowrap; }
+    nav .nav-title { font-size: 17px; }
+    nav .nav-title a { display: inline-flex; align-items: center; min-height: var(--tap); }
+    .nav-current {
+        display: block; flex: 1 1 auto; min-width: 0; text-align: right;
+        color: #2ecc71; font-size: 0.9rem; font-weight: 600;
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .nav-toggle {
+        display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+        flex: 0 0 auto; min-height: var(--tap); min-width: var(--tap); padding: 0 14px;
+        background: #162d1e; color: #2ecc71; border: 1px solid #2a5c3a; border-radius: 8px;
+        font-size: 0.9rem; font-weight: 600; cursor: pointer; user-select: none; width: auto;
+    }
+    .nav-toggle:hover { background: #1e4028; transform: none; }
+    .nav-toggle[hidden] { display: none; }
+    /* With JS the real button replaces the label. */
+    nav.nav-js .nav-toggle-label { display: none; }
+    .nav-check:checked ~ .nav-toggle { background: #1e4028; border-color: #2ecc71; }
+    nav .nav-panel {
+        display: none;
+        position: absolute; left: 0; right: 0; top: 100%;
+        background: #111; border-bottom: 1px solid #2a2a2a; box-shadow: 0 12px 24px rgba(0,0,0,0.6);
+        padding: var(--space-2) 16px var(--space-4);
+        max-height: calc(100vh - 64px); max-height: calc(100dvh - 64px); overflow-y: auto;
+        flex-direction: column; align-items: stretch; flex-wrap: nowrap; gap: 0;
+    }
+    .nav-check:checked ~ .nav-panel { display: flex; }
+    nav .nav-group { display: block; margin-top: var(--space-3); }
+    nav .nav-group-label {
+        display: block; margin: 0 0 var(--space-2); color: #777; font-size: 0.72rem;
+        font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+    }
+    nav .nav-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2); }
+    nav .nav-panel a {
+        display: flex; align-items: center; min-height: var(--tap); padding: 8px 12px;
+        background: #161616; border: 1px solid #252525; border-radius: 8px;
+        font-size: 0.95rem; white-space: normal; overflow-wrap: anywhere;
+    }
+    nav .nav-panel a.active, nav .nav-panel a[aria-current="page"] {
+        background: #162d1e; border-color: #2ecc71; color: #2ecc71; font-weight: 700;
+    }
+    nav .nav-panel a[aria-current="page"]::before { content: '\2022'; margin-right: 6px; }
+    nav .nav-logout {
+        margin: var(--space-4) 0 0; padding: var(--space-4) 0 0; border-left: 0; border-top: 1px solid #333;
+    }
+    nav .nav-logout a { justify-content: center; color: #ff9090; border-color: #4a2a2a; background: #1a1212; }
+}
