@@ -1,0 +1,22 @@
+<%# The status / priority / kind / Discord fields, shared by the create and edit forms. g is null on create. %>
+<div class="form-grid">
+    <div class="form-group">
+        <label>Status</label>
+        <select name="status">
+            <% STATUSES.forEach(s => { %><option value="<%= s %>" <%= (g ? g.status : 'active') === s ? 'selected' : '' %>><%= s %></option><% }) %>
+        </select>
+    </div>
+    <div class="form-group">
+        <label>Priority (1 = first; blank = last)</label>
+        <input type="number" step="1" min="1" name="priority" value="<%= g && g.priority != null ? g.priority : '' %>">
+    </div>
+    <div class="form-group">
+        <label>Kind</label>
+        <select name="kind">
+            <option value="">(none)</option>
+            <% KINDS.forEach(k => { %><option value="<%= k %>" <%= g && g.kind === k ? 'selected' : '' %>><%= k.replace('_', ' ') %></option><% }) %>
+        </select>
+    </div>
+</div>
+<label class="check-row"><input type="checkbox" name="inBrief" value="1" <%= !g || g.inBrief ? 'checked' : '' %>> Include in the Discord brief</label>
+<label class="check-row"><input type="checkbox" name="nudge" value="1" <%= g && g.nudge ? 'checked' : '' %>> Allow nudges and check-ins</label>

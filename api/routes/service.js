@@ -6,6 +6,7 @@
 
 const express = require('express');
 const { Op } = require('sequelize');
+const goalsApi = require('../goals');
 const router  = express.Router();
 const getDatabase = require('../../database');
 const { partition } = require('../dedupe-sets');
@@ -1044,21 +1045,17 @@ router.post('/weight', requireToken, async (req, res) => {
   } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
 });
 
-// GET /api/service/goals?active=1  → goals for the service user that are still live:
-// not completed AND not past their deadline (ET). A dated goal whose day has gone
-// (the 2026-09-29 superfight taper) kept appearing in every morning brief and in the
-// coaching context for a month, because "active" only ever meant "not completed".
-// Without ?active the full list is returned, expired ones included.
+// GET /api/service/goals?active=1[&brief=1]  → goals, via api/goals.js (the one definition
+// of "active": status 'active' AND not past its deadline (ET)), ordered by priority then age.
+// ?brief=1 (with active) also requires inBrief, i.e. exactly what the Discord morning brief
+// lists. Without ?active the full list is returned, paused, done and expired included.
 router.get('/goals', requireToken, async (req, res) => {
   try {
     const { Goal } = await getDB(req);
-    const where = {};
-    if (req.query.active === '1' || req.query.active === 'true') {
-      const todayET = new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
-      where.completed = false;
-      where[Op.or] = [{ deadline: null }, { deadline: { [Op.gte]: todayET } }];
-    }
-    const rows = await Goal.findAll({ where, order: [['deadline', 'ASC'], ['createdAt', 'DESC']] });
+    const on = v => v === '1' || v === 'true';
+    const rows = on(req.query.active)
+      ? await goalsApi.listActive(Goal, { brief: on(req.query.brief) })
+      : await goalsApi.listAll(Goal);
     res.json({ ok: true, goals: rows });
   } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
 });
@@ -1090,19 +1087,22 @@ function goalKey(title, exerciseName) {
 router.post('/goals', requireToken, async (req, res) => {
   try {
     const { Goal } = await getDB(req);
-    const b = req.body || {};
-    const type = ['weight', 'exercise', 'calories'].includes(b.type) ? b.type : 'exercise';
+    const b = { ...(req.body || {}) };
+    if (!goalsApi.TYPES.includes(b.type)) delete b.type;   // create has always defaulted a bad type to 'exercise'
+    let f;
+    try { f = goalsApi.fromBody(b); } catch (e) { return res.status(e.status || 400).json({ ok: false, error: e.message }); }
     const target = b.targetValue != null ? parseFloat(b.targetValue) : 0;
 
     // Update the matching goal rather than adding a second one. An ambition
     // restated is the same ambition — the newer wording and progression win,
     // and nothing is lost because this is an UPDATE, never a delete.
+    // (Open goals only: active and paused. A done goal restated is a new goal.)
     const key = goalKey(b.title, b.exerciseName);
     if (key) {
       const existing = (await Goal.findAll({ where: { completed: false } }))
         .find(g => goalKey(g.title, g.exerciseName) === key);
       if (existing) {
-        for (const [f, v] of Object.entries({
+        const upd = {
           title:        b.title        || existing.title,
           exerciseName: b.exerciseName || existing.exerciseName,
           targetValue:  Number.isFinite(target) && target ? target : existing.targetValue,
@@ -1111,14 +1111,19 @@ router.post('/goals', requireToken, async (req, res) => {
           deadline:     b.deadline     || existing.deadline,
           progression:  b.progression  || existing.progression,
           description:  b.description  || existing.description,
-        })) existing[f] = v;
+        };
+        // New fields are applied only when the caller actually sent them.
+        for (const k of ['kind', 'priority', 'inBrief', 'nudge']) if (b[k] !== undefined) upd[k] = f[k];
+        // A restated goal does not silently un-pause itself unless asked: status only if sent.
+        if (b.status !== undefined) { upd.status = f.status; upd.completed = f.completed; }
+        for (const [k, v] of Object.entries(upd)) existing[k] = v;
         await existing.save();
         return res.json({ ok: true, goal: existing, updatedExisting: true });
       }
     }
 
     const row = await Goal.create({
-      type,
+      type:         f.type || 'exercise',
       title:        b.title        || b.exerciseName || null,
       exerciseName: b.exerciseName || null,
       targetValue:  Number.isFinite(target) ? target : 0,
@@ -1127,25 +1132,37 @@ router.post('/goals', requireToken, async (req, res) => {
       deadline:     b.deadline     || null,
       progression:  b.progression  || null,
       description:  b.description   || null,
-      completed:    false,
+      status:       f.status, completed: f.completed,
+      priority:     f.priority !== undefined ? f.priority : null,
+      kind:         f.kind !== undefined ? f.kind : null,
+      inBrief:      f.inBrief !== undefined ? f.inBrief : true,
+      nudge:        f.nudge !== undefined ? f.nudge : false,
     });
     res.json({ ok: true, goal: row });
   } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
 });
 
-// PATCH /api/service/goals/:id  { currentValue, completed, progression, ... }
+// POST /api/service/goals/reorder  { ids: [3, 1, 2] }  → priorities 1..n in that order.
+router.post('/goals/reorder', requireToken, async (req, res) => {
+  try {
+    const { Goal } = await getDB(req);
+    const applied = await goalsApi.reorder(Goal, (req.body || {}).ids);
+    res.json({ ok: true, ids: applied });
+  } catch (e) { res.status(e.status || 500).json({ ok: false, error: e.message }); }
+});
+
+// PATCH /api/service/goals/:id  { status, priority, kind, inBrief, nudge, currentValue,
+//   progression, targetValue, deadline, title, description, completed, ... }
+// Only the fields sent are changed. `completed` and `status` are kept in step.
 router.patch('/goals/:id', requireToken, async (req, res) => {
   try {
     const { Goal } = await getDB(req);
     const row = await Goal.findByPk(req.params.id);
     if (!row) return res.status(404).json({ ok: false, error: 'goal not found' });
-    const b = req.body || {};
-    for (const f of ['title', 'exerciseName', 'unit', 'deadline', 'progression', 'description']) {
-      if (b[f] !== undefined) row[f] = b[f];
-    }
-    if (b.targetValue  !== undefined) row.targetValue  = parseFloat(b.targetValue);
-    if (b.currentValue !== undefined) row.currentValue = b.currentValue == null ? null : parseFloat(b.currentValue);
-    if (b.completed    !== undefined) row.completed    = !!b.completed;
+    let f;
+    try { f = goalsApi.fromBody(req.body || {}, row); } catch (e) { return res.status(e.status || 400).json({ ok: false, error: e.message }); }
+    delete f.type;   // a goal's type is fixed once created
+    Object.assign(row, f);
     await row.save();
     res.json({ ok: true, goal: row });
   } catch (e) { res.status(500).json({ ok: false, error: e.message }); }

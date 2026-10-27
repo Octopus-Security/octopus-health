@@ -56,43 +56,70 @@
                     <label>Description</label>
                     <textarea name="description" rows="2" placeholder="Describe your goal..."></textarea>
                 </div>
+                <%- include('partials/goal-fields', { g: null, KINDS, STATUSES }) %>
                 <button type="submit">Create Goal</button>
             </form>
+        </div>
+
+        <div class="card brief-preview">
+            <h2>Tomorrow's Discord brief will include</h2>
+            <% if (briefGoals.length) { %>
+                <ol>
+                <% briefGoals.forEach((g, i) => { %>
+                    <li<%= i >= 5 ? ' class=beyond' : '' %>>
+                        <%= g.title || g.exerciseName || (g.type + ' goal') %><%= g.deadline ? ' (by ' + g.deadline + ')' : '' %><%= i >= 5 ? ' (past the 5-goal limit, not sent)' : '' %>
+                    </li>
+                <% }) %>
+                </ol>
+            <% } else { %>
+                <p class="empty-state" style="padding:12px">Nothing: no goal is both active and set to appear in the brief.</p>
+            <% } %>
+            <p style="color:#888;font-size:0.85em">Active goals that are not past their deadline, in the order below, with "Include in the Discord brief" on. The brief lists the first five.</p>
         </div>
 
         <div class="card">
             <h2>Your Goals</h2>
             <% if (goals.length > 0) { %>
                 <% goals.forEach(goal => { %>
-                    <div class="goal-item <%= goal.completed ? 'completed' : '' %>">
+                    <div class="goal-item <%= goal.status === 'done' ? 'completed' : goal.status === 'paused' ? 'paused' : '' %>">
                         <div class="goal-header">
                             <div>
                                 <strong><%= goal.title || goal.exerciseName || (goal.type.charAt(0).toUpperCase() + goal.type.slice(1) + ' Goal') %></strong>
-                                <span style="color: #888; font-size: 0.85em; margin-left: 6px;"><%= goal.type %></span>
-                                <% if (goal.completed) { %>
-                                    <span style="color: #5df59a; margin-left: 10px;">✓ Completed</span>
-                                <% } %>
+                                <span style="color: #888; font-size: 0.85em; margin-left: 6px;"><%= goal.kind || goal.type %></span>
+                                <span class="status-pill <%= goal.status %>"><%= goal.status === 'done' ? '✓ done' : goal.status %></span>
+                                <% if (goal.status === 'active' && !goal.inBrief) { %><span style="color:#888;font-size:0.8em;margin-left:6px">not in brief</span><% } %>
+                                <% if (goal.nudge) { %><span style="color:#888;font-size:0.8em;margin-left:6px">nudges on</span><% } %>
                             </div>
                             <div class="goal-actions">
-                                <form method="POST" action="/goals/toggle/<%= goal.id %>" style="display: inline;">
-                                    <button type="submit" class="toggle-btn">
-                                        <%= goal.completed ? 'Reopen' : 'Complete' %>
-                                    </button>
+                                <form method="POST" action="/goals/reorder"><input type="hidden" name="ids" value="<%= swaps[goal.id].up || '' %>">
+                                    <button type="submit" class="move-btn" aria-label="Move up" <%= swaps[goal.id].up ? '' : 'disabled' %>>↑</button></form>
+                                <form method="POST" action="/goals/reorder"><input type="hidden" name="ids" value="<%= swaps[goal.id].down || '' %>">
+                                    <button type="submit" class="move-btn" aria-label="Move down" <%= swaps[goal.id].down ? '' : 'disabled' %>>↓</button></form>
+                                <a class="edit-link" href="/goals?edit=<%= goal.id %>#goal-<%= goal.id %>">Edit</a>
+                                <% if (goal.status !== 'done') { %>
+                                <form method="POST" action="/goals/toggle/<%= goal.id %>">
+                                    <input type="hidden" name="to" value="<%= goal.status === 'paused' ? 'active' : 'paused' %>">
+                                    <button type="submit" class="toggle-btn"><%= goal.status === 'paused' ? 'Resume' : 'Pause' %></button>
                                 </form>
-                                <form method="POST" action="/goals/delete/<%= goal.id %>" style="display: inline;">
+                                <% } %>
+                                <form method="POST" action="/goals/toggle/<%= goal.id %>">
+                                    <input type="hidden" name="to" value="<%= goal.status === 'done' ? 'active' : 'done' %>">
+                                    <button type="submit" class="toggle-btn"><%= goal.status === 'done' ? 'Reopen' : 'Complete' %></button>
+                                </form>
+                                <form method="POST" action="/goals/delete/<%= goal.id %>">
                                     <button type="submit" class="delete-btn">Delete</button>
                                 </form>
                             </div>
                         </div>
-                        <div>
+                        <div id="goal-<%= goal.id %>">
                             <strong>Target:</strong> <%= goal.targetValue %><%= goal.unit ? ' ' + goal.unit : '' %>
-                            <% if (goal.currentValue) { %>
+                            <% if (goal.currentValue != null) { %>
                                 | <strong>Current:</strong> <%= goal.currentValue %><%= goal.unit ? ' ' + goal.unit : '' %>
                             <% } %>
                             <% if (goal.deadline) { %>
                                 <%# DATEONLY is a plain YYYY-MM-DD; new Date() would read it as UTC midnight and show the day before in ET %>
                                 | <strong>Deadline:</strong> <%= goal.deadline %>
-                                <% if (!goal.completed && goal.deadline < todayET) { %>
+                                <% if (goal.status !== 'done' && goal.deadline < todayET) { %>
                                     <span style="margin-left:6px;padding:1px 8px;border-radius:10px;background:#3a2a1a;color:#e0a060;font-size:0.85em">Deadline passed: mark it done or delete it</span>
                                 <% } %>
                             <% } %>
@@ -106,6 +133,23 @@
                             <div style="margin-top: 8px; color: #888;">
                                 <%= goal.description %>
                             </div>
+                        <% } %>
+                        <% if (editId === goal.id) { %>
+                            <form method="POST" action="/goals/edit/<%= goal.id %>" class="goal-edit" style="margin-top:14px">
+                                <div class="form-grid">
+                                    <div class="form-group"><label>Title</label><input type="text" name="title" value="<%= goal.title || '' %>"></div>
+                                    <div class="form-group"><label>Exercise / Skill</label><input type="text" name="exerciseName" value="<%= goal.exerciseName || '' %>"></div>
+                                    <div class="form-group"><label>Target Value</label><input type="number" step="0.1" name="targetValue" value="<%= goal.targetValue %>"></div>
+                                    <div class="form-group"><label>Current Value</label><input type="number" step="0.1" name="currentValue" value="<%= goal.currentValue == null ? '' : goal.currentValue %>"></div>
+                                    <div class="form-group"><label>Unit</label><input type="text" name="unit" value="<%= goal.unit || '' %>"></div>
+                                    <div class="form-group"><label>Deadline</label><input type="date" name="deadline" value="<%= goal.deadline || '' %>"></div>
+                                </div>
+                                <div class="form-group"><label>Progression plan</label><textarea name="progression" rows="2"><%= goal.progression || '' %></textarea></div>
+                                <div class="form-group"><label>Description</label><textarea name="description" rows="2"><%= goal.description || '' %></textarea></div>
+                                <%- include('partials/goal-fields', { g: goal, KINDS, STATUSES }) %>
+                                <button type="submit">Save</button>
+                                <a class="edit-link" href="/goals" style="min-height:var(--tap);display:inline-flex;align-items:center;padding:0 14px">Cancel</a>
+                            </form>
                         <% } %>
                     </div>
                 <% }) %>
