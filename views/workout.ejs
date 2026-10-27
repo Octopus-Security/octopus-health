@@ -471,7 +471,7 @@ async function resumeSession() {
   const byOrder = {};
   for (const set of (s.sets || [])) {
     if (!byOrder[set.exerciseOrder]) byOrder[set.exerciseOrder] = { name: set.exerciseName, id: set.exerciseId, order: set.exerciseOrder, sets: [] };
-    byOrder[set.exerciseOrder].sets.push({ id: set.id, reps: set.reps, weight: set.weight, unit: set.weightUnit || 'lbs' });
+    byOrder[set.exerciseOrder].sets.push({ id: set.id, reps: set.reps, weight: set.weight, unit: set.weightUnit || 'lbs', failed: !!set.failed, failPoint: set.failPoint || null });
   }
   const logged = Object.values(byOrder).sort((a,b) => a.order - b.order);
   // Planned order first, each with its logged sets; then anything logged that was not planned.
@@ -679,6 +679,10 @@ function renderExercises() {
           </div>
           <button class="btn-del-set" onclick="deleteSet(${ei},${si})" title="Delete">🗑</button>
         </div>
+        <div class="set-fail" style="padding:2px 14px 6px 46px;font-size:0.78rem;color:#888;display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+          ${s.id ? `<label style="display:flex;gap:4px;align-items:center;min-height:32px"><input type="checkbox"${s.failed?' checked':''} onchange="setFailed(${ei},${si},this.checked)"> Failed</label>` : ''}
+          ${s.failed ? ['bottom','middle','top','grip'].map(pt => `<button type="button" onclick="setFailPoint(${ei},${si},'${pt}')" style="min-height:32px;padding:2px 10px;border-radius:14px;border:1px solid ${s.failPoint===pt?'#2ecc71':'#2a2a2a'};background:${s.failPoint===pt?'#1a2a1a':'#1a1a1a'};color:#ccc;cursor:pointer">${pt}</button>`).join('') + (s.failPoint ? '' : '<span>where did it give out?</span>') : ''}
+        </div>
       `).join('')}
       <button class="btn-add-set" onclick="addSet(${ei})">+ Add Set</button>
     </div>
@@ -700,7 +704,7 @@ async function addSet(ei) {
   });
   const j = await r.json();
   if (j.success) {
-    ex.sets.push({ id: j.data.id, reps: j.data.reps, weight: j.data.weight, unit: j.data.weightUnit || 'lbs' });
+    ex.sets.push({ id: j.data.id, reps: j.data.reps, weight: j.data.weight, unit: j.data.weightUnit || 'lbs', failed: false, failPoint: null });
     renderExercises();
     startRestTimer(90);
   }
@@ -726,6 +730,23 @@ async function updateSetField(ei, si, field, val) {
     alert('That change was not saved (' + e.message + '). Check your connection and enter it again.');
   }
 }
+
+// Coaching: mark a set failed, then tap where it gave out. Saved through the same editor.
+async function saveFail(ei, si, body) {
+  const set = exercises[ei].sets[si];
+  if (!set || !set.id) return;
+  try {
+    const r = await fetch('/logs/api/set/' + set.id, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || j.ok === false) throw new Error(j.error || 'HTTP ' + r.status);
+    set.failed = !!j.set.failed; set.failPoint = j.set.failPoint || null;
+  } catch (e) {
+    alert('That was not saved (' + e.message + ').');
+  }
+  renderExercises();
+}
+function setFailed(ei, si, on) { return saveFail(ei, si, { failed: !!on }); }
+function setFailPoint(ei, si, pt) { return saveFail(ei, si, { failed: true, failPoint: pt }); }
 
 async function deleteSet(ei, si) {
   const set = exercises[ei].sets[si];

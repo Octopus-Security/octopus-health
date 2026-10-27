@@ -312,6 +312,7 @@ app.get('/', requireLogin, async (req, res) => {
 // Skill tree, fitness tests, treadmill test, weekly benchmarks (api/web-fitness.js).
 require('./api/web-fitness')(app, { requireLogin, getDatabase });
 require('./api/web-gyms')(app, { requireLogin, getDatabase });
+require('./api/web-coaching')(app, { requireLogin, getDatabase });
 // Correcting the log in place: edit/delete a set, retitle or redate a session,
 // add a set, rename an exercise, and known-name suggestions (api/web-log-edit.js).
 require('./api/web-log-edit')(app, { requireLogin, getDatabase });
