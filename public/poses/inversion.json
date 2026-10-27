@@ -1,0 +1,19 @@
+{
+ "version": 2,
+ "title": "Inversion Drill",
+ "view": "side",
+ "highlight": ["spine","neck","hipL","hipR"],
+ "frames": [
+  {"duration":600,"label":"Sit-up guard, hand posted","anchor":{"joint":"hip","x":52,"y":88},"pose":{"torso":200,"head":190,"upperArmL":-10,"forearmL":0,"thighL":130,"shinL":70,"footL":130,"upperArmR":80,"forearmR":160,"thighR":140,"shinR":30,"footR":90}},
+  {"duration":150,"label":"Rock back onto the shoulders","hold":0,"anchor":{"joint":"hip","x":50,"y":88.2},"pose":{"torso":265,"head":230,"upperArmL":105,"forearmL":115,"thighL":225,"shinL":105,"footL":165,"upperArmR":105,"forearmR":115,"thighR":225,"shinR":105,"footR":165}},
+  {"duration":150,"hold":0,"anchor":{"joint":"neck","x":26,"y":88.2},"pose":{"torso":277.7,"head":239.7,"upperArmL":121.5,"forearmL":129.6,"upperArmR":121.5,"forearmR":129.6,"thighL":232.8,"shinL":132.2,"footL":200,"thighR":230.9,"shinR":128.3,"footR":196.1}},
+  {"duration":150,"hold":0,"anchor":{"joint":"neck","x":28.9,"y":88.2},"pose":{"torso":284,"head":244.6,"upperArmL":129.8,"forearmL":136.9,"upperArmR":129.8,"forearmR":136.9,"thighL":236.7,"shinL":145.8,"footL":217.5,"thighR":233.8,"shinR":140,"footR":211.7}},
+  {"duration":210,"hold":0,"anchor":{"joint":"neck","x":34.7,"y":88.2},"pose":{"torso":297.5,"head":255,"upperArmL":147.5,"forearmL":152.5,"upperArmR":147.5,"forearmR":152.5,"thighL":245,"shinL":175,"footL":255,"thighR":240,"shinR":165,"footR":245}},
+  {"duration":650,"label":"Invert: hips over, legs kick up","anchor":{"joint":"neck","x":46,"y":84.5},"pose":{"torso":330,"head":280,"upperArmL":190,"forearmL":190,"thighL":265,"shinL":245,"footL":345,"upperArmR":190,"forearmR":190,"thighR":255,"shinR":225,"footR":325}},
+  {"duration":250,"label":"Shoulders posted, legs point overhead","anchor":{"joint":"neck","x":44,"y":82.8},"pose":{"torso":345,"head":290,"upperArmL":205,"forearmL":205,"thighL":295,"shinL":280,"footL":380,"upperArmR":205,"forearmR":205,"thighR":285,"shinR":260,"footR":360}},
+  {"duration":150,"hold":0,"anchor":{"joint":"head","x":27,"y":86.2},"pose":{"torso":310.4,"head":265.8,"upperArmL":162.1,"forearmL":166.3,"upperArmR":162.1,"forearmR":166.3,"thighL":264.6,"shinL":210,"footL":307.9,"thighR":258.8,"shinR":198.3,"footR":296.3}},
+  {"duration":150,"hold":0,"anchor":{"joint":"neck","x":30.4,"y":88.2},"pose":{"torso":290.2,"head":251.7,"upperArmL":137.1,"forearmL":143.7,"upperArmR":137.1,"forearmR":143.7,"thighL":246.9,"shinL":169.2,"footL":265.9,"thighR":243.5,"shinR":162.3,"footR":259.1}},
+  {"duration":150,"hold":0,"anchor":{"joint":"neck","x":27.1,"y":88.2},"pose":{"torso":280.8,"head":245.1,"upperArmL":125.4,"forearmL":133.1,"upperArmR":125.4,"forearmR":133.1,"thighL":238.6,"shinL":150.1,"footL":246.3,"thighR":236.3,"shinR":145.5,"footR":241.7}},
+  {"duration":500,"label":"Unroll","hold":0,"anchor":{"joint":"hip","x":50,"y":88.2},"pose":{"torso":262,"head":232,"upperArmL":102,"forearmL":112,"thighL":222,"shinL":112,"footL":207,"upperArmR":102,"forearmR":112,"thighR":222,"shinR":112,"footR":207}}
+ ]
+}

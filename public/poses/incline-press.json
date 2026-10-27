@@ -1,0 +1,12 @@
+{
+ "version": 2,
+ "title": "Incline Dumbbell Press",
+ "view": "side",
+ "hold": "dumbbell",
+ "props": [{"type":"box","x":36,"y":76,"w":20,"h":16},{"type":"bar","x1":52,"y1":76,"x2":28,"y2":52}],
+ "highlight": ["shoulderL","elbowL"],
+ "frames": [
+  {"duration":900,"label":"Dumbbells at the chest, full stretch","anchor":{"joint":"ankleL","x":76,"y":90},"pose":{"torso":230,"head":225,"upperArmL":10,"forearmL":165,"thighL":100,"shinL":10,"footL":90,"upperArmR":10,"forearmR":165,"thighR":100,"shinR":10,"footR":90}},
+  {"duration":1000,"label":"Press up and slightly together","anchor":{"joint":"ankleL","x":76,"y":90},"pose":{"torso":230,"head":225,"upperArmL":165,"forearmL":170,"thighL":100,"shinL":10,"footL":90,"upperArmR":165,"forearmR":170,"thighR":100,"shinR":10,"footR":90}}
+ ]
+}

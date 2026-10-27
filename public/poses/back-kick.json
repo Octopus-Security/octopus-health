@@ -1,0 +1,13 @@
+{
+ "version": 2,
+ "title": "Spinning Back Kick",
+ "view": "side",
+ "highlight": ["hipR","kneeR"],
+ "frames": [
+  {"duration":450,"label":"Guard","anchor":{"joint":"ankleL","x":60,"y":90},"pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"thighL":12,"shinL":-4,"footL":90,"upperArmR":20,"forearmR":165,"thighR":-22,"shinR":-20,"footR":70}},
+  {"duration":350,"label":"Spin, look over the shoulder, chamber","anchor":{"joint":"ankleL","x":60,"y":90},"pose":{"torso":150,"head":160,"upperArmL":30,"forearmL":160,"thighL":12,"shinL":-4,"footL":90,"upperArmR":20,"forearmR":165,"thighR":50,"shinR":-80,"footR":0}},
+  {"duration":300,"label":"Thrust the heel straight back","hold":250,"anchor":{"joint":"ankleL","x":60,"y":90},"pose":{"torso":118,"head":130,"upperArmL":30,"forearmL":160,"thighL":12,"shinL":-4,"footL":90,"upperArmR":20,"forearmR":165,"thighR":-98,"shinR":-100,"footR":-10}},
+  {"duration":350,"label":"Retract","anchor":{"joint":"ankleL","x":60,"y":90},"pose":{"torso":150,"head":160,"upperArmL":30,"forearmL":160,"thighL":12,"shinL":-4,"footL":90,"upperArmR":20,"forearmR":165,"thighR":50,"shinR":-80,"footR":0}},
+  {"duration":450,"label":"Back to guard","anchor":{"joint":"ankleL","x":60,"y":90},"pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"thighL":12,"shinL":-4,"footL":90,"upperArmR":20,"forearmR":165,"thighR":-22,"shinR":-20,"footR":70}}
+ ]
+}

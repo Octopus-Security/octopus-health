@@ -1,0 +1,11 @@
+{
+ "version": 2,
+ "title": "Plank Dumbbell Row",
+ "view": "side",
+ "hold": "dumbbell",
+ "highlight": ["shoulderL","elbowL","spine"],
+ "frames": [
+  {"duration":800,"label":"Tall plank","pins":["handR"],"anchor":{"joint":"toeL","x":10,"y":91.5},"pose":{"torso":108,"head":112,"upperArmL":0,"forearmL":0,"thighL":-72,"shinL":-72,"footL":-10,"upperArmR":0,"forearmR":0,"thighR":-72,"shinR":-72,"footR":-10}},
+  {"duration":700,"label":"Row one dumbbell to the ribs","hold":250,"pins":["handR"],"anchor":{"joint":"toeL","x":10,"y":91.5},"pose":{"torso":108,"head":112,"upperArmL":-70,"forearmL":15,"thighL":-72,"shinL":-72,"footL":-10,"upperArmR":0,"forearmR":0,"thighR":-72,"shinR":-72,"footR":-10}}
+ ]
+}

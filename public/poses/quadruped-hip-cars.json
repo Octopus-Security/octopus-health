@@ -1,0 +1,13 @@
+{
+ "version": 2,
+ "title": "Quadruped Hip CARs",
+ "view": "side",
+ "highlight": ["hipL"],
+ "frames": [
+  {"duration":900,"label":"All fours, spine still","pins":["handL","handR"],"anchor":{"joint":"kneeR","x":42.2,"y":88.5},"pose":{"torso":108,"head":150,"upperArmL":0,"forearmL":0,"thighL":0,"shinL":-90,"footL":-72,"upperArmR":0,"forearmR":0,"thighR":0,"shinR":-90,"footR":-72}},
+  {"duration":900,"label":"Knee forward under the chest","hold":0,"pins":["handL","handR"],"anchor":{"joint":"kneeR","x":42.2,"y":88.5},"pose":{"torso":108,"head":150,"upperArmL":0,"forearmL":0,"thighL":50,"shinL":-108,"footL":-85,"upperArmR":0,"forearmR":0,"thighR":0,"shinR":-90,"footR":-72}},
+  {"duration":900,"label":"Knee out to the side","hold":0,"pins":["handL","handR"],"anchor":{"joint":"kneeR","x":42.2,"y":88.5},"pose":{"torso":108,"head":150,"upperArmL":0,"forearmL":0,"thighL":-10,"shinL":-95,"footL":-60,"upperArmR":0,"forearmR":0,"thighR":0,"shinR":-90,"footR":-72,"depth":{"thighL":0.45,"shinL":1}}},
+  {"duration":900,"label":"Knee back behind, foot to the ceiling","hold":0,"pins":["handL","handR"],"anchor":{"joint":"kneeR","x":42.2,"y":88.5},"pose":{"torso":108,"head":150,"upperArmL":0,"forearmL":0,"thighL":-80,"shinL":-170,"footL":-100,"upperArmR":0,"forearmR":0,"thighR":0,"shinR":-90,"footR":-72,"depth":{"thighL":1,"shinL":1}}},
+  {"duration":900,"label":"Down to the start","pins":["handL","handR"],"anchor":{"joint":"kneeR","x":42.2,"y":88.5},"pose":{"torso":108,"head":150,"upperArmL":0,"forearmL":0,"thighL":0,"shinL":-90,"footL":-72,"upperArmR":0,"forearmR":0,"thighR":0,"shinR":-90,"footR":-72}}
+ ]
+}

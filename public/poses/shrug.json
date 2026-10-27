@@ -1,0 +1,11 @@
+{
+ "version": 2,
+ "title": "Dumbbell Shrug",
+ "view": "front",
+ "hold": "dumbbell",
+ "highlight": ["shoulderL","shoulderR"],
+ "frames": [
+  {"duration":700,"label":"Shoulders down, arms long","pose":{"torso":180,"head":180,"upperArmL":6,"forearmL":4,"upperArmR":-6,"forearmR":-4,"thighL":3,"shinL":3,"footL":90,"thighR":-3,"shinR":-3,"footR":-90,"shrug":0,"root":{"x":50,"y":50.1}}},
+  {"duration":900,"label":"Shoulders straight up to the ears","hold":900,"pose":{"torso":180,"head":180,"upperArmL":6,"forearmL":4,"upperArmR":-6,"forearmR":-4,"thighL":3,"shinL":3,"footL":90,"thighR":-3,"shinR":-3,"footR":-90,"shrug":5,"root":{"x":50,"y":50.1}}}
+ ]
+}

@@ -1,0 +1,11 @@
+{
+ "version": 2,
+ "title": "Terminal Knee Extension",
+ "view": "side",
+ "props": [{"type":"bar","x1":52,"y1":70,"x2":94,"y2":70}],
+ "highlight": ["kneeL"],
+ "frames": [
+  {"duration":800,"label":"Band pulls the knee forward","anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":176,"head":178,"upperArmL":10,"forearmL":20,"thighL":28,"shinL":-6,"footL":90,"upperArmR":-5,"forearmR":5,"thighR":-12,"shinR":-30,"footR":70}},
+  {"duration":900,"label":"Straighten fully, squeeze the quad","hold":500,"anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":180,"head":180,"upperArmL":10,"forearmL":20,"thighL":1,"shinL":-1,"footL":90,"upperArmR":-5,"forearmR":5,"thighR":-12,"shinR":-30,"footR":70}}
+ ]
+}

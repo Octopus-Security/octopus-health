@@ -1,0 +1,16 @@
+{
+ "version": 2,
+ "title": "Hip Bump Sweep",
+ "view": "side",
+ "highlight": ["hipL","hipR","spine"],
+ "frames": [
+  {"duration":800,"label":"Closed guard on the back","anchor":{"joint":"hip","x":56,"y":88.2},"pose":{"torso":270,"head":255,"upperArmL":180,"forearmL":180,"thighL":150,"shinL":40,"footL":170,"upperArmR":180,"forearmR":180,"thighR":150,"shinR":40,"footR":170}},
+  {"duration":150,"label":"Sit up onto the posted hand, reach over","anchor":{"joint":"hip","x":56,"y":78.5},"pose":{"torso":215,"head":205,"upperArmL":185,"forearmL":215,"thighL":125,"shinL":25,"footL":135,"upperArmR":10,"forearmR":15,"thighR":115,"shinR":-5,"footR":115}},
+  {"duration":150,"hold":0,"anchor":{"joint":"ankleR","x":78.2,"y":90},"pose":{"torso":219.2,"head":208.2,"upperArmL":185,"forearmL":212.9,"upperArmR":11.1,"forearmR":16.1,"thighL":116.7,"shinL":20.9,"footL":130.9,"thighR":106.7,"shinR":5.4,"footR":127.5}},
+  {"duration":292,"hold":0,"anchor":{"joint":"ankleR","x":79.3,"y":90},"pose":{"torso":223.3,"head":211.3,"upperArmL":185,"forearmL":210.8,"upperArmR":12.1,"forearmR":17.1,"thighL":108.3,"shinL":16.7,"footL":126.7,"thighR":98.3,"shinR":15.8,"footR":140}},
+  {"duration":167,"label":"Hips up and forward into them","hold":350,"anchor":{"joint":"handR","x":38,"y":78.7},"pose":{"torso":235,"head":220,"upperArmL":185,"forearmL":205,"thighL":85,"shinL":5,"footL":115,"upperArmR":15,"forearmR":20,"thighR":75,"shinR":45,"footR":175}},
+  {"duration":150,"hold":0,"anchor":{"joint":"ankleL","x":69.2,"y":90},"pose":{"torso":246.7,"head":231.7,"upperArmL":183.3,"forearmL":196.7,"upperArmR":70,"forearmR":73.3,"thighL":106.7,"shinL":16.7,"footL":133.3,"thighR":100,"shinR":43.3,"footR":173.3}},
+  {"duration":250,"hold":0,"anchor":{"joint":"ankleL","x":72.4,"y":90},"pose":{"torso":252.5,"head":237.5,"upperArmL":182.5,"forearmL":192.5,"upperArmR":97.5,"forearmR":100,"thighL":117.5,"shinL":22.5,"footL":142.5,"thighR":112.5,"shinR":42.5,"footR":172.5}},
+  {"duration":800,"label":"Back to guard","anchor":{"joint":"hip","x":56,"y":88.2},"pose":{"torso":270,"head":255,"upperArmL":180,"forearmL":180,"thighL":150,"shinL":40,"footL":170,"upperArmR":180,"forearmR":180,"thighR":150,"shinR":40,"footR":170}}
+ ]
+}

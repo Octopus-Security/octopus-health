@@ -1,0 +1,12 @@
+{
+ "version": 2,
+ "title": "Upward Elbow",
+ "view": "side",
+ "highlight": ["shoulderL","elbowL"],
+ "frames": [
+  {"duration":450,"label":"Guard","anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"thighL":12,"shinL":-4,"footL":90,"upperArmR":20,"forearmR":165,"thighR":-22,"shinR":-20,"footR":70}},
+  {"duration":220,"label":"Dip","anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":165,"head":168,"upperArmL":30,"forearmL":160,"thighL":25,"shinL":-15,"footL":90,"upperArmR":20,"forearmR":165,"thighR":-15,"shinR":-35,"footR":55}},
+  {"duration":240,"label":"Drive the elbow up under the chin, rear heel lifts","hold":250,"anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":186,"head":180,"upperArmL":150,"forearmL":305,"thighL":5,"shinL":0,"footL":90,"upperArmR":20,"forearmR":165,"thighR":-25,"shinR":-28,"footR":40}},
+  {"duration":450,"label":"Back to guard","anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"thighL":12,"shinL":-4,"footL":90,"upperArmR":20,"forearmR":165,"thighR":-22,"shinR":-20,"footR":70}}
+ ]
+}

@@ -25,16 +25,19 @@ const files = fs.readdirSync(POSES).filter((f) => f.endsWith('.json'));
 const load = (k) => JSON.parse(fs.readFileSync(path.join(POSES, k + '.json'), 'utf8'));
 
 const BONES = [
-  ['hip', 'neck', 'torso'], ['neck', 'head', 'head'],
-  ['shoulderL', 'elbowL', 'upperArm'], ['elbowL', 'handL', 'forearm'],
-  ['shoulderR', 'elbowR', 'upperArm'], ['elbowR', 'handR', 'forearm'],
-  ['hipL', 'kneeL', 'thigh'], ['kneeL', 'ankleL', 'shin'], ['ankleL', 'toeL', 'foot'],
-  ['hipR', 'kneeR', 'thigh'], ['kneeR', 'ankleR', 'shin'], ['ankleR', 'toeR', 'foot'],
+  ['hip', 'neck', 'torso', 'torso'], ['neck', 'head', 'head', null],
+  ['shoulderL', 'elbowL', 'upperArm', 'upperArmL'], ['elbowL', 'handL', 'forearm', 'forearmL'],
+  ['shoulderR', 'elbowR', 'upperArm', 'upperArmR'], ['elbowR', 'handR', 'forearm', 'forearmR'],
+  ['hipL', 'kneeL', 'thigh', 'thighL'], ['kneeL', 'ankleL', 'shin', 'shinL'], ['ankleL', 'toeL', 'foot', 'footL'],
+  ['hipR', 'kneeR', 'thigh', 'thighR'], ['kneeR', 'ankleR', 'shin', 'shinR'], ['ankleR', 'toeR', 'foot', 'footR'],
 ];
-function assertConnected(jt, where) {
-  for (const [a, b, len] of BONES) {
+// A bone is exactly its length, times its "depth" (foreshortening) when the pose sets one.
+function assertConnected(jt, where, pose) {
+  for (const [a, b, len, seg] of BONES) {
     const d = Math.hypot(jt[a].x - jt[b].x, jt[a].y - jt[b].y);
-    assert.ok(Math.abs(d - SF.LEN[len]) < 1e-6, `${where}: ${a}→${b} is ${d.toFixed(3)}, should be ${SF.LEN[len]}`);
+    const k = pose && pose.depth && seg && typeof pose.depth[seg] === 'number' ? pose.depth[seg] : 1;
+    const want = SF.LEN[len] * k;
+    assert.ok(Math.abs(d - want) < 1e-6, `${where}: ${a}→${b} is ${d.toFixed(3)}, should be ${want}`);
   }
 }
 
@@ -55,7 +58,7 @@ test('every bone keeps its length throughout every animation, pins and anchors i
     frames.forEach((fr, i) => {
       for (let s = 0; s <= 10; s++) {
         const pose = SF.between(fr, SF.nextOf(frames, i), s / 10, data.view || 'side');
-        assertConnected(SF.solve(pose, data.view || 'side'), `${f} frame ${i} t=${s / 10}`);
+        assertConnected(SF.solve(pose, data.view || 'side'), `${f} frame ${i} t=${s / 10}`, pose);
       }
     });
   }
@@ -245,7 +248,7 @@ test('every seeded exercise is matched by a name rule, not the category fallback
 test('rules route the names that used to collide', () => {
   const cases = {
     'Mountain Climber': 'mountain-climber',  // "mount" is BJJ
-    'Cable Crunch': 'crunch',                // contains "run"
+    'Cable Crunch': 'cable-crunch',          // contains "run"; kneeling, not the floor crunch
     'Leg Curl': 'leg-curl',                  // contains "curl"
     'Romanian Deadlift (RDL)': 'rdl',
     'Barbell Deadlift': 'deadlift',
@@ -264,7 +267,7 @@ test('rules route the names that used to collide', () => {
     'Frog Stretch': 'frog',
     'Standing Figure-4 Stretch': 'figure-four',
     'Calf Foam Roll': 'foam-roll-calf',
-    'Foam Roll Lats': 'foam-roll',
+    'Foam Roll Lats': 'foam-roll-lats',
     'Thoracic Extension over Roller': 'thoracic-extension',
     'Levator Scapulae Stretch': 'neck-side-stretch',
     'Chin Tuck': 'chin-tuck',
@@ -278,6 +281,87 @@ test('rules route the names that used to collide', () => {
   for (const [n, k] of Object.entries(cases)) assert.strictEqual(PM.keyFor(n), k, n);
   assert.strictEqual(PM.keyFor('Something New', 'muay_thai'), 'fight-stance');
   assert.strictEqual(PM.keyFor('Something New'), 'stand-breathe');
+});
+
+// The 2026-10-26 audit: these each borrowed a neighbour's figure. Back Roll, Front Roll and
+// Granby Roll all played the same forward roll; Neck Bridge played Neck Circles.
+test('movements that are different are not drawn with the same figure', () => {
+  const groups = [
+    ['Front Roll', 'Back Roll', 'Granby Roll', 'Inversion Drill'],
+    ['Neck Bridge', 'Neck Circles'],
+    ['Dumbbell Shrug', 'Shoulder CARS'],
+    ['Thoracic Open Book', 'Thread the Needle'],
+    ['Box Jump', 'Jump Squat'],
+    ['Turkish Get-Up', 'Technical Stand-up'],
+    ['Spinning Back Kick', 'Teep (Front Push Kick)'],
+    ['Cable Crunch', 'Crunch'],
+    ['Dumbbell Tricep Kickback', 'Cable Tricep Pushdown'],
+    ['Dumbbell Pullovers', 'Barbell Bench Press', 'Incline Dumbbell Press', 'Chest Press Machine'],
+    ['Elbow Flexion/Extension', 'Wrist CARS'],
+    ['Terminal Knee Extension (TKE)', 'Knee CARS'],
+    ['Sleeper Stretch', 'Prone Shoulder ER Stretch', 'Cross-Body Shoulder Stretch'],
+    ['Hamstring Floss', 'Seated Spine Rotation', 'Seated Forward Fold'],
+    ['Wall Walks', 'Pike Push-up'],
+    ['Speed Bag', 'Jab Drill'],
+    ['Upward Elbow (Sok Ngad)', 'Horizontal Elbow (Sok Tad)'],
+    ['Quadruped Hip CARs', 'Bird Dog'],
+    ['Takedown Drilling', 'Turtle Position Defense', 'BJJ Drilling'],
+    ['Foam Roll Thoracic Spine', 'Foam Roll Hip Flexors', 'ITB Foam Roll', 'Foam Roll Lats'],
+    ['Hip Bump Sweep', 'Bridge and Roll'],
+    ['Dumbbell Row', 'Dumbbell Single-Arm Row', 'Barbell Bent-Over Row'],
+  ];
+  for (const g of groups) {
+    const keys = g.map((n) => PM.keyFor(n));
+    assert.strictEqual(new Set(keys).size, g.length, `${g.join(' / ')} → ${keys.join(' / ')}`);
+  }
+  assert.strictEqual(PM.keyFor("Wrestler's Bridge"), 'neck-bridge');
+  assert.strictEqual(PM.keyFor('Combination: 1-2-Low Kick'), 'muay-thai-combo');
+  assert.strictEqual(PM.keyFor('Shadow Boxing'), 'shadow-boxing');
+});
+
+// Rolls and circles are one continuous movement. Every key used to carry the default
+// hold and an ease to a full stop, so a 9-key roll halted nine times per rep and read
+// as slow and jerky next to a punch. The middle keys must be pass-through (hold 0).
+test('continuous movements do not stop at every key', () => {
+  const continuous = ['forward-roll', 'back-roll', 'granby-roll', 'inversion', 'arm-circle', 'ankle-circle',
+    'neck-circle', 'wrist-circle', 'knee-cars', 'hip-circle', 'run', 'walk', 'bike', 'battle-ropes', 'speed-bag',
+    'quadruped-hip-cars'];
+  for (const k of continuous) {
+    const stops = SF.resolveFrames(load(k)).filter((f) => f.hold > 0).length;
+    assert.ok(stops <= 3, `${k} comes to a stop at ${stops} keys`);
+  }
+});
+
+test('depth foreshortens only the drawn segment and is validated', () => {
+  const base = load('open-book');
+  const f = SF.resolveFrames(base)[0];
+  const full = SF.solve({ ...f.pose, depth: undefined }, 'side'), short = SF.solve(f.pose, 'side');
+  const arm = (j) => Math.hypot(j.elbowL.x - j.shoulderL.x, j.elbowL.y - j.shoulderL.y);
+  assert.ok(Math.abs(arm(full) - SF.LEN.upperArm) < 1e-9);
+  assert.ok(Math.abs(arm(short) - SF.LEN.upperArm * 0.3) < 1e-9);
+  const bad = JSON.parse(JSON.stringify(base)); bad.frames[0].pose.depth = { upperArmL: 0 };
+  assert.ok(SF.validate(bad).some((e) => /depth upperArmL must be/.test(e)));
+  bad.frames[0].pose.depth = { elbow: 0.5 };
+  assert.ok(SF.validate(bad).some((e) => /not a segment/.test(e)));
+});
+
+test('shrug lifts the shoulders and nothing else, and counts as movement', () => {
+  const d = load('shrug');
+  const [a, b] = SF.resolveFrames(d);
+  const ja = SF.solve(a.pose, 'front'), jb = SF.solve(b.pose, 'front');
+  assert.ok(ja.shoulderL.y - jb.shoulderL.y > 4, 'shoulders rise');
+  for (const j of ['neck', 'head', 'hip', 'kneeL', 'ankleL']) assert.deepStrictEqual(ja[j], jb[j], j + ' moved');
+  assert.deepStrictEqual(SF.validate(d), []);
+  const still = JSON.parse(JSON.stringify(d)); still.frames[1].shrug = 0; still.frames[1].pose.shrug = 0;
+  assert.ok(SF.validate(still).some((e) => /does not move/.test(e)));
+});
+
+test('one-handed equipment is drawn at the near hand only', () => {
+  const d = load('bench-row');
+  const svg = SF.svgFor(d, 0);
+  assert.strictEqual((svg.match(/r="3.4"/g) || []).length, 1, 'one dumbbell');
+  const two = SF.svgFor({ ...d, hold: 'dumbbell' }, 0);
+  assert.strictEqual((two.match(/r="3.4"/g) || []).length, 2);
 });
 
 test('Body Map is a top-level nav tab and lights up on /body', () => {

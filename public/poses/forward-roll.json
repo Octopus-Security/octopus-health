@@ -2,16 +2,16 @@
  "version": 2,
  "title": "Forward Roll",
  "view": "side",
- "highlight": ["spine", "neck"],
+ "highlight": ["spine","neck"],
  "frames": [
   {"duration":800,"label":"Crouch, hands down","anchor":{"joint":"neck","x":42.5,"y":67.7},"pins":["handL","handR"],"pose":{"torso":100,"head":115,"upperArmL":-35,"forearmL":52.8,"upperArmR":-35,"forearmR":52.8,"thighL":95,"shinL":-20,"footL":90,"thighR":95,"shinR":-20,"footR":90,"arch":0}},
-  {"duration":350,"label":"Tuck the chin, hips over","anchor":{"joint":"neck","x":46,"y":79},"pins":[],"pose":{"torso":15,"head":-30,"upperArmL":-71.2,"forearmL":70.5,"upperArmR":-71.2,"forearmR":70.5,"thighL":-25,"shinL":-175,"footL":210,"thighR":-20,"shinR":-170,"footR":215,"arch":0}},
-  {"duration":350,"label":"Hands sweep back","pose":{"upperArmL":-150,"forearmL":-70,"upperArmR":-150,"forearmR":-70}},
-  {"duration":700,"label":"Roll over the shoulder and back","anchor":{"joint":"neck","x":50,"y":85.5},"pose":{"torso":-70,"head":-130,"upperArmL":-233,"forearmL":-214.9,"upperArmR":-233,"forearmR":-214.9,"thighL":-120,"shinL":-270,"footL":110,"thighR":-120,"shinR":-270,"footR":110,"arch":0}},
-  {"duration":600,"label":"Rock up onto the feet","pose":{"root":{"x":58.4,"y":87.8},"torso":-150,"head":-160,"upperArmL":-260,"forearmL":-260,"upperArmR":-260,"forearmR":-260,"thighL":-225,"shinL":-325,"footL":90,"thighR":-225,"shinR":-325,"footR":90,"arch":0}},
-  {"duration":600,"label":"Drive up","anchor":{"joint":"ankleL","x":84,"y":90},"pose":{"torso":-172,"head":-175,"upperArmL":-300,"forearmL":-300,"upperArmR":-300,"forearmR":-300,"thighL":-235,"shinL":-375,"footL":90,"thighR":-235,"shinR":-375,"footR":90,"arch":0}},
-  {"duration":800,"label":"Stand","anchor":{"joint":"ankleL","x":84,"y":90},"pose":{"torso":-180,"head":-180,"upperArmL":-345,"forearmL":-345,"upperArmR":-345,"forearmR":-345,"thighL":-360,"shinL":-360,"footL":90,"thighR":-360,"shinR":-360,"footR":90,"arch":0}},
-  {"duration":900,"label":"Back to start","anchor":{"joint":"ankleL","x":26,"y":90},"pose":{}},
+  {"duration":350,"label":"Tuck the chin, hips over","anchor":{"joint":"neck","x":46,"y":79},"pins":[],"pose":{"torso":15,"head":-30,"upperArmL":-71.2,"forearmL":70.5,"upperArmR":-71.2,"forearmR":70.5,"thighL":-25,"shinL":-175,"footL":210,"thighR":-20,"shinR":-170,"footR":215,"arch":0},"hold":0},
+  {"duration":350,"label":"Hands sweep back","pose":{"upperArmL":-150,"forearmL":-70,"upperArmR":-150,"forearmR":-70},"hold":0},
+  {"duration":700,"label":"Roll over the shoulder and back","anchor":{"joint":"neck","x":50,"y":85.5},"pose":{"torso":-70,"head":-130,"upperArmL":-233,"forearmL":-214.9,"upperArmR":-233,"forearmR":-214.9,"thighL":-120,"shinL":-270,"footL":110,"thighR":-120,"shinR":-270,"footR":110,"arch":0},"hold":0},
+  {"duration":600,"label":"Rock up onto the feet","pose":{"root":{"x":58.4,"y":87.8},"torso":-150,"head":-160,"upperArmL":-260,"forearmL":-260,"upperArmR":-260,"forearmR":-260,"thighL":-225,"shinL":-325,"footL":90,"thighR":-225,"shinR":-325,"footR":90,"arch":0},"hold":0},
+  {"duration":600,"label":"Drive up","anchor":{"joint":"ankleL","x":84,"y":90},"pose":{"torso":-172,"head":-175,"upperArmL":-300,"forearmL":-300,"upperArmR":-300,"forearmR":-300,"thighL":-235,"shinL":-375,"footL":90,"thighR":-235,"shinR":-375,"footR":90,"arch":0},"hold":0},
+  {"duration":350,"label":"Stand","anchor":{"joint":"ankleL","x":84,"y":90},"pose":{"torso":-180,"head":-180,"upperArmL":-345,"forearmL":-345,"upperArmR":-345,"forearmR":-345,"thighL":-360,"shinL":-360,"footL":90,"thighR":-360,"shinR":-360,"footR":90,"arch":0}},
+  {"duration":600,"label":"Step back to the start","anchor":{"joint":"ankleL","x":26,"y":90},"pose":{},"hold":0},
   {"duration":300,"label":"Crouch","anchor":{"joint":"ankleL","x":26,"y":90},"pose":{"torso":-260,"head":-245,"upperArmL":-395,"forearmL":-307.2,"upperArmR":-395,"forearmR":-307.2,"thighL":-265,"shinL":-380,"footL":90,"thighR":-265,"shinR":-380,"footR":90,"arch":0}}
  ]
 }

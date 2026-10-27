@@ -1,0 +1,14 @@
+{
+ "version": 2,
+ "title": "Wall Walk",
+ "view": "side",
+ "props": [{"type":"wall","x":7}],
+ "highlight": ["shoulderL","spine"],
+ "frames": [
+  {"duration":900,"label":"Plank, feet at the wall","anchor":{"joint":"handL","x":82.1,"y":90},"pose":{"torso":109.2,"head":117.2,"upperArmL":0,"forearmL":0,"thighL":-70.8,"shinL":-70.8,"footL":-12,"upperArmR":0,"forearmR":0,"thighR":-70.8,"shinR":-70.8,"footR":-12}},
+  {"duration":900,"label":"Feet step up the wall","anchor":{"joint":"handL","x":78.8,"y":90},"pose":{"torso":63.7,"head":71.7,"upperArmL":0,"forearmL":0,"thighL":-116.3,"shinL":-116.3,"footL":-90,"upperArmR":0,"forearmR":0,"thighR":-116.3,"shinR":-116.3,"footR":-90}},
+  {"duration":900,"label":"Hands walk in","anchor":{"joint":"handL","x":56.6,"y":90},"pose":{"torso":35.5,"head":43.5,"upperArmL":0,"forearmL":0,"thighL":-144.5,"shinL":-144.5,"footL":-90,"upperArmR":0,"forearmR":0,"thighR":-144.5,"shinR":-144.5,"footR":-90}},
+  {"duration":1100,"label":"Chest to the wall, nearly vertical","anchor":{"joint":"handL","x":27.8,"y":90},"pose":{"torso":9.7,"head":17.7,"upperArmL":0,"forearmL":0,"thighL":-170.3,"shinL":-170.3,"footL":-82,"upperArmR":0,"forearmR":0,"thighR":-170.3,"shinR":-170.3,"footR":-82}},
+  {"duration":900,"label":"Walk back down","anchor":{"joint":"handL","x":78.8,"y":90},"pose":{"torso":63.7,"head":71.7,"upperArmL":0,"forearmL":0,"thighL":-116.3,"shinL":-116.3,"footL":-90,"upperArmR":0,"forearmR":0,"thighR":-116.3,"shinR":-116.3,"footR":-90}}
+ ]
+}

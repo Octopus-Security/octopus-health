@@ -1,0 +1,17 @@
+{
+ "version": 2,
+ "title": "Box Jump",
+ "view": "side",
+ "grounded": false,
+ "props": [{"type":"box","x":52,"y":72,"w":26,"h":20}],
+ "highlight": ["hipL","kneeL"],
+ "frames": [
+  {"duration":500,"label":"Stand facing the box","anchor":{"joint":"ankleL","x":24,"y":90},"pose":{"torso":180,"head":180,"upperArmL":0,"forearmL":5,"thighL":0,"shinL":0,"footL":90,"upperArmR":0,"forearmR":5,"thighR":0,"shinR":0,"footR":90}},
+  {"duration":350,"label":"Load: hips back, arms swing back","anchor":{"joint":"ankleL","x":24,"y":90},"pose":{"torso":140,"head":155,"upperArmL":-95,"forearmL":-85,"thighL":55,"shinL":-40,"footL":80,"upperArmR":-95,"forearmR":-85,"thighR":55,"shinR":-40,"footR":80}},
+  {"duration":180,"label":"Take off: arms swing through","hold":0,"anchor":{"joint":"ankleL","x":24,"y":90},"pose":{"torso":160,"head":170,"upperArmL":20,"forearmL":30,"thighL":20,"shinL":-20,"footL":90,"upperArmR":20,"forearmR":30,"thighR":20,"shinR":-20,"footR":90}},
+  {"duration":350,"label":"Jump: arms drive up","air":true,"pose":{"torso":170,"head":175,"upperArmL":110,"forearmL":120,"thighL":60,"shinL":-30,"footL":80,"upperArmR":110,"forearmR":120,"thighR":60,"shinR":-30,"footR":80,"root":{"x":42,"y":34}}},
+  {"duration":400,"label":"Land soft on the box","anchor":{"joint":"ankleL","x":62,"y":70},"pose":{"torso":145,"head":160,"upperArmL":35,"forearmL":55,"thighL":55,"shinL":-40,"footL":80,"upperArmR":35,"forearmR":55,"thighR":55,"shinR":-40,"footR":80}},
+  {"duration":500,"label":"Stand tall on top","anchor":{"joint":"ankleL","x":62,"y":70},"pose":{"torso":180,"head":180,"upperArmL":0,"forearmL":5,"thighL":0,"shinL":0,"footL":90,"upperArmR":0,"forearmR":5,"thighR":0,"shinR":0,"footR":90}},
+  {"duration":700,"label":"Step back down","anchor":{"joint":"ankleL","x":24,"y":90},"pose":{"torso":180,"head":180,"upperArmL":0,"forearmL":5,"thighL":0,"shinL":0,"footL":90,"upperArmR":0,"forearmR":5,"thighR":0,"shinR":0,"footR":90}}
+ ]
+}

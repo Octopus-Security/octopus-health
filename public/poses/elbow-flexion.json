@@ -1,0 +1,10 @@
+{
+ "version": 2,
+ "title": "Elbow Flexion / Extension",
+ "view": "side",
+ "highlight": ["elbowL"],
+ "frames": [
+  {"duration":1500,"label":"Arm straight, do not lock hard","anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":180,"head":180,"upperArmL":20,"forearmL":22,"thighL":0,"shinL":0,"footL":90,"upperArmR":0,"forearmR":0,"thighR":0,"shinR":0,"footR":90}},
+  {"duration":1500,"label":"Bend fully","hold":400,"anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":180,"head":180,"upperArmL":20,"forearmL":178,"thighL":0,"shinL":0,"footL":90,"upperArmR":0,"forearmR":0,"thighR":0,"shinR":0,"footR":90}}
+ ]
+}
