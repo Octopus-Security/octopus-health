@@ -52,6 +52,7 @@ function getActiveTab(requestPath) {
     // returned 'exercises' for it, so BOTH nav links lit up and only cleared
     // when you clicked something else entirely.
     if (requestPath === '/today') return 'today';
+    if (requestPath.startsWith('/gyms')) return 'gyms';
     if (requestPath.startsWith('/plan-maker')) return 'plan-maker';
     if (requestPath.startsWith('/exercises') || requestPath.startsWith('/library') || requestPath.startsWith('/exercise') || requestPath.startsWith('/workout')) return 'exercises';
     if (requestPath === '/body' || requestPath.startsWith('/body/') || requestPath.startsWith('/body?')) return 'body';
@@ -310,6 +311,7 @@ app.get('/', requireLogin, async (req, res) => {
 
 // Skill tree, fitness tests, treadmill test, weekly benchmarks (api/web-fitness.js).
 require('./api/web-fitness')(app, { requireLogin, getDatabase });
+require('./api/web-gyms')(app, { requireLogin, getDatabase });
 // Correcting the log in place: edit/delete a set, retitle or redate a session,
 // add a set, rename an exercise, and known-name suggestions (api/web-log-edit.js).
 require('./api/web-log-edit')(app, { requireLogin, getDatabase });

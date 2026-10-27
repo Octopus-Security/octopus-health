@@ -100,7 +100,10 @@ test('equipment: handles+dip bars alternatives, and the unset default', () => {
 });
 
 test('equipment words are normalised, unknown ones refused by name', () => {
-  assert.deepStrictEqual(T.normalizeEquipment('push-up handles, a pull-up bar and parallettes').sort(), ['bar', 'handles']);
+  assert.deepStrictEqual(T.normalizeEquipment('push-up handles, a pull-up bar and parallettes').sort(), ['bar', 'handles', 'parallettes']);
+  // 2026-10-27: parallettes became their own catalogue id, but owning them still gives the skills "handles".
+  assert.ok(T.effectiveEquipment(['parallettes']).has('handles'));
+  assert.ok(T.effectiveEquipment(['power-tower']).has('bar') && T.effectiveEquipment(['power-tower']).has('dip-bars'));
   assert.deepStrictEqual(T.normalizeEquipment(['Dip Station']), ['dip-bars']);
   assert.throws(() => T.normalizeEquipment(['trampoline']), /Unknown equipment: trampoline/);
 });

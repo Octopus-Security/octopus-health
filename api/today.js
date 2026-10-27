@@ -90,7 +90,21 @@ function mount(app, { requireLogin, getDatabase }) {
     const slug = resolveSlug(rows.map(r => r.name), String(req.query.slug || ''), day);
     const defs = await db.ExerciseDefinition.findAll({ attributes: ['id', 'name', 'category'] });
     const defsByName = new Map(defs.map(d => [String(d.name).toLowerCase(), d]));
-    const tpl = slug ? await db.WorkoutTemplate.findOne({ where: { name: slug } }) : null;
+    let tpl = slug ? await db.WorkoutTemplate.findOne({ where: { name: slug } }) : null;
+    // `at` = the gym the brief actually chose (set by Neith's link). Present: show the plan
+    // fitted to that gym's equipment, with what changed. Absent: the stored template as before.
+    let fitNotes = [], pausedNote = null;
+    const at = /^[a-z][a-z0-9_-]{0,23}$/.test(String(req.query.at || '')) ? String(req.query.at) : null;
+    if (tpl && at) {
+      try {
+        const p = await require('./gyms-store').planFor(db, { day: slug.split(':')[0], location: at });
+        pausedNote = p.pausedNote || null;
+        if (p.template) {
+          tpl = { name: p.template.slug, type: p.template.type, description: JSON.stringify({ label: p.template.label, location: p.template.location, warmup: p.template.warmup, cooldown: p.template.cooldown }), exercises: JSON.stringify(p.template.exercises) };
+          fitNotes = p.fit ? p.fit.notes : [];
+        }
+      } catch { /* gyms unavailable: show the stored template */ }
+    }
     const plan = tpl ? planFromTemplate(tpl, defsByName) : null;
 
     let stretches = null;
@@ -106,7 +120,7 @@ function mount(app, { requireLogin, getDatabase }) {
       };
     } catch { stretches = null; }   // the page still works without its stretch list
 
-    res.render('today', { title: 'Today', user: req.user, activeTab: 'today', plan, stretches,
+    res.render('today', { title: 'Today', user: req.user, activeTab: 'today', plan, stretches, fitNotes, pausedNote,
       today: todayET(), dayKey: day, requested: req.query.slug || null });
   });
 }

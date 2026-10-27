@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <%- include('partials/favicon') %>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="<%= asset('/theme.css') %>">
+</head>
+<body>
+<%- include('partials/nav') %>
+<div class="container" data-msg-root>
+  <div class="card">
+    <h2>Gyms and equipment</h2>
+    <p class="fx-meta">Plans only use equipment the location has; anything missing is swapped or left out and the plan says so. Pause a location (park in winter, say) and its days move to an active one, Home first. Logged workouts are never changed by pausing.</p>
+    <% if (allPaused) { %><p class="fx-msg error">Every location is paused, so no workout will be suggested. Resume one below.</p><% } else { %><p class="fx-msg"></p><% } %>
+  </div>
+
+  <% gyms.forEach(function (g) { %>
+  <div class="card gym-card" id="gym-<%= g.slug %>">
+    <h2><%= g.name %>
+      <span class="fx-chip <%= g.active ? 'achieved' : '' %>"><%= g.active ? 'Active' : 'Paused' %></span>
+      <% if (!g.active && g.pausedUntil) { %><span class="fx-chip">resumes <%= g.pausedUntil %></span><% } %>
+    </h2>
+    <% if (g.notes) { %><p class="fx-meta"><%= g.notes %></p><% } %>
+
+    <% if (g.active) { %>
+    <form data-json action="/gyms/api/<%= g.slug %>/pause" data-method="POST" class="fx-row gym-row">
+      <label class="fx-wrap">Pause until (optional)<br><input type="date" name="until" min="<%= today %>"></label>
+      <button type="submit" class="gym-btn">Pause <%= g.name %></button>
+    </form>
+    <% } else { %>
+    <div class="fx-row gym-row">
+      <button class="gym-btn" data-act data-method="POST" data-url="/gyms/api/<%= g.slug %>/resume">Resume <%= g.name %> now</button>
+    </div>
+    <% } %>
+
+    <h3 class="gym-h3">Equipment</h3>
+    <% if (!g.equipment.length) { %><p class="empty-state">Nothing listed. Bodyweight work still works here.</p><% } %>
+    <% g.equipment.forEach(function (e) { %>
+      <div class="list-item gym-eq">
+        <span class="fx-wrap"><strong><%= e.label || e.name %></strong><% if (e.label && e.label !== e.name) { %> <span class="fx-meta">(<%= e.name %>)</span><% } %>
+          <% if (e.attrs) { %><br><span class="fx-meta"><%= Object.keys(e.attrs).map(function (k) { return k + ': ' + e.attrs[k]; }).join(' · ') %></span><% } %></span>
+        <button class="gym-btn gym-btn-quiet" data-act data-method="DELETE" data-url="/gyms/api/<%= g.slug %>/equipment/<%= e.id %>" data-confirm="Remove <%= e.name %> from <%= g.name %>?" aria-label="Remove <%= e.name %>">Remove</button>
+      </div>
+    <% }) %>
+    <% var extra = g.effective.filter(function (id) { return !g.equipment.some(function (e) { return e.id === id; }); }); %>
+    <% if (extra.length) { %><p class="fx-meta">Also counted as present: <%= extra.join(', ') %> (provided by the equipment above).</p><% } %>
+
+    <form data-json action="/gyms/api/<%= g.slug %>/equipment" data-method="POST" class="fx-row gym-row">
+      <label class="fx-wrap">Add equipment<br>
+        <select name="equipment" required>
+          <option value="">Choose...</option>
+          <% Object.keys(groups).forEach(function (grp) { %>
+          <optgroup label="<%= grp %>">
+            <% groups[grp].forEach(function (it) { if (!g.equipment.some(function (e) { return e.id === it.id; })) { %><option value="<%= it.id %>"><%= it.name %></option><% } }) %>
+          </optgroup>
+          <% }) %>
+        </select></label>
+      <button type="submit" class="gym-btn">Add</button>
+    </form>
+  </div>
+  <% }) %>
+</div>
+<style>
+  .gym-row { margin-top: 10px; }
+  .gym-h3 { margin: 16px 0 6px; font-size: 1rem; }
+  .gym-btn { min-height: var(--tap, 44px); padding: 8px 14px; font-size: 16px; }
+  .gym-btn-quiet { flex-shrink: 0; }
+  .gym-eq { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .gym-card input, .gym-card select { font-size: 16px; min-height: var(--tap, 44px); }
+</style>
+<script src="<%= asset('/js/fx.js') %>"></script>
+</body>
+</html>

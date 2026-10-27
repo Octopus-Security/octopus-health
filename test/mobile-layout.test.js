@@ -65,7 +65,7 @@ test('nav: accessible menu button, no-JS checkbox fallback, grouped links, logou
 test('nav renders every link and marks the active one', async () => {
   const ejs = require('ejs');
   const html = await ejs.renderFile(path.join(root, 'views', 'partials', 'nav.ejs'), { activeTab: 'stretch', user: { username: 'x' } });
-  assert.strictEqual((html.match(/<a href="\/[a-z-]*"/g) || []).length, 15 + 1 + 1); // 15 links (Today added 2026-10-26) + title + logout
+  assert.strictEqual((html.match(/<a href="\/[a-z-]*"/g) || []).length, 16 + 1 + 1); // 16 links (Today added 2026-10-26, Gyms 2026-10-27) + title + logout
   assert.match(html, /<a href="\/stretch" class="active" aria-current="page">Stretch<\/a>/);
   assert.match(html, /class="nav-current"[^>]*>Stretch</);
 });

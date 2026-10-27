@@ -1,8 +1,28 @@
 # Gyms and equipment — design
 
-**Status: design, not built. Written 2026-10-19.** Nothing in this document
-exists in the code yet. Where it describes current behaviour it is marked
+**Status: partly built 2026-10-27 (see "Built so far"). Written 2026-10-19.** Below
+that section the document is still the design; where it says nothing exists in the code,
+that is no longer true of the items listed there. Where it describes current behaviour it is marked
 *today*, and those claims were verified by reading the source on that date.
+
+## Built so far (2026-10-27, branch feat/gyms-equipment-health)
+
+Differs from the design, deliberately; the code wins:
+
+- **`content/equipment/catalogue.json` is the one equipment list** (stable ids, aliases,
+  `provides`), read by `api/equipment.js`. The skill tree's tokens now derive from it;
+  cortex reads it via `GET /api/service/equipment`; octopus-mma holds a drift-tested
+  snapshot of the ids. `EquipmentModel`/`Movement` (load semantics, per-user custom
+  models) are NOT built; an id is just a string.
+- **`Gym` + `GymEquipment` tables** (additive, per-user file), seeded Home / Park / Work
+  gym. A gym also has `active` + `pausedUntil` (ET): paused locations are skipped by
+  plan suggestions and their days fall back to Home. Page: `/gyms`.
+- **Plan fitting**: exercises declare needs by name rule (catalogue `exerciseRules`) or
+  their own `requires`; `GET /api/service/gyms/plan` returns the day's template fitted to
+  the location, listing substitutions and omissions. Stored templates are never edited.
+- **Not built**: `WorkoutSet.gymEquipmentId` (deferred: adding a column to the hottest
+  table is risk with no reader yet), equipment-scoped PRs, user-defined settings fields,
+  gym sharing, custom per-user equipment.
 
 ## The bug that started it
 
