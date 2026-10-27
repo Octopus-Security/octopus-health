@@ -46,6 +46,8 @@
         </div>
       </div>
 
+      <% if (typeof pausedNote !== 'undefined' && pausedNote) { %><div class="today-plain"><%= pausedNote %></div><% } %>
+      <% if (typeof fitNotes !== 'undefined' && fitNotes.length) { %><div class="today-plain"><strong>Adjusted for this location:</strong><% fitNotes.forEach(function (n) { %><br><%= n %><% }) %></div><% } %>
       <% if (plan.warmup.length) { %>
         <div class="today-section">Warm-up</div>
         <% plan.warmup.forEach(function (w) { %><div class="today-plain"><%= w %></div><% }) %>

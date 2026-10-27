@@ -1114,6 +1114,27 @@ const getDatabase = (username) => {
         value: { type: DataTypes.TEXT },
     }, { tableName: 'UserSettings', timestamps: false });
 
+    // Where you train, and what is there (GYMS-AND-EQUIPMENT.md phase 1). Per-user file,
+    // so no owner column. `slug` is what plan templates target ("home", "park", "gym");
+    // `equipmentId` is an id from content/equipment/catalogue.json - the ONE list - kept
+    // as a plain string so a catalogue edit needs no migration. A paused gym is kept off
+    // plan suggestions (active=false; pausedUntil is the ET resume date, if any); its
+    // logged history is untouched. New tables only: sync() creates them, nothing altered.
+    const Gym = sequelize.define('Gym', {
+        slug:        { type: DataTypes.STRING,  allowNull: false, unique: true },
+        name:        { type: DataTypes.STRING,  allowNull: false },
+        active:      { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
+        pausedUntil: { type: DataTypes.STRING,  allowNull: true },   // YYYY-MM-DD, ET
+        notes:       { type: DataTypes.TEXT,    allowNull: true },
+        sortOrder:   { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
+    });
+    const GymEquipment = sequelize.define('GymEquipment', {
+        gymId:       { type: DataTypes.INTEGER, allowNull: false },
+        equipmentId: { type: DataTypes.STRING,  allowNull: false },
+        label:       { type: DataTypes.STRING,  allowNull: true },
+        attrs:       { type: DataTypes.TEXT,    allowNull: true },   // JSON: heights, rated load, ...
+    }, { indexes: [{ unique: true, fields: ['gymId', 'equipmentId'] }] });
+
     // Exercise plan builder (mobility / warmup / cooldown / circuit)
     const ExercisePlan = sequelize.define('ExercisePlan', {
         name:        { type: DataTypes.STRING, allowNull: false },
@@ -1339,6 +1360,8 @@ const getDatabase = (username) => {
         Benchmark,
         BenchmarkSeed,
         UserSetting,
+        Gym,
+        GymEquipment,
         seedData,
         sequelize,
     };

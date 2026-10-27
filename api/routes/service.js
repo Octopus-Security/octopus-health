@@ -1250,5 +1250,6 @@ router.get('/stretches/daily', requireToken, async (req, res) => {
 // Skill tree, fitness tests, weekly benchmarks. Mounted here so they share this
 // router's token + X-Service-User guards and getDB(); see fitness-service.js.
 require('./fitness-service')(router, getDB);
+require('./gyms-service')(router, getDB);
 
 module.exports = router;

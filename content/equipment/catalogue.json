@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "about": "The one equipment list for the whole estate. health owns it; cortex (Neith) reads it from GET /api/service/equipment; octopus-mma carries a drift-tested snapshot of the ids. An id is stable forever: rename the display name, never the id. `provides` means owning this item also gives you those items (a power tower has a pull-up bar). `aliases` are what people say, matched case-insensitively with punctuation ignored.",
+  "items": [
+    { "id": "wall",            "name": "Wall space",            "group": "bodyweight", "aliases": ["wall"] },
+    { "id": "chair",           "name": "Chair / box / step",    "group": "bodyweight", "aliases": ["chair", "box", "step", "bench", "plyo box"] },
+    { "id": "bar",             "name": "Pull-up bar",           "group": "bars",       "aliases": ["pull-up bar", "pullup bar", "pull up bar", "chin-up bar", "chinup bar", "bar"] },
+    { "id": "dip-bars",        "name": "Dip bars",              "group": "bars",       "aliases": ["dip bars", "dip bar", "dip station", "parallel bars", "dip stand"] },
+    { "id": "handles",         "name": "Push-up handles",       "group": "bars",       "aliases": ["push-up handles", "pushup handles", "push up handles", "push-up bars", "pushup bars", "handles"] },
+    { "id": "parallettes",     "name": "Parallettes",           "group": "bars",       "aliases": ["parallette"], "provides": ["handles"] },
+    { "id": "rings",           "name": "Gymnastic rings",       "group": "bars",       "aliases": ["gymnastic rings", "ring"] },
+    { "id": "captains-chair",  "name": "Captain's chair (vertical knee raise)", "group": "bars", "aliases": ["captains chair", "captain's chair", "vertical knee raise", "knee raise station", "back pad"] },
+    { "id": "power-tower",     "name": "Power tower",           "group": "bars",       "aliases": ["power tower", "pull-up tower", "dip tower", "pull up dip station"], "provides": ["bar", "dip-bars", "handles", "captains-chair"] },
+    { "id": "ab-roller",       "name": "Ab roller",             "group": "small",      "aliases": ["ab wheel", "ab roller wheel", "roller wheel"] },
+    { "id": "jump-rope",       "name": "Jump rope",             "group": "small",      "aliases": ["skipping rope", "speed rope", "rope"] },
+    { "id": "resistance-bands","name": "Resistance bands",      "group": "small",      "aliases": ["resistance band", "bands", "band", "loop bands"] },
+    { "id": "push-up-board",   "name": "Push-up board",         "group": "small",      "aliases": ["pushup board", "push up board"] },
+    { "id": "ball",            "name": "Medicine / stability ball", "group": "small",  "aliases": ["medicine ball", "stability ball", "swiss ball"] },
+    { "id": "dumbbell",        "name": "Dumbbells",             "group": "free-weights","aliases": ["dumbbells", "db", "dumbells"] },
+    { "id": "barbell",         "name": "Barbell + plates",      "group": "free-weights","aliases": ["barbells", "olympic bar", "ez bar", "ez-bar", "ezbar"] },
+    { "id": "kettlebell",      "name": "Kettlebell",            "group": "free-weights","aliases": ["kettlebells", "kb"] },
+    { "id": "weight-bench",    "name": "Weight bench",          "group": "free-weights","aliases": ["weight bench", "flat bench", "adjustable bench", "incline bench"] },
+    { "id": "cable-machine",   "name": "Cable machine",         "group": "machines",   "aliases": ["cable", "cables", "cable station", "pulley", "cable_machine"] },
+    { "id": "machine",         "name": "Weight machines",       "group": "machines",   "aliases": ["machines", "weight stack", "selectorized machine", "leg press machine"] },
+    { "id": "cardio-machine",  "name": "Cardio machine (treadmill / bike)", "group": "machines", "aliases": ["treadmill", "bike", "exercise bike", "rower", "elliptical", "cardio_machine", "cardio"] },
+    { "id": "bag",             "name": "Heavy bag",             "group": "combat",     "aliases": ["punching bag", "heavy bag", "boxing bag"] },
+    { "id": "pads",            "name": "Pads / mitts",          "group": "combat",     "aliases": ["mitts", "focus mitts", "thai pads"] }
+  ],
+  "legacyExerciseTokens": {
+    "none": null, "bodyweight": null, "dumbbell": "dumbbell", "barbell": "barbell", "kettlebell": "kettlebell",
+    "cable_machine": "cable-machine", "machine": "machine", "cardio_machine": "cardio-machine", "bag": "bag", "pads": "pads"
+  },
+  "gyms": [
+    { "slug": "home", "name": "Home", "sortOrder": 0,
+      "notes": "Garage setup: power tower, ab roller, parallettes. No cables, weight stack or bench. No jump rope here (that lives at the park / work gym).",
+      "equipment": [
+        { "id": "power-tower", "label": "Power tower",
+          "attrs": { "heights": 10, "ratedLb": 330, "pullUpBar": true, "dipStation": true, "pushUpHandlesAtBase": true, "verticalKneeRaiseBackPad": true, "cables": false, "weightStack": false, "bench": false } },
+        { "id": "ab-roller" },
+        { "id": "parallettes" }
+      ] },
+    { "slug": "park", "name": "Park", "sortOrder": 1,
+      "notes": "Outdoor pull-up bar. Edit this list to match what is really there.",
+      "equipment": [ { "id": "bar" }, { "id": "jump-rope" } ] },
+    { "slug": "gym", "name": "Work gym", "sortOrder": 2,
+      "notes": "Full machines and free weights. The ab roller stays home (the plan falls back to cable crunch).",
+      "equipment": [ { "id": "dumbbell" }, { "id": "barbell" }, { "id": "kettlebell" }, { "id": "weight-bench" }, { "id": "cable-machine" }, { "id": "machine" }, { "id": "cardio-machine" }, { "id": "bar" }, { "id": "dip-bars" }, { "id": "captains-chair" }, { "id": "jump-rope" } ] }
+  ],
+  "exerciseRules": [
+    { "match": "ab roller",              "requires": ["ab-roller"],  "substitutes": [ { "name": "Cable Crunch", "requires": ["cable-machine"] }, { "name": "Hollow Body Hold", "requires": [] } ] },
+    { "match": "hanging leg raise",      "requires": ["bar|captains-chair"], "substitutes": [ { "name": "Lying Leg Raise", "requires": [] } ] },
+    { "match": "^(pull-up|chin-up)$",    "requires": ["bar"],        "substitutes": [ { "name": "Lat Pulldown", "requires": ["cable-machine"] } ] },
+    { "match": "^dip$",                  "requires": ["dip-bars"],   "substitutes": [ { "name": "Diamond Push-up", "requires": [] } ] },
+    { "match": "resistance band lateral raise", "requires": ["resistance-bands"], "substitutes": [ { "name": "Dumbbell Lateral Raise", "requires": ["dumbbell"] } ] },
+    { "match": "resistance band face pull",     "requires": ["resistance-bands"], "substitutes": [ { "name": "Cable Face Pull", "requires": ["cable-machine"] } ] },
+    { "match": "resistance band tricep",        "requires": ["resistance-bands"], "substitutes": [ { "name": "Cable Tricep Pushdown", "requires": ["cable-machine"] } ] },
+    { "match": "resistance band row",           "requires": ["resistance-bands"], "substitutes": [ { "name": "Seated Cable Row", "requires": ["cable-machine"] } ] },
+    { "match": "resistance band bicep",         "requires": ["resistance-bands"], "substitutes": [ { "name": "Dumbbell Hammer Curl", "requires": ["dumbbell"] } ] },
+    { "match": "band pull-apart",        "requires": ["resistance-bands"] },
+    { "match": "push-up board",          "requires": ["push-up-board"], "substitutes": [ { "name": "Wide Push-up", "requires": [] } ] },
+    { "match": "jump rope",              "requires": ["jump-rope"] },
+    { "match": "bench press",            "requires": ["barbell|dumbbell", "weight-bench"] },
+    { "match": "barbell back squat",     "requires": ["barbell"],    "substitutes": [ { "name": "Bodyweight Squat", "requires": [] } ] },
+    { "match": "romanian deadlift",      "requires": ["barbell|dumbbell"] },
+    { "match": "ez-bar",                 "requires": ["barbell|dumbbell"] },
+    { "match": "incline dumbbell press", "requires": ["dumbbell", "weight-bench"] },
+    { "match": "dumbbell",               "requires": ["dumbbell"] },
+    { "match": "^cable |^pec deck|^lat pulldown|^seated cable", "requires": ["cable-machine|machine"] },
+    { "match": "^leg press|^leg curl|\\(machine\\)", "requires": ["machine"] }
+  ]
+}
