@@ -906,6 +906,13 @@ const getDatabase = (username) => {
         exerciseName: { type: DataTypes.STRING,   allowNull: true },  // the exercise/skill this goal targets
         unit:         { type: DataTypes.STRING,   allowNull: true },  // 'lbs' | 'reps' | 'sec' | …
         progression:  { type: DataTypes.TEXT,     allowNull: true },  // progression steps / accessory plan
+        // Active goals (api/goals.js is the one definition of "active"). `completed`
+        // stays for old readers and is kept equal to status === 'done' on every write.
+        status:       { type: DataTypes.STRING,   allowNull: false, defaultValue: 'active' }, // active | paused | done
+        priority:     { type: DataTypes.INTEGER,  allowNull: true },   // lower = higher; null sorts last
+        kind:         { type: DataTypes.STRING,   allowNull: true },   // strength | skill | mobility | body_comp | nutrition | habit | other
+        inBrief:      { type: DataTypes.BOOLEAN,  allowNull: false, defaultValue: true },  // include in the Discord morning brief
+        nudge:        { type: DataTypes.BOOLEAN,  allowNull: false, defaultValue: false }, // eligible for nudges / check-ins
     });
 
     const Routine = sequelize.define('Routine', {
@@ -1279,6 +1286,11 @@ const getDatabase = (username) => {
             ['Goals', 'exerciseName', 'VARCHAR(255)'],
             ['Goals', 'unit',         'VARCHAR(32)'],
             ['Goals', 'progression',  'TEXT'],
+            ['Goals', 'status',       "VARCHAR(16) NOT NULL DEFAULT 'active'"],
+            ['Goals', 'priority',     'INTEGER'],
+            ['Goals', 'kind',         'VARCHAR(32)'],
+            ['Goals', 'inBrief',      'TINYINT(1) NOT NULL DEFAULT 1'],
+            ['Goals', 'nudge',        'TINYINT(1) NOT NULL DEFAULT 0'],
         ];
         for (const [table, col, type] of adds) {
             try {
@@ -1288,6 +1300,13 @@ const getDatabase = (username) => {
                     console.error(`migrate: ${table}.${col} failed:`, e.message);
                 }
             }
+        }
+        // Backfill: a goal completed before `status` existed is 'done'. Only rows still at
+        // the column default are touched, so a rerun (or a later reopen) changes nothing.
+        try {
+            await sequelize.query(`UPDATE "Goals" SET "status" = 'done' WHERE "completed" = 1 AND "status" = 'active'`);
+        } catch (e) {
+            console.error('migrate: Goals.status backfill failed:', e.message);
         }
     }
 

@@ -258,6 +258,26 @@ tr:hover td { background: #141414; }
 .goal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 .goal-actions { display: flex; gap: 10px; }
 
+/* Active goals: status pill, reorder, edit form, brief preview. 44px taps, 16px inputs. */
+.goal-item.paused { opacity: 0.8; border-left-color: #b8892e; }
+.goal-header { flex-wrap: wrap; gap: 8px; }
+.goal-actions { flex-wrap: wrap; }
+.goal-actions .toggle-btn, .goal-actions .delete-btn, .goal-actions .edit-link, .goal-actions .move-btn {
+    min-height: var(--tap); min-width: var(--tap); padding: 0 14px; display: inline-flex; align-items: center; justify-content: center;
+}
+.goal-actions form { display: inline-flex; }
+.edit-link, .move-btn { background: #1a1a1a; color: #ccc; border: 1px solid #333; border-radius: 4px; font-size: 12px; font-weight: 600; text-decoration: none; cursor: pointer; }
+.move-btn[disabled] { opacity: 0.3; cursor: default; }
+.status-pill { display: inline-block; margin-left: 8px; padding: 1px 10px; border-radius: 10px; font-size: 0.8em; background: #0d2d1a; color: #5df59a; }
+.status-pill.paused { background: #3a2f12; color: #e0b050; }
+.status-pill.done { background: #1a1a1a; color: #888; }
+.goal-edit input, .goal-edit select, .goal-edit textarea { font-size: 16px; min-height: var(--tap); }
+.goal-edit textarea { min-height: 80px; }
+.check-row { display: flex; align-items: center; gap: 10px; min-height: var(--tap); }
+.check-row input[type=checkbox] { width: 24px; height: 24px; min-height: 0; flex: 0 0 auto; }
+.brief-preview li { margin: 6px 0 6px 18px; }
+.brief-preview .beyond { color: #888; }
+
 /* ── Settings / Danger zone ────────────────────────────────── */
 .danger-zone {
     border: 1px solid #5c2a2a;

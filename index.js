@@ -38,6 +38,7 @@ const port = process.env.PORT || 3000;
 const getDatabase = require('./database');
 const { parseWorkout, buildPreview } = require('./api/workout-parse');
 const { detectPR } = require('./api/pr-detect');
+const goalsApi = require('./api/goals');
 
 const auth = new AuthClient();
 const AUTH_URL = process.env.AUTH_SERVICE_URL || 'http://octopus-auth:3002';
@@ -245,7 +246,7 @@ app.get('/', requireLogin, async (req, res) => {
         const recentWeight = await WeightEntry.findOne({ order: [['date', 'DESC']] });
         const todayExercises = await Exercise.findAll({ where: { date: todayStr } });
         const todayMeals = await Meal.findAll({ where: { date: todayStr } });
-        const activeGoals = await Goal.findAll({ where: { completed: false } });
+        const activeGoals = await goalsApi.listActive(Goal);
 
         const todayCalories = todayMeals.reduce((sum, meal) => sum + (meal.calories || 0), 0);
         const todayExerciseMinutes = todayExercises.reduce((sum, ex) => sum + ex.duration, 0);
@@ -600,22 +601,70 @@ app.post('/meal-preps/:id/delete', requireLogin, async (req, res) => {
 // Goals routes
 app.get('/goals', requireLogin, async (req, res) => {
     const { Goal } = getDatabase(req.user.username);
-    const goals = await Goal.findAll({ order: [['completed', 'ASC'], ['deadline', 'ASC']] });
-    const todayET = new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
-    res.render('goals', { title: 'Goals', goals, user: req.user, todayET });
+    const goals = await goalsApi.listAll(Goal);
+    const todayET = goalsApi.etDay();
+    // What tomorrow morning's brief will list: the same query cortex makes (?active=1&brief=1),
+    // judged against TOMORROW's ET date because that is when the brief runs.
+    const briefGoals = await goalsApi.listActive(Goal, { brief: true, day: goalsApi.etDay(1) });
+    // Up/down: each button carries the full order with this goal swapped with its neighbour
+    // in the same status group, so reordering needs no JavaScript.
+    const order = goals.map(g => g.id);
+    const swaps = {};
+    goals.forEach((g, i) => {
+        const swap = j => { const o = order.slice(); [o[i], o[j]] = [o[j], o[i]]; return o.join(','); };
+        swaps[g.id] = {
+            up:   i > 0 && goals[i - 1].status === g.status ? swap(i - 1) : null,
+            down: i < goals.length - 1 && goals[i + 1].status === g.status ? swap(i + 1) : null,
+        };
+    });
+    res.render('goals', { title: 'Goals', goals, user: req.user, todayET, briefGoals, swaps,
+        STATUSES: goalsApi.STATUSES, KINDS: goalsApi.KINDS, editId: parseInt(req.query.edit, 10) || null });
 });
 
+// goalsApi.fromBody is an allow-list: the old Goal.create(req.body) let a form post set any column.
 app.post('/goals', requireLogin, async (req, res) => {
     const { Goal } = getDatabase(req.user.username);
-    await Goal.create(req.body);
+    let f;
+    try { f = goalsApi.fromBody(req.body || {}, null, { form: true }); }
+    catch (e) { return res.status(400).send(e.message); }
+    await Goal.create(f);
     res.redirect('/goals');
 });
 
+// Edit every field of one goal. Unticked checkboxes arrive as absent, hence { form: true }.
+app.post('/goals/edit/:id', requireLogin, async (req, res) => {
+    const { Goal } = getDatabase(req.user.username);
+    const goal = await Goal.findByPk(req.params.id);
+    if (!goal) return res.status(404).send('Goal not found');
+    let f;
+    try { f = goalsApi.fromBody(req.body || {}, goal, { form: true }); }
+    catch (e) { return res.status(400).send(e.message); }
+    delete f.type;
+    Object.assign(goal, f);
+    await goal.save();
+    res.redirect('/goals');
+});
+
+// Complete/Reopen and Pause/Resume go through status so `completed` stays in step.
 app.post('/goals/toggle/:id', requireLogin, async (req, res) => {
     const { Goal } = getDatabase(req.user.username);
     const goal = await Goal.findByPk(req.params.id);
-    goal.completed = !goal.completed;
+    if (!goal) return res.status(404).send('Goal not found');
+    const to = req.body && req.body.to;
+    const status = goalsApi.STATUSES.includes(to) ? to : (goal.status === 'done' ? 'active' : 'done');
+    goal.status = status;
+    goal.completed = status === 'done';
     await goal.save();
+    res.redirect('/goals');
+});
+
+// ids = comma-separated goal ids in the wanted order (JSON { ids: [...] } also accepted).
+app.post('/goals/reorder', requireLogin, async (req, res) => {
+    const { Goal } = getDatabase(req.user.username);
+    const raw = (req.body || {}).ids;
+    const ids = Array.isArray(raw) ? raw : String(raw || '').split(',').filter(Boolean);
+    try { await goalsApi.reorder(Goal, ids); }
+    catch (e) { return res.status(e.status || 500).send(e.message); }
     res.redirect('/goals');
 });
 
