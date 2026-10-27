@@ -601,7 +601,8 @@ app.post('/meal-preps/:id/delete', requireLogin, async (req, res) => {
 app.get('/goals', requireLogin, async (req, res) => {
     const { Goal } = getDatabase(req.user.username);
     const goals = await Goal.findAll({ order: [['completed', 'ASC'], ['deadline', 'ASC']] });
-    res.render('goals', { title: 'Goals', goals, user: req.user });
+    const todayET = new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
+    res.render('goals', { title: 'Goals', goals, user: req.user, todayET });
 });
 
 app.post('/goals', requireLogin, async (req, res) => {

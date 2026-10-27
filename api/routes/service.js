@@ -1044,12 +1044,20 @@ router.post('/weight', requireToken, async (req, res) => {
   } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
 });
 
-// GET /api/service/goals?active=1  → goals for the service user (active = not completed)
+// GET /api/service/goals?active=1  → goals for the service user that are still live:
+// not completed AND not past their deadline (ET). A dated goal whose day has gone
+// (the 2026-09-29 superfight taper) kept appearing in every morning brief and in the
+// coaching context for a month, because "active" only ever meant "not completed".
+// Without ?active the full list is returned, expired ones included.
 router.get('/goals', requireToken, async (req, res) => {
   try {
     const { Goal } = await getDB(req);
     const where = {};
-    if (req.query.active === '1' || req.query.active === 'true') where.completed = false;
+    if (req.query.active === '1' || req.query.active === 'true') {
+      const todayET = new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
+      where.completed = false;
+      where[Op.or] = [{ deadline: null }, { deadline: { [Op.gte]: todayET } }];
+    }
     const rows = await Goal.findAll({ where, order: [['deadline', 'ASC'], ['createdAt', 'DESC']] });
     res.json({ ok: true, goals: rows });
   } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
