@@ -1335,6 +1335,7 @@ app.get('/exercises', requireLogin, async (req, res) => {
 require('./api/body-map')(app, { requireLogin, getDatabase });
 require('./api/today')(app, { requireLogin, getDatabase });
 require('./api/daily-stretches')(app, { requireLogin, getDatabase });
+require('./api/mobility')(app, { requireLogin, getDatabase });
 
 app.get('/library', requireLogin, async (req, res) => {
     const { ExerciseDefinition, sequelize } = getDatabase(req.user.username);
