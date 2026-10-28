@@ -52,6 +52,28 @@
     });
   }
 
+  function loadMobility(kind, id, mine) {
+    var ul = $('bm-mobility'); if (!ul) return;
+    ul.textContent = ''; $('bm-n-mobility').textContent = '';
+    fetch('/mobility/api/' + kind + '/' + encodeURIComponent(id), { headers: { Accept: 'application/json' }, credentials: 'same-origin' })
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (mine !== seq || !j.success) return;
+        $('bm-n-mobility').textContent = '(' + j.items.length + ')';
+        $('bm-mobility-note').textContent = j.note;
+        if (!j.items.length) { var n = document.createElement('li'); n.className = 'bm-none'; n.textContent = 'No routine drills for this yet.'; ul.appendChild(n); return; }
+        j.items.forEach(function (e) {
+          var li = document.createElement('li');
+          var a = document.createElement(window.StretchDemo ? 'button' : 'span');
+          if (window.StretchDemo) { a.type = 'button'; window.StretchDemo.link(a, { id: null, name: e.demo, category: 'recovery' }); }
+          a.textContent = e.name; li.appendChild(a);
+          var s = document.createElement('span'); s.className = 'bm-meta'; s.textContent = e.rx + ' - ' + e.routine; li.appendChild(s);
+          ul.appendChild(li);
+        });
+      })
+      .catch(function () { /* the rest of the panel is unaffected */ });
+  }
+
   function open() { panel.setAttribute('data-open', 'true'); }
   function close() { panel.setAttribute('data-open', 'false'); }
   $('bm-close').addEventListener('click', close);
@@ -80,6 +102,7 @@
         fill('bm-primary', 'bm-n-primary', d.primary, 'None.');
         fill('bm-secondary', 'bm-n-secondary', d.secondary, 'None.');
         panel.scrollTop = 0;
+        loadMobility(kind, id, mine);
       })
       .catch(function () {
         if (mine !== seq) return;

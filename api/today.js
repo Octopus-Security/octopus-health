@@ -120,7 +120,13 @@ function mount(app, { requireLogin, getDatabase }) {
       };
     } catch { stretches = null; }   // the page still works without its stretch list
 
-    res.render('today', { title: 'Today', user: req.user, activeTab: 'today', plan, stretches, fitNotes, pausedNote,
+    let mobility = null;
+    try {
+      const mob = require('./mobility');
+      mobility = { note: mob.NOTE, routines: mob.publicRoutines(), done: await mob.doneToday(db), dailyId: mob.DAILY_ID };
+    } catch { mobility = null; }   // the page still works without routines
+
+    res.render('today', { title: 'Today', user: req.user, activeTab: 'today', plan, stretches, mobility, fitNotes, pausedNote,
       today: todayET(), dayKey: day, requested: req.query.slug || null });
   });
 }

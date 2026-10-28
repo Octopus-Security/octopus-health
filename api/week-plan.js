@@ -85,6 +85,14 @@ function buildPlan(ctx) {
     return blocks;
   };
   const week = B.buildWeek({ date, benchmarks, lastByItem, benchmarkDay, trainingBlocks });
+  // Days A and C (the 1st and 3rd training days) also carry the ~15 min injury-prevention
+  // routine (api/mobility.js). A day-level field, not a block: blocks are skills.
+  let ti = 0;
+  for (const d of week.days) {
+    if (d.kind !== 'train') continue;
+    if (ti % DAY_SLOTS.length === 0 || ti % DAY_SLOTS.length === 2) d.routines = ['injury-prevention'];
+    ti++;
+  }
   return {
     ...week, focus,
     routines: ROUTINES,

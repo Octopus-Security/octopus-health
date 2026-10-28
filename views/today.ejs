@@ -90,12 +90,36 @@
       </ul>
     </div>
   <% } %>
+  <% if (mobility) { %>
+    <div class="card" id="mob-card">
+      <h2 style="margin-bottom:6px">🤸 Mobility &amp; prep</h2>
+      <div class="today-meta" style="margin-bottom:8px"><%= mobility.note %></div>
+      <% mobility.routines.forEach(function (r) { %>
+        <details class="mob-routine" data-routine="<%= r.id %>" <%= r.id === mobility.dailyId ? 'open' : '' %>>
+          <summary><strong><%= r.name %></strong> <span class="today-meta">· <%= r.minutes %> min<%= r.perWeek ? ' · ' + r.perWeek + 'x/week' : '' %> · <%= r.blurb %></span></summary>
+          <ul class="today-list">
+            <% r.items.forEach(function (it, i) { %>
+              <li class="today-item">
+                <div>
+                  <button type="button" class="today-name" data-r="<%= r.id %>" data-i="<%= i %>"><%= it.name %></button>
+                  <div class="today-note"><%= it.cue %></div>
+                </div>
+                <span class="today-rx"><%= it.rx %></span>
+              </li>
+            <% }) %>
+          </ul>
+          <button type="button" class="btn mob-done" data-routine="<%= r.id %>" aria-pressed="<%= mobility.done[r.id] ? 'true' : 'false' %>" style="min-height:var(--tap)"><%= mobility.done[r.id] ? '✓ Done today (tap to undo)' : 'Mark done' %></button>
+        </details>
+      <% }) %>
+    </div>
+  <% } %>
 </div>
 
 <script src="<%= asset('/js/stretch-demo.js') %>"></script>
 <script>
 const PLAN = <%- JSON.stringify(plan || null).replace(/</g, '\\u003c') %>;
 const STRETCHES = <%- JSON.stringify(stretches ? stretches.items : []).replace(/</g, '\\u003c') %>;
+const MOBILITY = <%- JSON.stringify(mobility ? mobility.routines : []).replace(/</g, '\\u003c') %>;
 const TODAY = <%- JSON.stringify(today) %>;
 
 document.querySelectorAll('#today-exercises .today-name').forEach(function (b) {
@@ -105,6 +129,26 @@ document.querySelectorAll('#today-exercises .today-name').forEach(function (b) {
 document.querySelectorAll('#today-stretches .today-name').forEach(function (b) {
   const s = STRETCHES[+b.dataset.s];
   StretchDemo.link(b, { id: s.id, name: s.name, category: s.category || 'recovery' });
+});
+
+document.querySelectorAll('#mob-card .today-name').forEach(function (b) {
+  var r = MOBILITY.filter(function (x) { return x.id === b.dataset.r; })[0], it = r.items[+b.dataset.i];
+  StretchDemo.link(b, { id: null, name: it.demo, category: 'recovery' });
+});
+document.querySelectorAll('#mob-card .mob-done').forEach(function (b) {
+  b.addEventListener('click', async function () {
+    var want = b.getAttribute('aria-pressed') !== 'true';
+    b.disabled = true;
+    try {
+      var r = await fetch('/mobility/api/done', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ routine: b.dataset.routine, done: want }) });
+      var j = await r.json();
+      if (!j.success) throw new Error('failed');
+      b.setAttribute('aria-pressed', String(j.done));
+      b.textContent = j.done ? '✓ Done today (tap to undo)' : 'Mark done';
+    } catch (e) { alert('Could not save. Try again.'); }
+    b.disabled = false;
+  });
 });
 
 // Start: create the session, hand the plan to the logger, open it. The logger keeps the
