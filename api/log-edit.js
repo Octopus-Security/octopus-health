@@ -107,6 +107,14 @@ function applySetFields(target, body) {
     target.weightUnit = body.weightUnit;
   }
   if (has(body, 'notes')) target.notes = String(body.notes || '').trim() || null;
+  // Coaching: mark a set failed and where it gave out. Un-failing clears the point.
+  if (has(body, 'failed') || has(body, 'failPoint')) {
+    const failed = has(body, 'failed') ? !!body.failed : !!target.failed;
+    const point = has(body, 'failPoint') ? body.failPoint : target.failPoint;
+    if (failed && point != null && point !== '' && !['bottom', 'middle', 'top', 'grip'].includes(point)) return 'failPoint must be bottom, middle, top or grip';
+    target.failed = failed;
+    target.failPoint = failed && point ? point : null;
+  }
   if (has(body, 'exerciseName')) {
     const name = String(body.exerciseName || '').trim();
     if (!name) return 'exerciseName cannot be empty';

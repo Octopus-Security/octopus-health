@@ -999,6 +999,8 @@ const getDatabase = (username) => {
         distanceUnit:  { type: DataTypes.STRING,  allowNull: true },
         rpe:           { type: DataTypes.INTEGER, allowNull: true },   // 1–10
         notes:         { type: DataTypes.TEXT,    allowNull: true },
+        failed:        { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false }, // marked failed by the owner
+        failPoint:     { type: DataTypes.STRING,  allowNull: true },   // bottom | middle | top | grip, only when failed
     });
 
     // Training plan template
@@ -1312,6 +1314,9 @@ const getDatabase = (username) => {
             ['Goals', 'kind',         'VARCHAR(32)'],
             ['Goals', 'inBrief',      'TINYINT(1) NOT NULL DEFAULT 1'],
             ['Goals', 'nudge',        'TINYINT(1) NOT NULL DEFAULT 0'],
+            // Coaching (api/coaching.js): a set the owner marked failed, and where it gave out.
+            ['WorkoutSets', 'failed',    'TINYINT(1) NOT NULL DEFAULT 0'],
+            ['WorkoutSets', 'failPoint', 'VARCHAR(16)'],
         ];
         for (const [table, col, type] of adds) {
             try {
