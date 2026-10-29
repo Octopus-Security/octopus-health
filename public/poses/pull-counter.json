@@ -1,0 +1,12 @@
+{
+ "version": 2,
+ "title": "Pull Counter",
+ "view": "side",
+ "highlight": ["spine","kneeR"],
+ "frames": [
+  {"duration":380,"label":"Guard","anchor":{"joint":"ankleR","x":38,"y":88.5},"pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"thighL":12,"shinL":-4,"footL":90,"upperArmR":20,"forearmR":165,"thighR":-22,"shinR":-20,"footR":70}},
+  {"duration":220,"label":"Pull back onto the rear leg, lead leg light","highlight":["spine","kneeR"],"anchor":{"joint":"ankleR","x":38,"y":88.5},"pose":{"torso":198,"head":190,"upperArmL":30,"forearmL":160,"thighL":22,"shinL":16,"footL":100,"upperArmR":30,"forearmR":180,"thighR":-2,"shinR":-34,"footR":58}},
+  {"duration":200,"label":"Fire the cross as the weight comes forward","hold":250,"highlight":["shoulderR","elbowR"],"anchor":{"joint":"ankleR","x":38,"y":88.5},"pose":{"torso":162,"head":166,"upperArmL":30,"forearmL":160,"thighL":18,"shinL":-6,"footL":90,"upperArmR":88,"forearmR":90,"thighR":-24,"shinR":-24,"footR":66}},
+  {"duration":420,"label":"Back to guard","highlight":[],"anchor":{"joint":"ankleR","x":38,"y":88.5},"pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"thighL":12,"shinL":-4,"footL":90,"upperArmR":20,"forearmR":165,"thighR":-22,"shinR":-20,"footR":70}}
+ ]
+}

@@ -1,0 +1,12 @@
+{
+ "version": 2,
+ "title": "Crab Walk",
+ "view": "side",
+ "highlight": ["shoulderL","hipL","elbowL"],
+ "frames": [
+  {"duration":300,"label":"Near hand and far foot step","hold":0,"pose":{"torso":257,"head":200,"upperArmL":-41.7,"forearmL":41.1,"thighL":94.6,"shinL":-11.3,"footL":90,"upperArmR":-28.1,"forearmR":9.4,"thighR":110.4,"shinR":3.6,"footR":90,"root":{"x":46,"y":70}}},
+  {"duration":300,"label":"Plant them","hold":0,"pose":{"torso":257,"head":200,"upperArmL":-12.5,"forearmL":27.6,"thighL":94.6,"shinL":-11.3,"footL":90,"upperArmR":-28.1,"forearmR":9.4,"thighR":94.5,"shinR":11.7,"footR":90,"root":{"x":46,"y":70}}},
+  {"duration":300,"label":"Far hand and near foot step","hold":0,"pose":{"torso":257,"head":200,"upperArmL":-28.1,"forearmL":9.4,"thighL":110.4,"shinL":3.6,"footL":90,"upperArmR":-41.7,"forearmR":41.1,"thighR":94.6,"shinR":-11.3,"footR":90,"root":{"x":46,"y":70}}},
+  {"duration":300,"label":"Plant them","hold":0,"pose":{"torso":257,"head":200,"upperArmL":-28.1,"forearmL":9.4,"thighL":94.5,"shinL":11.7,"footL":90,"upperArmR":-12.5,"forearmR":27.6,"thighR":94.6,"shinR":-11.3,"footR":90,"root":{"x":46,"y":70}}}
+ ]
+}

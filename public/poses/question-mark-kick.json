@@ -1,0 +1,14 @@
+{
+ "version": 2,
+ "title": "Question-Mark Kick",
+ "view": "side",
+ "highlight": ["hipL","kneeL"],
+ "frames": [
+  {"duration":420,"label":"Guard","anchor":{"joint":"ankleR","x":34,"y":88.5},"pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"thighL":12,"shinL":-4,"footL":90,"upperArmR":20,"forearmR":165,"thighR":-22,"shinR":-20,"footR":70}},
+  {"duration":220,"label":"Chamber low, like a body kick","hold":0,"anchor":{"joint":"ankleR","x":34,"y":88.5},"pose":{"torso":180,"head":178,"upperArmL":30,"forearmL":160,"thighL":62,"shinL":-30,"footL":70,"upperArmR":20,"forearmR":165,"thighR":-12,"shinR":-12,"footR":78}},
+  {"duration":160,"label":"Hip turns over, the knee rises","hold":0,"anchor":{"joint":"ankleR","x":34,"y":88.5},"pose":{"torso":200,"head":190,"upperArmL":30,"forearmL":160,"thighL":110,"shinL":40,"footL":120,"upperArmR":-10,"forearmR":20,"thighR":-12,"shinR":-12,"footR":78}},
+  {"duration":200,"label":"Shin hooks over onto the head","hold":250,"highlight":["hipL","kneeL"],"anchor":{"joint":"ankleR","x":34,"y":88.5},"pose":{"torso":222,"head":200,"upperArmL":30,"forearmL":160,"thighL":128,"shinL":122,"footL":200,"upperArmR":-25,"forearmR":5,"thighR":-6,"shinR":-6,"footR":84}},
+  {"duration":240,"label":"Fold back","hold":0,"anchor":{"joint":"ankleR","x":34,"y":88.5},"pose":{"torso":182,"head":178,"upperArmL":30,"forearmL":160,"thighL":80,"shinL":-20,"footL":80,"upperArmR":-10,"forearmR":20,"thighR":-6,"shinR":-6,"footR":84}},
+  {"duration":420,"label":"Back to guard","highlight":[],"anchor":{"joint":"ankleR","x":34,"y":88.5},"pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"thighL":12,"shinL":-4,"footL":90,"upperArmR":20,"forearmR":165,"thighR":-22,"shinR":-20,"footR":70}}
+ ]
+}

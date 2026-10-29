@@ -5,6 +5,7 @@
 //   elL/elR elbow flexion, hipL/hipR hip flexion (0 standing, 90 sitting, - = extended behind),
 //   knL/knR knee flexion, anL/anR ankle (90 neutral, foot - shin).
 // abs: absolute angle overrides (front view uses abs only).
+// ik per frame: {ankleL:{x,y},handR:{x,y},...}; ikFoot = absolute foot angle for IK'd ankles, a number or {ankleL:..,ankleR:..}.
 // placement per frame: anchor {joint,x,y} | root {x,y} | ground {joint, x}  (ground: lowest drawn edge on the floor)
 const fs=require('fs'),path=require('path');
 const SF=require(path.join(process.cwd(),'public/stick-figure.js'));
@@ -50,7 +51,7 @@ for(const file of process.argv.slice(2)){
         let par=dir-L[5]*al;const el={x:base.x+Math.sin(par*Math.PI/180)*la,y:base.y+Math.cos(par*Math.PI/180)*la};
         let ch=Math.atan2(tg.x-el.x,tg.y-el.y)*180/Math.PI;
         const near=(v,ref)=>v+Math.round((ref-v)/360)*360; const prev=frames.length?frames[frames.length-1].pose:p; par=near(par,prev[L[1]]);ch=near(ch,par+(L[5]>0?60:-60));
-        const footKey=end==='ankleL'?'footL':end==='ankleR'?'footR':null; if(footKey){p[footKey]=r1(near(f.ikFoot??90,ch+90));}
+        const footKey=end==='ankleL'?'footL':end==='ankleR'?'footR':null; if(footKey){const fa=f.ikFoot&&typeof f.ikFoot==='object'?f.ikFoot[end]:f.ikFoot;p[footKey]=r1(near(fa??90,ch+90));}
         p[L[1]]=r1(par);p[L[2]]=r1(ch);}
     }
     out.pose=p;frames.push(out);

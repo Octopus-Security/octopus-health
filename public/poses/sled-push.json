@@ -1,0 +1,15 @@
+{
+ "version": 2,
+ "title": "Sled Push",
+ "view": "side",
+ "props": [{"type":"box","x":78,"y":80,"w":20,"h":12},{"type":"bar","x1":79,"y1":42,"x2":79,"y2":80}],
+ "highlight": ["hipL","kneeL","hipR"],
+ "frames": [
+  {"duration":200,"label":"Near leg drives back, far knee drives through","hold":0,"pose":{"torso":128,"head":148,"upperArmL":23.7,"forearmL":143.5,"thighL":-31.7,"shinL":-77,"footL":40,"upperArmR":11.6,"forearmR":126,"thighR":106.1,"shinR":-34.1,"footR":60,"root":{"x":40,"y":63}}},
+  {"duration":200,"label":"Far foot strikes under the hip","hold":0,"pose":{"torso":128,"head":148,"upperArmL":23.7,"forearmL":143.5,"thighL":-3.6,"shinL":-110.4,"footL":10,"upperArmR":11.6,"forearmR":126,"thighR":58.7,"shinR":-49,"footR":70,"root":{"x":40,"y":63}}},
+  {"duration":200,"label":"Far foot pushes the floor back","hold":0,"pose":{"torso":128,"head":148,"upperArmL":23.7,"forearmL":143.5,"thighL":64.1,"shinL":-92.1,"footL":40,"upperArmR":11.6,"forearmR":126,"thighR":17,"shinR":-83.2,"footR":40,"root":{"x":40,"y":63}}},
+  {"duration":200,"label":"Far leg drives back, near knee drives through","hold":0,"pose":{"torso":128,"head":148,"upperArmL":23.7,"forearmL":143.5,"thighL":106.1,"shinL":-34.1,"footL":60,"upperArmR":11.6,"forearmR":126,"thighR":-31.7,"shinR":-77,"footR":40,"root":{"x":40,"y":63}}},
+  {"duration":200,"label":"Near foot strikes under the hip","hold":0,"pose":{"torso":128,"head":148,"upperArmL":23.7,"forearmL":143.5,"thighL":58.7,"shinL":-49,"footL":70,"upperArmR":11.6,"forearmR":126,"thighR":-3.6,"shinR":-110.4,"footR":10,"root":{"x":40,"y":63}}},
+  {"duration":200,"label":"Near foot pushes the floor back","hold":0,"pose":{"torso":128,"head":148,"upperArmL":23.7,"forearmL":143.5,"thighL":17,"shinL":-83.2,"footL":40,"upperArmR":11.6,"forearmR":126,"thighR":64.1,"shinR":-92.1,"footR":40,"root":{"x":40,"y":63}}}
+ ]
+}
