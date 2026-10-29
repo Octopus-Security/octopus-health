@@ -1,0 +1,10 @@
+{
+ "version": 2,
+ "title": "Puppy Pose",
+ "view": "side",
+ "static": true,
+ "highlight": ["spine","shoulderL"],
+ "frames": [
+  {"label":"Hips over knees, chest sinks","anchor":{"joint":"kneeL","x":30,"y":89.5},"pose":{"torso":64,"head":72,"upperArmL":96,"forearmL":92,"thighL":4,"shinL":-90,"footL":-72,"upperArmR":96,"forearmR":92,"thighR":4,"shinR":-90,"footR":-72,"arch":-14}}
+ ]
+}

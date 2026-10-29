@@ -1,0 +1,11 @@
+{
+ "version": 2,
+ "title": "Legs Up the Wall",
+ "view": "side",
+ "static": true,
+ "props": [{"type":"wall","x":68}],
+ "highlight": ["hipL"],
+ "frames": [
+  {"label":"Legs rest on the wall, breathe slowly","pose":{"torso":-90,"head":-88,"upperArmL":95,"forearmL":150,"thighL":180,"shinL":180,"footL":250,"upperArmR":97,"forearmR":145,"thighR":178,"shinR":178,"footR":248,"root":{"x":62,"y":87}}}
+ ]
+}

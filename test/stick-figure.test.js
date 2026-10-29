@@ -208,6 +208,9 @@ test('static poses: one frame, exempt from must-move, rendered without distortio
 
 test('genuine holds are static and genuine movers are not', () => {
   for (const k of ['plank', 'side-plank', 'dead-hang', 'hollow-body', 'deep-squat-hold', 'couch-stretch', 'quad-stretch', 'pigeon', 'childs-pose', 'neck-isometric']) assert.ok(staticKeys.includes(k), k + ' is a hold');
+  for (const k of ['pancake', 'prone-quad', 'sphinx', 'puppy', 'legs-up-wall', 'ninety-ninety-breathing', 'supported-bridge',
+    'thomas-stretch', 'kneeling-shin-stretch', 'bench-lat-stretch', 'side-lunge-stretch']) assert.ok(staticKeys.includes(k), k + ' is a hold');
+  for (const k of ['pnf-hamstring', 'adductor-rock-back', 'shin-box-get-up', 'squat-to-stand']) assert.ok(!staticKeys.includes(k), k + ' moves');
   for (const k of ['squat', 'lunge', 'push-up', 'roundhouse', 'jab-cross', 'burpee', 'pull-up', 'cat-cow']) assert.ok(!staticKeys.includes(k), k + ' moves');
 });
 
@@ -277,6 +280,15 @@ test('rules route the names that used to collide', () => {
     'Overhead Banded Shoulder Stretch': 'overhead-shoulder-stretch',
     'Dumbbell Bulgarian Split Squat': 'bulgarian-split-squat',
     'Dumbbell Lunge': 'lunge',
+    // stretches & mobility added 2026-10-26: each contains a word an older, more general rule matches
+    '90/90 Breathing': 'ninety-ninety-breathing',          // "90/90" is the hip switch
+    'Side Lunge Adductor Stretch': 'side-lunge-stretch',   // "lunge"
+    'Squat to Stand': 'squat-to-stand',                    // "squat"
+    'Supported Bridge (Block Under Hips)': 'supported-bridge', // "bridge"
+    'Prone Quad Stretch': 'prone-quad',                    // "quad stretch" is the standing one
+    'Kneeling Bench Lat Stretch': 'bench-lat-stretch',     // "bench"
+    'PNF Hamstring Contract-Relax': 'pnf-hamstring',       // "hamstring"
+    'Thomas Stretch (Bench)': 'thomas-stretch',
   };
   for (const [n, k] of Object.entries(cases)) assert.strictEqual(PM.keyFor(n), k, n);
   assert.strictEqual(PM.keyFor('Something New', 'muay_thai'), 'fight-stance');
@@ -309,6 +321,17 @@ test('movements that are different are not drawn with the same figure', () => {
     ['Foam Roll Thoracic Spine', 'Foam Roll Hip Flexors', 'ITB Foam Roll', 'Foam Roll Lats'],
     ['Hip Bump Sweep', 'Bridge and Roll'],
     ['Dumbbell Row', 'Dumbbell Single-Arm Row', 'Barbell Bent-Over Row'],
+    // stretches & mobility added 2026-10-26
+    ['Sphinx Pose', 'Cobra Stretch'],
+    ['Puppy Pose', "Child's Pose", 'Downward Dog', 'Kneeling Bench Lat Stretch'],
+    ['Prone Quad Stretch', 'Standing Quad Stretch', 'Couch Stretch', 'Thomas Stretch (Bench)'],
+    ['PNF Hamstring Contract-Relax', 'Supine Hamstring Stretch', 'Legs Up the Wall', '90/90 Breathing'],
+    ['Seated Straddle Stretch (Pancake)', 'Seated Forward Fold', 'Butterfly Stretch'],
+    ['Side Lunge Adductor Stretch', 'Cossack Squat', 'Adductor Rock-Back', 'Frog Stretch'],
+    ['Supported Bridge (Block Under Hips)', 'Glute Bridge'],
+    ['Shin Box Get-Up', '90/90 Hip Switch', 'Technical Stand-up'],
+    ['Squat to Stand', 'Deep Squat Hold', 'Standing Forward Fold'],
+    ['Kneeling Shin Stretch', "Child's Pose", 'Half-Kneeling Hip Flexor Stretch'],
   ];
   for (const g of groups) {
     const keys = g.map((n) => PM.keyFor(n));

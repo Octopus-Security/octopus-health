@@ -58,6 +58,22 @@
     [/hip external rotation pails|bjj hip mobility flow/i, 'ninety-ninety'],
 
     // ── specific stretches and mobility drills that used to share a generic figure ──
+    // ── stretches & mobility added 2026-10-26 ──
+    [/straddle|pancake/i, 'pancake'],
+    [/prone quad|lying quad/i, 'prone-quad'],
+    [/\bpnf\b|contract-?relax/i, 'pnf-hamstring'],
+    [/90\/90 breathing/i, 'ninety-ninety-breathing'],
+    [/supported bridge/i, 'supported-bridge'],
+    [/sphinx/i, 'sphinx'],
+    [/puppy/i, 'puppy'],
+    [/side lunge (adductor )?stretch/i, 'side-lunge-stretch'],
+    [/bench lat stretch/i, 'bench-lat-stretch'],
+    [/legs up the wall/i, 'legs-up-wall'],
+    [/adductor rock-?back/i, 'adductor-rock-back'],
+    [/shin box get-?up/i, 'shin-box-get-up'],
+    [/kneeling shin stretch|tibialis stretch/i, 'kneeling-shin-stretch'],
+    [/thomas (stretch|test)/i, 'thomas-stretch'],
+    [/squat to stand/i, 'squat-to-stand'],
     [/couch stretch/i, 'couch-stretch'],
     [/lizard/i, 'lizard'],
     [/world'?s greatest/i, 'worlds-greatest'],

@@ -1,0 +1,11 @@
+{
+ "version": 2,
+ "title": "Shin Box Get-Up",
+ "view": "side",
+ "highlight": ["hipL","hipR"],
+ "frames": [
+  {"duration":1300,"label":"Seated shin box, chest tall","hold":500,"anchor":{"joint":"kneeL","x":52,"y":88.5},"pose":{"torso":182,"head":182,"upperArmL":40,"forearmL":100,"thighL":88,"shinL":-70,"footL":-40,"upperArmR":40,"forearmR":100,"thighR":73,"shinR":-92,"footR":-77,"depth":{"shinL":0.15,"footL":0.5,"thighR":0.3,"shinR":1}}},
+  {"duration":1100,"label":"Drive the hips up and forward","hold":0,"anchor":{"joint":"kneeL","x":52,"y":88.5},"pose":{"torso":176,"head":178,"upperArmL":60,"forearmL":110,"thighL":48,"shinL":-70,"footL":-40,"upperArmR":60,"forearmR":110,"thighR":40,"shinR":-90,"footR":-72,"depth":{"shinL":0.15,"footL":0.5,"thighR":0.65,"shinR":1}}},
+  {"duration":1400,"label":"Tall kneel, glutes squeezed","hold":700,"anchor":{"joint":"kneeL","x":52,"y":88.5},"pose":{"torso":180,"head":180,"upperArmL":45,"forearmL":95,"thighL":0,"shinL":-70,"footL":-40,"upperArmR":45,"forearmR":95,"thighR":0,"shinR":-90,"footR":-72,"depth":{"shinL":0.15,"footL":0.5,"thighR":1,"shinR":1}}}
+ ]
+}

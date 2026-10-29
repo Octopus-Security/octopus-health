@@ -1,0 +1,11 @@
+{
+ "version": 2,
+ "title": "PNF Hamstring Contract-Relax",
+ "view": "side",
+ "highlight": ["kneeL","hipL"],
+ "frames": [
+  {"duration":1400,"label":"Raise the straight leg to a first stretch","hold":600,"pose":{"torso":-90,"head":-88,"upperArmL":118,"forearmL":122,"thighL":158,"shinL":158,"footL":238,"upperArmR":116,"forearmR":120,"thighR":90,"shinR":90,"footR":180,"root":{"x":54,"y":87}}},
+  {"duration":500,"label":"Contract: press the heel down into the strap, 6 s","hold":2000,"highlight":["hipL","kneeL","ankleL"],"pose":{"torso":-90,"head":-88,"upperArmL":124,"forearmL":128,"thighL":152,"shinL":152,"footL":232,"upperArmR":122,"forearmR":126,"thighR":90,"shinR":90,"footR":180,"root":{"x":54,"y":87}}},
+  {"duration":1600,"label":"Relax, breathe out, draw the leg higher","hold":1800,"pose":{"torso":-90,"head":-88,"upperArmL":130,"forearmL":134,"thighL":180,"shinL":180,"footL":260,"upperArmR":128,"forearmR":132,"thighR":90,"shinR":90,"footR":180,"root":{"x":54,"y":87}}}
+ ]
+}

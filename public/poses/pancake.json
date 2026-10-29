@@ -1,0 +1,10 @@
+{
+ "version": 2,
+ "title": "Seated Straddle Stretch",
+ "view": "front",
+ "static": true,
+ "highlight": ["hipL","hipR"],
+ "frames": [
+  {"label":"Legs wide, hinge forward from the hips","anchor":{"joint":"hip","x":50,"y":83.1},"pose":{"torso":180,"head":180,"upperArmL":12,"forearmL":-8,"upperArmR":-12,"forearmR":8,"thighL":80,"shinL":80,"footL":180,"thighR":-80,"shinR":-80,"footR":180,"depth":{"torso":0.55,"upperArmL":0.55,"upperArmR":0.55,"forearmL":0.5,"forearmR":0.5}}}
+ ]
+}

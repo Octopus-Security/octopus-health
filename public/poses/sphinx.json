@@ -1,0 +1,10 @@
+{
+ "version": 2,
+ "title": "Sphinx Pose",
+ "view": "side",
+ "static": true,
+ "highlight": ["spine"],
+ "frames": [
+  {"label":"Elbows under shoulders, hips heavy","anchor":{"joint":"hip","x":52,"y":87.2},"pose":{"torso":114,"head":140,"upperArmL":-2,"forearmL":88,"thighL":-90,"shinL":-90,"footL":-60,"upperArmR":-2,"forearmR":88,"thighR":-90,"shinR":-90,"footR":-60,"arch":-16}}
+ ]
+}
