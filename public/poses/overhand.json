@@ -1,0 +1,12 @@
+{
+ "version": 2,
+ "title": "Overhand Right",
+ "view": "side",
+ "highlight": ["shoulderL","spine"],
+ "frames": [
+  {"duration":420,"label":"Guard","anchor":{"joint":"ankleR","x":50,"y":90},"pose":{"torso":172,"head":172,"upperArmL":20,"forearmL":165,"thighL":-22,"shinL":-20,"footL":70,"upperArmR":30,"forearmR":160,"thighR":12,"shinR":-4,"footR":90}},
+  {"duration":200,"label":"Elbow lifts, rear hand loops up","hold":0,"anchor":{"joint":"ankleR","x":50,"y":90},"pose":{"torso":166,"head":168,"upperArmL":120,"forearmL":200,"thighL":-4.9,"shinL":-34.6,"footL":66,"upperArmR":30,"forearmR":160,"thighR":20,"shinR":-8,"footR":90}},
+  {"duration":220,"label":"Over the top and down: head drops off the line","hold":250,"highlight":["shoulderL","elbowL","spine"],"anchor":{"joint":"ankleR","x":50,"y":90},"pose":{"torso":146,"head":152,"upperArmL":104,"forearmL":106,"thighL":9.9,"shinL":-45.2,"footL":50,"upperArmR":20,"forearmR":170,"thighR":34,"shinR":-14,"footR":90}},
+  {"duration":450,"label":"Back to guard","highlight":[],"anchor":{"joint":"ankleR","x":50,"y":90},"pose":{"torso":172,"head":172,"upperArmL":20,"forearmL":165,"thighL":-22,"shinL":-20,"footL":70,"upperArmR":30,"forearmR":160,"thighR":12,"shinR":-4,"footR":90}}
+ ]
+}

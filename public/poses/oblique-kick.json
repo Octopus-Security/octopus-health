@@ -1,0 +1,12 @@
+{
+ "version": 2,
+ "title": "Oblique Kick",
+ "view": "side",
+ "highlight": ["hipL","kneeL"],
+ "frames": [
+  {"duration":420,"label":"Guard","anchor":{"joint":"ankleR","x":38,"y":88.5},"pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"thighL":12,"shinL":-4,"footL":90,"upperArmR":20,"forearmR":165,"thighR":-22,"shinR":-20,"footR":70}},
+  {"duration":200,"label":"Lift the lead knee, foot turned out","anchor":{"joint":"ankleR","x":38,"y":88.5},"pose":{"torso":178,"head":176,"upperArmL":30,"forearmL":160,"thighL":70,"shinL":-10,"footL":110,"upperArmR":20,"forearmR":165,"thighR":-14,"shinR":-14,"footR":76}},
+  {"duration":180,"label":"Stomp down through the knee line","hold":250,"highlight":["hipL","kneeL"],"anchor":{"joint":"ankleR","x":38,"y":88.5},"pose":{"torso":190,"head":184,"upperArmL":30,"forearmL":160,"thighL":58,"shinL":52,"footL":150,"upperArmR":20,"forearmR":165,"thighR":-10,"shinR":-10,"footR":80}},
+  {"duration":420,"label":"Back to guard","highlight":[],"anchor":{"joint":"ankleR","x":38,"y":88.5},"pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"thighL":12,"shinL":-4,"footL":90,"upperArmR":20,"forearmR":165,"thighR":-22,"shinR":-20,"footR":70}}
+ ]
+}

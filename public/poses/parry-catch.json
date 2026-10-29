@@ -1,0 +1,14 @@
+{
+ "version": 2,
+ "title": "Parry and Catch",
+ "view": "side",
+ "highlight": ["shoulderL","shoulderR"],
+ "frames": [
+  {"duration":380,"label":"Guard","anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"thighL":12,"shinL":-4,"footL":90,"upperArmR":20,"forearmR":165,"thighR":-22,"shinR":-20,"footR":70}},
+  {"duration":240,"label":"Long guard: lead hand out, open","highlight":["shoulderL"],"anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":172,"head":172,"upperArmL":78,"forearmL":96,"thighL":12,"shinL":-4,"footL":90,"upperArmR":20,"forearmR":165,"thighR":-22,"shinR":-20,"footR":70}},
+  {"duration":180,"label":"Rear hand parries the jab down and across","highlight":["shoulderR","elbowR"],"anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":170,"head":172,"upperArmL":40,"forearmL":170,"thighL":12,"shinL":-4,"footL":90,"upperArmR":56,"forearmR":76,"thighR":-22,"shinR":-20,"footR":70}},
+  {"duration":200,"label":"Lead glove catches in front of the face","highlight":["shoulderL","elbowL"],"anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":174,"head":174,"upperArmL":48,"forearmL":184,"thighL":12,"shinL":-4,"footL":90,"upperArmR":20,"forearmR":165,"thighR":-22,"shinR":-20,"footR":70}},
+  {"duration":200,"label":"Jab straight back","highlight":["shoulderL","elbowL"],"anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":170,"head":172,"upperArmL":90,"forearmL":92,"thighL":12,"shinL":-4,"footL":90,"upperArmR":20,"forearmR":165,"thighR":-22,"shinR":-20,"footR":70}},
+  {"duration":380,"label":"Back to guard","highlight":[],"anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"thighL":12,"shinL":-4,"footL":90,"upperArmR":20,"forearmR":165,"thighR":-22,"shinR":-20,"footR":70}}
+ ]
+}
