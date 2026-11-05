@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <%- include('partials/favicon') %>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="<%= asset('/theme.css') %>">
+</head>
+<body>
+<%- include('partials/nav') %>
+<%
+  var t = targets, td = week.todaySummary;
+  var metrics = [['calories', 'Calories', 'kcal'], ['protein', 'Protein', 'g'], ['carbs', 'Carbs', 'g'], ['fats', 'Fat', 'g']];
+  function fmt(n) { return Number(n).toLocaleString('en-US'); }
+%>
+<div class="container" data-msg-root>
+  <div class="card">
+    <h2>Nutrition targets</h2>
+    <p class="fx-meta"><%= note %> <a href="/nutrition">Back to meals</a></p>
+    <p class="fx-msg"></p>
+  </div>
+
+  <div class="card">
+    <h2>Today</h2>
+    <% if (!t) { %>
+      <p class="empty-state">No targets set yet. Set them below to see your progress here.</p>
+    <% } %>
+    <% if (td.status === 'not_logged') { %>
+      <p class="fx-meta">Nothing logged today yet. That is not the same as eating nothing, so no total is shown.</p>
+    <% } else if (td.status === 'partial') { %>
+      <p class="fx-meta">Some of today's meals have no calories entered, so the calorie figure is only what was logged.</p>
+    <% } %>
+    <% metrics.forEach(function (m) { var k = m[0], got = td[k], goal = t ? t[k] : null; if (goal === null && got === null) return; %>
+      <div class="nt-row">
+        <div class="nt-head"><strong><%= m[1] %></strong>
+          <span class="fx-meta">
+            <% if (got === null) { %>not logged<% } else { %><%= fmt(got) %> <%= m[2] %> logged<% } %><% if (goal !== null && goal !== undefined) { %> · target <%= fmt(goal) %> <%= m[2] %><% } %>
+          </span></div>
+        <% if (goal && got !== null) { var pct = Math.min(100, Math.round(got / goal * 100)); %>
+          <div class="nt-bar" role="img" aria-label="<%= m[1] %>: <%= fmt(got) %> of <%= fmt(goal) %> <%= m[2] %> logged"><span style="width: <%= pct %>%"></span></div>
+        <% } %>
+      </div>
+    <% }) %>
+  </div>
+
+  <div class="card">
+    <h2>Last 7 days</h2>
+    <p class="fx-meta"><%= week.loggedDays %> of 7 days have meals logged. A day with nothing logged shows a dash and is left out of the averages; it does not count as zero.</p>
+    <div class="fx-table-wrap">
+      <table>
+        <thead><tr><th>Date</th><th>Status</th><th>Calories</th><th>Protein (g)</th><% if (t && (t.carbs !== null || t.fats !== null)) { %><th>Carbs (g)</th><th>Fat (g)</th><% } %></tr></thead>
+        <tbody>
+        <% week.days.slice().reverse().forEach(function (d) { %>
+          <tr>
+            <td><%= d.date %></td>
+            <td><%= d.status === 'not_logged' ? 'Not logged' : d.status === 'partial' ? 'Partly logged' : 'Logged' %></td>
+            <td><%= d.calories === null ? '-' : fmt(d.calories) %></td>
+            <td><%= d.protein === null ? '-' : fmt(d.protein) %></td>
+            <% if (t && (t.carbs !== null || t.fats !== null)) { %><td><%= d.carbs === null ? '-' : fmt(d.carbs) %></td><td><%= d.fats === null ? '-' : fmt(d.fats) %></td><% } %>
+          </tr>
+        <% }) %>
+        </tbody>
+      </table>
+    </div>
+    <% if (week.average.calories || week.average.protein) { %>
+      <p class="fx-meta">Average over days with data:
+        <% if (week.average.calories) { %><%= fmt(week.average.calories.value) %> kcal (<%= week.average.calories.days %> days)<% } %>
+        <% if (week.average.calories && week.average.protein) { %> · <% } %>
+        <% if (week.average.protein) { %><%= fmt(week.average.protein.value) %> g protein (<%= week.average.protein.days %> days)<% } %></p>
+    <% } %>
+  </div>
+
+  <div class="card nt-card">
+    <h2>Your targets</h2>
+    <form data-json action="/nutrition/targets/api" data-method="PUT">
+      <div class="form-grid">
+        <div class="form-group"><label for="nt-cal">Calories per day</label>
+          <input id="nt-cal" type="number" name="calories" inputmode="numeric" min="<%= N.LIMITS.calories[0] %>" max="<%= N.LIMITS.calories[1] %>" value="<%= t && t.calories !== null ? t.calories : '' %>"></div>
+        <div class="form-group"><label for="nt-pro">Protein (g) per day</label>
+          <input id="nt-pro" type="number" name="protein" inputmode="numeric" min="<%= N.LIMITS.protein[0] %>" max="<%= N.LIMITS.protein[1] %>" value="<%= t && t.protein !== null ? t.protein : '' %>"></div>
+        <div class="form-group"><label for="nt-carb">Carbs (g), optional</label>
+          <input id="nt-carb" type="number" name="carbs" inputmode="numeric" min="0" max="<%= N.LIMITS.carbs[1] %>" value="<%= t && t.carbs !== null ? t.carbs : '' %>"></div>
+        <div class="form-group"><label for="nt-fat">Fat (g), optional</label>
+          <input id="nt-fat" type="number" name="fats" inputmode="numeric" min="0" max="<%= N.LIMITS.fats[1] %>" value="<%= t && t.fats !== null ? t.fats : '' %>"></div>
+      </div>
+      <p class="fx-meta">Set at least calories or protein. Calories can be <%= N.KCAL_MIN %> to <%= fmt(N.KCAL_MAX) %>. These are your own numbers; this page does not tell you what you should eat.</p>
+      <button type="submit" class="nt-btn">Save targets</button>
+      <% if (t) { %><button type="button" class="nt-btn nt-quiet" data-act data-method="DELETE" data-url="/nutrition/targets/api" data-confirm="Clear your targets?">Clear targets</button>
+        <p class="fx-meta">Saved <%= t.updatedOn || '' %> (<%= t.source === 'estimate' ? 'from an estimate' : 'entered by you' %>).</p><% } %>
+    </form>
+  </div>
+
+  <div class="card nt-card">
+    <h2>Need a starting point?</h2>
+    <p class="fx-meta">A rough estimate from your weight, nothing more. <%= note %></p>
+    <form method="GET" action="/nutrition/targets">
+      <div class="form-grid">
+        <div class="form-group"><label for="e-w">Your weight</label>
+          <input id="e-w" type="number" step="0.1" name="weight" inputmode="decimal" required value="<%= q.weight || (lastWeight ? lastWeight.weight : '') %>"></div>
+        <div class="form-group"><label for="e-u">Unit</label>
+          <select id="e-u" name="unit"><% var uSel = q.unit || (lastWeight ? lastWeight.unit : 'lbs'); %>
+            <option value="lbs" <%= uSel === 'lbs' ? 'selected' : '' %>>lbs</option><option value="kg" <%= uSel === 'kg' ? 'selected' : '' %>>kg</option></select></div>
+        <div class="form-group"><label for="e-g">Goal</label>
+          <select id="e-g" name="goal"><% Object.keys(N.GOALS).forEach(function (k) { %><option value="<%= k %>" <%= (q.goal || 'maintain') === k ? 'selected' : '' %>><%= N.GOALS[k].label %></option><% }) %></select></div>
+        <div class="form-group"><label for="e-a">Activity</label>
+          <select id="e-a" name="activity"><% Object.keys(N.ACTIVITY).forEach(function (k) { %><option value="<%= k %>" <%= (q.activity || 'light') === k ? 'selected' : '' %>><%= N.ACTIVITY[k].label %></option><% }) %></select></div>
+      </div>
+      <button type="submit" class="nt-btn">Estimate</button>
+    </form>
+    <% if (estError) { %><p class="error" style="margin-top:12px;"><%= estError %></p><% } %>
+    <% if (est) { %>
+      <div class="nt-est">
+        <p><strong>Estimate: about <%= fmt(est.calories) %> kcal and <%= est.protein %> g protein a day.</strong></p>
+        <p class="fx-meta">How it was worked out: <%= est.working %>.</p>
+        <p class="fx-meta">This is an estimate and can be well off for any one person. <%= est.note %></p>
+        <button type="button" class="nt-btn" data-act data-method="PUT" data-url="/nutrition/targets/api"
+          data-body='<%= JSON.stringify({ calories: est.calories, protein: est.protein, source: "estimate" }) %>'>Use these as my targets</button>
+      </div>
+    <% } %>
+  </div>
+</div>
+<style>
+  .nt-row { margin: 14px 0; }
+  .nt-head { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px 12px; }
+  .nt-bar { height: 12px; border-radius: 6px; background: #1e1e1e; overflow: hidden; margin-top: 6px; }
+  .nt-bar span { display: block; height: 100%; background: #3498db; }
+  .nt-btn { min-height: var(--tap, 44px); padding: 8px 14px; font-size: 16px; margin: 6px 8px 0 0; }
+  .nt-card input, .nt-card select { font-size: 16px; min-height: var(--tap, 44px); }
+  .nt-est { margin-top: 14px; border-top: 1px solid #1e1e1e; padding-top: 12px; }
+</style>
+<script src="<%= asset('/js/fx.js') %>"></script>
+</body>
+</html>

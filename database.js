@@ -1221,6 +1221,18 @@ const getDatabase = (username) => {
         value: { type: DataTypes.TEXT },
     }, { tableName: 'UserSettings', timestamps: false });
 
+    // Daily nutrition targets (api/nutrition-targets.js). One row (id 1) per account file,
+    // so no owner column. A new table: sync() creates it, nothing existing is altered.
+    const NutritionTarget = sequelize.define('NutritionTarget', {
+        id:        { type: DataTypes.INTEGER, primaryKey: true },
+        calories:  { type: DataTypes.INTEGER, allowNull: true },
+        protein:   { type: DataTypes.INTEGER, allowNull: true },
+        carbs:     { type: DataTypes.INTEGER, allowNull: true },
+        fats:      { type: DataTypes.INTEGER, allowNull: true },
+        source:    { type: DataTypes.STRING(16), allowNull: false, defaultValue: 'manual' },
+        updatedOn: { type: DataTypes.DATEONLY, allowNull: true },
+    }, { tableName: 'NutritionTargets', timestamps: false });
+
     // Where you train, and what is there (GYMS-AND-EQUIPMENT.md phase 1). Per-user file,
     // so no owner column. `slug` is what plan templates target ("home", "park", "gym");
     // `equipmentId` is an id from content/equipment/catalogue.json - the ONE list - kept
@@ -1470,6 +1482,7 @@ const getDatabase = (username) => {
         Benchmark,
         BenchmarkSeed,
         UserSetting,
+        NutritionTarget,
         Gym,
         GymEquipment,
         seedData,

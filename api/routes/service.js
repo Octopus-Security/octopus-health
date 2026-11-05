@@ -985,6 +985,15 @@ router.get('/nutrition-today', requireToken, async (req, res) => {
   } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
 });
 
+// GET /api/service/nutrition-targets - the caller's daily targets plus today and the last
+// 7 ET days. Read-only. Unlogged days are status "not_logged" with null totals, never 0.
+router.get('/nutrition-targets', requireToken, async (req, res) => {
+  try {
+    const db = await getDB(req);
+    res.json(await require('../nutrition-targets').overview(db));
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+
 // GET /api/service/templates?slug=mon:gym
 // Returns workout template by slug (dayKey:location), or all if no slug.
 router.get('/templates', requireToken, async (req, res) => {
