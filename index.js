@@ -3,6 +3,8 @@ const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
 const { BUILD, STARTED_AT, asset } = require('./build');
+const ET = require('./lib/et');
+const { displayName } = require('./api/template-names');
 const { Op } = require('sequelize');
 const { AuthClient } = require('@octopus-security/auth-client');
 const axios = require('axios');
@@ -54,6 +56,8 @@ function getActiveTab(requestPath) {
     // when you clicked something else entirely.
     if (requestPath === '/today') return 'today';
     if (requestPath.startsWith('/gyms')) return 'gyms';
+    if (requestPath === '/week') return 'week';
+    if (requestPath.startsWith('/constraints')) return 'constraints';
     if (requestPath.startsWith('/plan-maker')) return 'plan-maker';
     if (requestPath.startsWith('/exercises') || requestPath.startsWith('/library') || requestPath.startsWith('/exercise') || requestPath.startsWith('/workout')) return 'exercises';
     if (requestPath === '/body' || requestPath.startsWith('/body/') || requestPath.startsWith('/body?')) return 'body';
@@ -72,9 +76,7 @@ function getActiveTab(requestPath) {
 
 // ── Periodisation phase helper ────────────────────────────────────────────────
 function getPeriodisationPhase(competitionDate) {
-    const today = new Date();
-    const compDate = new Date(competitionDate);
-    const weeksOut = Math.ceil((compDate - today) / (7 * 24 * 60 * 60 * 1000));
+    const weeksOut = Math.ceil(ET.daysBetween(ET.todayET(), competitionDate) / 7);
     if (weeksOut < 0)  return { phase: 'Past',   color: '#555',     weeksOut };
     if (weeksOut <= 1) return { phase: 'Taper',  color: '#9b59b6',  weeksOut };
     if (weeksOut <= 4) return { phase: 'Peak',   color: '#e74c3c',  weeksOut };
@@ -120,6 +122,8 @@ app.set('views', './views');
 // "remember to pass it" is one template quietly going stale — which is the bug,
 // not a smaller version of it.
 app.locals.asset = asset;
+// ET calendar date for templates (a date input's default was the UTC day after 8pm ET).
+app.locals.todayET = () => ET.todayET();
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
@@ -244,7 +248,7 @@ app.get('/', requireLogin, async (req, res) => {
     await sequelize.sync();
 
     try {
-        const todayStr = new Date().toISOString().split('T')[0];
+        const todayStr = ET.todayET();
 
         const recentWeight = await WeightEntry.findOne({ order: [['date', 'DESC']] });
         const todayExercises = await Exercise.findAll({ where: { date: todayStr } });
@@ -282,7 +286,7 @@ app.get('/', requireLogin, async (req, res) => {
             const phase = getPeriodisationPhase(nextComp.date);
             let regWarning = null;
             if (nextComp.registrationDeadline) {
-                const regDays = Math.ceil((new Date(nextComp.registrationDeadline) - new Date()) / (24 * 60 * 60 * 1000));
+                const regDays = ET.daysBetween(todayStr, nextComp.registrationDeadline);
                 if (regDays > 0 && regDays <= 14) regWarning = regDays;
             }
             competitionWidget = { ...nextComp.toJSON(), phase, regWarning };
@@ -314,6 +318,8 @@ app.get('/', requireLogin, async (req, res) => {
 require('./api/web-fitness')(app, { requireLogin, getDatabase });
 require('./api/web-gyms')(app, { requireLogin, getDatabase });
 require('./api/web-nutrition')(app, { requireLogin, getDatabase });
+require('./api/web-week')(app, { requireLogin, getDatabase });
+require('./api/web-constraints')(app, { requireLogin, getDatabase });
 require('./api/web-coaching')(app, { requireLogin, getDatabase });
 // Correcting the log in place: edit/delete a set, retitle or redate a session,
 // add a set, rename an exercise, and known-name suggestions (api/web-log-edit.js).
@@ -506,8 +512,8 @@ app.post('/meal-templates/:id/log', requireLogin, async (req, res) => {
 
     const now = new Date();
     await Meal.create({
-        date:     req.body.date || now.toISOString().slice(0, 10),
-        time:     req.body.time || now.toTimeString().slice(0, 8),
+        date:     req.body.date || ET.todayET(now),
+        time:     req.body.time || ET.timeET(now).slice(0, 8),
         mealType: ['breakfast', 'lunch', 'dinner', 'snack'].includes(req.body.mealType) ? req.body.mealType : t.mealType,
         description: describe(t.name, slots, servings),
         calories: result.totals.kcal    || null,
@@ -649,6 +655,24 @@ app.post('/goals/edit/:id', requireLogin, async (req, res) => {
     Object.assign(goal, f);
     await goal.save();
     res.redirect('/goals');
+});
+
+// Quick progress update: sets ONLY currentValue. The full edit form posts every field and
+// reads an unticked checkbox as false, so using it for one number would silently turn
+// "include in the brief" off. Same validation as every other write (goalsApi.fromBody).
+app.post('/goals/progress/:id', requireLogin, async (req, res) => {
+    const { Goal } = getDatabase(req.user.username);
+    const goal = await Goal.findByPk(req.params.id);
+    if (!goal) return res.status(404).send('Goal not found');
+    const raw = (req.body || {}).currentValue;
+    if (raw === undefined) return res.status(400).send('currentValue is required');
+    if (raw !== '' && !Number.isFinite(Number(raw))) return res.status(400).send('currentValue must be a number');
+    let f;
+    try { f = goalsApi.fromBody({ currentValue: raw }, goal); }
+    catch (e) { return res.status(e.status || 400).send(e.message); }
+    goal.currentValue = f.currentValue;
+    await goal.save();
+    res.redirect('/goals#goal-' + goal.id);
 });
 
 // Complete/Reopen and Pause/Resume go through status so `completed` stays in step.
@@ -907,16 +931,16 @@ app.get('/planner', requireLogin, async (req, res) => {
         openMatDays:    parseArr(schedule.openMatDays),
     } : { workDays: [], workShiftStart: '', workShiftEnd: '', bjjDays: [], muayThaiDays: [], openMatDays: [] };
 
-    const todayStr = new Date().toISOString().split('T')[0];
-    const twoWeeksStr = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-    const sevenDaysAgoStr = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    const todayStr = ET.todayET();
+    const twoWeeksStr = ET.etDateOffset(14);
+    const sevenDaysAgoStr = ET.etDateOffset(-7);
 
     const upcomingSessions = await TrainingSession.findAll({
         where: { date: { [Op.between]: [todayStr, twoWeeksStr] } },
         order: [['date', 'ASC']],
     });
     const recentSessions = await TrainingSession.findAll({
-        where: { date: { [Op.between]: [sevenDaysAgoStr, new Date(todayStr + 'T00:00:00').toISOString().split('T')[0]] } },
+        where: { date: { [Op.between]: [sevenDaysAgoStr, todayStr] } },
         order: [['date', 'DESC']],
     });
     const competitions = await Competition.findAll({
@@ -1010,14 +1034,14 @@ app.get('/competitions', requireLogin, async (req, res) => {
     await sequelize.sync();
 
     const all = await Competition.findAll({ order: [['date', 'ASC']] });
-    const todayStr = new Date().toISOString().split('T')[0];
+    const todayStr = ET.todayET();
 
     const enriched = all.map(c => {
-        const daysOut  = Math.ceil((new Date(c.date) - new Date()) / (24 * 60 * 60 * 1000));
+        const daysOut  = ET.daysBetween(todayStr, c.date);
         const phase    = getPeriodisationPhase(c.date);
         let regWarning = null;
         if (c.registrationDeadline) {
-            const regDays = Math.ceil((new Date(c.registrationDeadline) - new Date()) / (24 * 60 * 60 * 1000));
+            const regDays = ET.daysBetween(todayStr, c.registrationDeadline);
             if (regDays > 0 && regDays <= 14) regWarning = regDays;
         }
         return { ...c.toJSON(), daysOut, phase, regWarning, isPast: daysOut < 0 };
@@ -1060,18 +1084,17 @@ app.get('/accountability', requireLogin, async (req, res) => {
     const { TrainingSession, sequelize } = getDatabase(req.user.username);
     await sequelize.sync();
 
-    const today    = new Date();
-    const todayStr = today.toISOString().split('T')[0];
+    const todayStr = ET.todayET();
 
     // 30-day heatmap
-    const thirtyStr = new Date(today.getTime() - 29 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    const thirtyStr = ET.etDateOffset(-29);
     const heatmapSessions = await TrainingSession.findAll({
         where: { date: { [Op.gte]: thirtyStr } },
     });
     const heatmap = [];
     for (let i = 29; i >= 0; i--) {
-        const d = new Date(today.getTime() - i * 24 * 60 * 60 * 1000);
-        const ds = d.toISOString().split('T')[0];
+        const ds = ET.etDateOffset(-i);
+        const [, hm, hd] = ds.split('-').map(Number);
         const daySess = heatmapSessions.filter(s => s.date === ds);
         let status = 'empty';
         if (ds > todayStr)                                        status = 'future';
@@ -1079,7 +1102,7 @@ app.get('/accountability', requireLogin, async (req, res) => {
         else if (daySess.some(s => s.status === 'partial'))       status = 'partial';
         else if (daySess.some(s => s.status === 'missed'))        status = 'missed';
         else if (daySess.some(s => s.status === 'planned'))       status = 'planned';
-        heatmap.push({ date: ds, label: `${d.getMonth()+1}/${d.getDate()}`, status, count: daySess.length });
+        heatmap.push({ date: ds, label: `${hm}/${hd}`, status, count: daySess.length });
     }
 
     // Streak (consecutive completed/partial days going back from today)
@@ -1089,17 +1112,14 @@ app.get('/accountability', requireLogin, async (req, res) => {
     });
     const doneDates = new Set(allDone.map(s => s.date));
     let streak = 0;
-    let check  = new Date(today);
-    if (!doneDates.has(todayStr)) check.setDate(check.getDate() - 1);
-    while (doneDates.has(check.toISOString().split('T')[0])) {
+    let check  = doneDates.has(todayStr) ? todayStr : ET.addDays(todayStr, -1);
+    while (doneDates.has(check)) {
         streak++;
-        check.setDate(check.getDate() - 1);
+        check = ET.addDays(check, -1);
     }
 
     // This week stats
-    const startOfWeek = new Date(today);
-    startOfWeek.setDate(today.getDate() - today.getDay());
-    const weekStr = startOfWeek.toISOString().split('T')[0];
+    const weekStr = ET.addDays(todayStr, -ET.weekdayOf(todayStr));
     const weekSessions = await TrainingSession.findAll({
         where: { date: { [Op.between]: [weekStr, todayStr] } },
     });
@@ -1129,9 +1149,10 @@ app.get('/accountability', requireLogin, async (req, res) => {
 
 function withKitMeta(t) {
     const buy = EQUIPMENT.kitBuyLink(t.name);
-    let label = null;
-    if (buy) { try { label = JSON.parse(t.description || '{}').label || null; } catch { label = null; } }
-    return { ...t.toJSON(), exercises: JSON.parse(t.exercises || '[]'), displayName: label || t.name, buy };
+    let meta = null;
+    try { meta = JSON.parse(t.description || '{}'); } catch { meta = null; }
+    // The stored name is a slug ("fri:gym"); show the label, or the slug spelled out.
+    return { ...t.toJSON(), exercises: JSON.parse(t.exercises || '[]'), displayName: displayName(t.name, meta), buy };
 }
 
 app.get('/workout', requireLogin, async (req, res) => {
@@ -1150,8 +1171,8 @@ app.get('/workout', requireLogin, async (req, res) => {
         const plan = await TrainingPlan.findByPk(assignment.planId);
         if (plan) {
             const phases = JSON.parse(plan.phases || '[]');
-            const weekNumber = Math.floor((new Date() - new Date(assignment.startDate)) / (7*24*60*60*1000)) + 1;
-            const dayOfWeek  = new Date().getDay();
+            const weekNumber = Math.floor(ET.daysBetween(assignment.startDate, ET.todayET()) / 7) + 1;
+            const dayOfWeek  = ET.weekdayET();
             let phase = phases[0];
             for (const p of phases) {
                 const [s, e] = p.weeks.split('–').map(Number);
@@ -1194,7 +1215,7 @@ app.post('/workout/api/session', requireLogin, async (req, res) => {
     await sequelize.sync();
     const { type, title, date } = req.body;
     // ET is the only clock: toISOString() is UTC, so a workout started after 8pm ET was dated tomorrow.
-    const todayET = new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
+    const todayET = ET.todayET();
     const session = await WorkoutSession.create({ type, title: title || null, date: date || todayET, startedAt: new Date(), status: 'active' });
     res.json({ success: true, data: session });
 });
@@ -1270,7 +1291,7 @@ app.post('/workout/api/quick-log', requireLogin, async (req, res) => {
             return res.status(400).json({ success: false, error: 'Nothing loggable to commit', unparsed: parsed.unparsed });
         }
 
-        const logDate = (date && /^\d{4}-\d{2}-\d{2}$/.test(date)) ? date : new Date().toISOString().slice(0, 10);
+        const logDate = (date && /^\d{4}-\d{2}-\d{2}$/.test(date)) ? date : ET.todayET();
         const session = await WorkoutSession.create({
             date: logDate, type: type || 'strength', title: title || null,
             startedAt: new Date(), status: 'finished', finishedAt: new Date(),
@@ -1396,8 +1417,8 @@ app.get('/plans', requireLogin, async (req, res) => {
         activePlan = plans.find(p => p.id === assignment.planId);
         if (activePlan) {
             const phases = JSON.parse(activePlan.phases || '[]');
-            const weekNumber = Math.floor((new Date() - new Date(assignment.startDate)) / (7*24*60*60*1000)) + 1;
-            const dayOfWeek = new Date().getDay();
+            const weekNumber = Math.floor(ET.daysBetween(assignment.startDate, ET.todayET()) / 7) + 1;
+            const dayOfWeek = ET.weekdayET();
             let phase = phases[0];
             for (const p of phases) {
                 const [s, e] = p.weeks.split('–').map(Number);
@@ -1415,7 +1436,7 @@ app.post('/plans/assign', requireLogin, async (req, res) => {
     await sequelize.sync();
     const { planId, startDate } = req.body;
     await TrainingPlanAssignment.update({ status: 'paused' }, { where: { status: 'active' } });
-    await TrainingPlanAssignment.create({ planId, startDate: startDate || new Date().toISOString().split('T')[0], status: 'active' });
+    await TrainingPlanAssignment.create({ planId, startDate: startDate || ET.todayET(), status: 'active' });
     res.redirect('/plans');
 });
 

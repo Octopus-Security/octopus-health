@@ -50,14 +50,7 @@ const NOTE = 'General guidance for a fitness log, not medical advice. If you hav
 
 const err = (message) => Object.assign(new Error(message), { status: 400 });
 
-function todayET(now = new Date()) {
-  return now.toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
-}
-/** YYYY-MM-DD plus n days, calendar arithmetic only (no timezone involved). */
-function addDays(ymd, n) {
-  const [y, m, d] = ymd.split('-').map(Number);
-  return new Date(Date.UTC(y, m - 1, d + n)).toISOString().slice(0, 10);
-}
+const { todayET, addDays } = require('../lib/et');
 
 function parseNum(v) {
   if (v === undefined || v === null || v === '') return null;

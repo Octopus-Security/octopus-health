@@ -107,11 +107,21 @@ test('library exercises carry their id (the demo needs it); unknown ones still r
 });
 
 test('no plan for the day: says so and still offers the logger', { skip }, async () => {
-  const r = await get('/today?slug=zzz');
-  assert.strictEqual(r.status, 200);
-  // today may or may not be Monday; either the gym plan is not today's or it is shown
-  if (/No workout planned for today/.test(r.html)) assert.match(r.html, /href="\/workout"/);
-  else assert.strictEqual(T.dayKeyET(), 'mon');
+  // seedData() adds plans for several weekdays, so what the page says would depend on
+  // the day the suite runs. Remove today's plans (whatever ET day it is) and the answer is fixed.
+  const db = getDatabase(user);
+  const { Op } = require('sequelize');
+  const saved = await db.WorkoutTemplate.findAll({ where: { name: { [Op.like]: `${T.dayKeyET()}:%` } } });
+  const rows = saved.map(t => t.toJSON());
+  await db.WorkoutTemplate.destroy({ where: { name: { [Op.like]: `${T.dayKeyET()}:%` } } });
+  try {
+    const r = await get('/today?slug=zzz');
+    assert.strictEqual(r.status, 200);
+    assert.match(r.html, /No workout planned for today/);
+    assert.match(r.html, /href="\/workout"/);
+  } finally {
+    for (const t of rows) { delete t.id; await db.WorkoutTemplate.create(t); }
+  }
 });
 
 // The demo sheet (public/js/stretch-demo.js) finds its parts by id. The workout logger

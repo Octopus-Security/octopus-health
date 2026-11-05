@@ -1254,6 +1254,19 @@ const getDatabase = (username) => {
         attrs:       { type: DataTypes.TEXT,    allowNull: true },   // JSON: heights, rated load, ...
     }, { indexes: [{ unique: true, fields: ['gymId', 'equipmentId'] }] });
 
+    // Ongoing training limits (injury, travel, equipment) that adapt every suggested workout
+    // until cleared. Health owns them (api/constraints.js); cortex used to keep one in its
+    // own settings. A new table only: sync() creates it, nothing existing is altered.
+    // `until` is an ET date (YYYY-MM-DD); a row past it is expired but kept as history.
+    const WorkoutConstraint = sequelize.define('WorkoutConstraint', {
+        text:      { type: DataTypes.TEXT,    allowNull: false },
+        equipment: { type: DataTypes.STRING,  allowNull: true },
+        until:     { type: DataTypes.STRING,  allowNull: true },
+        active:    { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
+        source:    { type: DataTypes.STRING,  allowNull: true },   // web | cortex | cortex-import
+        clearedAt: { type: DataTypes.DATE,    allowNull: true },
+    });
+
     // Exercise plan builder (mobility / warmup / cooldown / circuit)
     const ExercisePlan = sequelize.define('ExercisePlan', {
         name:        { type: DataTypes.STRING, allowNull: false },
@@ -1485,6 +1498,7 @@ const getDatabase = (username) => {
         NutritionTarget,
         Gym,
         GymEquipment,
+        WorkoutConstraint,
         seedData,
         sequelize,
     };
