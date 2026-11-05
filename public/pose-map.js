@@ -26,6 +26,19 @@
     [/lacrosse ball glute/i, 'figure-four'],
     [/lacrosse ball chest/i, 'doorway-chest'],
     [/spiky ball foot/i, 'stand-breathe'],
+    [/lacrosse ball foot/i, 'stand-breathe'],
+    // A null key means "no figure yet" (variety audit, step 3): matching stops here, so a looser rule
+    // further down cannot hand the exercise a wrong figure ("upper trap" would take the neck stretch,
+    // "wrist" the wrist circle). match() returns null and keyFor() falls to the category figure.
+    // test/stick-figure.test.js lists these in NEEDS_POSE; author the pose, then change null to its key.
+    [/lacrosse ball (hamstring|quad|calf|forearm|upper trap|lat)\b/i, null],
+    [/tibialis raise|toe yoga|short foot|ankle eversion/i, null],
+    [/wrist (extensor|curl)|wrist rocks/i, null],
+    [/spanish squat|wall sit/i, null],
+    [/scapular pull|towel hang|flexed-arm hang/i, null],
+    [/single-leg (stand|reach)|heel-to-toe/i, null],
+    [/progressive muscle/i, null],
+    [/ankle alphabet/i, 'ankle-circle'],
     [/granby/i, 'granby-roll'],
     [/upward elbow|sok ngad/i, 'upward-elbow'],
     [/quadruped hip/i, 'quadruped-hip-cars'],
@@ -253,7 +266,7 @@
   }
   function keys() {
     var seen = {};
-    RULES.forEach(function (r) { seen[r[1]] = true; });
+    RULES.forEach(function (r) { if (r[1]) seen[r[1]] = true; });
     for (var c in BY_CATEGORY) seen[BY_CATEGORY[c]] = true;
     seen[FALLBACK] = true;
     return Object.keys(seen).sort();
