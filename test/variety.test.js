@@ -39,7 +39,7 @@ const NEW_EX = {
   'Feet, shins, ankles': ['Tibialis Raise (Wall)', 'Ankle Alphabet', 'Toe Yoga', 'Short Foot Exercise', 'Banded Ankle Eversion'],
   Grip: ['Scapular Pull-up', 'Towel Hang', 'Flexed-Arm Hang'],
   Balance: ['Single-Leg Stand', 'Single-Leg Reach', 'Single-Leg RDL (Bodyweight)', 'Heel-to-Toe Walk'],
-  Conditioning: ['Jump Rope — Room Intervals', 'Jump Rope — Boxer Skip'],
+  Conditioning: ['Jump Rope: Room Intervals', 'Jump Rope: Boxer Skip'],
   Breathing: ['Box Breathing', 'Extended Exhale Breathing', 'Belly Breathing (Lying)', 'Progressive Muscle Relaxation'],
 };
 const NEW_EX_ALL = Object.values(NEW_EX).flat();
@@ -86,7 +86,7 @@ test('starting points are stated, and a risky movement carries its own caution',
     'Spanish Squat': /stop if the knees hurt/i, 'Wall Sit': /knee hurts/i, 'Tempo Bodyweight Squat': /knees hurt/i,
     'Tibialis Raise (Wall)': /stop if/i, 'Towel Hang': /step down/i, 'Flexed-Arm Hang': /step down|sore/i, 'Scapular Pull-up': /step down/i,
     'Single-Leg RDL (Bodyweight)': /back flat/i, 'Box Breathing': /lightheaded/i, 'Progressive Muscle Relaxation': /sore|injured/i,
-    'Jump Rope — Room Intervals': /ceiling/i, 'Jump Rope — Boxer Skip': /ceiling/i,
+    'Jump Rope: Room Intervals': /ceiling/i, 'Jump Rope: Boxer Skip': /ceiling/i,
   };
   for (const [n, re] of Object.entries(need)) assert.match(byName.get(n).instructions, re, `${n} caution`);
   // the neck set is gentle: no bridges, no loading
@@ -151,7 +151,7 @@ test('every substitute named by a new rule is a seeded exercise that needs nothi
   assert.strictEqual(E.fitExercises([{ exerciseName: 'Band Wrist Curl' }], ['mat']).omitted.length, 1, 'no substitute: said, not hidden');
   assert.strictEqual(E.fitExercises([{ exerciseName: 'Towel Hang' }], ['mat']).omitted.length, 1);
   assert.strictEqual(E.fitExercises([{ exerciseName: 'Towel Hang' }], ['power-tower']).omitted.length, 0, 'the tower is a bar');
-  assert.strictEqual(E.fitExercises([{ exerciseName: 'Jump Rope — Room Intervals' }], ['jump-rope']).omitted.length, 0);
+  assert.strictEqual(E.fitExercises([{ exerciseName: 'Jump Rope: Room Intervals' }], ['jump-rope']).omitted.length, 0);
   assert.strictEqual(E.fitExercises([{ exerciseName: 'Lacrosse Ball Calf Roll' }], ['massage-ball-set']).substitutions.length, 0, 'the QLDT set holds a lacrosse ball');
   assert.strictEqual(E.fitExercises([{ exerciseName: 'Lacrosse Ball Calf Roll' }], ['massage-ball-peanut']).substitutions.length, 1, 'a peanut ball is not a lacrosse ball');
 });
