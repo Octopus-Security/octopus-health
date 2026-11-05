@@ -108,6 +108,36 @@ function describeFit(fit, gymName) {
   return lines;
 }
 
+// ── buy links (Amazon Associates) ─────────────────────────────────────────────
+// The tag is public by design (it is in the page source of every tagged link), so it
+// lives once in the catalogue. Mirrors withTag in octopus-blog/src/lib/amazon.ts: never
+// double a tag that is already there. Full dp/ URLs only, never a.co short links.
+const AMAZON_TAG = CATALOGUE.amazonTag || '';
+const AMAZON_DISCLOSURE = 'As an Amazon Associate I earn from qualifying purchases.';
+
+function withTag(url) {
+  if (!AMAZON_TAG) return url;
+  const [base, hash] = String(url).split('#');
+  if (/[?&]tag=/.test(base)) return url;
+  const tagged = `${base}${base.includes('?') ? '&' : '?'}tag=${AMAZON_TAG}`;
+  return hash ? `${tagged}#${hash}` : tagged;
+}
+
+/** Item (object or id) -> { label, url } for its buy link, or null when it has none. */
+function buyLink(itemOrId) {
+  const it = typeof itemOrId === 'string' ? BY_ID.get(itemOrId) : itemOrId;
+  if (!it || !it.buy || !/^[A-Z0-9]{10}$/.test(String(it.buy.asin || ''))) return null;
+  return { label: it.buy.label, url: withTag(`https://www.amazon.com/dp/${it.buy.asin}`) };
+}
+
+// The five single-item plans (templates with slugs "kit:<key>") and the item each is for.
+const KIT_PLAN_ITEM = {
+  'kit:power-tower': 'power-tower', 'kit:bands': 'resistance-bands', 'kit:parallettes': 'parallettes',
+  'kit:push-up-board': 'push-up-board', 'kit:mat': 'mat',
+};
+/** Buy link for a "kit:*" template slug; null for anything else (day plans, custom ones). */
+const kitBuyLink = slug => (KIT_PLAN_ITEM[slug] ? buyLink(KIT_PLAN_ITEM[slug]) : null);
+
 // ── pause / resume (dates are ET YYYY-MM-DD strings; they compare as strings) ──
 
 /** Active today? A paused gym with a resume date on or before today is active again. */
@@ -138,5 +168,5 @@ function resolveLocation(gyms, requested, today) {
 }
 
 module.exports = {
-  CATALOGUE, ITEMS, IDS, toId, expand, requirementsFor, fitExercises, describeFit, isActive, resolveLocation, unmet,
+  CATALOGUE, ITEMS, IDS, AMAZON_TAG, AMAZON_DISCLOSURE, KIT_PLAN_ITEM, withTag, buyLink, kitBuyLink, toId, expand, requirementsFor, fitExercises, describeFit, isActive, resolveLocation, unmet,
 };

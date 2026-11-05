@@ -179,10 +179,10 @@ const svc = (user, method, p, body) => fetch(base + '/api/service' + p, {
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => null) }));
 const web = (user, method, p, body, headers = {}) => fetch(base + p, { method, redirect: 'manual', headers: { 'Content-Type': 'application/json', 'X-Test-User': user, ...headers }, body: body ? JSON.stringify(body) : undefined });
 
-test('seed: Home has the tower, ab roller and parallettes; the jump rope is at the park and work gym only', { skip }, async () => {
+test('seed: Home has the tower, ab roller, parallettes, bands, push-up board and mat; the jump rope is at the park and work gym only', { skip }, async () => {
   const db = await fresh(A);
   const g = Object.fromEntries((await G.listGyms(db)).map(x => [x.slug, x]));
-  assert.deepStrictEqual(g.home.equipment.map(e => e.id).sort(), ['ab-roller', 'parallettes', 'power-tower']);
+  assert.deepStrictEqual(g.home.equipment.map(e => e.id).sort(), ['ab-roller', 'mat', 'parallettes', 'power-tower', 'push-up-board', 'resistance-bands']);
   const tower = g.home.equipment.find(e => e.id === 'power-tower');
   assert.strictEqual(tower.attrs.heights, 10);
   assert.strictEqual(tower.attrs.ratedLb, 330);
@@ -207,6 +207,7 @@ test('existing workouts and templates are untouched by gyms', { skip }, async ()
 
 test('home plan for Monday: fitted to the tower, with the omissions listed', { skip }, async () => {
   const db = await fresh(Bu);
+  await G.removeEquipment(db, 'home', 'resistance-bands');   // new accounts own bands now; an older Home row may not
   const p = await G.planFor(db, { day: 'mon', location: 'home' });
   assert.strictEqual(p.location, 'home');
   const ex = p.template.exercises.map(e => e.exerciseName);
@@ -297,11 +298,111 @@ test('web: the page renders for a signed-in account and shows pause state; write
 });
 
 test('/today?at=: the plan is fitted to the gym the brief chose and says what changed; without it, unchanged', { skip }, async () => {
-  await fresh(WB);
+  const dbB = await fresh(WB);
+  await G.removeEquipment(dbB, 'home', 'resistance-bands');   // new accounts own bands; take them out so Monday has something to adjust
   let html = await (await web(WB, 'GET', '/today?slug=mon:home&at=home')).text();
   assert.match(html, /Adjusted for this location/);
   assert.ok(!/Resistance Band Lateral Raise/.test(html.split('const PLAN = ')[1].split('\n')[0]), 'the logger plan has no bands');
   html = await (await web(WB, 'GET', '/today?slug=mon:home')).text();
   assert.match(html.split('const PLAN = ')[1].split('\n')[0], /Resistance Band Lateral Raise/);
   assert.ok(!/Adjusted for this location/.test(html));
+});
+
+// ── equipment plans (slug "kit:<item>") and buy links ─────────────────────────
+const KIT_SLUGS = ['kit:power-tower', 'kit:bands', 'kit:parallettes', 'kit:push-up-board', 'kit:mat'];
+const ASINS = { 'power-tower': 'B0F8HVK8MD', 'resistance-bands': 'B0GQS7YQLX', parallettes: 'B0DSVXKJZS', 'push-up-board': 'B0B73XM8ZB', mat: 'B0DHKCM18G' };
+// database.js needs sequelize to load; read the seed arrays from source when it cannot be required.
+function seedArrays() {
+  if (getDatabase) return { ex: getDatabase.SEED_EXERCISES, tpl: getDatabase.SEED_WORKOUT_TEMPLATES };
+  const src = fs.readFileSync(path.join(__dirname, '..', 'database.js'), 'utf8');
+  const grab = n => eval(src.match(new RegExp('const ' + n + ' = (\\[[\\s\\S]*?\\n\\]);'))[1]); // eslint-disable-line no-eval
+  return { ex: grab('SEED_EXERCISES'), tpl: grab('SEED_WORKOUT_TEMPLATES') };
+}
+const homeIds = () => E.CATALOGUE.gyms.find(g => g.slug === 'home').equipment.map(e => e.id);
+
+test('buy links: every one builds the tagged dp/ URL, once, with no short links', () => {
+  assert.strictEqual(E.AMAZON_TAG, 'octopustec031-20');
+  assert.deepStrictEqual(E.ITEMS.filter(i => i.buy).map(i => i.id).sort(), Object.keys(ASINS).sort());
+  for (const [id, asin] of Object.entries(ASINS)) {
+    const b = E.buyLink(id);
+    assert.strictEqual(b.url, `https://www.amazon.com/dp/${asin}?tag=octopustec031-20`, id);
+    assert.ok(b.label.length > 5);
+    assert.ok(!/a\.co\//.test(b.url));
+  }
+  assert.strictEqual(E.buyLink('wall'), null);
+  assert.strictEqual(E.buyLink('nope'), null);
+  // mirrors octopus-blog withTag: never doubles a tag, keeps a query and a hash
+  assert.strictEqual(E.withTag('https://www.amazon.com/dp/X?tag=other-20'), 'https://www.amazon.com/dp/X?tag=other-20');
+  assert.strictEqual(E.withTag('https://www.amazon.com/dp/X?th=1#r'), 'https://www.amazon.com/dp/X?th=1&tag=octopustec031-20#r');
+  assert.match(E.AMAZON_DISCLOSURE, /^As an Amazon Associate I earn from qualifying purchases\.$/);
+});
+
+test('mat is in the catalogue and resolves from what people say', () => {
+  for (const q of ['mat', 'a yoga mat', 'exercise mats', 'floor mat']) assert.strictEqual(E.toId(q), 'mat', q);
+});
+
+test('equipment plans: five kit slugs, each a Home template naming real exercises and a real item with a buy link', () => {
+  const { ex, tpl } = seedArrays();
+  const lib = new Set(ex.map(e => e.name));
+  assert.deepStrictEqual(Object.keys(E.KIT_PLAN_ITEM).sort(), [...KIT_SLUGS].sort());
+  for (const slug of KIT_SLUGS) {
+    const t = tpl.find(x => x.slug === slug);
+    assert.ok(t, slug + ' is seeded');
+    assert.strictEqual(t.location, 'home');
+    assert.ok(!/^(sun|mon|tue|wed|thu|fri|sat):/.test(slug), 'not a weekday slug');
+    assert.ok(t.name.length > 5 && t.name !== slug, "a human name, not the slug");
+    assert.ok(t.exercises.length >= 5, slug);
+    for (const e of t.exercises) assert.ok(lib.has(e.exerciseName), `${slug}: "${e.exerciseName}" is not in the exercise library`);
+    assert.ok(E.kitBuyLink(slug), slug + ' has a buy link');
+    assert.ok(E.ITEMS.some(i => i.id === E.KIT_PLAN_ITEM[slug]));
+  }
+  assert.strictEqual(E.kitBuyLink('mon:home'), null);
+  assert.strictEqual(new Set(tpl.map(t => t.slug)).size, tpl.length, 'slugs unique');
+});
+
+test('equipment plans fit Home as seeded: nothing omitted, nothing swapped', () => {
+  const { ex, tpl } = seedArrays();
+  const legacy = new Map(ex.map(e => [e.name.toLowerCase(), e.equipment]));
+  for (const slug of KIT_SLUGS) {
+    const t = tpl.find(x => x.slug === slug);
+    const fit = E.fitExercises(t.exercises, homeIds(), legacy);
+    assert.deepStrictEqual(fit.omitted, [], slug);
+    assert.deepStrictEqual(fit.substitutions, [], slug);
+    assert.strictEqual(fit.exercises.length, t.exercises.length, slug);
+  }
+});
+
+test('the new rules: a gym without the kit loses or swaps the right things', () => {
+  const swap = (names, owned) => E.fitExercises(names.map(exerciseName => ({ exerciseName })), owned);
+  assert.deepStrictEqual(swap(['Band-Assisted Pull-up'], ['bar']).omitted.map(o => o.name), ['Band-Assisted Pull-up']);
+  assert.strictEqual(swap(['Band-Assisted Pull-up'], ['power-tower', 'resistance-bands']).omitted.length, 0);
+  assert.strictEqual(swap(['Parallette Push-up'], []).exercises[0].exerciseName, 'Push-up');
+  assert.strictEqual(swap(['Hanging Knee Raise'], ['captains-chair']).omitted.length, 0);
+  assert.strictEqual(swap(['Hanging Knee Raise'], []).exercises[0].exerciseName, 'Lying Leg Raise');
+  assert.strictEqual(swap(['Dead Hang'], []).omitted.length, 1);
+});
+
+test('equipment plans: a slug that is not a weekday never becomes a day\'s plan', { skip }, async () => {
+  const T = require('../api/today');
+  const names = ['kit:bands', 'kit:mat', 'mon:home', 'mon:gym'];
+  assert.strictEqual(T.resolveSlug(names, 'kit:bands', 'mon'), 'mon:home', 'today page ignores a kit slug and shows the day plan');
+  assert.strictEqual(T.resolveSlug(['kit:bands', 'kit:mat'], '', 'mon'), null, 'no day plan means none, not a kit plan');
+  const db = await fresh(Bu);
+  await G.addEquipment(db, 'home', { equipment: 'resistance-bands' });   // an earlier test took them off this account
+  for (const day of G.DAYS) for (const location of ['home', 'park', 'gym']) {
+    const p = await G.planFor(db, { day, location });
+    if (p.template) assert.ok(!p.template.slug.startsWith('kit:'), `${day} ${location}`);
+  }
+  const rows = (await db.WorkoutTemplate.findAll()).map(t => t.name);
+  for (const s of KIT_SLUGS) assert.ok(rows.includes(s), s + ' reaches an account additively');
+  const mon = await G.planFor(db, { day: 'mon', location: 'home' });
+  assert.strictEqual(mon.template.slug, 'mon:home');
+  assert.deepStrictEqual(mon.fit.omitted, [], 'with bands and the board at Home, Monday loses nothing');
+});
+
+test('gyms page: each item with a buy link shows it, sponsored, with the disclosure', { skip }, async () => {
+  const html = await (await web(WA, 'GET', '/gyms')).text();
+  assert.match(html, /href="https:\/\/www\.amazon\.com\/dp\/B0F8HVK8MD\?tag=octopustec031-20" target="_blank" rel="sponsored nofollow noopener"/);
+  assert.match(html, /As an Amazon Associate I earn from qualifying purchases\./);
+  assert.ok(!/a\.co\//.test(html));
 });

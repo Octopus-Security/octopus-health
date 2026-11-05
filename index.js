@@ -6,6 +6,7 @@ const { BUILD, STARTED_AT, asset } = require('./build');
 const { Op } = require('sequelize');
 const { AuthClient } = require('@octopus-security/auth-client');
 const axios = require('axios');
+const EQUIPMENT = require('./api/equipment');
 const app = express();
 
 // Express 4 does NOT catch a rejected promise from an async route handler, and
@@ -1125,6 +1126,13 @@ app.get('/accountability', requireLogin, async (req, res) => {
 
 // ── Workout Logger ────────────────────────────────────────────────────────────
 
+function withKitMeta(t) {
+    const buy = EQUIPMENT.kitBuyLink(t.name);
+    let label = null;
+    if (buy) { try { label = JSON.parse(t.description || '{}').label || null; } catch { label = null; } }
+    return { ...t.toJSON(), exercises: JSON.parse(t.exercises || '[]'), displayName: label || t.name, buy };
+}
+
 app.get('/workout', requireLogin, async (req, res) => {
     const { WorkoutSession, WorkoutSet, TrainingPlan, TrainingPlanAssignment, WorkoutTemplate, sequelize } = getDatabase(req.user.username);
     await sequelize.sync();
@@ -1152,8 +1160,10 @@ app.get('/workout', requireLogin, async (req, res) => {
         }
     }
     const rawTemplates = await WorkoutTemplate.findAll({ order: [['name','ASC']] });
-    const templates = rawTemplates.map(t => ({ ...t.toJSON(), exercises: JSON.parse(t.exercises || '[]') }));
-    res.render('workout', { title: 'Workout Logger', user: req.user, activeTab: 'workout', recentWorkouts: recentWithCounts, todayPlan, templates });
+    // Equipment plans (slug "kit:*") carry a human label in their description JSON, and a buy link for the
+    // item they need. Every other template keeps showing its stored name.
+    const templates = rawTemplates.map(withKitMeta);
+    res.render('workout', { title: 'Workout Logger', user: req.user, activeTab: 'workout', recentWorkouts: recentWithCounts, todayPlan, templates, disclosure: EQUIPMENT.AMAZON_DISCLOSURE });
 });
 
 // Workout Logs — full session history, sets grouped by exercise, with a type filter.
@@ -1301,7 +1311,7 @@ app.get('/workout/api/templates', requireLogin, async (req, res) => {
     const { WorkoutTemplate, sequelize } = getDatabase(req.user.username);
     await sequelize.sync();
     const templates = await WorkoutTemplate.findAll({ order: [['name','ASC']] });
-    res.json({ success: true, data: templates.map(t => ({ ...t.toJSON(), exercises: JSON.parse(t.exercises || '[]') })) });
+    res.json({ success: true, data: templates.map(withKitMeta) });
 });
 
 app.post('/workout/api/templates', requireLogin, async (req, res) => {
