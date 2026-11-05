@@ -213,6 +213,7 @@
   <div style="margin-bottom:12px">
     <span class="count-badge" id="count-label"></span>
   </div>
+  <p id="rec-note" hidden style="color:#777;font-size:0.82rem;margin:0 0 12px"><%= locals.recoveryNote || "" %></p>
 
   <div class="lib-grid" id="lib-grid"></div>
 </div>
@@ -312,6 +313,8 @@ const CAT_ICON = {
 
 function renderGrid(list) {
   document.getElementById('count-label').textContent = `${list.length} exercise${list.length !== 1 ? 's' : ''}`;
+  // One standing safety line for the page, shown only while recovery content is on screen.
+  document.getElementById('rec-note').hidden = !list.some(e => e.category === 'recovery');
   const grid = document.getElementById('lib-grid');
   grid.innerHTML = list.map(e => {
     const catClass   = 'tag-' + (e.category || 'strength');
@@ -342,7 +345,7 @@ function renderGrid(list) {
       ? `<div class="sf-container" id="sf-${e.id}"></div>${guideLink}`
       : hasVideo
         ? `<a href="${escHtml(e.videoUrl)}" target="_blank" rel="noopener" class="ex-video-btn" title="Watch on YouTube"><div class="play-circle">▶</div></a><span class="ex-media-icon">${icon}</span>`
-        : `<span class="ex-media-icon">${icon}</span><span class="ex-media-label">no animation yet</span>`;
+        : `<span class="ex-media-icon">${icon}</span>`;
 
     return `
 <div class="ex-card" data-id="${e.id}" data-cat="${e.category}">

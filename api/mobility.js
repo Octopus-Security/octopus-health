@@ -20,8 +20,9 @@
  */
 
 const M = require('../lib/muscles');
+const { RECOVERY_NOTE } = require('../lib/recovery-note');
 
-const NOTE = 'Stretch to tension, not pain. If an Achilles, knee or groin hurts more the next morning, back off and get it checked.';
+const NOTE = 'Stretch to tension, not pain. If an Achilles, knee or groin hurts more the next morning, back off and get it checked. ' + RECOVERY_NOTE;
 
 const item = (id, name, rx, joints, muscles, cue, demo) => ({ id, name, rx, joints, muscles, cue, demo: demo || name });
 
@@ -43,7 +44,7 @@ const ROUTINES = [
       item('open-book', 'Open-book rotation', '5 each side', ['thoracic_spine', 'shoulder'], ['traps', 'lats'],
         'Side-lying, knees stacked, open the top arm and follow it with your eyes.', 'Open Book'),
       item('neck-cars-iso', 'Neck circles + isometric hand presses', '10 s each direction', ['neck'], ['neck', 'traps'],
-        'Slow circles, then press a hand into your head and hold without moving.', 'Neck Circle'),
+        'Slow circles in a small, comfortable range, then press a hand into your head and hold without moving. Stop for dizziness, sharp pain or tingling in the arms.', 'Neck Circle'),
     ],
   },
   {
@@ -51,7 +52,7 @@ const ROUTINES = [
     blurb: 'All dynamic. Before any session.',
     items: [
       item('hip-cars', 'Hip CARs', '5 slow circles each side', ['hip'], ['hip_flexors', 'glutes', 'adductors'], 'Biggest pain-free circle, rest of the body still.', 'Quadruped Hip CARs'),
-      item('shoulder-cars', 'Shoulder CARs', '5 slow circles each side', ['shoulder'], ['rotator_cuff', 'front_delts', 'rear_delts'], 'Reach long, make the biggest circle you own.', 'Shoulder CARs'),
+      item('shoulder-cars', 'Shoulder CARs', '5 slow circles each side', ['shoulder'], ['rotator_cuff', 'front_delts', 'rear_delts'], 'Reach long and make the biggest circle you can without pain.', 'Shoulder CARs'),
       item('leg-swings', 'Leg swings', '10 each direction, each leg', ['hip'], ['hamstrings', 'hip_flexors', 'adductors'], 'Front-back then side-side, easy range first.', 'Hip Circle'),
       item('ankle-rocks', 'Ankle rocks', '10 each side', ['ankle', 'knee'], ['calves'], 'Knee over the toes, heel stays down.', 'Ankle Dorsiflexion'),
       item('band-pull-aparts', 'Band pull-aparts', '15', ['shoulder', 'thoracic_spine'], ['rear_delts', 'traps'], 'Arms straight, pull the band to your chest.', 'Band Pull-Apart'),
@@ -61,11 +62,11 @@ const ROUTINES = [
     id: 'injury-prevention', name: 'Injury-prevention strength', minutes: 15, kind: 'strength', perWeek: 2,
     blurb: 'About 15 minutes, twice a week (attached to training days A and C of the week plan).',
     items: [
-      item('copenhagen', 'Copenhagen side plank', '2 x 20 s each side', ['hip', 'knee'], ['adductors'], 'Groin insurance. Bottom leg supported on a bench, short lever first.', 'Side Plank'),
+      item('copenhagen', 'Copenhagen side plank', '2 x 20 s each side', ['hip', 'knee'], ['adductors'], 'Bottom leg supported on a bench, short lever first. Stop if the groin or hip hurts.', 'Side Plank'),
       item('tib-raise', 'Tibialis raises', '2 x 15', ['ankle', 'knee'], ['calves'], 'Heels on the floor, back to a wall, lift the toes.'),
       item('band-er', 'Band external rotations', '2 x 15 each side', ['shoulder'], ['rotator_cuff', 'rear_delts'], 'Elbow at your side, rotate out, slow back.', 'Prone Shoulder ER'),
       item('face-pull', 'Face pulls', '2 x 15', ['shoulder', 'thoracic_spine'], ['rear_delts', 'traps', 'rotator_cuff'], 'Pull to the eyes, elbows high.', 'Resistance Band Face Pull'),
-      item('sl-bridge', 'Single-leg bridge or hamstring walkouts', '2 x 8 each side', ['hip', 'knee'], ['hamstrings', 'glutes'], 'Slow lower. Hamstring insurance.', 'Glute Bridge'),
+      item('sl-bridge', 'Single-leg bridge or hamstring walkouts', '2 x 8 each side', ['hip', 'knee'], ['hamstrings', 'glutes'], 'Lower slowly. Stop if the back of the thigh cramps or hurts.', 'Glute Bridge'),
       item('finger-wrist', 'Band finger extensions + wrist curls', '2 x 15 each', ['wrist', 'elbow'], ['forearms'], 'Open against the band, then light wrist curls.'),
       item('side-plank', 'Side plank', '2 x 30 s each side', ['lumbar_spine'], ['obliques', 'glutes'], 'Straight line from ankle to ear.', 'Side Plank'),
       item('dead-bug', 'Dead bug', '2 x 8 each side', ['lumbar_spine', 'hip'], ['abs', 'hip_flexors'], 'Low back stays flat, move slowly.', 'Dead Bug'),
