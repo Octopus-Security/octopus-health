@@ -72,10 +72,11 @@ test('Home defaults: massage ball set and jump rope, no garage claim; foam rolle
   for (const g of E.CATALOGUE.gyms) for (const id of ['foam-roller', 'strap', 'yoga-block', 'step']) assert.ok(!g.equipment.some(e => e.id === id), `${g.slug} must not default ${id}`);
 });
 
-test('Home still fits all five kit plans without dropping or swapping anything', () => {
+test('Home still fits every kit plan (the five with buy links, and the variety plans) without dropping or swapping anything', () => {
   const { tpl } = seedSrc();
   const kits = tpl.filter(t => String(t.slug).startsWith('kit:'));
-  assert.strictEqual(kits.length, 5);
+  assert.strictEqual(kits.filter(t => E.KIT_PLAN_ITEM[t.slug]).length, 5, 'five plans carry a buy link');
+  assert.ok(kits.length >= 5);
   for (const t of kits) {
     const fit = E.fitExercises(t.exercises, homeIds());
     assert.deepStrictEqual(fit.omitted, [], t.slug);
@@ -151,7 +152,7 @@ test('substitution table: every foam-roller exercise falls back, and every subst
 
 test('the four ball exercises are seeded once each, with placement safety and no sizes or claims', () => {
   const { ex } = seedSrc();
-  const balls = ex.filter(e => /^(Spiky|Peanut|Lacrosse) Ball/.test(e.name));
+  const balls = ex.filter(e => ['Spiky Ball Foot Roll', 'Peanut Ball Upper Back Release', 'Lacrosse Ball Glute Release', 'Lacrosse Ball Chest and Shoulder Release'].includes(e.name));   // the later lacrosse entries are in variety.test.js
   assert.strictEqual(balls.length, 4);
   for (const e of balls) {
     assert.strictEqual(e.category, 'recovery');

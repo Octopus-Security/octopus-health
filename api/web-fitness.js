@@ -102,9 +102,10 @@ function mount(app, { requireLogin, getDatabase }) {
     const db = dbFor(req);
     const view = await S.listBenchmarks(db);
     const reminder = await S.getReminder(db);
-    const plan = await S.weekPlan(db);
+    const deload = req.query.deload === '1';   // a view of the plan, never saved
+    const plan = deload ? require('./week-plan').deloadWeek(await S.weekPlan(db)) : await S.weekPlan(db);
     res.render('benchmarks', {
-      title: 'Benchmarks', user: req.user, ...view, reminder, plan, fmt: F.formatValue, getItem: F.getItem,
+      title: 'Benchmarks', user: req.user, ...view, reminder, plan, deload, fmt: F.formatValue, getItem: F.getItem,
       catalog: F.catalog().filter(i => !view.benchmarks.some(b => b.item === i.id)),
       focuses: B.FOCUSES, dayNames: B.DAY_NAMES,
     });
