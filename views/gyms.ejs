@@ -40,10 +40,12 @@
     <% g.equipment.forEach(function (e) { %>
       <div class="list-item gym-eq">
         <span class="fx-wrap"><strong><%= e.label || e.name %></strong><% if (e.label && e.label !== e.name) { %> <span class="fx-meta">(<%= e.name %>)</span><% } %>
-          <% if (e.attrs) { %><br><span class="fx-meta"><%= Object.keys(e.attrs).map(function (k) { return k + ': ' + e.attrs[k]; }).join(' · ') %></span><% } %></span>
+          <% if (e.attrs) { %><br><span class="fx-meta"><%= Object.keys(e.attrs).map(function (k) { return k + ': ' + e.attrs[k]; }).join(' · ') %></span><% } %>
+          <% if (e.buy) { %><br><span class="fx-meta">Where to buy: <a href="<%= e.buy.url %>" target="_blank" rel="sponsored nofollow noopener"><%= e.buy.label %></a></span><% } %></span>
         <button class="gym-btn gym-btn-quiet" data-act data-method="DELETE" data-url="/gyms/api/<%= g.slug %>/equipment/<%= e.id %>" data-confirm="Remove <%= e.name %> from <%= g.name %>?" aria-label="Remove <%= e.name %>">Remove</button>
       </div>
     <% }) %>
+    <% if (g.equipment.some(function (e) { return e.buy; })) { %><p class="fx-meta"><%= disclosure %></p><% } %>
     <% var extra = g.effective.filter(function (id) { return !g.equipment.some(function (e) { return e.id === id; }); }); %>
     <% if (extra.length) { %><p class="fx-meta">Also counted as present: <%= extra.join(', ') %> (provided by the equipment above).</p><% } %>
 

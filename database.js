@@ -200,6 +200,14 @@ const SEED_EXERCISES = [
   { name: 'V-Up',                       category: 'strength',    equipment: 'bodyweight', primaryMuscles: ['abs','hip_flexors'],       secondaryMuscles: ['core'],                  instructions: 'Lie flat, legs and arms extended. Simultaneously raise legs and torso, reach hands toward feet. Lower with control.', videoUrl: 'https://www.youtube.com/watch?v=iP2fjvG0g3w', mediaUrl: null, defaultSets: 3, defaultReps: 15, defaultDuration: null },
   { name: 'Lying Leg Raise',            category: 'strength',    equipment: 'bodyweight', primaryMuscles: ['abs','hip_flexors'],       secondaryMuscles: ['core'],                  instructions: 'Lie flat, legs straight. Raise to 90° keeping lower back pressed to floor. Lower slowly — do NOT let lower back arch at the bottom.', videoUrl: 'https://www.youtube.com/watch?v=Wp4BlxcFTkE', mediaUrl: null, defaultSets: 3, defaultReps: 15, defaultDuration: null },
   { name: 'Dead Bug',                   category: 'strength',    equipment: 'bodyweight', primaryMuscles: ['abs','core'],              secondaryMuscles: ['hip_flexors'],           instructions: 'On back, arms up, knees 90°. Extend opposite arm and leg while pressing lower back to floor. The key is not letting your back arch — builds real anti-extension core strength.', videoUrl: 'https://www.youtube.com/watch?v=4XLEnwUr1d8', mediaUrl: null, defaultSets: 3, defaultReps: 10, defaultDuration: null },
+  { name: 'Band-Assisted Pull-up', category: 'strength', equipment: 'none', primaryMuscles: ['lats','biceps'], secondaryMuscles: ['upper_back','forearms'], instructions: "Loop a resistance band over the pull-up bar and step one foot or both knees into the bottom of the loop. Start from a dead hang, pull until the chin clears the bar, lower under control. The band helps most at the bottom, so use a thicker band only until you can do the reps with a thinner one.", videoUrl: null, mediaUrl: null, defaultSets: 4, defaultReps: 6, defaultDuration: null },
+  { name: 'Hanging Knee Raise', category: 'strength', equipment: 'bodyweight', primaryMuscles: ['abs','hip_flexors'], secondaryMuscles: ['obliques','forearms'], instructions: "Hang from the bar, or stand in a captain's chair with the back pad against you. Curl the knees up toward the chest by tucking the pelvis, then lower without swinging. Easier than the straight-leg raise.", videoUrl: null, mediaUrl: null, defaultSets: 3, defaultReps: 10, defaultDuration: null },
+  { name: 'Dead Hang', category: 'strength', equipment: 'bodyweight', primaryMuscles: ['forearms','lats'], secondaryMuscles: ['shoulders'], instructions: "Hang from the bar with a full grip and arms straight, shoulders gently pulled down away from the ears. Breathe normally and stay still. Stop the set when the grip starts to slip, not after.", videoUrl: null, mediaUrl: null, defaultSets: 2, defaultReps: null, defaultDuration: 30 },
+  { name: 'Tuck L-sit Hold', category: 'strength', equipment: 'bodyweight', primaryMuscles: ['abs','hip_flexors'], secondaryMuscles: ['triceps','front_delts'], instructions: "On parallettes, press down through straight arms until the hips lift off the floor. Pull the knees up into a tuck and hold, shoulders pushed down and away from the ears. Feet may rest on the floor at first.", videoUrl: null, mediaUrl: null, defaultSets: 4, defaultReps: null, defaultDuration: 15 },
+  { name: 'Parallette Push-up', category: 'strength', equipment: 'bodyweight', primaryMuscles: ['chest','triceps'], secondaryMuscles: ['front_delts','core'], instructions: "Hands on parallettes, body in one straight line. Lower until the chest is between the handles and the elbows are about 45 degrees from the ribs, then press back up. The handles let the chest go deeper than a floor push-up.", videoUrl: null, mediaUrl: null, defaultSets: 4, defaultReps: 10, defaultDuration: null },
+  { name: 'Pseudo-Planche Lean', category: 'strength', equipment: 'bodyweight', primaryMuscles: ['front_delts','chest'], secondaryMuscles: ['abs','forearms','biceps'], instructions: "In a push-up position with hands on the floor or parallettes by the hips, fingers pointing back or out. Keep the arms straight and lean the shoulders forward past the hands, body rigid. Hold, then ease back. Stop if the wrists complain.", videoUrl: null, mediaUrl: null, defaultSets: 3, defaultReps: null, defaultDuration: 15 },
+  { name: 'Plank Shoulder Taps', category: 'strength', equipment: 'bodyweight', primaryMuscles: ['abs','core'], secondaryMuscles: ['front_delts','obliques'], instructions: "From a high plank, feet wider than hip width, tap one shoulder with the opposite hand and put it back, then switch. Keep the hips level and still. Count every tap as one rep.", videoUrl: null, mediaUrl: null, defaultSets: 3, defaultReps: 20, defaultDuration: null },
+  { name: 'Glute Bridge', category: 'strength', equipment: 'bodyweight', primaryMuscles: ['glutes','hamstrings'], secondaryMuscles: ['core','lower_back'], instructions: "On your back, knees bent, feet flat and hip width apart. Press through the heels and lift the hips until the body is a straight line from shoulders to knees. Squeeze the glutes at the top, lower slowly.", videoUrl: null, mediaUrl: null, defaultSets: 3, defaultReps: 15, defaultDuration: null },
   { name: 'Calf Raise (bodyweight)',    category: 'strength',    equipment: 'bodyweight', primaryMuscles: ['calves'],                  secondaryMuscles: [],                        instructions: 'Stand on edge of step or flat. Rise on balls of feet, full extension. Lower slowly past neutral for full stretch. Can load with a backpack.', videoUrl: 'https://www.youtube.com/watch?v=gwLzBJYoWlI', mediaUrl: null, defaultSets: 4, defaultReps: 25, defaultDuration: null },
 
   // ── GYM EXERCISES NOT YET IN LIBRARY ─────────────────────────────────────────
@@ -529,6 +537,67 @@ const SEED_WORKOUT_TEMPLATES = [
       { exerciseName: 'Cable Tricep Pushdown',           sets: 3, reps: 15,   repMode: 'fixed',duration: null,                                  notes: 'Single-rope for variety' },
       { exerciseName: 'Overhead Tricep Extension',       sets: 3, reps: 12,   repMode: 'fixed',duration: null, prKey: 'Overhead Tricep Extension', notes: 'Cable or dumbbell' },
       { exerciseName: 'Cable Crunch',                    sets: 4, reps: 15,   repMode: 'fixed',duration: null,                                  notes: 'Core finisher' },
+    ]},
+
+  // ── EQUIPMENT PLANS (slug 'kit:<item>', not a weekday, so they never become a day's plan) ──
+  { slug: 'kit:power-tower', name: 'Power Tower: Pull and Dip', type: 'strength', location: 'home',
+    description: "Back, chest and triceps on the tower. Stop each pull set 1-2 reps short of failure.",
+    warmup: "Scapular pull-ups x8, arm circles 10 each way, 30s easy hang",
+    cooldown: "Lat stretch on the bar 30s each side, chest doorway stretch 30s",
+    exercises: [
+      { exerciseName: 'Pull-up',                           sets: 4, reps: null, repMode: 'max', duration: null, notes: "Stop 1-2 reps short of failure. Dead hang start, chin over the bar" },
+      { exerciseName: 'Dip',                               sets: 4, reps: '6-10', repMode: 'fixed', duration: null, notes: "Shoulders to bar level, no bouncing" },
+      { exerciseName: 'Chin-up',                           sets: 3, reps: null, repMode: 'max', duration: null, notes: "Underhand. Same rule: stop 1-2 reps short of failure" },
+      { exerciseName: 'Hanging Knee Raise',                sets: 3, reps: '8-12', repMode: 'fixed', duration: null, notes: "Hang from the bar or use the captain's chair. No swinging" },
+      { exerciseName: 'Dead Hang',                         sets: 2, reps: null, repMode: 'timed', duration: 30, notes: "Active shoulders, full grip. Easy to finish the session on" },
+    ]},
+  { slug: 'kit:bands', name: 'Resistance Bands: Pull and Shoulders', type: 'strength', location: 'home',
+    description: "Back, arms and rear shoulders with bands. Anchor the band on the tower bar where needed.",
+    warmup: "Arm circles 10 each way, 15 band pull-aparts light",
+    cooldown: "Band pull-aparts x15, doorway chest stretch 30s",
+    exercises: [
+      { exerciseName: 'Band-Assisted Pull-up',             sets: 4, reps: '5-8', repMode: 'fixed', duration: null, notes: "Band looped over the tower bar, knee or foot in the loop. Move to a thinner band as you get stronger" },
+      { exerciseName: 'Resistance Band Row',               sets: 3, reps: '12-15', repMode: 'fixed', duration: null, notes: "Squeeze the shoulder blades for 1s at the end" },
+      { exerciseName: 'Resistance Band Face Pull',         sets: 3, reps: 15, repMode: 'fixed', duration: null, notes: "Pull to the face, elbows high. Shoulder health work" },
+      { exerciseName: 'Resistance Band Bicep Curl',        sets: 3, reps: 12, repMode: 'fixed', duration: null, notes: "Elbows pinned to the sides, full extension at the bottom" },
+      { exerciseName: 'Resistance Band Tricep Extension',  sets: 3, reps: 12, repMode: 'fixed', duration: null, notes: "Band anchored high on the tower, push straight down (pushdown) to full lockout" },
+      { exerciseName: 'Resistance Band Lateral Raise',     sets: 3, reps: 15, repMode: 'fixed', duration: null, notes: "Slow, no shrugging" },
+    ]},
+  { slug: 'kit:parallettes', name: 'Parallettes: Push and Core', type: 'strength', location: 'home',
+    description: "Pressing and core on parallettes. No freestanding handstands in this plan.",
+    warmup: "Wrist circles 20s each way, wrist rocks 10, arm circles 10 each way",
+    cooldown: "Wrist flexor stretch 30s each side, chest doorway stretch 30s",
+    exercises: [
+      { exerciseName: 'Tuck L-sit Hold',                   sets: 4, reps: null, repMode: 'timed', duration: 15, notes: "Aim for 10-20 s. Feet may rest down at first" },
+      { exerciseName: 'Parallette Push-up',                sets: 4, reps: '8-12', repMode: 'fixed', duration: null, notes: "Deep, chest between the handles" },
+      { exerciseName: 'Pseudo-Planche Lean',               sets: 3, reps: null, repMode: 'timed', duration: 15, notes: "Straight arms, lean the shoulders forward over the hands. Ease off if the wrists complain" },
+      { exerciseName: 'Pike Push-up',                      sets: 3, reps: '6-10', repMode: 'fixed', duration: null, notes: "Hips high, feet on the floor. Head goes between the hands" },
+      { exerciseName: 'Plank Shoulder Taps',               sets: 3, reps: 20, repMode: 'fixed', duration: null, notes: "Total taps. Hips level and still" },
+    ]},
+  { slug: 'kit:push-up-board', name: 'Push-up Board: Four Hand Positions', type: 'strength', location: 'home',
+    description: "Standard, wide, close-grip and pike push-ups on the board, then a plank.",
+    warmup: "Arm circles 10 each way, 10 easy push-ups on the floor",
+    cooldown: "Chest doorway stretch 30s each side, shoulder dislocates with a band x10",
+    exercises: [
+      { exerciseName: 'Push-up',                           sets: 4, reps: '8-15', repMode: 'fixed', duration: null, notes: "Standard position. Hands on the marks for this position; check the colour chart printed on your board, as the exact positions may differ from what is described here (unverified)." },
+      { exerciseName: 'Push-up Board Wide',                sets: 3, reps: '8-15', repMode: 'fixed', duration: null, notes: "Wide position. Hands on the marks for this position; check the colour chart printed on your board, as the exact positions may differ from what is described here (unverified)." },
+      { exerciseName: 'Push-up Board Narrow',              sets: 3, reps: '8-15', repMode: 'fixed', duration: null, notes: "Close-grip position. Elbows brush the ribs. Hands on the marks for this position; check the colour chart printed on your board, as the exact positions may differ from what is described here (unverified)." },
+      { exerciseName: 'Pike Push-up',                      sets: 3, reps: '8-15', repMode: 'fixed', duration: null, notes: "Pike position, hips high. Hands on the marks for this position; check the colour chart printed on your board, as the exact positions may differ from what is described here (unverified)." },
+      { exerciseName: 'Plank',                             sets: 3, reps: null, repMode: 'timed', duration: 30, notes: "30-45 s. Straight line head to heels" },
+    ]},
+  { slug: 'kit:mat', name: 'Mat: Legs and Mobility', type: 'strength', location: 'home',
+    description: "Lower-body work and mobility on a mat. The other four equipment plans are upper body, so this one carries the legs.",
+    warmup: "March in place 1 min, hip circles 10 each way",
+    cooldown: "Slow nasal breathing 1 min, finish with the three mobility drills above",
+    exercises: [
+      { exerciseName: 'Bodyweight Squat',                  sets: 3, reps: '15-20', repMode: 'fixed', duration: null, notes: "Full depth, heels down" },
+      { exerciseName: 'Reverse Lunge',                     sets: 3, reps: 10, repMode: 'fixed', duration: null, notes: "10 each side. Knee tracks over the toes" },
+      { exerciseName: 'Glute Bridge',                      sets: 3, reps: 15, repMode: 'fixed', duration: null, notes: "Squeeze at the top for 1s" },
+      { exerciseName: 'Dead Bug',                          sets: 3, reps: 10, repMode: 'fixed', duration: null, notes: "10 per side. Lower back stays on the floor" },
+      { exerciseName: 'Side Plank',                        sets: 2, reps: null, repMode: 'timed', duration: 30, notes: "30 s each side" },
+      { exerciseName: 'Cat-Cow',                           sets: 2, reps: 10, repMode: 'fixed', duration: null, notes: "Slow, with the breath" },
+      { exerciseName: 'Pigeon Stretch',                    sets: 2, reps: null, repMode: 'timed', duration: 45, notes: "45 s each side" },
+      { exerciseName: 'World\'s Greatest Stretch',         sets: 2, reps: 6, repMode: 'fixed', duration: null, notes: "6 per side to finish" },
     ]},
 ];
 
@@ -1411,4 +1480,5 @@ const getDatabase = (username) => {
 module.exports = getDatabase;
 // Exposed for tests and the coverage report; the factory stays the default export.
 module.exports.SEED_EXERCISES = SEED_EXERCISES;
+module.exports.SEED_WORKOUT_TEMPLATES = SEED_WORKOUT_TEMPLATES;
 module.exports.SEED_EXERCISE_PLANS = SEED_EXERCISE_PLANS;

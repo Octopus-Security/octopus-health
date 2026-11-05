@@ -43,7 +43,7 @@ function mount(app, { requireLogin, getDatabase }) {
     const gyms = await G.listGyms(db);
     const groups = {};
     for (const it of E.ITEMS) (groups[it.group] = groups[it.group] || []).push(it);
-    res.render('gyms', { title: 'Gyms', user: req.user, activeTab: 'gyms', gyms, groups, today: G.todayET(), allPaused: gyms.length > 0 && gyms.every(g => !g.active) });
+    res.render('gyms', { title: 'Gyms', user: req.user, activeTab: 'gyms', gyms, groups, disclosure: E.AMAZON_DISCLOSURE, today: G.todayET(), allPaused: gyms.length > 0 && gyms.every(g => !g.active) });
   });
 
   app.put('/gyms/api/:slug', requireLogin, sameOriginJson, api(async (req, db) => ({ ok: true, gym: await G.updateGym(db, req.params.slug, { name: req.body.name, notes: req.body.notes }) })));

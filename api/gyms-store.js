@@ -32,7 +32,7 @@ function view(g, eqRows, today) {
   const equipment = eqRows.filter(r => r.gymId === g.id).map(r => {
     const item = E.ITEMS.find(i => i.id === r.equipmentId);
     let attrs = null; try { attrs = r.attrs ? JSON.parse(r.attrs) : null; } catch { attrs = null; }
-    return { id: r.equipmentId, name: item ? item.name : r.equipmentId, label: r.label || null, attrs, known: !!item };
+    return { id: r.equipmentId, name: item ? item.name : r.equipmentId, label: r.label || null, attrs, known: !!item, buy: item ? E.buyLink(item) : null };
   });
   return {
     slug: g.slug, name: g.name, notes: g.notes || null, sortOrder: g.sortOrder,
