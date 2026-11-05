@@ -81,7 +81,10 @@
   function row(it, idx, n) {
     var li = el('li', 'ds-row');
     var ref = { exerciseId: it.exerciseId, name: it.name };
-    li.appendChild(nameNode(it.name, it.exerciseId));
+    if (it.gear && it.gear.text) {
+      var nm = el('span', 'ds-namewrap'); nm.appendChild(nameNode(it.name, it.exerciseId));
+      nm.appendChild(el('span', 'ds-gear', it.gear.text)); li.appendChild(nm);
+    } else li.appendChild(nameNode(it.name, it.exerciseId));
     var hold = el('input', 'ds-hold'); hold.type = 'number'; hold.min = 5; hold.max = 600; hold.step = 5; hold.value = it.holdSeconds;
     hold.setAttribute('aria-label', 'Hold seconds for ' + it.name);
     hold.addEventListener('change', function () { guard(DS.update(ref, { holdSeconds: Number(hold.value) })); });

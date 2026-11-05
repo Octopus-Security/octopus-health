@@ -36,6 +36,7 @@
  */
 
 const M = require('../lib/muscles');
+const E = require('./equipment');
 
 const SETTING_KEY = 'dailyStretchPlanId';
 const DEFAULT_NAME = 'Daily Starter Stretch (10 min)';
@@ -246,10 +247,30 @@ async function loadPreset(db, username, presetId, mode) {
   });
 }
 
+/**
+ * Gear cues for a list at one gym, for DISPLAY ONLY: the stored list is never changed, and
+ * every item keeps its own name so move / remove / update still find it. Each item that has
+ * something to say gets `gear: { state, text }` (state: ok | optional-missing | swap | omit).
+ * `have` = Set of equipment ids, or null (unknown gym: say nothing).
+ */
+function withGear(items, have, legacy) {
+  if (!have) return items;
+  const names = items.map(i => i.name);
+  return items.map(i => {
+    const g = E.gearFor({ name: i.name }, have, legacy && legacy.get(String(i.name).toLowerCase()), names);
+    const text = g.state === 'ok' ? g.tool : g.state === 'optional-missing' ? g.note : g.note;
+    return text ? { ...i, gear: { state: g.state, text } } : i;
+  });
+}
+
+async function gearHave(db) {
+  try { const g = await require('./mobility').activeGear(db, null); return g ? g.have : null; } catch { return null; }
+}
+
 /** The shape the browser gets. */
 async function view(db) {
   const d = await loadDaily(db);
-  return { name: d.name, isDefault: d.isDefault, totalMinutes: totalMinutes(d.items), items: d.items };
+  return { name: d.name, isDefault: d.isDefault, totalMinutes: totalMinutes(d.items), items: withGear(d.items, await gearHave(db)) };
 }
 
 /**
@@ -267,6 +288,11 @@ async function serviceView(db, baseUrl) {
       instructions: shortInstructions(def && def.instructions),
     };
   });
+  const have = await gearHave(db);
+  if (have) {
+    const g = withGear(d.items, have);
+    items.forEach((it, n) => { if (g[n].gear) it.gear = g[n].gear; });
+  }
   return {
     name: d.name, totalMinutes: totalMinutes(d.items), items,
     url: `${baseUrl || process.env.HEALTH_PUBLIC_URL || 'https://health.octopustechnology.net'}/stretch`,
@@ -313,5 +339,5 @@ Object.assign(module.exports, {
   SETTING_KEY, DEFAULT_NAME, MY_NAME,
   ownPlan, loadDaily, view, serviceView, listPresets, loadPreset,
   addStretch, removeStretch, moveStretch, updateStretch,
-  totalMinutes, shortInstructions, fromStored, toStored,
+  totalMinutes, shortInstructions, fromStored, toStored, withGear, gearHave,
 });

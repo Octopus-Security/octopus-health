@@ -22,6 +22,9 @@
     .today-name:hover { color:#2ecc71; background:none; }
     .today-rx { color:#2ecc71; font-variant-numeric:tabular-nums; white-space:nowrap; font-size:0.9rem; }
     .today-note { color:#777; font-size:0.78rem; margin-top:2px; font-weight:400; }
+    .today-tool { color:#2ecc71; font-size:0.8rem; margin-top:2px; font-weight:600; overflow-wrap:anywhere; }
+    .today-tool[data-gear="optional-missing"], .today-tool[data-gear="swap"], .today-tool[data-gear="omit"] { color:#d4a537; }
+    .today-left { color:#d4a537; font-size:0.8rem; padding:6px 0; overflow-wrap:anywhere; }
     .today-plain { color:#bbb; font-size:0.88rem; padding:4px 0; }
     .today-start { width:100%; min-height:var(--tap); font-size:1rem; font-weight:600; margin-top:18px; }
     .today-hint { color:#666; font-size:0.78rem; margin-top:8px; }
@@ -83,7 +86,10 @@
       <ul class="today-list" id="today-stretches">
         <% stretches.items.forEach(function (s, i) { %>
           <li class="today-item">
-            <button type="button" class="today-name" data-s="<%= i %>"><%= s.name %></button>
+            <div>
+              <button type="button" class="today-name" data-s="<%= i %>"><%= s.name %></button>
+              <% if (s.gear) { %><div class="today-tool" data-gear="<%= s.gear.state %>"><%= s.gear.text %></div><% } %>
+            </div>
             <span class="today-rx"><%= s.holdSeconds %> s<%= s.sides === 2 ? ' each side' : '' %></span>
           </li>
         <% }) %>
@@ -94,6 +100,7 @@
     <div class="card" id="mob-card">
       <h2 style="margin-bottom:6px">🤸 Mobility &amp; prep</h2>
       <div class="today-meta" style="margin-bottom:8px"><%= mobility.note %></div>
+      <% if (mobility.gym) { %><div class="today-meta" style="margin-bottom:8px">Tools shown for: <%= mobility.gym.name %> (change what is there on <a href="/gyms">Gyms</a>).</div><% } %>
       <% mobility.routines.forEach(function (r) { %>
         <details class="mob-routine" data-routine="<%= r.id %>" <%= r.id === mobility.dailyId ? 'open' : '' %>>
           <summary><strong><%= r.name %></strong> <span class="today-meta">· <%= r.minutes %> min<%= r.perWeek ? ' · ' + r.perWeek + 'x/week' : '' %> · <%= r.blurb %></span></summary>
@@ -103,11 +110,14 @@
                 <div>
                   <button type="button" class="today-name" data-r="<%= r.id %>" data-i="<%= i %>"><%= it.name %></button>
                   <div class="today-note"><%= it.cue %></div>
+                  <% if (it.tool) { %><div class="today-tool"><%= it.tool %></div><% } %>
+                  <% if (it.swapNote) { %><div class="today-tool" data-gear="swap"><%= it.swapNote %></div><% } %>
                 </div>
                 <span class="today-rx"><%= it.rx %></span>
               </li>
             <% }) %>
           </ul>
+          <% (r.omitted || []).forEach(function (o) { %><div class="today-left"><%= o.note %></div><% }) %>
           <button type="button" class="btn mob-done" data-routine="<%= r.id %>" aria-pressed="<%= mobility.done[r.id] ? 'true' : 'false' %>" style="min-height:var(--tap)"><%= mobility.done[r.id] ? '✓ Done today (tap to undo)' : 'Mark done' %></button>
         </details>
       <% }) %>

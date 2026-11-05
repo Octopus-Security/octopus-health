@@ -67,7 +67,7 @@
           var a = document.createElement(window.StretchDemo ? 'button' : 'span');
           if (window.StretchDemo) { a.type = 'button'; window.StretchDemo.link(a, { id: null, name: e.demo, category: 'recovery' }); }
           a.textContent = e.name; li.appendChild(a);
-          var s = document.createElement('span'); s.className = 'bm-meta'; s.textContent = e.rx + ' - ' + e.routine; li.appendChild(s);
+          var s = document.createElement('span'); s.className = 'bm-meta'; s.textContent = e.rx + ' - ' + e.routine + (e.tool ? ' - ' + e.tool : '') + (e.swapNote ? ' - ' + e.swapNote : ''); li.appendChild(s);
           ul.appendChild(li);
         });
       })
