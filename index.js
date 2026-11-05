@@ -122,6 +122,7 @@ app.set('views', './views');
 // "remember to pass it" is one template quietly going stale — which is the bug,
 // not a smaller version of it.
 app.locals.asset = asset;
+app.locals.recoveryNote = require('./lib/recovery-note').RECOVERY_NOTE;
 // ET calendar date for templates (a date input's default was the UTC day after 8pm ET).
 app.locals.todayET = () => ET.todayET();
 
