@@ -680,3 +680,9 @@ body.login-page {
     }
     nav .nav-logout a { justify-content: center; color: #ff9090; border-color: #4a2a2a; background: #1a1212; }
 }
+
+/* Goals: one-number progress update (does not touch the other fields) */
+.goal-progress { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 10px; }
+.goal-progress label { color: #888; font-size: 0.85rem; }
+.goal-progress input { font-size: 16px; min-height: var(--tap); width: 9em; max-width: 100%; }
+.goal-progress button { min-height: var(--tap); min-width: var(--tap); }

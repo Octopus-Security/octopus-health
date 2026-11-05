@@ -87,7 +87,7 @@
           </option>
           <% }) %>
         </select>
-        <input type="date" name="startDate" id="startDate" value="<%= new Date().toISOString().split('T')[0] %>">
+        <input type="date" name="startDate" id="startDate" value="<%= todayET() %>">
         <button type="submit" class="btn btn-green">Assign</button>
       </div>
       <!-- Optional: enter your comp date and the start is back-dated so the plan's
@@ -175,7 +175,7 @@
         <% if (!isActive) { %>
         <form action="/plans/assign" method="POST" style="margin-left:auto">
           <input type="hidden" name="planId" value="<%= plan.id %>">
-          <input type="hidden" name="startDate" value="<%= new Date().toISOString().split('T')[0] %>">
+          <input type="hidden" name="startDate" value="<%= todayET() %>">
           <button type="submit" class="btn" style="padding:4px 12px;font-size:0.8rem">Use This Plan</button>
         </form>
         <% } %>

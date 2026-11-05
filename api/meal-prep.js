@@ -53,7 +53,7 @@ function snapshotFor(template, slots, result, { portions, preppedOn, notes } = {
     mealType: template.mealType || 'snack',
     portions: made,
     portionsLeft: made,
-    preppedOn: preppedOn || new Date().toISOString().slice(0, 10),
+    preppedOn: preppedOn || require('../lib/et').todayET(),
     slots: JSON.stringify(Array.isArray(slots) ? slots : []),
     notes: notes || template.notes || null,
   };
@@ -77,8 +77,8 @@ const isFinished = prep => !prep || Number(prep.portionsLeft) < 1;
 function mealFor(prep, { date, time, mealType } = {}) {
   const now = new Date();
   return {
-    date: date || now.toISOString().slice(0, 10),
-    time: time || now.toTimeString().slice(0, 8),
+    date: date || require('../lib/et').todayET(now),
+    time: time || require('../lib/et').timeET(now).slice(0, 8),
     mealType: ['breakfast', 'lunch', 'dinner', 'snack'].includes(mealType) ? mealType : prep.mealType,
     description: `${prep.name} (meal prep from ${prep.preppedOn})`,
     calories: prep.kcal,

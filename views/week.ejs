@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <%- include('partials/favicon') %>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="<%= asset('/theme.css') %>">
+</head>
+<body>
+<%- include('partials/nav') %>
+<div class="container">
+  <div class="card">
+    <h2>Your week</h2>
+    <p class="fx-meta">Each day's plan as it stands in your account, and where it happens today. A paused location moves its days to an active one, Home first. Tap a day to open that workout.</p>
+    <% if (paused.length) { %>
+      <p class="wk-banner">
+        <strong>Paused:</strong>
+        <%= paused.map(function (g) { return g.name + (g.until ? ' (resumes ' + g.until + ')' : ' (until resumed)'); }).join(', ') %>.
+        <a href="/gyms">Manage locations</a>
+      </p>
+    <% } %>
+    <% if (constraints.length) { %>
+      <p class="wk-banner wk-warn">
+        <strong>Adapting for:</strong>
+        <%= constraints.map(function (c) { return c.text + (c.until ? ' (until ' + c.until + ')' : ''); }).join('; ') %>.
+        <a href="/constraints">Edit constraints</a>
+      </p>
+    <% } else { %>
+      <p class="fx-meta">No injury or travel limits set. <a href="/constraints">Add one</a></p>
+    <% } %>
+  </div>
+
+  <% days.forEach(function (d) { %>
+  <div class="card wk-day<%= d.isToday ? ' wk-today' : '' %>" id="day-<%= d.day %>">
+    <h2><%= d.name %>
+      <% if (d.isToday) { %><span class="fx-chip achieved">Today</span><% } %>
+      <% if (d.status === 'plan') { %><span class="fx-chip"><%= d.gym %></span><% } %>
+      <% if (d.status === 'plan' && d.moved) { %><span class="fx-chip">moved from <%= d.requested %></span><% } %>
+    </h2>
+    <% if (d.status === 'plan') { %>
+      <p class="wk-label"><a class="wk-open" href="/today?slug=<%= encodeURIComponent(d.slug) %>&amp;at=<%= encodeURIComponent(d.where) %>"><%= d.label %></a></p>
+      <% if (d.note) { %><p class="fx-meta"><%= d.note %></p><% } %>
+      <% if (d.exercises.length) { %>
+      <ul class="wk-list">
+        <% d.exercises.forEach(function (e) { %><li><span class="wk-ex"><%= e.name %></span><% if (e.prescription) { %> <span class="fx-meta"><%= e.prescription %></span><% } %></li><% }) %>
+      </ul>
+      <% } %>
+      <% d.fitNotes.forEach(function (n) { %><p class="fx-meta">Adjusted: <%= n %></p><% }) %>
+    <% } else if (d.status === 'paused') { %>
+      <p class="fx-meta">No workout suggested. <%= d.note %></p>
+    <% } else { %>
+      <p class="fx-meta">Nothing planned<%= d.where ? ' at ' + d.where : '' %>. Rest day, or <a href="/workout">log something anyway</a>.</p>
+    <% } %>
+  </div>
+  <% }) %>
+</div>
+<style>
+  .wk-banner { margin: 10px 0 0; padding: 10px 12px; border-radius: 8px; background: #1a1f26; color: #cfd6de; overflow-wrap: anywhere; }
+  .wk-warn { background: #2a2216; color: #e0c080; }
+  .wk-today { border-color: #2ecc71; }
+  .wk-label { margin: 4px 0 6px; font-size: 1.05rem; }
+  .wk-open { display: inline-flex; align-items: center; min-height: var(--tap, 44px); overflow-wrap: anywhere; }
+  .wk-list { margin: 0; padding-left: 20px; }
+  .wk-list li { padding: 3px 0; overflow-wrap: anywhere; }
+  .wk-ex { color: #e8e8e8; }
+  .wk-day h2 { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+</style>
+</body>
+</html>
