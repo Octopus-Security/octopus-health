@@ -21,6 +21,11 @@
 
   var RULES = [
     // ── movements that used to borrow a neighbour's figure (audit 2026-10-26) ──
+    // massage-ball work (2026-11): no ball figure exists, so each reuses the closest existing pose
+    [/peanut ball upper back/i, 'thoracic-extension'],
+    [/lacrosse ball glute/i, 'figure-four'],
+    [/lacrosse ball chest/i, 'doorway-chest'],
+    [/spiky ball foot/i, 'stand-breathe'],
     [/granby/i, 'granby-roll'],
     [/upward elbow|sok ngad/i, 'upward-elbow'],
     [/quadruped hip/i, 'quadruped-hip-cars'],

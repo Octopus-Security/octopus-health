@@ -53,3 +53,8 @@
   .ds-block summary { display: flex; align-items: center; min-height: var(--tap); }
   .ds-search { min-height: var(--tap); font-size: 16px; }
 }
+
+/* gear cue under a stretch's name (what to use, or what to do without it) */
+.ds-namewrap { flex: 1 1 180px; display: flex; flex-direction: column; align-items: flex-start; min-width: 0; }
+.ds-namewrap .ds-name { flex: none; }
+.ds-gear { color: #2ecc71; font-size: 0.78rem; margin-top: 2px; overflow-wrap: anywhere; }

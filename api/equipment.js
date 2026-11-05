@@ -7,14 +7,18 @@
  *
  * Who reads this list: the skill tree (api/skill-tree.js derives its tokens from
  * it), the gyms page, plan fitting below, cortex (GET /api/service/equipment) and
- * octopus-mma (a drift-tested snapshot of the ids). A new piece of equipment goes
- * in the JSON and nowhere else.
+ * octopus-mma (a snapshot of the ids in lib/equipment-ids.json). mma's test compares
+ * the snapshot with a sibling health checkout, but it is skipped when there is none and
+ * mma has no CI, so the snapshot can drift: it is a check you run, not a guarantee.
+ * A new piece of equipment goes in the JSON, then the snapshot is updated by hand.
  *
- * Three ideas:
+ * Four ideas:
  *   - an id is stable forever; names and aliases change freely;
  *   - `provides` — owning a power tower IS owning a pull-up bar, dip bars, handles;
  *   - an exercise declares what it needs ("a|b" = either); a location only gets
- *     the exercises its equipment allows, with a reported substitute or omission.
+ *     the exercises its equipment allows, with a reported substitute or omission;
+ *   - `optional` gear (a strap a towel can replace) never removes an exercise: it only
+ *     changes the one-line cue. `tool` is the cue when the gear is there, `without` when not.
  */
 
 const fs = require('fs');
@@ -61,11 +65,35 @@ function unmet(requires, have) {
  */
 function requirementsFor(ex, legacy) {
   const name = String(ex.exerciseName || ex.name || '');
-  if (Array.isArray(ex.requires)) return { requires: ex.requires, substitutes: ex.substitutes || [] };
+  if (Array.isArray(ex.requires)) return { requires: ex.requires, substitutes: ex.substitutes || [], optional: ex.optional || [], tool: ex.tool || null, without: ex.without || null };
   const rule = RULES.find(r => r.re.test(name));
-  if (rule) return { requires: rule.requires || [], substitutes: rule.substitutes || [] };
+  if (rule) return { requires: rule.requires || [], substitutes: rule.substitutes || [], optional: rule.optional || [], tool: rule.tool || null, without: rule.without || null };
   const tok = legacy ? CATALOGUE.legacyExerciseTokens[String(legacy).toLowerCase()] : null;
-  return { requires: tok ? [tok] : [], substitutes: [] };
+  return { requires: tok ? [tok] : [], substitutes: [], optional: [], tool: null, without: null };
+}
+
+/**
+ * The gear cue for one exercise at a location, for display only (never changes the list).
+ *   { state: 'ok', tool }                      gear present (or none needed): tool cue if the rule has one
+ *   { state: 'optional-missing', note }        optional gear absent: the exercise stays, `note` says what to use instead
+ *   { state: 'swap', to, note }                a required item is absent and a substitute fits
+ *   { state: 'omit', note }                    a required item is absent and nothing fits
+ * `others` = names already in the same list, so a swap never duplicates one.
+ */
+function gearFor(ex, ownedIds, legacy, others) {
+  const have = expand(ownedIds);
+  const name = String(ex.exerciseName || ex.name || '');
+  const r = requirementsFor(ex, legacy);
+  const missing = unmet(r.requires, have);
+  const label = m => m.split('|').map(a => BY_ID.get(a)?.name || a).join(' or ');
+  if (missing.length) {
+    const taken = new Set([...(others || [])].map(n => String(n).toLowerCase()));
+    const sub = r.substitutes.find(x => !taken.has(String(x.name).toLowerCase()) && unmet(x.requires, have).length === 0);
+    const why = `no ${missing.map(label).join(', ')}`;
+    return sub ? { state: 'swap', to: sub.name, note: `Swapped for ${sub.name} (${why}).` } : { state: 'omit', note: `Left out (${why}).` };
+  }
+  if (r.optional.length && unmet(r.optional, have).length) return { state: 'optional-missing', note: r.without || null };
+  return { state: 'ok', tool: r.tool || null };
 }
 
 /**
@@ -83,9 +111,14 @@ function fitExercises(exercises, ownedIds, legacyByName) {
   const out = [], substitutions = [], omitted = [];
   for (const ex of list) {
     const name = String(ex.exerciseName || ex.name || '');
-    const { requires, substitutes } = requirementsFor(ex, legacyByName && legacyByName.get(name.toLowerCase()));
+    const { requires, substitutes, optional: opt, without } = requirementsFor(ex, legacyByName && legacyByName.get(name.toLowerCase()));
     const missing = unmet(requires, have);
-    if (!missing.length) { out.push(ex); continue; }
+    if (!missing.length) {
+      // Optional gear (a strap you can swap for a towel) never removes the exercise; it adds a one-line cue.
+      if (opt.length && unmet(opt, have).length && without) out.push({ ...ex, gearNote: without });
+      else out.push(ex);
+      continue;
+    }
     const sub = substitutes.find(s => !names.has(String(s.name).toLowerCase()) && unmet(s.requires, have).length === 0);
     if (sub) {
       names.add(String(sub.name).toLowerCase());
@@ -168,5 +201,5 @@ function resolveLocation(gyms, requested, today) {
 }
 
 module.exports = {
-  CATALOGUE, ITEMS, IDS, AMAZON_TAG, AMAZON_DISCLOSURE, KIT_PLAN_ITEM, withTag, buyLink, kitBuyLink, toId, expand, requirementsFor, fitExercises, describeFit, isActive, resolveLocation, unmet,
+  CATALOGUE, ITEMS, IDS, AMAZON_TAG, AMAZON_DISCLOSURE, KIT_PLAN_ITEM, withTag, buyLink, kitBuyLink, toId, expand, requirementsFor, gearFor, fitExercises, describeFit, isActive, resolveLocation, unmet,
 };
