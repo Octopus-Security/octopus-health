@@ -149,7 +149,7 @@ router.post('/prs', requireToken, async (req, res) => {
       weight:       weight      != null ? parseFloat(weight)     : null,
       weightUnit:   weightUnit  || 'lbs',
       durationSecs: durationSecs != null ? parseInt(durationSecs) : null,
-      date:         date        || new Date().toISOString().slice(0, 10),
+      date:         date        || new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' }),
       notes:        notes       || null,
     });
     res.json({ ok: true, pr: row });
@@ -985,6 +985,15 @@ router.get('/nutrition-today', requireToken, async (req, res) => {
   } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
 });
 
+// GET /api/service/nutrition-targets - the caller's daily targets plus today and the last
+// 7 ET days. Read-only. Unlogged days are status "not_logged" with null totals, never 0.
+router.get('/nutrition-targets', requireToken, async (req, res) => {
+  try {
+    const db = await getDB(req);
+    res.json(await require('../nutrition-targets').overview(db));
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+
 // GET /api/service/templates?slug=mon:gym
 // Returns workout template by slug (dayKey:location), or all if no slug.
 router.get('/templates', requireToken, async (req, res) => {
@@ -1213,10 +1222,9 @@ router.get('/plans/today', requireToken, async (req, res) => {
     const plan = await TrainingPlan.findByPk(assignment.planId);
     if (!plan) return res.json({ ok: true, active: false });
     const phases = JSON.parse(plan.phases || '[]');
-    const start = new Date(assignment.startDate);
-    const today = new Date();
-    const weekNumber = Math.floor((today - start) / (7 * 24 * 60 * 60 * 1000)) + 1;
-    const dayOfWeek = today.getDay();
+    const ET = require('../../lib/et');
+    const weekNumber = Math.floor(ET.daysBetween(assignment.startDate, ET.todayET()) / 7) + 1;
+    const dayOfWeek = ET.weekdayET();
     let currentPhase = phases[0];
     for (const phase of phases) {
       const [startW, endW] = String(phase.weeks).split('–').map(Number);
@@ -1251,5 +1259,6 @@ router.get('/stretches/daily', requireToken, async (req, res) => {
 // router's token + X-Service-User guards and getDB(); see fitness-service.js.
 require('./fitness-service')(router, getDB);
 require('./gyms-service')(router, getDB);
+require('./constraints-service')(router, getDB);
 
 module.exports = router;

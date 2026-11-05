@@ -124,6 +124,13 @@
                                 <% } %>
                             <% } %>
                         </div>
+                        <% if (goal.status !== 'done') { %>
+                        <form method="POST" action="/goals/progress/<%= goal.id %>" class="goal-progress">
+                            <label for="cur-<%= goal.id %>">Where are you now?</label>
+                            <input id="cur-<%= goal.id %>" type="number" step="any" inputmode="decimal" name="currentValue" value="<%= goal.currentValue == null ? '' : goal.currentValue %>" placeholder="current<%= goal.unit ? ' (' + goal.unit + ')' : '' %>">
+                            <button type="submit" class="toggle-btn">Update</button>
+                        </form>
+                        <% } %>
                         <% if (goal.progression) { %>
                             <div style="margin-top: 8px; color: #aaa;">
                                 <strong>Progression:</strong> <%= goal.progression %>

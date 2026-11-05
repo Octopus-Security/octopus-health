@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <%- include('partials/favicon') %>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="<%= asset('/theme.css') %>">
+</head>
+<body>
+<%- include('partials/nav') %>
+<div class="container" data-msg-root>
+  <div class="card">
+    <h2>Workout constraints</h2>
+    <p class="fx-meta">An injury, a trip or missing kit that every suggested workout should work around until you clear it. Neith reads these too, so setting one here or in chat is the same thing. They are stored in your account.</p>
+    <p class="fx-msg"></p>
+  </div>
+
+  <div class="card">
+    <h2>Active</h2>
+    <% if (!active.length) { %><p class="empty-state">None. Workouts are unchanged.</p><% } %>
+    <% active.forEach(function (c) { %>
+    <div class="cn-item" id="constraint-<%= c.id %>">
+      <form data-json action="/constraints/api/<%= c.id %>" data-method="PUT" class="cn-form">
+        <label class="fx-wrap">What is limited<br><textarea name="text" rows="2" maxlength="500" required><%= c.text %></textarea></label>
+        <div class="fx-row">
+          <label class="fx-wrap">Equipment available (optional)<br><input type="text" name="equipment" maxlength="300" value="<%= c.equipment || '' %>" placeholder="e.g. dumbbells and a treadmill"></label>
+          <label class="fx-wrap">Until (optional)<br><input type="date" name="until" min="<%= today %>" value="<%= c.until || '' %>"></label>
+        </div>
+        <div class="fx-row">
+          <button type="submit" class="cn-btn">Save</button>
+          <button type="button" class="cn-btn cn-btn-quiet" data-act data-method="DELETE" data-url="/constraints/api/<%= c.id %>" data-confirm="Clear this constraint?">Clear</button>
+        </div>
+      </form>
+    </div>
+    <% }) %>
+    <% if (active.length > 1) { %>
+    <div class="fx-row cn-row"><button type="button" class="cn-btn cn-btn-quiet" data-act data-method="POST" data-url="/constraints/api/clear" data-confirm="Clear every constraint and go back to your normal program?">Clear all</button></div>
+    <% } %>
+  </div>
+
+  <div class="card">
+    <h2>Add one</h2>
+    <form data-json action="/constraints/api" data-method="POST" class="cn-form">
+      <label class="fx-wrap">What is limited<br><textarea name="text" rows="2" maxlength="500" required placeholder="e.g. left shoulder strain, no overhead pressing"></textarea></label>
+      <div class="fx-row">
+        <label class="fx-wrap">Equipment available (optional)<br><input type="text" name="equipment" maxlength="300" placeholder="e.g. hotel gym: dumbbells, treadmill"></label>
+        <label class="fx-wrap">Until (optional)<br><input type="date" name="until" min="<%= today %>"></label>
+      </div>
+      <div class="fx-row"><button type="submit" class="cn-btn">Add constraint</button></div>
+    </form>
+  </div>
+
+  <% if (past.length) { %>
+  <div class="card">
+    <h2>Earlier</h2>
+    <% past.forEach(function (c) { %>
+      <div class="list-item cn-past">
+        <span class="fx-wrap"><%= c.text %><% if (c.equipment) { %><br><span class="fx-meta">Equipment: <%= c.equipment %></span><% } %></span>
+        <span class="fx-chip"><%= c.expired ? 'expired ' + c.until : 'cleared' %></span>
+      </div>
+    <% }) %>
+  </div>
+  <% } %>
+</div>
+<style>
+  .cn-item { border-top: 1px solid #1e1e1e; padding: 12px 0; }
+  .cn-item:first-of-type { border-top: 0; }
+  .cn-form textarea, .cn-form input { font-size: 16px; width: 100%; box-sizing: border-box; }
+  .cn-form input, .cn-form button { min-height: var(--tap, 44px); }
+  .cn-form .fx-row { margin-top: 10px; }
+  .cn-form .fx-row > label { flex: 1 1 200px; }
+  .cn-btn { min-height: var(--tap, 44px); padding: 8px 16px; font-size: 16px; }
+  .cn-row { margin-top: 12px; }
+  .cn-past { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+</style>
+<script src="<%= asset('/js/fx.js') %>"></script>
+</body>
+</html>

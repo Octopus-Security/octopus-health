@@ -1221,6 +1221,18 @@ const getDatabase = (username) => {
         value: { type: DataTypes.TEXT },
     }, { tableName: 'UserSettings', timestamps: false });
 
+    // Daily nutrition targets (api/nutrition-targets.js). One row (id 1) per account file,
+    // so no owner column. A new table: sync() creates it, nothing existing is altered.
+    const NutritionTarget = sequelize.define('NutritionTarget', {
+        id:        { type: DataTypes.INTEGER, primaryKey: true },
+        calories:  { type: DataTypes.INTEGER, allowNull: true },
+        protein:   { type: DataTypes.INTEGER, allowNull: true },
+        carbs:     { type: DataTypes.INTEGER, allowNull: true },
+        fats:      { type: DataTypes.INTEGER, allowNull: true },
+        source:    { type: DataTypes.STRING(16), allowNull: false, defaultValue: 'manual' },
+        updatedOn: { type: DataTypes.DATEONLY, allowNull: true },
+    }, { tableName: 'NutritionTargets', timestamps: false });
+
     // Where you train, and what is there (GYMS-AND-EQUIPMENT.md phase 1). Per-user file,
     // so no owner column. `slug` is what plan templates target ("home", "park", "gym");
     // `equipmentId` is an id from content/equipment/catalogue.json - the ONE list - kept
@@ -1241,6 +1253,19 @@ const getDatabase = (username) => {
         label:       { type: DataTypes.STRING,  allowNull: true },
         attrs:       { type: DataTypes.TEXT,    allowNull: true },   // JSON: heights, rated load, ...
     }, { indexes: [{ unique: true, fields: ['gymId', 'equipmentId'] }] });
+
+    // Ongoing training limits (injury, travel, equipment) that adapt every suggested workout
+    // until cleared. Health owns them (api/constraints.js); cortex used to keep one in its
+    // own settings. A new table only: sync() creates it, nothing existing is altered.
+    // `until` is an ET date (YYYY-MM-DD); a row past it is expired but kept as history.
+    const WorkoutConstraint = sequelize.define('WorkoutConstraint', {
+        text:      { type: DataTypes.TEXT,    allowNull: false },
+        equipment: { type: DataTypes.STRING,  allowNull: true },
+        until:     { type: DataTypes.STRING,  allowNull: true },
+        active:    { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
+        source:    { type: DataTypes.STRING,  allowNull: true },   // web | cortex | cortex-import
+        clearedAt: { type: DataTypes.DATE,    allowNull: true },
+    });
 
     // Exercise plan builder (mobility / warmup / cooldown / circuit)
     const ExercisePlan = sequelize.define('ExercisePlan', {
@@ -1470,8 +1495,10 @@ const getDatabase = (username) => {
         Benchmark,
         BenchmarkSeed,
         UserSetting,
+        NutritionTarget,
         Gym,
         GymEquipment,
+        WorkoutConstraint,
         seedData,
         sequelize,
     };
