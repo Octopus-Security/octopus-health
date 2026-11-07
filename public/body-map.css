@@ -62,7 +62,7 @@
   .bm-svg { max-height: 60vh; }
   .bm-panel {
     position: fixed; left: 0; right: 0; bottom: 0; top: auto; z-index: 50;
-    max-height: 55vh; border-radius: 14px 14px 0 0; margin: 0; padding: 16px;
+    max-height: 55vh; max-height: 55dvh; overscroll-behavior: contain; border-radius: 14px 14px 0 0; margin: 0; padding: 16px;
     transform: translateY(105%); transition: transform .2s ease; box-shadow: 0 -6px 24px rgba(0,0,0,.45);
   }
   .bm-panel[data-open="true"] { transform: translateY(0); }

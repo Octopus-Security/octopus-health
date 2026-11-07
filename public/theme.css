@@ -631,7 +631,10 @@ body.login-page {
 
 /* ── Mobile nav (800px and below) ─────────────────────────────── */
 @media (max-width: 800px) {
-    nav.site-nav { padding: 8px 16px; }
+    /* Sticky so the Menu toggle (and so the close control) is always on screen; the panel hangs
+       off it. --nav-h = 8px + 44px tap + 8px padding + 1px border. */
+    :root { --nav-h: 61px; }
+    nav.site-nav { padding: calc(8px + env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 8px max(16px, env(safe-area-inset-left)); position: sticky; top: 0; }
     nav .nav-bar { flex-wrap: nowrap; }
     nav .nav-title { font-size: 17px; }
     nav .nav-title a { display: inline-flex; align-items: center; min-height: var(--tap); }
@@ -655,10 +658,16 @@ body.login-page {
         display: none;
         position: absolute; left: 0; right: 0; top: 100%;
         background: #111; border-bottom: 1px solid #2a2a2a; box-shadow: 0 12px 24px rgba(0,0,0,0.6);
-        padding: var(--space-2) 16px var(--space-4);
-        max-height: calc(100vh - 64px); max-height: calc(100dvh - 64px); overflow-y: auto;
-        flex-direction: column; align-items: stretch; flex-wrap: nowrap; gap: 0;
+        padding: var(--space-2) max(16px, env(safe-area-inset-right)) calc(var(--space-4) + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+        /* Never taller than the room under the header; scrolls inside itself. */
+        max-height: calc(100vh - var(--nav-h) - env(safe-area-inset-top));
+        max-height: calc(100dvh - var(--nav-h) - env(safe-area-inset-top));
+        overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+        /* The desktop rule says flex-end. In a column that pins the content to the BOTTOM, so a
+           panel taller than its box overflows upward, behind the header, where no scroll can reach. */
+        flex-direction: column; justify-content: flex-start; align-items: stretch; flex-wrap: nowrap; gap: 0;
     }
+    nav .nav-panel > * { flex-shrink: 0; }
     .nav-check:checked ~ .nav-panel { display: flex; }
     nav .nav-group { display: block; margin-top: var(--space-3); }
     nav .nav-group-label {

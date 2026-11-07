@@ -147,7 +147,7 @@
 
     .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:100; align-items:center; justify-content:center; }
     .modal-overlay.open { display:flex; }
-    .modal { background:#111; border:1px solid #222; border-radius:14px; padding:24px; width:min(480px,95vw); max-height:85vh; overflow-y:auto; }
+    .modal { background:#111; border:1px solid #222; border-radius:14px; padding:24px; width:min(480px,95vw); max-height:85vh; max-height:85dvh; overscroll-behavior:contain; overflow-y:auto; }
     .modal h3 { color:#e8e8e8; margin-bottom:16px; }
     .form-group { margin-bottom:12px; }
     .form-group label { display:block; font-size:0.8rem; color:#888; margin-bottom:4px; }
