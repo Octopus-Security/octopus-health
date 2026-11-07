@@ -19,7 +19,8 @@
     { "id": "mat",            "name": "Exercise mat",          "group": "small",      "aliases": ["exercise mat", "yoga mat", "floor mat", "workout mat", "mat"], "buy": { "label": "HAPBEAR large exercise mat", "asin": "B0DHKCM18G" } },
     { "id": "ball",            "name": "Medicine / stability ball", "group": "small",  "aliases": ["medicine ball", "stability ball", "swiss ball"] },
     { "id": "dumbbell",        "name": "Dumbbells",             "group": "free-weights","aliases": ["dumbbells", "db", "dumbells"] },
-    { "id": "barbell",         "name": "Barbell + plates",      "group": "free-weights","aliases": ["barbells", "olympic bar", "ez bar", "ez-bar", "ezbar"] },
+    { "id": "weight-plates",   "name": "Weight plates",         "group": "free-weights","aliases": ["plates", "weight plate", "45 lb plate", "45lb plate", "bumper plates", "olympic plates"] },
+    { "id": "barbell",         "name": "Barbell + plates",      "group": "free-weights","aliases": ["barbells", "olympic bar", "ez bar", "ez-bar", "ezbar"], "provides": ["weight-plates"] },
     { "id": "kettlebell",      "name": "Kettlebell",            "group": "free-weights","aliases": ["kettlebells", "kb"] },
     { "id": "weight-bench",    "name": "Weight bench",          "group": "free-weights","aliases": ["weight bench", "flat bench", "adjustable bench", "incline bench"] },
     { "id": "cable-machine",   "name": "Cable machine",         "group": "machines",   "aliases": ["cable", "cables", "cable station", "pulley", "cable_machine"] },
@@ -29,7 +30,7 @@
     { "id": "pads",            "name": "Pads / mitts",          "group": "combat",     "aliases": ["mitts", "focus mitts", "thai pads"] }
   ],
   "legacyExerciseTokens": {
-    "none": null, "bodyweight": null, "dumbbell": "dumbbell", "barbell": "barbell", "kettlebell": "kettlebell",
+    "none": null, "bodyweight": null, "dumbbell": "dumbbell", "barbell": "barbell", "kettlebell": "kettlebell", "plate": "weight-plates",
     "cable_machine": "cable-machine", "machine": "machine", "cardio_machine": "cardio-machine", "bag": "bag", "pads": "pads"
   },
   "gyms": [
@@ -52,6 +53,12 @@
       "equipment": [ { "id": "dumbbell" }, { "id": "barbell" }, { "id": "kettlebell" }, { "id": "weight-bench" }, { "id": "cable-machine" }, { "id": "machine" }, { "id": "cardio-machine" }, { "id": "bar" }, { "id": "dip-bars" }, { "id": "captains-chair" }, { "id": "jump-rope" } ] }
   ],
   "exerciseRules": [
+    { "match": "^plate goblet squat$",   "requires": ["weight-plates"], "substitutes": [ { "name": "Goblet Squat", "requires": ["dumbbell"] }, { "name": "Bodyweight Squat", "requires": [] } ] },
+    { "match": "^plate push-up$",        "requires": ["weight-plates"], "substitutes": [ { "name": "Push-up", "requires": [] } ] },
+    { "match": "^plate glute bridge$",   "requires": ["weight-plates"], "substitutes": [ { "name": "Glute Bridge", "requires": [] } ] },
+    { "match": "^plate calf raise$",     "requires": ["weight-plates"], "substitutes": [ { "name": "Calf Raise (bodyweight)", "requires": [] } ] },
+    { "match": "^plate sit-up$",         "requires": ["weight-plates"], "substitutes": [ { "name": "Hollow Body Hold", "requires": [] } ] },
+    { "match": "^plate pinch carry$",    "requires": ["weight-plates"] },
     { "match": "ab roller",              "requires": ["ab-roller"],  "substitutes": [ { "name": "Cable Crunch", "requires": ["cable-machine"] }, { "name": "Hollow Body Hold", "requires": [] } ] },
     { "match": "hanging leg raise",      "requires": ["bar|captains-chair"], "substitutes": [ { "name": "Lying Leg Raise", "requires": [] } ] },
     { "match": "^(pull-up|chin-up)$",    "requires": ["bar"],        "substitutes": [ { "name": "Lat Pulldown", "requires": ["cable-machine"] } ] },
