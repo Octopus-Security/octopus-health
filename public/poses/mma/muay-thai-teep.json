@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "title": "Teep: Lead and Rear",
+  "view": "side",
+  "anchor": {
+    "joint": "ankleL",
+    "x": 56,
+    "y": 90
+  },
+  "frames": [
+    {"duration":400,"label":"Guard","highlight":[],"anchor":{"joint":"toeR","x":29.82,"y":91.02},"pose":{"torso":180,"head":177,"upperArmL":40,"forearmL":174,"upperArmR":30,"forearmR":174,"thighL":14,"shinL":-2,"footL":80,"thighR":-20,"shinR":-22,"footR":64}},
+    {"duration":240,"label":"Lead teep: knee lifts to the chest, toes pulled back","highlight":["hipL","kneeL"],"anchor":{"joint":"toeR","x":29.82,"y":91.02},"pose":{"torso":184,"head":180,"thighL":102,"shinL":8,"footL":122,"thighR":-8,"shinR":-10,"footR":84}},
+    {"duration":280,"label":"Push the hips through: the ball of the foot drives straight into the belly","highlight":["hipL","kneeL","ankleL"],"anchor":{"joint":"toeR","x":29.82,"y":91.02},"pose":{"torso":200,"head":186,"thighL":92,"shinL":90,"footL":172,"thighR":-12,"shinR":-12,"footR":86,"upperArmL":10,"forearmL":130}},
+    {"duration":220,"label":"Knee back to the chest","highlight":[],"anchor":{"joint":"toeR","x":29.82,"y":91.02},"pose":{"torso":184,"head":180,"thighL":102,"shinL":8,"footL":122,"thighR":-8,"shinR":-10,"footR":84,"upperArmL":40,"forearmL":174}},
+    {"duration":300,"label":"Lead foot back down: guard","highlight":[],"anchor":{"joint":"toeR","x":29.82,"y":91.02},"pose":{"torso":180,"head":177,"upperArmL":40,"forearmL":174,"upperArmR":30,"forearmR":174,"thighL":14,"shinL":-2,"footL":80,"thighR":-20,"shinR":-22,"footR":64}},
+    {"duration":200,"label":"Guard (reset)","highlight":[],"anchor":{"joint":"toeL","x":48.89,"y":91.22},"pose":{"torso":180,"head":177,"upperArmL":40,"forearmL":174,"upperArmR":30,"forearmR":174,"thighL":14,"shinL":-2,"footL":80,"thighR":-20,"shinR":-22,"footR":64}},
+    {"duration":240,"label":"Rear teep: rear knee lifts to the chest","highlight":["hipR","kneeR"],"anchor":{"joint":"toeL","x":48.89,"y":91.22},"pose":{"torso":182,"head":179,"thighR":102,"shinR":8,"footR":122,"thighL":2,"shinL":0,"footL":80}},
+    {"duration":280,"label":"Hips forward, lean back: the rear foot pushes them away","highlight":["hipR","kneeR","ankleR"],"anchor":{"joint":"toeL","x":48.89,"y":91.22},"pose":{"torso":202,"head":188,"thighR":92,"shinR":90,"footR":172,"thighL":-8,"shinL":-10,"footL":84,"upperArmR":-26,"forearmR":10}},
+    {"duration":220,"label":"Knee back to the chest","highlight":[],"anchor":{"joint":"toeL","x":48.89,"y":91.22},"pose":{"torso":182,"head":179,"thighR":102,"shinR":8,"footR":122,"thighL":2,"shinL":0,"footL":80,"upperArmR":30,"forearmR":174}},
+    {"duration":350,"label":"Rear foot back down: guard","highlight":[],"anchor":{"joint":"toeL","x":48.89,"y":91.22},"pose":{"torso":180,"head":177,"upperArmL":40,"forearmL":174,"upperArmR":30,"forearmR":174,"thighL":14,"shinL":-2,"footL":80,"thighR":-20,"shinR":-22,"footR":64}}
+  ]
+}

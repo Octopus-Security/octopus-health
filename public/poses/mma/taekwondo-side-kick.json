@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "title": "Side Kick (Yeop Chagi)",
+  "view": "side",
+  "anchor": {
+    "joint": "ankleL",
+    "x": 52,
+    "y": 90
+  },
+  "frames": [
+    {"duration":500,"label":"Fighting stance","highlight":[],"pose":{"torso":176,"head":176,"upperArmL":40,"forearmL":150,"upperArmR":25,"forearmR":160,"thighL":14,"shinL":-6,"footL":90,"thighR":-20,"shinR":-18,"footR":72}},
+    {"duration":300,"label":"Chamber: knee to the chest, foot flexed, heel leads","highlight":["hipR","kneeR"],"pose":{"torso":184,"head":176,"thighL":8,"shinL":-2,"thighR":100,"shinR":-8,"footR":60}},
+    {"duration":180,"label":"Thrust: hip drives, leg locks out heel-first, body leans away","highlight":["hipR","kneeR","ankleR"],"pose":{"torso":208,"head":196,"thighR":98,"shinR":100,"footR":165,"upperArmL":50,"forearmL":160}},
+    {"duration":280,"label":"Retract through the chamber","highlight":["hipR"],"pose":{"torso":184,"head":176,"thighL":8,"shinL":-2,"thighR":100,"shinR":-8,"footR":60}},
+    {"duration":450,"label":"Back to the stance","highlight":[],"pose":{"torso":176,"head":176,"upperArmL":40,"forearmL":150,"upperArmR":25,"forearmR":160,"thighL":14,"shinL":-6,"footL":90,"thighR":-20,"shinR":-18,"footR":72}}
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "title": "Footwork: Step and Follow",
+  "view": "side",
+  "frames": [
+    {"duration":500,"label":"Stance","highlight":[],"pins":["ankleL","ankleR"],"pose":{"torso":180,"head":177,"upperArmL":40,"forearmL":174,"upperArmR":30,"forearmR":174,"thighL":14,"shinL":-2,"footL":80,"thighR":-20,"shinR":-22,"footR":64,"root":{"x":45.86,"y":50.61}}},
+    {"duration":220,"label":"Push off the rear foot, lead foot skims forward","highlight":["hipL","kneeL"],"pins":["ankleL","ankleR"],"air":false,"pose":{"torso":180,"head":177,"upperArmL":40,"forearmL":174,"upperArmR":30,"forearmR":174,"thighL":30,"shinL":4,"footL":92,"thighR":-18,"shinR":-18,"footR":82,"root":{"x":43.89,"y":51.96}}},
+    {"duration":260,"label":"Lead foot lands a half step forward","highlight":["kneeL","ankleL"],"pins":["ankleL","ankleR"],"pose":{"torso":180,"head":177,"upperArmL":40,"forearmL":174,"upperArmR":30,"forearmR":174,"thighL":22,"shinL":6,"footL":80,"thighR":-20,"shinR":-20,"footR":64,"root":{"x":49.42,"y":51.57}}},
+    {"duration":400,"label":"Rear foot follows the same distance: stance restored","highlight":["kneeR","ankleR"],"pins":["ankleL","ankleR"],"pose":{"torso":180,"head":177,"upperArmL":40,"forearmL":174,"upperArmR":30,"forearmR":174,"thighL":14,"shinL":-2,"footL":80,"thighR":-20,"shinR":-22,"footR":64,"root":{"x":54.86,"y":50.61}}},
+    {"duration":260,"label":"Step back: rear foot first","highlight":["kneeR","ankleR"],"pins":["ankleL","ankleR"],"pose":{"torso":180,"head":177,"upperArmL":40,"forearmL":174,"upperArmR":30,"forearmR":174,"thighL":22,"shinL":6,"footL":80,"thighR":-20,"shinR":-20,"footR":64,"root":{"x":49.42,"y":51.57}}},
+    {"duration":150,"label":"Lead foot follows: back where you started","highlight":["kneeL","ankleL"],"pins":["ankleL","ankleR"],"pose":{"torso":180,"head":177,"upperArmL":40,"forearmL":174,"upperArmR":30,"forearmR":174,"thighL":14,"shinL":-2,"footL":80,"thighR":-20,"shinR":-22,"footR":64,"root":{"x":45.86,"y":50.61}}}
+  ]
+}

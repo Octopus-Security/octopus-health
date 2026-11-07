@@ -56,6 +56,7 @@ function getActiveTab(requestPath) {
     // when you clicked something else entirely.
     if (requestPath === '/today') return 'today';
     if (requestPath.startsWith('/gyms')) return 'gyms';
+    if (requestPath.startsWith('/sessions')) return 'sessions';
     if (requestPath === '/week') return 'week';
     if (requestPath.startsWith('/constraints')) return 'constraints';
     if (requestPath.startsWith('/plan-maker')) return 'plan-maker';
@@ -110,6 +111,22 @@ app.get('/api/build', (_req, res) => res.json({
 
 // Static files
 app.use(express.static(path.join(__dirname, 'public')));
+
+// ── Dedicated public host for shared sessions (OFF by default) ───────────────
+// With PUBLIC_HOST unset (the default) nothing here does anything and /s lives on the app host.
+// With it set, a request for that host may reach ONLY the public session pages (/s...), the pose
+// files they draw from, static assets above, and the two liveness routes; everything else is a 404,
+// so the tracker itself is never served from the public domain. Same idea as octopus-kitchen's
+// PUBLIC_HOST, stricter: kitchen serves its whole app there.
+const PUBLIC_HOST = (process.env.PUBLIC_HOST || '').trim().toLowerCase();
+if (PUBLIC_HOST) {
+    app.use((req, res, next) => {
+        if (req.hostname.toLowerCase() !== PUBLIC_HOST) return next();
+        if (req.path === '/') return res.redirect(302, '/s');
+        if (req.path === '/s' || req.path.startsWith('/s/') || req.path === '/health' || req.path === '/api/build') return next();
+        return res.status(404).type('text/plain').send('Not found');
+    });
+}
 
 // View engine setup
 app.set('view engine', 'ejs');
@@ -185,6 +202,10 @@ app.use(async (req, res, next) => {
     res.locals.activeTab = getActiveTab(req.path);
     next();
 });
+
+// Shared sessions, public side: BEFORE the login and app-access gates, needs no account.
+// Handlers never read req.user. Authoring is in api/web-sessions.js, behind login.
+require('./api/public-sessions')(app, { publicHost: PUBLIC_HOST });
 
 // Mount API routes (before session-based routes)
 const apiRouter = require('./api');
@@ -322,6 +343,8 @@ require('./api/web-nutrition')(app, { requireLogin, getDatabase });
 require('./api/web-week')(app, { requireLogin, getDatabase });
 require('./api/web-constraints')(app, { requireLogin, getDatabase });
 require('./api/web-coaching')(app, { requireLogin, getDatabase });
+// Shareable sessions, authoring side (admin only in phase 1; SESSIONS.md).
+require('./api/web-sessions')(app, { requireLogin, getDatabase });
 // Correcting the log in place: edit/delete a set, retitle or redate a session,
 // add a set, rename an exercise, and known-name suggestions (api/web-log-edit.js).
 require('./api/web-log-edit')(app, { requireLogin, getDatabase });

@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "title": "Head Kick (Te Kan Kho)",
+  "view": "side",
+  "anchor": {
+    "joint": "toeL",
+    "x": 48.89,
+    "y": 91.22
+  },
+  "frames": [
+    {"duration":450,"label":"Guard","highlight":[],"pose":{"torso":180,"head":177,"upperArmL":40,"forearmL":174,"upperArmR":30,"forearmR":174,"thighL":14,"shinL":-2,"footL":80,"thighR":-20,"shinR":-22,"footR":64}},
+    {"duration":220,"label":"Step out and turn: up on the ball of the lead foot, rear leg starts to swing","highlight":["hipR","kneeR"],"pose":{"torso":186,"head":180,"thighL":8,"shinL":-2,"footL":62,"thighR":31,"shinR":-34,"footR":40,"upperArmR":4,"forearmR":60,"upperArmL":46,"forearmL":178}},
+    {"duration":260,"label":"Impact: hips turned over, the shin swings up into the neck and jaw","highlight":["hipR","kneeR","ankleR"],"pose":{"torso":226,"head":204,"thighL":4,"shinL":0,"footL":52,"thighR":112,"shinR":114,"footR":136,"upperArmR":-30,"forearmR":-10,"upperArmL":52,"forearmL":182}},
+    {"duration":300,"label":"Return the leg the way it came, foot back under you","highlight":[],"pose":{"torso":184,"head":179,"thighL":10,"shinL":-2,"footL":66,"thighR":16,"shinR":-40,"footR":40,"upperArmR":20,"forearmR":150,"upperArmL":40,"forearmL":174}},
+    {"duration":420,"label":"Guard","highlight":[],"pose":{"torso":180,"head":177,"upperArmL":40,"forearmL":174,"upperArmR":30,"forearmR":174,"thighL":14,"shinL":-2,"footL":80,"thighR":-20,"shinR":-22,"footR":64}}
+  ]
+}

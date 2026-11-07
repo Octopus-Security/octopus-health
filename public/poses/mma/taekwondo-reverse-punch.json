@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "title": "Reverse Punch (Bandae Jirugi)",
+  "view": "side",
+  "anchor": {
+    "joint": "ankleL",
+    "x": 54,
+    "y": 90
+  },
+  "frames": [
+    {"duration":700,"label":"Walking stance: right fist at the hip","highlight":[],"pose":{"thighL":28,"shinL":-6,"footL":90,"thighR":-20.5,"shinR":-20.5,"footR":90,"torso":180,"head":180,"upperArmL":90,"forearmL":90,"upperArmR":-20,"forearmR":55}},
+    {"duration":220,"label":"Hips rotate: right hip drives forward","highlight":["hipR","spine"],"pose":{"torso":177,"head":178,"upperArmL":40,"forearmL":110,"upperArmR":30,"forearmR":100}},
+    {"duration":170,"label":"Punch: left fist pulls back to the hip","highlight":["shoulderR","elbowR","hand","hipR"],"pose":{"torso":172,"head":174,"upperArmL":-20,"forearmL":55,"upperArmR":90,"forearmR":90}},
+    {"duration":220,"label":"Hold: lock the whole body at the moment of contact","highlight":["shoulderR","elbowR","hand"],"pose":{"torso":172}},
+    {"duration":280,"label":"Retract the fist to the hip","highlight":[],"pose":{"torso":177,"head":178,"upperArmL":40,"forearmL":110,"upperArmR":30,"forearmR":100}}
+  ]
+}

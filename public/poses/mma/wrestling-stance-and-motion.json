@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "title": "Stance and Motion",
+  "view": "side",
+  "pins": ["ankleL","ankleR"],
+  "frames": [
+    {"duration":900,"label":"Stance: feet wide and staggered, knees bent, hips under, back straight, head up","highlight":["hipL","hipR"],"pose":{"torso":140,"head":168,"upperArmL":-7.2,"forearmL":97.7,"thighL":58.6,"shinL":-11.7,"footL":90,"upperArmR":-22.9,"forearmR":81,"thighR":-9.7,"shinR":-68.6,"footR":64.4,"root":{"x":50,"y":60}}},
+    {"duration":700,"label":"Motion forward: the lead foot steps first, short and low","highlight":["kneeL"],"pose":{"torso":140,"head":168,"upperArmL":-7.2,"forearmL":97.7,"thighL":63.3,"shinL":0.4,"footL":90,"upperArmR":-22.9,"forearmR":81,"thighR":-21.8,"shinR":-68.2,"footR":63.8,"root":{"x":54,"y":61}}},
+    {"duration":900,"label":"The rear foot follows the same distance: stance again, feet never cross","highlight":["kneeR"],"pose":{"torso":140,"head":168,"upperArmL":-7.2,"forearmL":97.7,"thighL":58.6,"shinL":-11.7,"footL":90,"upperArmR":-22.9,"forearmR":81,"thighR":-9.7,"shinR":-68.6,"footR":64.4,"root":{"x":59,"y":60}}},
+    {"duration":700,"label":"Motion back: the rear foot steps first, then the lead foot follows","highlight":["kneeR"],"pose":{"torso":140,"head":168,"upperArmL":-7.2,"forearmL":97.7,"thighL":63.3,"shinL":0.4,"footL":90,"upperArmR":-22.9,"forearmR":81,"thighR":-21.8,"shinR":-68.2,"footR":63.8,"root":{"x":54,"y":61}}}
+  ]
+}

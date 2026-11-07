@@ -1,0 +1,28 @@
+/* Session authoring pages (admin). Layout rules: 44px taps, 16px inputs, no sideways scroll. */
+.sx-field { display: block; margin: 0 0 14px; border: 0; padding: 0; min-width: 0; }
+.sx-field legend { padding: 0; margin-bottom: 6px; color: #bbb; }
+.sx-field input[type=text], .sx-field textarea, .sx-field select, .sx-searchrow input, .sx-searchrow select, .sx-linkbox input { display: block; width: 100%; font-size: 16px; min-height: var(--tap); margin-top: 4px; }
+.sx-searchrow { display: flex; gap: 8px; flex-wrap: wrap; }
+.sx-searchrow input { flex: 1 1 200px; margin-top: 0; } .sx-searchrow select { flex: 0 1 200px; margin-top: 0; }
+.sx-btn { min-height: var(--tap); font-size: 16px; }
+.sx-primary { background: #1e4028; }
+.sx-danger { background: #2d1010; color: #ff7878; border-color: #5c2a2a; }
+.sx-msg { min-height: 1.4em; color: #2ecc71; } .sx-msg.error { color: #ff7878; }
+.sx-vis-private { color: #999; } .sx-vis-unlisted { color: #e0b030; border-color: #e0b030; } .sx-vis-public { color: #2ecc71; border-color: #2ecc71; }
+.sx-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.sx-chips label, .sx-radio { display: inline-flex; align-items: center; gap: 8px; min-height: var(--tap); padding: 0 10px; border: 1px solid #2a2a2a; border-radius: 999px; cursor: pointer; }
+.sx-radio { display: flex; border-radius: 8px; margin-bottom: 6px; }
+.sx-results, .sx-items { list-style: none; margin: 0; padding: 0; }
+.sx-results li, .sx-items li { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; padding: 8px 0; border-bottom: 1px solid #1e1e1e; }
+.sx-results .sx-name { flex: 1 1 180px; min-width: 0; }
+.sx-kind { font-size: 0.75rem; color: #888; }
+.sx-item { display: block !important; }
+.sx-item .sx-head { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.sx-item .sx-head strong { flex: 1 1 160px; min-width: 0; }
+.sx-item input, .sx-item textarea { display: block; width: 100%; font-size: 16px; min-height: var(--tap); margin-top: 6px; }
+.sx-item .sx-vis-note { font-size: 0.8rem; color: #e0b030; }
+.sx-mini { min-width: var(--tap); min-height: var(--tap); padding: 0 10px; }
+.sx-private { border-color: #4a3a10; }
+.sx-linkbox { display: flex; flex-direction: column; gap: 8px; }
+.sx-group { margin: 12px 0 4px; color: #bbb; font-weight: 600; }
+@media (min-width: 700px) { .sx-linkbox { flex-direction: row; flex-wrap: wrap; align-items: center; } .sx-linkbox input { flex: 1 1 280px; margin-top: 0; } }

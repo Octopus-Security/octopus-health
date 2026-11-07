@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title><%= title %></title>
+  <meta name="referrer" content="no-referrer">
+  <meta name="description" content="Training sessions with animated diagrams, shared by Serpopard.">
+  <link rel="canonical" href="<%= canonical %>">
+  <link rel="stylesheet" href="<%= asset('/sessions-public.css') %>">
+</head>
+<body>
+<main class="sp-wrap">
+  <header class="sp-head">
+    <h1>Sessions</h1>
+    <p class="sp-by">Shared by Serpopard</p>
+  </header>
+  <% if (!sessions.length) { %><p class="sp-empty">Nothing is published yet.</p><% } %>
+  <ul class="sp-list">
+    <% sessions.forEach(function (c) { %>
+    <li><a class="sp-card" href="/s/<%= c.slug %>"><strong><%= c.title %></strong><span><%= c.itemCount %> item<%= c.itemCount === 1 ? '' : 's' %></span><% if (c.intro) { %><em><%= c.intro %></em><% } %></a></li>
+    <% }) %>
+  </ul>
+  <footer class="sp-foot"><p>General information, not medical advice.</p></footer>
+</main>
+</body>
+</html>

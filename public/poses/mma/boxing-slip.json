@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "title": "Slip and Counter",
+  "view": "side",
+  "anchor": {
+    "joint": "ankleL",
+    "x": 56,
+    "y": 90
+  },
+  "frames": [
+    {"duration":450,"label":"Guard: a jab is coming","pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"upperArmR":20,"forearmR":165,"thighL":12,"shinL":-4,"footL":90,"thighR":-22,"shinR":-20,"footR":70},"highlight":[]},
+    {"duration":210,"label":"Slip: rotate and drop the head off the line","highlight":["spine","neck"],"pose":{"torso":152,"head":158,"thighL":20,"shinL":-12}},
+    {"duration":220,"label":"Hands stay up while the punch passes","pose":{"torso":150,"head":154,"thighL":22,"shinL":-14}},
+    {"duration":240,"label":"Counter: rise and throw the cross","highlight":["shoulderR","elbowR","hand"],"pose":{"torso":162,"head":166,"upperArmR":88,"forearmR":90,"thighL":14,"shinL":-6,"thighR":-30,"shinR":-30,"footR":50}},
+    {"duration":450,"label":"Back to the guard","highlight":[],"pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"upperArmR":20,"forearmR":165,"thighL":12,"shinL":-4,"footL":90,"thighR":-22,"shinR":-20,"footR":70}}
+  ]
+}

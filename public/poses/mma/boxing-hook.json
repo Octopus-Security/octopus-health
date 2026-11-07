@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "title": "Lead Hook",
+  "view": "side",
+  "anchor": {
+    "joint": "ankleL",
+    "x": 56,
+    "y": 90
+  },
+  "frames": [
+    {"duration":450,"label":"Guard","pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"upperArmR":20,"forearmR":165,"thighL":12,"shinL":-4,"footL":90,"thighR":-22,"shinR":-20,"footR":70},"highlight":[]},
+    {"duration":220,"label":"Weight to the lead foot, pivot begins","highlight":["spine","hipL"],"pose":{"torso":168,"head":168,"upperArmL":60,"forearmL":150,"thighL":16,"shinL":-8}},
+    {"duration":220,"label":"Hook: elbow high, forearm level, body rotates","highlight":["shoulderL","elbowL","spine"],"pose":{"torso":158,"head":164,"upperArmL":82,"forearmL":122,"thighL":18,"shinL":-10,"upperArmR":24,"forearmR":168}},
+    {"duration":400,"label":"Back to the guard","highlight":[],"pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"upperArmR":20,"forearmR":165,"thighL":12,"shinL":-4,"footL":90,"thighR":-22,"shinR":-20,"footR":70}}
+  ]
+}

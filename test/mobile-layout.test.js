@@ -68,6 +68,14 @@ test('nav renders every link and marks the active one', async () => {
   assert.strictEqual((html.match(/<a href="\/[a-z-]*"/g) || []).length, 19 + 1 + 1); // 19 links (Today added 2026-10-26, Gyms 2026-10-27, Coaching 2026-10-27, Week and Limits 2026-11) + title + logout
   assert.match(html, /<a href="\/stretch" class="active" aria-current="page">Stretch<\/a>/);
   assert.match(html, /class="nav-current"[^>]*>Stretch</);
+  assert.doesNotMatch(html, /href="\/sessions"/, 'Sessions is offered to admins only (phase 1)');
+});
+
+test('nav offers Sessions to an admin: one more link, and it is marked current on /sessions', async () => {
+  const ejs = require('ejs');
+  const html = await ejs.renderFile(path.join(root, 'views', 'partials', 'nav.ejs'), { activeTab: 'sessions', user: { username: 'x', role: 'admin' } });
+  assert.strictEqual((html.match(/<a href="\/[a-z-]*"/g) || []).length, 20 + 1 + 1);
+  assert.match(html, /<a href="\/sessions" class="active" aria-current="page">Sessions<\/a>/);
 });
 
 test('Shadow Boxing has its own pose with real punches; footwork keeps the old one', () => {

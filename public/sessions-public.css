@@ -1,0 +1,53 @@
+/* Public shared-session pages. Kit layout rules: html AND body take the background, body clips sideways
+   overflow, 16px side gutter, 44px tap targets, words stay whole. Dark on screen, white on paper. */
+:root { --tap: 44px; --bg: #0d0d0d; --card: #111; --line: #262626; --fg: #d4d4d4; --head: #f0f0f0; --muted: #8a8a8a; --accent: #2ecc71; }
+* { box-sizing: border-box; }
+html { background: var(--bg); }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.5 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  min-height: 100vh; min-height: 100dvh; overflow-x: clip; overflow-wrap: break-word; hyphens: manual; }
+img, video, svg { max-width: 100%; }
+.sp-wrap { max-width: 720px; margin: 0 auto; padding: 16px; padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); padding-bottom: max(24px, env(safe-area-inset-bottom)); }
+h1, h2 { color: var(--head); line-height: 1.2; }
+h1 { font-size: 1.6rem; margin: 8px 0 4px; }
+h2 { font-size: 1.15rem; margin: 0 0 4px; }
+.sp-by, .sp-dose, .sp-foot { color: var(--muted); font-size: 0.9rem; }
+.sp-by { margin: 0 0 12px; }
+.sp-intro, .sp-how, .sp-note { white-space: pre-line; }
+.sp-btn, .sp-card { display: inline-flex; align-items: center; min-height: var(--tap); padding: 0 16px; border-radius: 8px; border: 1px solid #2a5c3a; background: #162d1e; color: var(--accent); font: 600 16px/1.2 inherit; cursor: pointer; text-decoration: none; }
+.sp-items, .sp-list { list-style: none; margin: 0; padding: 0; }
+.sp-item, .sp-card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; }
+.sp-item { padding: 16px; margin: 0 0 16px; }
+.sp-n { color: var(--muted); }
+.sp-dose { margin: 0 0 8px; color: var(--accent); font-weight: 600; }
+.sp-fig { margin: 8px 0; }
+.sp-live { width: 100%; max-width: 360px; aspect-ratio: 100 / 116; margin: 0 auto; background: #14141a; border-radius: 8px; display: none; }
+.sp-fig.js-live .sp-live { display: block; }
+.sp-fig.js-live .sp-stills { display: none; }
+.sp-stills { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
+.sp-still { margin: 0; background: #14141a; border-radius: 8px; padding: 6px; }
+.sp-still svg { display: block; width: 100%; height: auto; }
+.sp-still figcaption { font-size: 0.8rem; color: var(--muted); text-align: center; }
+.sp-cues { margin: 8px 0; padding-left: 20px; }
+.sp-note { margin: 8px 0 0; padding: 8px 12px; border-left: 3px solid var(--accent); background: #101a14; }
+.sp-foot { margin-top: 24px; border-top: 1px solid var(--line); padding-top: 12px; }
+.sp-list li { margin: 0 0 12px; }
+.sp-card { flex-direction: column; align-items: flex-start; justify-content: center; gap: 2px; padding: 12px 16px; background: var(--card); color: var(--fg); font-weight: 400; }
+.sp-card strong { color: var(--head); } .sp-card span, .sp-card em { color: var(--muted); font-size: 0.9rem; font-style: normal; }
+.sp-empty { color: var(--muted); }
+
+/* Paper: white, black, still diagrams only, no buttons. The figure is drawn for a dark panel, so it is
+   inverted (and hue-rotated back so the highlight stays red-ish) to read on white. */
+@media print {
+  html, body { background: #fff; color: #000; }
+  body { font-size: 11pt; }
+  h1, h2 { color: #000; }
+  .sp-by, .sp-dose, .sp-foot, .sp-still figcaption { color: #333; }
+  .sp-actions { display: none; }
+  .sp-live { display: none !important; }
+  .sp-stills { display: grid !important; grid-template-columns: repeat(4, 1fr); }
+  .sp-item { break-inside: avoid; border-color: #999; background: #fff; }
+  .sp-still { background: #fff; padding: 0; }
+  .sp-still svg { filter: invert(1) hue-rotate(180deg); }
+  .sp-note { background: #fff; border-left-color: #000; }
+  .sp-wrap { max-width: none; padding: 0; }
+}
