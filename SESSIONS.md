@@ -81,8 +81,8 @@ and writes `lib/mma-moves.json` (title, discipline, level, type, summary, steps,
 `--check` reports drift; `test/mma-snapshot.test.js` validates format and runs that check when a
 sibling checkout exists (like mma #6's equipment-ids test, a check you run, not a guarantee).
 Format: health's engine and mma's are both v2 rigid-skeleton; mma's adds a `partner` second figure.
-**Left out, listed with reasons in the catalogue:** 9 poses use `partner` (all BJJ except none of
-the strikes; wrestling takedown; clinch knee, long guard, parry) which health's engine does not
+**Left out, listed with reasons in the catalogue:** 9 poses use `partner` (all 5 BJJ, the
+wrestling double-leg, and the Muay Thai clinch knee, long guard and parry) which health's engine does not
 draw, and 1 (muay-thai switch kick) fails health's stricter validator. So grappling is NOT in.
 Bringing it in means porting mma's partner rendering into `public/stick-figure.js`. Licence:
 octopus-mma is public and has no LICENSE file (checked 2026-11-07); the content was written in this
