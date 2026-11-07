@@ -7,6 +7,7 @@ const ET = require('./lib/et');
 const { displayName } = require('./api/template-names');
 const { Op } = require('sequelize');
 const { AuthClient } = require('@octopus-security/auth-client');
+const { registerAccount } = require('./registerAccount');
 const axios = require('axios');
 const EQUIPMENT = require('./api/equipment');
 const app = express();
@@ -248,7 +249,7 @@ app.get('/logout', (req, res) => {
 // REST API endpoints for mobile app
 app.post('/api/auth/register', async (req, res) => {
     try {
-        const r = await auth.register(req.body.username, req.body.password, req.body.email, req.body.inviteCode);
+        const r = await registerAccount(auth, req.body);
         res.status(r.status).json(r.data);
     } catch (error) {
         res.status(503).json({ success: false, error: 'Auth service unavailable' });
