@@ -4,6 +4,139 @@
   "sourceCommit": "6816ce7d020608ae00a502a3ef7dfc50e8cce55b",
   "moves": [
     {
+      "id": "bjj-armbar",
+      "poseKey": "mma/bjj-armbar",
+      "title": "Armbar",
+      "discipline": "bjj",
+      "level": "white-belt",
+      "techniqueType": "submission",
+      "difficulty": "beginner",
+      "nativeName": null,
+      "summary": "The armbar hyperextends the opponent's elbow by isolating the arm across the hips and applying upward pressure — executable from guard, mount, and many other positions.",
+      "steps": [
+        "From closed guard, control one of the opponent's arms — grip the wrist with both hands or one hand, securing it to your chest.",
+        "Place the same-side foot on the opponent's hip (the side of the controlled arm) to create a posting platform.",
+        "Shoot the opposite leg up and over the back of the opponent's neck (the leg crosses to the far side of their head).",
+        "Pivot your hips outward by pushing off the hip-foot, rotating 90° so your body is perpendicular to theirs.",
+        "Bring the first foot (the hip foot) across and over the opponent's face or onto their shoulder.",
+        "You should now have both legs clamping the arm: one thigh above the elbow, one thigh across the face.",
+        "Keep the arm close to your chest, thumb pointing upward. Squeeze your knees together.",
+        "Lift your hips upward to apply pressure against the elbow joint. The opponent taps."
+      ],
+      "stepsTitle": "Armbar from Guard",
+      "keyPoints": [
+        "The arm must be held thumb-upward (elbow crease facing up) — this aligns the elbow joint for hyperextension. Rotating the arm palm-down reduces the effectiveness and risks a shoulder injury rather than an elbow tap.",
+        "Squeeze the knees together tightly — a gap lets the opponent pull the arm free.",
+        "The hip extension (lift) is the submission — the arm across the hip acts as a fulcrum.",
+        "Control the wrist, not just the elbow — wrist control prevents the opponent rotating their arm out of position.",
+        "Tap early if caught — the armbar can hyperextend faster than the caught person can react."
+      ]
+    },
+    {
+      "id": "bjj-guard",
+      "poseKey": "mma/bjj-guard",
+      "title": "Guard",
+      "discipline": "bjj",
+      "level": "white-belt",
+      "techniqueType": "other",
+      "difficulty": "beginner",
+      "nativeName": null,
+      "summary": "The guard is the foundational BJJ position — the bottom player uses their legs to control, attack, and sweep from the ground while the top player attempts to pass.",
+      "steps": [
+        "Lie on your back with the opponent between your legs (or pull guard from standing).",
+        "Cross your ankles behind the opponent's lower back and squeeze the knees inward to control hip distance.",
+        "Control the opponent's posture: break it down by pulling the head or collar, or maintain it for attack setups.",
+        "Keep your elbows in and your hips active — move to maintain the angle of attack."
+      ],
+      "stepsTitle": "Closed Guard",
+      "keyPoints": [
+        "Closed guard is a dynamic, active position — stalling in guard without attacking creates no pressure and allows the opponent to work a guard pass.",
+        "Control the opponent's posture first. Without posture control, attacks are extremely difficult.",
+        "The guard player's hips must stay active — sliding hips out to create angles and elevation is the engine of guard work.",
+        "If the guard is opened (legs uncrossed), you transition to open guard — the guard is not lost, it changes form."
+      ]
+    },
+    {
+      "id": "bjj-mount",
+      "poseKey": "mma/bjj-mount",
+      "title": "Mount",
+      "discipline": "bjj",
+      "level": "white-belt",
+      "techniqueType": "other",
+      "difficulty": "beginner",
+      "nativeName": null,
+      "summary": "Mount is a dominant top position where the attacker sits astride the opponent's chest, controlling them with body weight while threatening submissions from above.",
+      "steps": [
+        "Sit on the opponent's chest with your hips between their navel and chest — too high (on the stomach) gives them room to escape; too low (on the stomach/hips) reduces your control.",
+        "Keep your knees pinched inward against the opponent's ribs — do not let your legs flare wide.",
+        "Stay low: your chest should be near their chest. A high, upright mount is easier to bridge and roll.",
+        "Establish grips: underhooks, collar grips (in gi), or overhooks to control their arms and prevent framing.",
+        "Keep your weight on their chest, not on your knees — this is what makes the position oppressive."
+      ],
+      "stepsTitle": "Holding Mount",
+      "keyPoints": [
+        "Mount position rewards patience — if your opponent cannot escape, simply maintaining control scores points and exhausts them.",
+        "The low mount (hips close to chest) is more stable and harder to bridge-and-roll than a high mount.",
+        "Knee pressure against the ribs prevents hip-escape (shrimping) which is the most common escape route.",
+        "Grip their arms to prevent frames — if they can get their arms into your hips, they can create space.",
+        "In gi BJJ, the collar is a constant submission threat from mount."
+      ]
+    },
+    {
+      "id": "bjj-side-control",
+      "poseKey": "mma/bjj-side-control",
+      "title": "Side Control",
+      "discipline": "bjj",
+      "level": "white-belt",
+      "techniqueType": "other",
+      "difficulty": "beginner",
+      "nativeName": null,
+      "summary": "Side control is a dominant top position where the attacker pins the opponent from the side, controlling the chest-to-chest without legs entangled.",
+      "steps": [
+        "After passing guard or from a takedown, position yourself at 90° to the opponent's body — your chest on their chest, bodies perpendicular.",
+        "Place the near-side knee against their hip to block hip escape.",
+        "Place the far-side knee or foot against their head or upper body to prevent rolling away.",
+        "Establish your grips: near arm goes under their head (underhook the near arm or grab the far collar in gi); far arm goes under their far arm or controls their near arm across the chest.",
+        "Drive your chest into their chest and drop your weight — do not support yourself on your knees."
+      ],
+      "stepsTitle": "Establishing Side Control",
+      "keyPoints": [
+        "The near knee blocks the hip — if they can move their hips, they can begin shrimping and recovering guard.",
+        "Far-side knee or foot blocks rolling — without it, the opponent rolls toward you into guard recovery.",
+        "Drive your chest into theirs: chest-to-chest pressure is the primary control mechanism.",
+        "Your hips should be low and your weight dropped onto them. Supporting yourself on your knees makes you light and easy to escape.",
+        "In gi, the collar and underhook grips provide powerful submission options (americana, kimura, choke entries)."
+      ]
+    },
+    {
+      "id": "bjj-triangle-choke",
+      "poseKey": "mma/bjj-triangle-choke",
+      "title": "Triangle Choke",
+      "discipline": "bjj",
+      "level": "white-belt",
+      "techniqueType": "submission",
+      "difficulty": "beginner",
+      "nativeName": null,
+      "summary": "The triangle choke uses the legs to form a triangular figure-four around the opponent's neck and one arm, compressing the carotid arteries to cause a blood choke.",
+      "steps": [
+        "From closed guard, break the opponent's posture down so they are hunched forward.",
+        "Create an angle — shift your hips to one side (e.g., right). Open your guard.",
+        "Shoot your right leg up and across the back of the opponent's left shoulder and neck. The crook of your knee (the back of the knee) should sit on the back of their neck/shoulder.",
+        "Simultaneously, clear their right arm to the outside with your left arm — their left arm is inside (between your legs) and their right arm is outside. This one-in-one-out position is the key to the choke.",
+        "Lock the triangle: hook the right ankle behind the left knee (or behind the right knee crossing it). The leg forms a figure-four.",
+        "Pull the opponent's head down with both hands and squeeze the knees together while tightening the figure-four.",
+        "Adjust the angle — rotating your body slightly perpendicular to the opponent's body often tightens the choke significantly."
+      ],
+      "stepsTitle": "Triangle from Guard",
+      "keyPoints": [
+        "One arm in, one arm out — this is the entire foundation. With both arms inside or both outside, the choke does not work.",
+        "The choke is on the neck, not the throat — it is a blood choke (carotid compression), not a windpipe choke. If the opponent says it's on the jaw or chin, adjust.",
+        "Angle matters — straight-on triangles are often loose. Rotating to an angle almost always tightens the finish.",
+        "Lock the figure-four before pulling the head down — trying to finish without a secure lock is ineffective.",
+        "The trapped arm being pushed across the centreline tightens the shoulder into the neck on that side."
+      ]
+    },
+    {
       "id": "boxing-bob-and-weave",
       "poseKey": "mma/boxing-bob-and-weave",
       "title": "Bob and Weave",
@@ -336,6 +469,31 @@
       ]
     },
     {
+      "id": "muay-thai-clinch-knee",
+      "poseKey": "mma/muay-thai-clinch-knee",
+      "title": "Clinch (Plum) and Knee",
+      "discipline": "muay-thai",
+      "level": "intermediate",
+      "techniqueType": "strike",
+      "difficulty": "intermediate",
+      "nativeName": "Chap Kho",
+      "summary": "The plum, both hands locked behind the opponent's head with the forearms on their collarbones, used to pull them down onto rear knees.",
+      "steps": [
+        "From close range, get both hands to the back of the opponent's head, one hand over the other (do not interlace the fingers).",
+        "Press the forearms into their collarbones and squeeze the elbows together, so their head is trapped between your arms.",
+        "Pull their head down and step the rear foot back to make space and load the knee.",
+        "Drive the hips forward and bring the rear knee up into their body, pulling the head down to meet it.",
+        "Put the foot back down under you and keep the plum. Repeat, or switch legs."
+      ],
+      "keyPoints": [
+        "Hands on the back of the head, not the neck. Hands on top of each other, never interlaced (interlaced fingers are easy to break and to injure).",
+        "The elbows squeeze in. Wide elbows let the opponent swim an arm inside and break the plum.",
+        "Posture: stand tall, hips forward, chest up. You break their posture, not yours.",
+        "The power is the hips driving forward, not the leg alone.",
+        "Keep them off balance between knees by turning them and stepping, so they cannot set their feet."
+      ]
+    },
+    {
       "id": "muay-thai-cross",
       "poseKey": "mma/muay-thai-cross",
       "title": "Cross",
@@ -511,6 +669,31 @@
       ]
     },
     {
+      "id": "muay-thai-long-guard",
+      "poseKey": "mma/muay-thai-long-guard",
+      "title": "Long Guard",
+      "discipline": "muay-thai",
+      "level": "intermediate",
+      "techniqueType": "defense",
+      "difficulty": "intermediate",
+      "nativeName": null,
+      "summary": "The lead arm reaches out and frames on the opponent's forehead while the rear glove covers the temple, so their punches fall short.",
+      "steps": [
+        "From the guard at punching range, reach the lead arm out with the glove on the opponent's forehead or face.",
+        "Keep the rear glove high at your temple, chin down.",
+        "When they step in to punch, keep the lead arm long and push their head back so the punch falls short.",
+        "Keep the frame while they reset; use it to turn them or set up a counter.",
+        "Bring the lead arm back to the guard."
+      ],
+      "keyPoints": [
+        "The frame is on the head, which controls the whole body. A frame on the chest does not stop the punch.",
+        "The lead arm is long but not locked straight, so it can absorb a push.",
+        "Rear glove high and chin down, because hooks come around the long arm.",
+        "The long guard is temporary: use it, then counter or return to the guard.",
+        "Keep the feet in your stance; the frame works with your weight behind it."
+      ]
+    },
+    {
       "id": "muay-thai-low-kick",
       "poseKey": "mma/muay-thai-low-kick",
       "title": "Low Kick",
@@ -559,6 +742,30 @@
         "Gloves higher than in boxing, at the brow — elbows and head kicks are coming.",
         "Elbows stay close enough to the body that a body kick lands on the arm, not the ribs.",
         "Many Thai fighters keep a gentle rhythm, rocking forward and back on the rear leg; stay relaxed rather than rigid."
+      ]
+    },
+    {
+      "id": "muay-thai-parry",
+      "poseKey": "mma/muay-thai-parry",
+      "title": "Parry and Counter",
+      "discipline": "muay-thai",
+      "level": "beginner",
+      "techniqueType": "defense",
+      "difficulty": "beginner",
+      "nativeName": null,
+      "summary": "A short slap with the rear glove that knocks the incoming jab down and across, opening the line for an immediate counter.",
+      "steps": [
+        "From the stance, watch the opponent's chest and shoulders, not the hands.",
+        "As their jab comes, move the rear glove a few centimetres forward to meet it in front of your face.",
+        "Slap it down and slightly across with a short wrist-and-forearm movement.",
+        "Return the glove to the brow immediately.",
+        "Counter into the opening, with a jab, cross or teep, before their arm returns."
+      ],
+      "keyPoints": [
+        "Small movement. The glove travels a few centimetres, not out to meet the punch.",
+        "Parry late, at the face, so you cannot be faked out of position.",
+        "The parrying glove comes straight back to the brow.",
+        "Parry and counter together: the parry creates the opening only for a moment."
       ]
     },
     {
@@ -1073,6 +1280,33 @@
       ]
     },
     {
+      "id": "wrestling-double-leg-takedown",
+      "poseKey": "mma/wrestling-double-leg-takedown",
+      "title": "Double Leg Takedown",
+      "discipline": "wrestling",
+      "level": "fundamentals",
+      "techniqueType": "throw",
+      "difficulty": "beginner",
+      "nativeName": null,
+      "summary": "Level change, penetration step, both hands behind the knees, then step up and drive through with the head so the opponent falls backward.",
+      "steps": [
+        "Start in stance at shooting range: close enough that one penetration step reaches the opponent's hips.",
+        "Change levels: the hips drop, the head and chest stay up.",
+        "Penetration step: the lead knee comes down between or just outside their feet, your shoulder into their hips (around the belt line), both hands reaching behind their knees.",
+        "Keep your head tight to their side, against the ribs, not in the middle of their body.",
+        "Step the rear foot up beside you, pull their knees into your chest and drive forward with the legs, head pushing through.",
+        "They tip over backward. Come down with them, still holding the legs.",
+        "Finish with your chest on their hips, ready to move to the side and control."
+      ],
+      "keyPoints": [
+        "The shot is won by the level change and the penetration step. If those are right, the finish is easy.",
+        "Head to the side and up, pressing into their ribs. Never put your head down in the middle.",
+        "Pull the knees in tight to your chest; their legs should not be able to move back.",
+        "Drive forward through the opponent, using the legs and turning a little if needed. Do not try to lift them.",
+        "Keep driving until they are down. Stopping halfway gives them time to sprawl."
+      ]
+    },
+    {
       "id": "wrestling-level-change",
       "poseKey": "mma/wrestling-level-change",
       "title": "Level Change",
@@ -1151,44 +1385,8 @@
   ],
   "skipped": [
     {
-      "id": "bjj-armbar",
-      "reason": "uses a partner figure, which health's engine does not draw"
-    },
-    {
-      "id": "bjj-guard",
-      "reason": "uses a partner figure, which health's engine does not draw"
-    },
-    {
-      "id": "bjj-mount",
-      "reason": "uses a partner figure, which health's engine does not draw"
-    },
-    {
-      "id": "bjj-side-control",
-      "reason": "uses a partner figure, which health's engine does not draw"
-    },
-    {
-      "id": "bjj-triangle-choke",
-      "reason": "uses a partner figure, which health's engine does not draw"
-    },
-    {
-      "id": "muay-thai-clinch-knee",
-      "reason": "uses a partner figure, which health's engine does not draw"
-    },
-    {
-      "id": "muay-thai-long-guard",
-      "reason": "uses a partner figure, which health's engine does not draw"
-    },
-    {
-      "id": "muay-thai-parry",
-      "reason": "uses a partner figure, which health's engine does not draw"
-    },
-    {
       "id": "muay-thai-switch-kick",
       "reason": "fails health's pose validator: frame 1→2: forearmL swings 198° — write angles continuously (190, not -170); a move is always played the short way round"
-    },
-    {
-      "id": "wrestling-double-leg-takedown",
-      "reason": "uses a partner figure, which health's engine does not draw"
     }
   ]
 }

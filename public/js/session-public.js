@@ -20,6 +20,8 @@
       if (!key || !/^[a-z0-9-]+(\/[a-z0-9-]+)?$/.test(key)) return;
       cache[key] = cache[key] || fetch('/poses/' + key + '.json', { credentials: 'omit' }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); });
       cache[key].then(function (data) {
+        var vb = window.StickFigure && window.StickFigure.viewBoxFor ? window.StickFigure.viewBoxFor(data).split(' ') : null;
+        if (vb && vb.length === 4) box.style.aspectRatio = vb[2] + ' / ' + vb[3];   // a two-figure move is wider
         new Player(box, data, { autoplay: true });
         box.parentNode.classList.add('js-live');
         document.documentElement.classList.add('js-live-any');

@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "title": "Triangle Choke",
+  "view": "side",
+  "frames": [
+    {"duration":1000,"label":"Closed guard: break their posture, one arm in, one arm out","highlight":["hand"],"pose":{"torso":-92,"head":-100,"upperArmL":117.4,"forearmL":120.3,"thighL":132.4,"shinL":74.1,"footL":164.1,"upperArmR":138.4,"forearmR":140.4,"thighR":127.9,"shinR":65.6,"footR":155.6,"root":{"x":40,"y":87}},"partner":{"pose":{"torso":151.7,"head":-232,"upperArmL":19.3,"forearmL":16.5,"thighL":18.2,"shinL":-90,"footL":-75,"upperArmR":-24.3,"forearmR":-22.1,"thighR":14.2,"shinR":-88,"footR":-73,"root":{"x":40,"y":70}},"highlight":[]}},
+    {"duration":900,"label":"Hips up, push the trapped arm across, climb a leg up their back","highlight":["hipL","kneeL"],"pose":{"torso":-80,"head":-92,"upperArmL":90,"forearmL":131.1,"thighL":180,"shinL":90,"footL":180,"upperArmR":90,"forearmR":131.1,"thighR":152,"shinR":46.9,"footR":136.9,"root":{"x":40,"y":82}},"partner":{"pose":{"torso":120,"head":-244,"upperArmL":-25.3,"forearmL":62.6,"thighL":36.9,"shinL":-90,"footL":-75,"upperArmR":-39.6,"forearmR":-37.1,"thighR":32.9,"shinR":-88,"footR":-73,"root":{"x":32,"y":73}},"highlight":[]}},
+    {"duration":1300,"label":"Triangle: leg over the shoulder, other foot locked behind your knee, head and arm trapped","highlight":["hipL","kneeL"],"pose":{"torso":-80,"head":-92,"upperArmL":120.5,"forearmL":123.2,"thighL":162.5,"shinL":92.7,"footL":182.7,"upperArmR":119.3,"forearmR":122.2,"thighR":208.2,"shinR":76.6,"footR":166.6,"root":{"x":40,"y":82}},"partner":{"pose":{"torso":112.9,"head":-250,"upperArmL":-29.4,"forearmL":57,"thighL":36.9,"shinL":-90,"footL":-75,"upperArmR":-40.5,"forearmR":-37.9,"thighR":32.9,"shinR":-88,"footR":-73,"root":{"x":30,"y":73}},"highlight":["neck"]}}
+  ]
+}
