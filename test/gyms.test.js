@@ -179,15 +179,15 @@ const svc = (user, method, p, body) => fetch(base + '/api/service' + p, {
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => null) }));
 const web = (user, method, p, body, headers = {}) => fetch(base + p, { method, redirect: 'manual', headers: { 'Content-Type': 'application/json', 'X-Test-User': user, ...headers }, body: body ? JSON.stringify(body) : undefined });
 
-test('seed: Home has the tower, ab roller, parallettes, bands, push-up board and mat; the jump rope is at the park and work gym only', { skip }, async () => {
+test('seed: Home has the tower, ab roller, parallettes, bands, push-up board and mat; the massage ball set and jump rope are there too', { skip }, async () => {
   const db = await fresh(A);
   const g = Object.fromEntries((await G.listGyms(db)).map(x => [x.slug, x]));
-  assert.deepStrictEqual(g.home.equipment.map(e => e.id).sort(), ['ab-roller', 'mat', 'parallettes', 'power-tower', 'push-up-board', 'resistance-bands']);
+  assert.deepStrictEqual(g.home.equipment.map(e => e.id).sort(), ['ab-roller', 'jump-rope', 'massage-ball-set', 'mat', 'parallettes', 'power-tower', 'push-up-board', 'resistance-bands']);
   const tower = g.home.equipment.find(e => e.id === 'power-tower');
   assert.strictEqual(tower.attrs.heights, 10);
   assert.strictEqual(tower.attrs.ratedLb, 330);
   assert.strictEqual(tower.attrs.cables, false);
-  assert.ok(!g.home.effective.includes('jump-rope'));
+  assert.ok(g.home.effective.includes('jump-rope') && g.home.effective.includes('massage-ball-lacrosse'));
   assert.ok(g.park.effective.includes('jump-rope') && g.gym.effective.includes('jump-rope'));
   assert.ok(g.home.effective.includes('captains-chair') && g.home.effective.includes('dip-bars'));
   // idempotent, and an edit survives a re-seed
@@ -310,7 +310,7 @@ test('/today?at=: the plan is fitted to the gym the brief chose and says what ch
 
 // ── equipment plans (slug "kit:<item>") and buy links ─────────────────────────
 const KIT_SLUGS = ['kit:power-tower', 'kit:bands', 'kit:parallettes', 'kit:push-up-board', 'kit:mat', 'kit:dip-belt', 'kit:ab-straps'];
-const ASINS = { 'power-tower': 'B0F8HVK8MD', 'resistance-bands': 'B0GQS7YQLX', parallettes: 'B0DSVXKJZS', 'push-up-board': 'B0B73XM8ZB', mat: 'B0DHKCM18G', 'dip-belt': 'B01N5PB7CZ', 'ab-straps': 'B07778BQRJ' };
+const ASINS = { 'power-tower': 'B0F8HVK8MD', 'resistance-bands': 'B0GQS7YQLX', parallettes: 'B0DSVXKJZS', 'push-up-board': 'B0B73XM8ZB', mat: 'B0DHKCM18G', 'dip-belt': 'B01N5PB7CZ', 'ab-straps': 'B07778BQRJ', 'massage-ball-set': 'B0GRMVPCGZ' };
 // database.js needs sequelize to load; read the seed arrays from source when it cannot be required.
 function seedArrays() {
   if (getDatabase) return { ex: getDatabase.SEED_EXERCISES, tpl: getDatabase.SEED_WORKOUT_TEMPLATES };

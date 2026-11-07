@@ -107,15 +107,19 @@ function mount(app, { requireLogin, getDatabase }) {
     }
     const plan = tpl ? planFromTemplate(tpl, defsByName) : null;
 
+    // The gym this page is for: the one the brief chose, else the plan's own, else Home.
+    const gear = await require('./mobility').activeGear(db, at || (plan && plan.location) || null);
+
     let stretches = null;
     try {
-      const d = await require('./daily-stretches').loadDaily(db);
+      const dsm = require('./daily-stretches');
+      const d = await dsm.loadDaily(db);
       stretches = {
         name: d.name,
-        items: d.items.map(i => {
+        items: dsm.withGear(d.items, gear && gear.have).map(i => {
           const def = defsByName.get(String(i.name).toLowerCase());
           return { name: i.name, id: i.exerciseId != null ? i.exerciseId : (def ? def.id : null), category: def ? def.category : null,
-            holdSeconds: i.holdSeconds, sides: i.sides };
+            holdSeconds: i.holdSeconds, sides: i.sides, gear: i.gear || null };
         }),
       };
     } catch { stretches = null; }   // the page still works without its stretch list
@@ -123,7 +127,7 @@ function mount(app, { requireLogin, getDatabase }) {
     let mobility = null;
     try {
       const mob = require('./mobility');
-      mobility = { note: mob.NOTE, routines: mob.publicRoutines(), done: await mob.doneToday(db), dailyId: mob.DAILY_ID };
+      mobility = { note: mob.NOTE, routines: mob.publicRoutines(gear && gear.have), gym: gear && gear.gym, done: await mob.doneToday(db), dailyId: mob.DAILY_ID };
     } catch { mobility = null; }   // the page still works without routines
 
     res.render('today', { title: 'Today', user: req.user, activeTab: 'today', plan, stretches, mobility, fitNotes, pausedNote,

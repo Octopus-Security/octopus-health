@@ -247,8 +247,14 @@ test('every seeded exercise is matched by a name rule, not the category fallback
   assert.ok(ex.length > 250, `found ${ex.length} seeded exercises — the parser is broken`);
   // Exercises with NO correct pose yet. They fall to the category figure (a squat), which is wrong for
   // both. Author a pose, map it in pose-map.js, then delete the name here (the test below fails until you do).
-  const NEEDS_POSE = ['Pseudo-Planche Lean', 'Tuck L-sit Hold'];
-  assert.deepStrictEqual(ex.filter((e) => !PM.match(e.name)).map((e) => e.name).sort(), NEEDS_POSE);
+  const NEEDS_POSE = ['Pseudo-Planche Lean', 'Tuck L-sit Hold',
+    // variety audit (step 3): rules with a null key in pose-map.js stop a looser rule giving these a wrong figure
+    'Band Reverse Wrist Curl', 'Band Wrist Curl', 'Banded Ankle Eversion', 'Flexed-Arm Hang', 'Heel-to-Toe Walk',
+    'Lacrosse Ball Calf Roll', 'Lacrosse Ball Forearm Roll', 'Lacrosse Ball Hamstring Roll', 'Lacrosse Ball Lat Wall Roll',
+    'Lacrosse Ball Quad Roll', 'Lacrosse Ball Upper Trap Wall Roll', 'Progressive Muscle Relaxation', 'Quadruped Wrist Rocks',
+    'Scapular Pull-up', 'Short Foot Exercise', 'Single-Leg Reach', 'Single-Leg Stand', 'Spanish Squat', 'Tibialis Raise (Wall)',
+    'Toe Yoga', 'Towel Hang', 'Wall Sit', 'Wrist Extensor Stretch'];
+  assert.deepStrictEqual(ex.filter((e) => !PM.match(e.name)).map((e) => e.name).sort(), [...NEEDS_POSE].sort());
 });
 
 test('rules route the names that used to collide', () => {
