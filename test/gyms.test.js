@@ -309,8 +309,8 @@ test('/today?at=: the plan is fitted to the gym the brief chose and says what ch
 });
 
 // ── equipment plans (slug "kit:<item>") and buy links ─────────────────────────
-const KIT_SLUGS = ['kit:power-tower', 'kit:bands', 'kit:parallettes', 'kit:push-up-board', 'kit:mat'];
-const ASINS = { 'power-tower': 'B0F8HVK8MD', 'resistance-bands': 'B0GQS7YQLX', parallettes: 'B0DSVXKJZS', 'push-up-board': 'B0B73XM8ZB', mat: 'B0DHKCM18G', 'massage-ball-set': 'B0GRMVPCGZ' };
+const KIT_SLUGS = ['kit:power-tower', 'kit:bands', 'kit:parallettes', 'kit:push-up-board', 'kit:mat', 'kit:dip-belt', 'kit:ab-straps'];
+const ASINS = { 'power-tower': 'B0F8HVK8MD', 'resistance-bands': 'B0GQS7YQLX', parallettes: 'B0DSVXKJZS', 'push-up-board': 'B0B73XM8ZB', mat: 'B0DHKCM18G', 'dip-belt': 'B01N5PB7CZ', 'ab-straps': 'B07778BQRJ', 'massage-ball-set': 'B0GRMVPCGZ' };
 // database.js needs sequelize to load; read the seed arrays from source when it cannot be required.
 function seedArrays() {
   if (getDatabase) return { ex: getDatabase.SEED_EXERCISES, tpl: getDatabase.SEED_WORKOUT_TEMPLATES };
@@ -341,7 +341,7 @@ test('mat is in the catalogue and resolves from what people say', () => {
   for (const q of ['mat', 'a yoga mat', 'exercise mats', 'floor mat']) assert.strictEqual(E.toId(q), 'mat', q);
 });
 
-test('equipment plans: five kit slugs, each a Home template naming real exercises and a real item with a buy link', () => {
+test('equipment plans: the kit slugs, each a Home template naming real exercises and a real item with a buy link', () => {
   const { ex, tpl } = seedArrays();
   const lib = new Set(ex.map(e => e.name));
   assert.deepStrictEqual(Object.keys(E.KIT_PLAN_ITEM).sort(), [...KIT_SLUGS].sort());
@@ -360,16 +360,41 @@ test('equipment plans: five kit slugs, each a Home template naming real exercise
   assert.strictEqual(new Set(tpl.map(t => t.slug)).size, tpl.length, 'slugs unique');
 });
 
-test('equipment plans fit Home as seeded: nothing omitted, nothing swapped', () => {
+// Add-on gear is not in the seeded Home: an account ticks it on /gyms when it owns it.
+const KIT_EXTRA_GEAR = { 'kit:dip-belt': ['dip-belt', 'weight-plates'], 'kit:ab-straps': ['ab-straps'] };
+
+test('equipment plans fit Home as seeded, plus any add-on gear they name: nothing omitted, nothing swapped', () => {
   const { ex, tpl } = seedArrays();
   const legacy = new Map(ex.map(e => [e.name.toLowerCase(), e.equipment]));
   for (const slug of KIT_SLUGS) {
     const t = tpl.find(x => x.slug === slug);
-    const fit = E.fitExercises(t.exercises, homeIds(), legacy);
+    const fit = E.fitExercises(t.exercises, [...homeIds(), ...(KIT_EXTRA_GEAR[slug] || [])], legacy);
     assert.deepStrictEqual(fit.omitted, [], slug);
     assert.deepStrictEqual(fit.substitutions, [], slug);
     assert.strictEqual(fit.exercises.length, t.exercises.length, slug);
   }
+});
+
+test('plates, dip belt and ab straps: owned they stay, missing they swap, and a barbell counts as plates', () => {
+  const fit = (names, owned) => E.fitExercises(names.map(exerciseName => ({ exerciseName })), owned);
+  const tower = ['power-tower'];
+  const kept = r => r.exercises.map(x => x.exerciseName || x.name);
+  assert.deepStrictEqual(kept(fit(['Weighted Pull-up', 'Weighted Dip'], [...tower, 'dip-belt', 'weight-plates'])), ['Weighted Pull-up', 'Weighted Dip']);
+  assert.deepStrictEqual(kept(fit(['Weighted Pull-up'], [...tower, 'dip-belt', 'barbell'])), ['Weighted Pull-up']);
+  assert.deepStrictEqual(kept(fit(['Weighted Pull-up'], [...tower, 'dip-belt'])), ['Pull-up'], 'a belt with nothing to hang on it is not weighted');
+  assert.deepStrictEqual(kept(fit(['Weighted Dip'], tower)), ['Dip']);
+  assert.deepStrictEqual(kept(fit(['Ab Strap Knee Raise'], [...tower, 'ab-straps'])), ['Ab Strap Knee Raise']);
+  assert.deepStrictEqual(kept(fit(['Ab Strap Knee Raise'], tower)), ['Hanging Knee Raise']);
+  assert.deepStrictEqual(kept(fit(['Plate Goblet Squat'], [])), ['Bodyweight Squat']);
+  assert.deepStrictEqual(fit(['Plate Pinch Carry'], []).omitted.map(o => o.name), ['Plate Pinch Carry']);
+  assert.strictEqual(E.toId('plates'), 'weight-plates');
+  assert.strictEqual(E.toId('dip belt'), 'dip-belt');
+  assert.strictEqual(E.toId('ab straps'), 'ab-straps');
+});
+
+test('ab strap raises show the hanging pose, not the knee strike', () => {
+  const PM = require('../public/pose-map.js');
+  for (const n of ['Ab Strap Knee Raise', 'Ab Strap Leg Raise', 'Ab Strap Oblique Knee Raise']) assert.strictEqual(PM.keyFor(n), 'hanging-leg-raise', n);
 });
 
 test('the new rules: a gym without the kit loses or swaps the right things', () => {

@@ -72,13 +72,16 @@ test('Home defaults: massage ball set and jump rope, no garage claim; foam rolle
   for (const g of E.CATALOGUE.gyms) for (const id of ['foam-roller', 'strap', 'yoga-block', 'step']) assert.ok(!g.equipment.some(e => e.id === id), `${g.slug} must not default ${id}`);
 });
 
-test('Home still fits every kit plan (the five with buy links, and the variety plans) without dropping or swapping anything', () => {
+// Add-on gear is not in the seeded Home: an account ticks it on /gyms when it owns it.
+const KIT_EXTRA_GEAR = { 'kit:dip-belt': ['dip-belt', 'weight-plates'], 'kit:ab-straps': ['ab-straps'] };
+
+test('Home, plus any add-on gear a plan names, fits every kit plan (those with buy links, and the variety plans) without dropping or swapping anything', () => {
   const { tpl } = seedSrc();
   const kits = tpl.filter(t => String(t.slug).startsWith('kit:'));
-  assert.strictEqual(kits.filter(t => E.KIT_PLAN_ITEM[t.slug]).length, 5, 'five plans carry a buy link');
+  assert.strictEqual(kits.filter(t => E.KIT_PLAN_ITEM[t.slug]).length, 7, 'seven plans carry a buy link');
   assert.ok(kits.length >= 5);
   for (const t of kits) {
-    const fit = E.fitExercises(t.exercises, homeIds());
+    const fit = E.fitExercises(t.exercises, [...homeIds(), ...(KIT_EXTRA_GEAR[t.slug] || [])]);
     assert.deepStrictEqual(fit.omitted, [], t.slug);
     assert.deepStrictEqual(fit.substitutions, [], t.slug);
     assert.strictEqual(fit.exercises.length, t.exercises.length, t.slug);

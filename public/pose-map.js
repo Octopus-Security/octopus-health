@@ -182,6 +182,7 @@
     [/teep|push kick/i, 'teep'],
     [/kick check/i, 'kick-check'],
     [/roundhouse|switch kick|low kick|kick work|shin conditioning/i, 'roundhouse'],
+    [/ab strap/i, 'hanging-leg-raise'],
     [/hanging knee raise|captain'?s chair/i, 'hanging-leg-raise'],   // before the knee-strike rule below, which would take any "knee"
     [/knee|clinch|plum|dteh chiang/i, 'knee-strike'],
     [/elbow|sok /i, 'elbow-strike'],

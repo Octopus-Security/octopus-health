@@ -12,6 +12,7 @@
     { "id": "rings",           "name": "Gymnastic rings",       "group": "bars",       "aliases": ["gymnastic rings", "ring"] },
     { "id": "captains-chair",  "name": "Captain's chair (vertical knee raise)", "group": "bars", "aliases": ["captains chair", "captain's chair", "vertical knee raise", "knee raise station", "back pad"] },
     { "id": "power-tower",     "name": "Power tower",           "group": "bars",       "aliases": ["power tower", "pull-up tower", "dip tower", "pull up dip station"], "provides": ["bar", "dip-bars", "handles", "captains-chair"], "buy": { "label": "sogesfurniture adjustable power tower", "asin": "B0F8HVK8MD" } },
+    { "id": "ab-straps",       "name": "Hanging ab straps",     "group": "bars",       "aliases": ["ab straps", "ab strap", "hanging ab strap", "ab slings", "ab sling"], "buy": { "label": "DMoose hanging ab straps", "asin": "B07778BQRJ" } },
     { "id": "ab-roller",       "name": "Ab roller",             "group": "small",      "aliases": ["ab wheel", "ab roller wheel", "roller wheel"] },
     { "id": "jump-rope",       "name": "Jump rope",             "group": "small",      "aliases": ["skipping rope", "speed rope", "rope"] },
     { "id": "resistance-bands","name": "Resistance bands",      "group": "small",      "aliases": ["resistance band", "bands", "band", "loop bands"], "buy": { "label": "Pull-up assistance resistance bands", "asin": "B0GQS7YQLX" } },
@@ -28,7 +29,9 @@
     { "id": "step",            "name": "Step / stair edge",    "group": "bodyweight", "aliases": ["stair", "stairs", "stair edge", "aerobics step", "step platform"] },
     { "id": "ball",            "name": "Medicine / stability ball", "group": "small",  "aliases": ["medicine ball", "stability ball", "swiss ball"] },
     { "id": "dumbbell",        "name": "Dumbbells",             "group": "free-weights","aliases": ["dumbbells", "db", "dumbells"] },
-    { "id": "barbell",         "name": "Barbell + plates",      "group": "free-weights","aliases": ["barbells", "olympic bar", "ez bar", "ez-bar", "ezbar"] },
+    { "id": "dip-belt",        "name": "Dip belt",              "group": "free-weights","aliases": ["dip belt", "weight belt", "weighted belt", "pull-up belt", "pullup belt", "belt with chain"], "buy": { "label": "DMoose dip belt with chain", "asin": "B01N5PB7CZ" } },
+    { "id": "weight-plates",   "name": "Weight plates",         "group": "free-weights","aliases": ["plates", "weight plate", "45 lb plate", "45lb plate", "bumper plates", "olympic plates"] },
+    { "id": "barbell",         "name": "Barbell + plates",      "group": "free-weights","aliases": ["barbells", "olympic bar", "ez bar", "ez-bar", "ezbar"], "provides": ["weight-plates"] },
     { "id": "kettlebell",      "name": "Kettlebell",            "group": "free-weights","aliases": ["kettlebells", "kb"] },
     { "id": "weight-bench",    "name": "Weight bench",          "group": "free-weights","aliases": ["weight bench", "flat bench", "adjustable bench", "incline bench"] },
     { "id": "cable-machine",   "name": "Cable machine",         "group": "machines",   "aliases": ["cable", "cables", "cable station", "pulley", "cable_machine"] },
@@ -38,7 +41,7 @@
     { "id": "pads",            "name": "Pads / mitts",          "group": "combat",     "aliases": ["mitts", "focus mitts", "thai pads"] }
   ],
   "legacyExerciseTokens": {
-    "none": null, "bodyweight": null, "dumbbell": "dumbbell", "barbell": "barbell", "kettlebell": "kettlebell",
+    "none": null, "bodyweight": null, "dumbbell": "dumbbell", "barbell": "barbell", "kettlebell": "kettlebell", "plate": "weight-plates", "dip_belt": "dip-belt", "ab_straps": "ab-straps",
     "cable_machine": "cable-machine", "machine": "machine", "cardio_machine": "cardio-machine", "bag": "bag", "pads": "pads"
   },
   "gyms": [
@@ -63,6 +66,15 @@
       "equipment": [ { "id": "dumbbell" }, { "id": "barbell" }, { "id": "kettlebell" }, { "id": "weight-bench" }, { "id": "cable-machine" }, { "id": "machine" }, { "id": "cardio-machine" }, { "id": "bar" }, { "id": "dip-bars" }, { "id": "captains-chair" }, { "id": "jump-rope" } ] }
   ],
   "exerciseRules": [
+    { "match": "^weighted (pull-up|chin-up)$", "requires": ["dip-belt", "weight-plates|dumbbell|kettlebell", "bar"], "substitutes": [ { "name": "Pull-up", "requires": ["bar"] } ] },
+    { "match": "^weighted dip$",         "requires": ["dip-belt", "weight-plates|dumbbell|kettlebell", "dip-bars"], "substitutes": [ { "name": "Dip", "requires": ["dip-bars"] } ] },
+    { "match": "^ab strap ",             "requires": ["ab-straps", "bar"], "substitutes": [ { "name": "Hanging Knee Raise", "requires": ["bar|captains-chair"] }, { "name": "Lying Leg Raise", "requires": [] } ] },
+    { "match": "^plate goblet squat$",   "requires": ["weight-plates"], "substitutes": [ { "name": "Goblet Squat", "requires": ["dumbbell"] }, { "name": "Bodyweight Squat", "requires": [] } ] },
+    { "match": "^plate push-up$",        "requires": ["weight-plates"], "substitutes": [ { "name": "Push-up", "requires": [] } ] },
+    { "match": "^plate glute bridge$",   "requires": ["weight-plates"], "substitutes": [ { "name": "Glute Bridge", "requires": [] } ] },
+    { "match": "^plate calf raise$",     "requires": ["weight-plates"], "substitutes": [ { "name": "Calf Raise (bodyweight)", "requires": [] } ] },
+    { "match": "^plate sit-up$",         "requires": ["weight-plates"], "substitutes": [ { "name": "Hollow Body Hold", "requires": [] } ] },
+    { "match": "^plate pinch carry$",    "requires": ["weight-plates"] },
     { "match": "ab roller",              "requires": ["ab-roller"],  "substitutes": [ { "name": "Cable Crunch", "requires": ["cable-machine"] }, { "name": "Hollow Body Hold", "requires": [] } ] },
     { "match": "hanging leg raise",      "requires": ["bar|captains-chair"], "substitutes": [ { "name": "Lying Leg Raise", "requires": [] } ] },
     { "match": "^(pull-up|chin-up)$",    "requires": ["bar"],        "substitutes": [ { "name": "Lat Pulldown", "requires": ["cable-machine"] } ] },
