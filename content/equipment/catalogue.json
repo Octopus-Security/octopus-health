@@ -29,6 +29,7 @@
     { "id": "step",            "name": "Step / stair edge",    "group": "bodyweight", "aliases": ["stair", "stairs", "stair edge", "aerobics step", "step platform"] },
     { "id": "ball",            "name": "Medicine / stability ball", "group": "small",  "aliases": ["medicine ball", "stability ball", "swiss ball"] },
     { "id": "dumbbell",        "name": "Dumbbells",             "group": "free-weights","aliases": ["dumbbells", "db", "dumbells"] },
+    { "id": "landmine",        "name": "Landmine attachment",   "group": "free-weights","aliases": ["landmine", "land mine", "landmine anchor", "landmine post", "landmine base"] },
     { "id": "dip-belt",        "name": "Dip belt",              "group": "free-weights","aliases": ["dip belt", "weight belt", "weighted belt", "pull-up belt", "pullup belt", "belt with chain"], "buy": { "label": "DMoose dip belt with chain", "asin": "B01N5PB7CZ" } },
     { "id": "weight-plates",   "name": "Weight plates",         "group": "free-weights","aliases": ["plates", "weight plate", "45 lb plate", "45lb plate", "bumper plates", "olympic plates"] },
     { "id": "barbell",         "name": "Barbell + plates",      "group": "free-weights","aliases": ["barbells", "olympic bar", "ez bar", "ez-bar", "ezbar"], "provides": ["weight-plates"] },
@@ -41,7 +42,7 @@
     { "id": "pads",            "name": "Pads / mitts",          "group": "combat",     "aliases": ["mitts", "focus mitts", "thai pads"] }
   ],
   "legacyExerciseTokens": {
-    "none": null, "bodyweight": null, "dumbbell": "dumbbell", "barbell": "barbell", "kettlebell": "kettlebell", "plate": "weight-plates", "dip_belt": "dip-belt", "ab_straps": "ab-straps",
+    "none": null, "bodyweight": null, "dumbbell": "dumbbell", "barbell": "barbell", "kettlebell": "kettlebell", "plate": "weight-plates", "landmine": "landmine", "dip_belt": "dip-belt", "ab_straps": "ab-straps",
     "cable_machine": "cable-machine", "machine": "machine", "cardio_machine": "cardio-machine", "bag": "bag", "pads": "pads"
   },
   "gyms": [
@@ -66,6 +67,11 @@
       "equipment": [ { "id": "dumbbell" }, { "id": "barbell" }, { "id": "kettlebell" }, { "id": "weight-bench" }, { "id": "cable-machine" }, { "id": "machine" }, { "id": "cardio-machine" }, { "id": "bar" }, { "id": "dip-bars" }, { "id": "captains-chair" }, { "id": "jump-rope" } ] }
   ],
   "exerciseRules": [
+    { "match": "^landmine (rotation|punch|rotational press|anti-rotation|deadlift to rotational press)$", "requires": ["landmine", "barbell"], "substitutes": [ { "name": "Wood Chop", "requires": ["cable-machine"] } ] },
+    { "match": "^landmine push press$",  "requires": ["landmine", "barbell"], "substitutes": [ { "name": "Barbell Overhead Press", "requires": ["barbell"] } ] },
+    { "match": "^landmine meadows row$", "requires": ["landmine", "barbell"], "substitutes": [ { "name": "Barbell Bent-Over Row", "requires": ["barbell"] } ] },
+    { "match": "^landmine reverse lunge$", "requires": ["landmine", "barbell"], "substitutes": [ { "name": "Reverse Lunge", "requires": [] } ] },
+    { "match": "^landmine ",             "requires": ["landmine", "barbell"] },
     { "match": "^weighted (pull-up|chin-up)$", "requires": ["dip-belt", "weight-plates|dumbbell|kettlebell", "bar"], "substitutes": [ { "name": "Pull-up", "requires": ["bar"] } ] },
     { "match": "^weighted dip$",         "requires": ["dip-belt", "weight-plates|dumbbell|kettlebell", "dip-bars"], "substitutes": [ { "name": "Dip", "requires": ["dip-bars"] } ] },
     { "match": "^ab strap ",             "requires": ["ab-straps", "bar"], "substitutes": [ { "name": "Hanging Knee Raise", "requires": ["bar|captains-chair"] }, { "name": "Lying Leg Raise", "requires": [] } ] },
