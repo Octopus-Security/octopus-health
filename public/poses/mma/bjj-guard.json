@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "title": "Closed Guard",
+  "view": "side",
+  "static": true,
+  "frames": [
+    {"duration":3200,"label":"Closed guard: legs locked round their waist, they kneel in posture","highlight":["hipL","kneeL","hipR","kneeR"],"pose":{"torso":-92,"head":-100,"upperArmL":82,"forearmL":158.5,"thighL":132.4,"shinL":74.1,"footL":164.1,"upperArmR":117.2,"forearmR":130.5,"thighR":127.9,"shinR":65.6,"footR":155.6,"root":{"x":40,"y":87}},"partner":{"pose":{"torso":162.8,"head":-190,"upperArmL":8.8,"forearmL":11.4,"thighL":18.2,"shinL":-90,"footL":-75,"upperArmR":2,"forearmR":4.6,"thighR":14.2,"shinR":-88,"footR":-73,"root":{"x":40,"y":70}},"highlight":[]},"contacts":[{"a":"thighL","b":"torso","tol":12},{"a":"ankleL","b":"hip","tol":20}]}
+  ]
+}

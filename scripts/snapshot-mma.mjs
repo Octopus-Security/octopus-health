@@ -7,8 +7,8 @@
 //
 // What is copied: the pose JSON (byte for byte) and, from each technique's markdown, the title,
 // discipline, level, type, summary, "Steps" and "Key Points". What is NOT copied: poses that do not
-// pass health's own validator, and poses with a second ("partner") figure, which health's engine
-// does not draw. Skipped moves are listed in the catalogue with the reason, never dropped silently.
+// pass health's own validator. Poses with a second ("partner") figure ARE copied: health's engine
+// draws them. Skipped moves are listed in the catalogue with the reason, never dropped silently.
 //
 // mma is a PUBLIC repo with no LICENSE file (checked 2026-11-07): the content was written inside
 // this estate, so copying it between two estate repos is the owner's own material. The owner
@@ -45,6 +45,22 @@ export function section(body, heading) {
   return m[1].split('\n').map((l) => l.replace(/^\s*(?:\d+\.|-)\s+/, '').trim()).filter(Boolean);
 }
 
+// The steps of a technique. Most files have a "## Steps" section; the BJJ ones are named after the
+// position instead ("## Closed Guard", "## Getting to Mount"), so fall back to the first section
+// that holds a numbered list, ignoring the sections that are never steps.
+export function stepsOf(body) {
+  const direct = section(body, 'Steps');
+  if (direct.length) return { steps: direct };
+  const skip = /^(key points|common mistakes|drills|variations|safety|related|history)/i;
+  for (const m of body.matchAll(/^## (.+)$/gm)) {
+    if (skip.test(m[1].trim())) continue;
+    const sec = new RegExp('^## ' + m[1].replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*\\n([\\s\\S]*?)(?=^## |$(?![\\s\\S]))', 'm').exec(body);
+    const lines = sec ? sec[1].split('\n').filter((l) => /^\s*\d+\.\s/.test(l)) : [];
+    if (lines.length >= 2) return { steps: lines.map((l) => l.replace(/^\s*\d+\.\s+/, '').trim()), stepsTitle: m[1].trim() };
+  }
+  return { steps: [] };
+}
+
 export function build() {
   const sha = git('rev-parse', 'main').trim();
   const files = git('ls-tree', '-r', '--name-only', 'main', 'content').split('\n').filter(Boolean);
@@ -59,7 +75,6 @@ export function build() {
     if (!files.includes(poseRel)) { skipped.push({ id, reason: 'no pose file' }); continue; }
     const rawPose = git('show', 'main:' + poseRel);
     const pose = JSON.parse(rawPose);
-    if (/"partner"/.test(rawPose)) { skipped.push({ id, reason: 'uses a partner figure, which health\'s engine does not draw' }); continue; }
     const errs = SF.validate(pose);
     if (errs.length) { skipped.push({ id, reason: 'fails health\'s pose validator: ' + errs[0] }); continue; }
     if (poseFiles[id]) throw new Error('duplicate move id ' + id);
@@ -68,7 +83,7 @@ export function build() {
       id, poseKey: 'mma/' + id, title: data.title || slug, discipline, level,
       techniqueType: data.techniqueType || null, difficulty: data.difficulty || null,
       nativeName: data.nativeName || null, summary: data.summary || '',
-      steps: section(body, 'Steps'), keyPoints: section(body, 'Key Points'),
+      ...stepsOf(body), keyPoints: section(body, 'Key Points'),
     });
   }
   moves.sort((a, b) => a.id.localeCompare(b.id));

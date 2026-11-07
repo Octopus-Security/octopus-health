@@ -55,6 +55,22 @@
  * Optional "shrug" (0…5, default 0) lifts both shoulders that far toward the
  * ears along the torso, for shrugs. The neck and head do not move.
  *
+ * A second figure — "partner" (ported from octopus-mma, for grappling and pad/partner
+ * work). A frame may carry  "partner": { "pose": {…}, "anchor"|"root", "pins",
+ * "highlight", "air", "over" }  with the same meaning as on the main figure; frame 0 must
+ * give the partner every angle, later frames inherit. The partner is AUTHORED
+ * FACING RIGHT exactly like the main figure and is then mirrored on screen
+ * (x → 100 − x), so it faces left, drawn in blue. Its anchor/root x values are in
+ * that pre-mirror space. Set  "partnerFront": true  to draw it over the main
+ * figure (the default is behind); "over": ["armL", …] on the partner redraws just those
+ * parts in front of the main figure. The partner obeys every rule the main figure
+ * does except that it need not move (and, with a partner, the x limits of the frame
+ * are lifted: the viewBox is fitted to both bodies, see viewBoxFor). Two-figure
+ * checks: the two spines must stay 7+ apart, and a frame's  "contacts":
+ * [{"a":"thighL","b":"neck","tol":9}]  (a = the main figure's joint or bone, b = the
+ * partner's, tol optional) must each be within tolerance on screen.
+ * A single-figure animation (no "partner" anywhere) is drawn exactly as before.
+ *
  * Frame 0 must carry every angle; later frames inherit what they omit. validate()
  * is the rule book; test/stick-figure.test.js runs it over every pose file.
  */
@@ -145,8 +161,29 @@
     return { x: anchor.x - at.x, y: anchor.y - at.y };
   }
 
-  // Every frame with a complete pose and a concrete root.
+  // Every frame with a complete pose and a concrete root. With a partner, each frame also carries
+  // .partner, the second figure resolved the same way on the same timeline.
   function resolveFrames(data) {
+    var frames = resolveOwn(data);
+    if (!hasPartner(data)) return frames;
+    var pf = resolveOwn(partnerData(data));
+    frames.forEach(function (fr, i) { fr.partner = pf[i]; fr.partner.over = (data.frames[i].partner || {}).over || []; });
+    return frames;
+  }
+  function hasPartner(data) {
+    return !!data && (data.frames || []).some(function (fr) { return fr && fr.partner; });
+  }
+  // The partner's track as an ordinary animation (a frame without a partner block keeps the
+  // previous pose, anchor, pins and highlight).
+  function partnerData(data) {
+    return { version: 2, title: (data.title || '') + ' (partner)', view: data.view, grounded: data.grounded, static: data.static, loop: data.loop,
+      frames: (data.frames || []).map(function (fr) {
+        var pt = fr.partner || { pose: {} };
+        return { duration: fr.duration, hold: fr.hold, ease: fr.ease, label: fr.label, air: !!pt.air, anchor: pt.anchor,
+          pins: pt.pins, highlight: pt.highlight, pose: pt.pose || {} };
+      }) };
+  }
+  function resolveOwn(data) {
     var view = data.view || 'side', out = [], prev = null;
     (data.frames || []).forEach(function (fr) {
       var p = {}, src = fr.pose || {};
@@ -163,7 +200,7 @@
       p.root = anchor ? rootFor(p, anchor, view) : { x: p.root.x, y: p.root.y };
       var pins = fr.pins || (prev ? prev.pins : data.pins) || [];
       var dur = fr.duration || 1000;
-      var r = { duration: dur, hold: typeof fr.hold === 'number' ? fr.hold : Math.min(HOLD_MAX, dur * 0.2), ease: fr.ease, label: fr.label, air: !!fr.air, anchor: anchor, pins: pins,
+      var r = { contacts: fr.contacts || [], duration: dur, hold: typeof fr.hold === 'number' ? fr.hold : Math.min(HOLD_MAX, dur * 0.2), ease: fr.ease, label: fr.label, air: !!fr.air, anchor: anchor, pins: pins,
         highlight: fr.highlight || (prev ? prev.highlight : data.highlight) || [], pose: p };
       out.push(r); prev = r;
     });
@@ -236,7 +273,21 @@
     ANGLES.forEach(function (k) { p[k] = last[k] + norm(f0.pose[k] - last[k]); });
     var w = {}; for (var j in f0) w[j] = f0[j];
     w.pose = p;
+    if (f0.partner && frames[i].partner) {
+      var lp = frames[i].partner.pose, pp = {};
+      for (var k2 in f0.partner.pose) pp[k2] = f0.partner.pose[k2];
+      ANGLES.forEach(function (k) { pp[k] = lp[k] + norm(f0.partner.pose[k] - lp[k]); });
+      var pw = {}; for (var j2 in f0.partner) pw[j2] = f0.partner[j2];
+      pw.pose = pp; w.partner = pw;
+    }
     return w;
+  }
+
+  // Both figures at fraction t of the way from frame a to frame b: { pose, partner? }.
+  function blend(a, b, t, view) {
+    var out = { pose: t ? between(a, b, t, view) : a.pose };
+    if (a.partner) out.partner = t ? between(a.partner, b.partner, t, view) : a.partner.pose;
+    return out;
   }
 
   // ── timeline ─────────────────────────────────────────────────────────────
@@ -265,13 +316,14 @@
   function sampleAt(frames, tl, ms, view, loop) {
     var end = tl.total;
     if (loop !== false) { ms = end > 0 ? ((ms % end) + end) % end : 0; }
-    else if (ms >= end) return { pose: frames[frames.length - 1].pose, index: frames.length - 1, t: 0, done: true };
+    else if (ms >= end) { var lf = frames[frames.length - 1]; return { pose: lf.pose, partner: lf.partner && lf.partner.pose, index: frames.length - 1, t: 0, done: true }; }
     var i = 0;
     while (i < tl.segs.length - 1 && ms >= tl.segs[i + 1].start) i++;
     var sg = tl.segs[i], local = ms - sg.start;
-    if (local < sg.hold || sg.dur <= 0) return { pose: frames[i].pose, index: i, t: 0, done: false };
+    if (local < sg.hold || sg.dur <= 0) return { pose: frames[i].pose, partner: frames[i].partner && frames[i].partner.pose, index: i, t: 0, done: false };
     var t = easeValue((local - sg.hold) / sg.dur, sg.ease);
-    return { pose: between(frames[i], nextOf(frames, i), t, view), index: i, t: t, done: false };
+    var bl = blend(frames[i], nextOf(frames, i), t, view);
+    return { pose: bl.pose, partner: bl.partner, index: i, t: t, done: false };
   }
 
   // ── rules ────────────────────────────────────────────────────────────────
@@ -307,8 +359,76 @@
     return out;
   }
 
-  // Every problem with an animation; empty means valid.
+  // Every problem with an animation; empty means valid. With a partner the second figure is
+  // checked as an animation in its own right (it need not move, and the x limits are lifted for
+  // both bodies), then the two together.
   function validate(data) {
+    var two = hasPartner(data);
+    if (!two) return check(data, true, false);
+    if (!data.frames[0] || !data.frames[0].partner) return ['frame 0: partner must be given in frame 0'];
+    // The partner first: resolving the main figure resolves the partner too, and a partner with a
+    // missing angle or root must be reported, not crash the resolve.
+    var pe = check(partnerData(data), false, true);
+    if (pe.length) return pe.map(function (e) { return 'partner: ' + e; });
+    var errs = check(data, true, true);
+    if (!errs.length) errs = checkTwo(data);
+    return errs;
+  }
+
+  // ── two figures: bodies must not pass through each other, declared contacts must touch ──
+  var TORSO_GAP = 7;       // min distance between the two spines (each is drawn 10 wide)
+  var CONTACT_TOL = 9;     // default reach of a declared contact
+  var BONE = { torso: ['hip', 'neck'], head: ['neck', 'head'],
+    upperArmL: ['shoulderL', 'elbowL'], forearmL: ['elbowL', 'handL'], upperArmR: ['shoulderR', 'elbowR'], forearmR: ['elbowR', 'handR'],
+    thighL: ['hipL', 'kneeL'], shinL: ['kneeL', 'ankleL'], footL: ['ankleL', 'toeL'],
+    thighR: ['hipR', 'kneeR'], shinR: ['kneeR', 'ankleR'], footR: ['ankleR', 'toeR'] };
+  function segOf(jt, name) {
+    if (BONE[name]) return [jt[BONE[name][0]], jt[BONE[name][1]]];
+    return jt[name] ? [jt[name], jt[name]] : null;
+  }
+  function ptSeg(p, a, b) {
+    var dx = b.x - a.x, dy = b.y - a.y, l = dx * dx + dy * dy;
+    var t = l ? Math.max(0, Math.min(1, ((p.x - a.x) * dx + (p.y - a.y) * dy) / l)) : 0;
+    return Math.hypot(p.x - a.x - t * dx, p.y - a.y - t * dy);
+  }
+  function crosses(a, b, c, d) {
+    function o(p, q, r) { return (q.x - p.x) * (r.y - p.y) - (q.y - p.y) * (r.x - p.x); }
+    return o(a, b, c) * o(a, b, d) < 0 && o(c, d, a) * o(c, d, b) < 0;
+  }
+  function segDist(s1, s2) {
+    if (crosses(s1[0], s1[1], s2[0], s2[1])) return 0;
+    return Math.min(ptSeg(s1[0], s2[0], s2[1]), ptSeg(s1[1], s2[0], s2[1]), ptSeg(s2[0], s1[0], s1[1]), ptSeg(s2[1], s1[0], s1[1]));
+  }
+  // The partner's joints as they appear on screen (it is authored facing right, then mirrored).
+  function mirrored(jt) {
+    var o = {}; for (var k in jt) o[k] = { x: 100 - jt[k].x, y: jt[k].y };
+    return o;
+  }
+  function checkTwo(data) {
+    var errs = [], view = data.view || 'side', frames = resolveFrames(data);
+    frames.forEach(function (fr, i) {
+      var ni = (i + 1) % frames.length, nx = nextOf(frames, i), worstGap = Infinity, worstAt = 0;
+      for (var s = 0; s <= 6; s++) {
+        if (s && ni === 0 && data.loop === false) break;
+        var q = blend(fr, nx, s / 6, view), me = solve(q.pose, view), them = mirrored(solve(q.partner, view));
+        var gap = segDist(segOf(me, 'torso'), segOf(them, 'torso'));
+        if (gap < worstGap) { worstGap = gap; worstAt = s; }
+      }
+      if (worstGap < TORSO_GAP) errs.push('frame ' + i + ': the two torsos overlap (' + worstGap.toFixed(1) + ' apart, need ' + TORSO_GAP + '+' + (worstAt ? ', worst at ' + Math.round(worstAt / 6 * 100) + '% to the next frame' : '') + ')');
+      var me0 = solve(fr.pose, view), them0 = mirrored(solve(fr.partner.pose, view));
+      (fr.contacts || []).forEach(function (c) {
+        var a = segOf(me0, c.a), b = segOf(them0, c.b);
+        if (!a || !b) { errs.push('frame ' + i + ': contact ' + c.a + ' / ' + c.b + ' names an unknown joint or bone'); return; }
+        var d = segDist(a, b), tol = c.tol || CONTACT_TOL;
+        if (d > tol) errs.push('frame ' + i + ': contact ' + c.a + ' (attacker) should touch ' + c.b + ' (partner) but is ' + d.toFixed(1) + ' away (tolerance ' + tol + ')');
+      });
+    });
+    return errs;
+  }
+
+  // requireMove: the figure must visibly move (the partner need not). two: the x limits of the
+  // frame are lifted, because the viewBox is fitted to both bodies.
+  function check(data, requireMove, two) {
     var errs = [];
     if (!data || data.version !== 2) return ['version must be 2'];
     var view = data.view || 'side';
@@ -381,7 +501,7 @@
         var lowest = -Infinity, at = s ? (i + '→' + ni) : String(i), pct = Math.round(s / 6 * 100);
         JOINTS.forEach(function (n) {
           var pt = jt[n], edge = pt.y + RADIUS[n];
-          if (pt.x - (n === 'head' ? HEAD_R : 0) < 1 || pt.x + (n === 'head' ? HEAD_R : 0) > 99) note(worst, at, n, 'leaves the frame sideways', Math.abs(pt.x - 50), 'x=' + pt.x.toFixed(1), pct);
+          if (!two && (pt.x - (n === 'head' ? HEAD_R : 0) < 1 || pt.x + (n === 'head' ? HEAD_R : 0) > 99)) note(worst, at, n, 'leaves the frame sideways', Math.abs(pt.x - 50), 'x=' + pt.x.toFixed(1), pct);
           if (pt.y - (n === 'head' ? HEAD_R : 0) < -19.5) note(worst, at, n, 'leaves the top of the frame', -pt.y, 'y=' + pt.y.toFixed(1), pct);
           if (edge > SURFACE + 1.5) note(worst, at, n, 'goes through the floor', edge, 'bottom edge ' + edge.toFixed(1) + ', floor surface ' + SURFACE, pct);
           lowest = Math.max(lowest, edge);
@@ -408,7 +528,7 @@
       var neck = norm(p.head - p.torso);
       if (neck < -70 || neck > 70) errs.push('frame ' + i + ': neck out of range (' + neck.toFixed(0) + '°; head−torso must be ±70)');
     });
-    if (!isStatic && moved < 10) errs.push('does not move — biggest change between frames is ' + moved.toFixed(1) + '° (needs ≥ 10°)');
+    if (requireMove && !isStatic && moved < 10) errs.push('does not move — biggest change between frames is ' + moved.toFixed(1) + '° (needs ≥ 10°)');
     return errs.filter(function (e, i) { return errs.indexOf(e) === i; });
   }
 
@@ -462,7 +582,7 @@
     }
   }
 
-  function figureHTML(pose, opts, hlArr) {
+  function figureHTML(pose, opts, hlArr, only) {
     var view = opts.view, pal = opts.palette || PAL;
     var jt = solve(pose, view);
     var hl = {};
@@ -486,8 +606,10 @@
     var headCol = hl.neck || hl.head ? pal.hl : pal.ctr;
 
     var out = '';
-    if (opts.floor !== false) out += '<line x1="0" y1="' + (FLOOR_Y + 1.5) + '" x2="100" y2="' + (FLOOR_Y + 1.5) + '" stroke="' + pal.floor + '" stroke-width="1.5"/>';
-    (opts.props || []).forEach(function (p) { out += propHTML(p, pal); });
+    if (!opts.bare) {   // bare: the scene (floor, props) is drawn once by sceneHTML when there are two figures
+      if (opts.floor !== false) out += '<line x1="0" y1="' + (FLOOR_Y + 1.5) + '" x2="100" y2="' + (FLOOR_Y + 1.5) + '" stroke="' + pal.floor + '" stroke-width="1.5"/>';
+      (opts.props || []).forEach(function (p) { out += propHTML(p, pal); });
+    }
     out += '<g class="sf-bob">';     // the figure only: a static pose's breathing bob moves this, not the floor or props
 
     var headHTML = line(jt.neck, jt.head, headCol, 4.5) + circ(jt.head, HEAD_R, pal.headFill, ' stroke="' + headCol + '" stroke-width="2.5"');
@@ -502,17 +624,67 @@
       var bow = step({ x: (jt.hip.x + jt.neck.x) / 2, y: (jt.hip.y + jt.neck.y) / 2 }, pose.torso + 90, (pose.arch || 0) / 45 * 16);
       var spine = '<path d="M' + f(jt.hip.x) + ' ' + f(jt.hip.y) + ' Q' + f(bow.x) + ' ' + f(bow.y) + ' ' + f(jt.neck.x) + ' ' + f(jt.neck.y) +
         '" fill="none" stroke="' + torsoCol + '" stroke-width="10" stroke-linecap="round"/>';
-      out += leg('R', 0.85) + arm('R', 0.85) + spine + leg('L', 1) + headHTML +
-        circ(step(jt.head, fa, 3.6), 1.4, headCol) + arm('L', 1);
+      var want = function (n) { return !only || only.indexOf(n) >= 0; };   // only: redraw just these parts (a partner's limb passing in front)
+      out += (want('legR') ? leg('R', 0.85) : '') + (want('armR') ? arm('R', 0.85) : '') + (want('torso') ? spine : '') +
+        (want('legL') ? leg('L', 1) : '') + (want('head') ? headHTML + circ(step(jt.head, fa, 3.6), 1.4, headCol) : '') +
+        (want('armL') ? arm('L', 1) : '');
     }
-    out += holdHTML(opts.hold, jt, pal, view) + '</g>';
+    out += (only ? '' : holdHTML(opts.hold, jt, pal, view)) + '</g>';
     return opts.faceRight === false ? '<g transform="translate(100 0) scale(-1 1)">' + out + '</g>' : out;
   }
 
   function drawOpts(data, over) {
     over = over || {};
     return { view: data.view || 'side', props: data.props, hold: data.hold, floor: data.floor,
+      partnerFront: !!data.partnerFront,
       palette: over.palette || PAL, faceRight: over.faceRight !== false };
+  }
+
+  var PARTNER_PAL = { near: '#5090c8', far: '#1f4672', ctr: '#2c6098', hl: '#e74c3c', prop: '#5f5f75', floor: '#34343f', headFill: '#14202e' };
+
+  // The viewBox for an animation. One figure uses the standard box. With a partner it is the
+  // combined bounding box of BOTH figures over the whole loop (padded, floor included), fixed for
+  // the animation so the picture does not jump between frames.
+  function viewBoxFor(data) {
+    if (!hasPartner(data)) return VIEWBOX;
+    var view = data.view || 'side', frames = resolveFrames(data);
+    var x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+    function take(jt, mirror) {
+      JOINTS.forEach(function (n) {
+        var r = (n === 'head' ? HEAD_R : RADIUS[n]) + 1.5, x = mirror ? 100 - jt[n].x : jt[n].x;
+        x0 = Math.min(x0, x - r); x1 = Math.max(x1, x + r); y0 = Math.min(y0, jt[n].y - r); y1 = Math.max(y1, jt[n].y + r);
+      });
+    }
+    frames.forEach(function (fr, i) {
+      var nx = nextOf(frames, i);
+      for (var s = 0; s <= 6; s++) {
+        var q = blend(fr, nx, s / 6, view);
+        take(solve(q.pose, view), false);
+        if (q.partner) take(solve(q.partner, view), true);
+      }
+    });
+    y1 = Math.max(y1, SURFACE);
+    var pad = 5, w = x1 - x0 + 2 * pad, h = y1 - y0 + 2 * pad;
+    var minW = h * 1.25;                       // keep a landscape canvas
+    if (w < minW) { x0 -= (minW - w) / 2; w = minW; }
+    return (x0 - pad).toFixed(1) + ' ' + (y0 - pad).toFixed(1) + ' ' + w.toFixed(1) + ' ' + h.toFixed(1);
+  }
+
+  // The whole picture. st is { pose, partner? }; hl / phl the two highlight lists; over the partner
+  // parts (armL armR legL legR torso head) redrawn on top of the main figure. One figure: exactly
+  // figureHTML, unchanged. Two: a wide floor and the props once, the partner behind the main figure
+  // unless "partnerFront", and each figure without its own floor.
+  function sceneHTML(opts, st, hl, phl, over) {
+    if (!st.partner) return figureHTML(st.pose, opts, hl);
+    var out = '';
+    if (opts.floor !== false) out += '<line x1="-300" y1="' + (FLOOR_Y + 1.5) + '" x2="400" y2="' + (FLOOR_Y + 1.5) + '" stroke="' + PAL.floor + '" stroke-width="1.5"/>';
+    (opts.props || []).forEach(function (p) { out += propHTML(p, PAL); });
+    var mo = {}; for (var k in opts) mo[k] = opts[k]; mo.bare = true;
+    var po = { view: opts.view, palette: PARTNER_PAL, faceRight: false, bare: true };
+    var me = figureHTML(st.pose, mo, hl);
+    var them = figureHTML(st.partner, po, phl);
+    var top = over && over.length && !opts.partnerFront ? figureHTML(st.partner, po, phl, over) : '';
+    return out + (opts.partnerFront ? me + them : them + me + top);
   }
 
   // ── player ───────────────────────────────────────────────────────────────
@@ -557,18 +729,22 @@
     this._still = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('viewBox', VIEWBOX);
+    svg.setAttribute('viewBox', viewBoxFor(data));
     svg.setAttribute('role', 'img');
     if (data.title) svg.setAttribute('aria-label', data.title);
     svg.style.cssText = 'width:100%;height:100%;display:block;';
     this.svg = svg;
     container.innerHTML = '';
     container.appendChild(svg);
-    this._render(this.frames[0].pose, this.frames[0].highlight);
-    if (this.static) this._bob = svg.querySelector('.sf-bob');
+    var f0 = this.frames[0];
+    this._render({ pose: f0.pose, partner: f0.partner && f0.partner.pose }, f0, f0);
+    if (this.static) this._bob = svg.querySelectorAll('.sf-bob');
     if (opts.autoplay !== false && !(this.static && this._still)) this.play();
   }
-  Player.prototype._render = function (pose, hl) { this.svg.innerHTML = figureHTML(pose, this.opts, hl); };
+  // st: { pose, partner? }; hf / pf: the frames whose highlight and partner-over lists to use.
+  Player.prototype._render = function (st, hf, pf) {
+    this.svg.innerHTML = sceneHTML(this.opts, st, hf.highlight, hf.partner && hf.partner.highlight, pf.partner && pf.partner.over);
+  };
   Player.prototype._tick = function (ts) {
     if (this._last !== null) {
       var dt = Math.min(ts - this._last, 100);
@@ -576,9 +752,9 @@
         // One pose, drawn once. Only the whole figure's transform changes, at ~20 fps: no re-render, no limb moves.
         if (dt < 48) return;
         this._clock += dt;
-        if (this._bob) {
+        if (this._bob && this._bob.length) {
           var y = (Math.sin(this._clock / BOB_MS * 2 * Math.PI) * 0.5 + 0.5) * BOB;
-          this._bob.setAttribute('transform', 'translate(0 ' + y.toFixed(2) + ')');
+          for (var bi = 0; bi < this._bob.length; bi++) this._bob[bi].setAttribute('transform', 'translate(0 ' + y.toFixed(2) + ')');
         }
         this._last = ts;
         return;
@@ -586,7 +762,9 @@
       this._clock += dt;
       var smp = sampleAt(this.frames, this.tl, this._clock, this.view, this.loop);
       var fr = this.frames[smp.index], nx = this.frames[(smp.index + 1) % this.frames.length];
-      this._render(smp.pose, smp.t < 0.5 ? fr.highlight : nx.highlight);
+      var src = smp.t < 0.5 ? fr : nx;
+      try { this._render({ pose: smp.pose, partner: smp.partner }, src, src); }
+      catch (err) { this.pause(); showEmpty(this.container, 'Diagram failed to draw'); return; }
       if (smp.done) { this.pause(); return; }
     }
     this._last = ts;
@@ -597,32 +775,59 @@
 
   var cache = {};
   Player.load = function (container, key, opts, cb) {
-    cache[key] = cache[key] || fetch('/poses/' + encodeURIComponent(key) + '.json').then(function (r) {
+    // 'mma/bjj-armbar' keeps its slash: a %2F in a URL path is refused by some proxies.
+    cache[key] = cache[key] || fetch('/poses/' + String(key).split('/').map(encodeURIComponent).join('/') + '.json').then(function (r) {
       if (!r.ok) throw new Error('pose ' + key + ': HTTP ' + r.status);
       return r.json();
     });
     cache[key].then(function (data) {
       var p = new Player(container, data, opts);
       if (cb) cb(null, p);
-    }).catch(function (err) { delete cache[key]; if (cb) cb(err); });
+    }).catch(function (err) {
+      // One bad or missing pose must not leave a blank panel, nor touch any other card.
+      delete cache[key];
+      showEmpty(container, 'No diagram yet');
+      if (cb) { try { cb(err); } catch (e2) { /* a caller's own error is not ours to rethrow here */ } }
+    });
   };
+  // Player.mount(container, key, opts, cb): load by pose key; no key means the same small
+  // "No diagram yet" state, never a blank box.
+  Player.mount = function (container, key, opts, cb) {
+    if (!key) { showEmpty(container, 'No diagram yet'); if (cb) cb(new Error('no pose')); return; }
+    Player.load(container, key, opts, cb);
+  };
+
+  // The small, plain state for an exercise with no diagram (or one that failed to draw).
+  function showEmpty(container, text) {
+    if (!container) return;
+    try {
+      container.innerHTML = '';
+      var d = (container.ownerDocument || document).createElement('div');
+      d.className = 'sf-empty';
+      d.textContent = text || 'No diagram yet';
+      d.style.cssText = 'display:flex;align-items:center;justify-content:center;width:100%;height:100%;min-height:0;' +
+        'font:12px/1.3 system-ui,sans-serif;color:#8a8296;text-align:center;padding:4px;box-sizing:border-box;';
+      container.appendChild(d);
+    } catch (e) { /* nothing more to try */ }
+  }
 
   // A static SVG of one moment — the contact sheet uses it. t is the fraction
   // of the way from frameIndex to the next frame.
   function svgFor(data, frameIndex, t) {
     var frames = resolveFrames(data), a = frames[frameIndex || 0], b = nextOf(frames, frameIndex || 0);
-    var pose = t ? between(a, b, t, data.view || 'side') : a.pose;
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="' + VIEWBOX + '">' + figureHTML(pose, drawOpts(data), a.highlight) + '</svg>';
+    var st = blend(a, b, t || 0, data.view || 'side');
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="' + viewBoxFor(data) + '">' + sceneHTML(drawOpts(data), st, a.highlight, a.partner && a.partner.highlight, a.partner && a.partner.over) + '</svg>';
   }
 
   // A static SVG at an exact moment of the real playback (ms into the cycle), hold and easing included.
   function svgAt(data, ms) {
     var frames = resolveFrames(data), view = data.view || 'side', loop = data.loop !== false;
     var smp = sampleAt(frames, timeline(frames, loop), ms, view, loop);
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="' + VIEWBOX + '">' + figureHTML(smp.pose, drawOpts(data), frames[smp.index].highlight) + '</svg>';
+    var fr = frames[smp.index];
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="' + viewBoxFor(data) + '">' + sceneHTML(drawOpts(data), { pose: smp.pose, partner: smp.partner }, fr.highlight, fr.partner && fr.partner.highlight, fr.partner && fr.partner.over) + '</svg>';
   }
   function duration(data) { var f = resolveFrames(data); return timeline(f, data.loop !== false).total; }
 
   return { Player: Player, validate: validate, svgAt: svgAt, duration: duration, timeline: timeline, sampleAt: sampleAt, solve: solve, resolveFrames: resolveFrames, between: between,
-    nextOf: nextOf, svgFor: svgFor, LEN: LEN, ANGLES: ANGLES, JOINTS: JOINTS, FLOOR_Y: FLOOR_Y };
+    nextOf: nextOf, blend: blend, hasPartner: hasPartner, partnerData: partnerData, viewBoxFor: viewBoxFor, VIEWBOX: VIEWBOX, svgFor: svgFor, LEN: LEN, ANGLES: ANGLES, JOINTS: JOINTS, FLOOR_Y: FLOOR_Y };
 }));

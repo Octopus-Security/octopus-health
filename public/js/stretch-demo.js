@@ -67,11 +67,11 @@
     if (player) { player.destroy(); player = null; }
     if (key && window.StickFigurePlayer) {
       var box = el('div', 'sf-container'); media.appendChild(box);
-      window.StickFigurePlayer.load(box, key, { autoplay: true }, function (err, p) {
+      window.StickFigurePlayer.mount(box, key, { autoplay: true }, function (err, p) {
         if (mine !== seq) { if (p) p.destroy(); return; }
-        if (err) { media.textContent = ''; media.appendChild(el('span', 'sd-nopose', '🧘')); } else player = p;
+        if (err) { media.textContent = ''; media.appendChild(el('span', 'sd-nopose', 'No diagram yet')); } else player = p;
       });
-    } else media.appendChild(el('span', 'sd-nopose', '🧘'));
+    } else media.appendChild(el('span', 'sd-nopose', 'No diagram yet'));
 
     overlay.querySelector('.sd-close').focus();
 

@@ -253,7 +253,9 @@ test('every seeded exercise is matched by a name rule, not the category fallback
     'Lacrosse Ball Calf Roll', 'Lacrosse Ball Forearm Roll', 'Lacrosse Ball Hamstring Roll', 'Lacrosse Ball Lat Wall Roll',
     'Lacrosse Ball Quad Roll', 'Lacrosse Ball Upper Trap Wall Roll', 'Progressive Muscle Relaxation', 'Quadruped Wrist Rocks',
     'Scapular Pull-up', 'Short Foot Exercise', 'Single-Leg Reach', 'Single-Leg Stand', 'Spanish Squat', 'Tibialis Raise (Wall)',
-    'Toe Yoga', 'Towel Hang', 'Wall Sit', 'Wrist Extensor Stretch'];
+    'Toe Yoga', 'Towel Hang', 'Wall Sit', 'Wrist Extensor Stretch',
+    // a sweep: the clinch-knee figure it used to get is a different move (martial categories show "No diagram yet")
+    'Inside Clinch Sweep (Dteh Chiang)'];
   assert.deepStrictEqual(ex.filter((e) => !PM.match(e.name)).map((e) => e.name).sort(), [...NEEDS_POSE].sort());
 });
 
@@ -265,7 +267,7 @@ test('rules route the names that used to collide', () => {
     'Romanian Deadlift (RDL)': 'rdl',
     'Barbell Deadlift': 'deadlift',
     'Muay Thai Footwork — Triangle': 'fight-stance',
-    'Triangle Choke Setup': 'guard',
+    'Triangle Choke Setup': 'mma/bjj-triangle-choke',   // the two-figure mma pose; it used to fall to the one-figure guard
     'Jump Squat': 'jump-squat',
     'Goblet Squat': 'squat',
     'Pike Push-up': 'pike-push-up',

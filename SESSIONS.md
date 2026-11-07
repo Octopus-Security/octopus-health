@@ -75,16 +75,22 @@ The page carries a general-information, not-medical-advice line and "Shared by S
 
 ## mma moves
 
-Included: **45 of 55** techniques. `scripts/snapshot-mma.mjs` reads octopus-mma's `main` with
+Included: **54 of 55** techniques. `scripts/snapshot-mma.mjs` reads octopus-mma's `main` with
 `git show` (never its checked-out branch), copies pose JSON byte for byte to `public/poses/mma/`,
 and writes `lib/mma-moves.json` (title, discipline, level, type, summary, steps, key points).
 `--check` reports drift; `test/mma-snapshot.test.js` validates format and runs that check when a
 sibling checkout exists (like mma #6's equipment-ids test, a check you run, not a guarantee).
-Format: health's engine and mma's are both v2 rigid-skeleton; mma's adds a `partner` second figure.
-**Left out, listed with reasons in the catalogue:** 9 poses use `partner` (all 5 BJJ, the
-wrestling double-leg, and the Muay Thai clinch knee, long guard and parry) which health's engine does not
-draw, and 1 (muay-thai switch kick) fails health's stricter validator. So grappling is NOT in.
-Bringing it in means porting mma's partner rendering into `public/stick-figure.js`. Licence:
+Format: health's engine and mma's are both v2 rigid-skeleton; mma's adds a `partner` second figure,
+which health's engine now draws too (ported 2026-11-07, `public/stick-figure.js`: `viewBoxFor`, the
+mirrored blue partner, `over` layering, the two-figure validator rules, and server-side stills that
+show both). The nine two-figure moves (all 5 BJJ, the wrestling double leg, Muay Thai clinch knee,
+long guard and parry) are in. **Left out, listed with its reason in the catalogue:** 1 pose, muay-thai
+switch kick. Health's validator is right about it, not too strict: frame 1 to 2 turns the left forearm
+from 174 to -24 degrees, and health's engine always takes the short way round (162 degrees, up and over)
+where mma's older engine interpolates the numbers as written (198 degrees, the long way), so it would play
+as a different motion here. It is not patched in mma. Which motion was meant is
+mma's author's call: the short way is written -24 as 336; the long way needs an extra in-between key in
+mma, because no step may exceed 180 degrees here. Licence:
 octopus-mma is public and has no LICENSE file (checked 2026-11-07); the content was written in this
 estate. **Owner to confirm** before offering it to paying clients. Both repos are public, so
 nothing here carries personal data.
@@ -99,8 +105,8 @@ had none and one would cover the whole app host); submit `/s/sitemap.xml` to a s
 
 ## Phases
 
-1. **This PR.** Admin authoring, three visibilities, snapshots, assist, public page, print, 45 mma moves.
-2. Grappling moves (needs partner-figure rendering in health's engine); image cards in the formats
+1. **This PR.** Admin authoring, three visibilities, snapshots, assist, public page, print, 54 mma moves (grappling included).
+2. Image cards in the formats
    of octopus-mma's `DownloadCard` (portrait, story, square, landscape); a dedicated public domain
    (set `PUBLIC_HOST`, add DNS and proxy host); a UI toggle for the owner's domain in links.
 3. Reusable templates; groups for training partners and students.

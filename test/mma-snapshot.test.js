@@ -17,12 +17,26 @@ const SF = require('../public/stick-figure.js');
 const cat = require('../lib/mma-moves.json');
 const dir = path.join(root, 'public', 'poses', 'mma');
 
-test('every snapshotted pose passes health\'s own validator and has no partner figure', () => {
-  assert.ok(cat.moves.length >= 40);
+const PARTNER_MOVES = ['bjj-armbar', 'bjj-guard', 'bjj-mount', 'bjj-side-control', 'bjj-triangle-choke',
+  'muay-thai-clinch-knee', 'muay-thai-long-guard', 'muay-thai-parry', 'wrestling-double-leg-takedown'];
+
+test('every snapshotted pose passes health\'s own validator, two-figure ones included', () => {
+  assert.ok(cat.moves.length >= 50);
   for (const m of cat.moves) {
     const raw = fs.readFileSync(path.join(root, 'public', 'poses', m.poseKey + '.json'), 'utf8');
-    assert.doesNotMatch(raw, /"partner"/, m.id);
     assert.deepStrictEqual(SF.validate(JSON.parse(raw)), [], m.id);
+  }
+});
+
+test('the nine partner moves are in, and are the ones drawn with a second figure', () => {
+  const have = cat.moves.filter(m => /"partner"/.test(fs.readFileSync(path.join(root, 'public', 'poses', m.poseKey + '.json'), 'utf8'))).map(m => m.id).sort();
+  assert.deepStrictEqual(have, PARTNER_MOVES);
+});
+
+test('the BJJ techniques, whose text has no "Steps" heading, still carry their steps', () => {
+  for (const id of PARTNER_MOVES.filter(i => i.startsWith('bjj-'))) {
+    const m = cat.moves.find(x => x.id === id);
+    assert.ok(m.steps.length >= 2 && m.keyPoints.length, id);
   }
 });
 
@@ -37,6 +51,8 @@ test('catalogue and files agree, ids are unique, text is present', () => {
 test('moves left out are listed with a reason, never dropped silently', () => {
   assert.ok(cat.skipped.length > 0);
   for (const s of cat.skipped) assert.ok(s.id && s.reason, JSON.stringify(s));
+  // The switch kick is the only one left out: health's validator is right about it (see SESSIONS.md).
+  assert.deepStrictEqual(cat.skipped.map(s => s.id), ['muay-thai-switch-kick']);
   const ids = new Set(cat.moves.map(m => m.id));
   for (const s of cat.skipped) assert.ok(!ids.has(s.id));
 });

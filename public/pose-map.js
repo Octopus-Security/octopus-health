@@ -31,6 +31,8 @@
     // further down cannot hand the exercise a wrong figure ("upper trap" would take the neck stretch,
     // "wrist" the wrist circle). match() returns null and keyFor() falls to the category figure.
     // test/stick-figure.test.js lists these in NEEDS_POSE; author the pose, then change null to its key.
+    // Inside Clinch Sweep (Dteh Chiang) is a sweep; the clinch-knee figure below would be a different move.
+    [/inside clinch sweep|dteh chiang/i, null],
     [/lacrosse ball (hamstring|quad|calf|forearm|upper trap|lat)\b/i, null],
     [/tibialis raise|toe yoga|short foot|ankle eversion/i, null],
     [/wrist (extensor|curl)|wrist rocks/i, null],
@@ -145,6 +147,23 @@
     [/cossack/i, 'cossack'],
     [/band pull-?apart/i, 'chest-fly'],
     [/breath/i, 'stand-breathe'],
+
+    // ── techniques drawn by octopus-mma's poses (snapshot in public/poses/mma/, two-figure ones included).
+    // Only where that pose IS the technique (or, for the mount, the position it is done from). Before these,
+    // the same exercises fell to a generic one-figure guard / top-base / slip.
+    [/armbar/i, 'mma/bjj-armbar'],
+    [/triangle choke/i, 'mma/bjj-triangle-choke'],
+    [/\bmount\b(?! escape)/i, 'mma/bjj-mount'],
+    [/parry and counter/i, 'mma/muay-thai-parry'],
+    [/clinch work|double collar tie|plum/i, 'mma/muay-thai-clinch-knee'],
+    [/clinch knee . diagonal|diagonal knee/i, 'mma/muay-thai-diagonal-knee'],
+    [/roundhouse kick . low/i, 'mma/muay-thai-low-kick'],
+    [/roundhouse kick . body/i, 'mma/muay-thai-body-kick'],
+    [/roundhouse kick . head/i, 'mma/muay-thai-head-kick'],
+    [/^jab drill/i, 'mma/muay-thai-jab'],
+    [/^cross drill/i, 'mma/muay-thai-cross'],
+    [/horizontal elbow/i, 'mma/muay-thai-horizontal-elbow'],
+    [/footwork . pivot/i, 'mma/muay-thai-footwork'],
 
     // ── BJJ ("mount" is a whole word: Mountain Climber is not a BJJ position) ──
     [/mountain climber/i, 'mountain-climber'],
