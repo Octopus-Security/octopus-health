@@ -104,8 +104,13 @@
   </div>
 
   <div class="card">
-    <h2>This week</h2>
+    <h2 id="this-week">This week</h2>
     <p class="fx-meta">Week of <%= plan.weekStart %> · focus <%= plan.focus %>. Built from your skill tree and equipment (see <a href="/skills">Skill tree</a>).</p>
+    <% if (plan.deload) { %>
+      <p class="fx-meta"><strong><%= plan.deloadLabel %></strong> <a href="/benchmarks#this-week">Back to the normal plan</a></p>
+    <% } else { %>
+      <p class="fx-meta"><a href="/benchmarks?deload=1#this-week">Show this week as a deload</a> (about half the sets; a view only, nothing is saved).</p>
+    <% } %>
     <% plan.days.forEach(function (d) { %>
       <div class="fx-skill">
         <h4><%= d.name %> <span class="fx-meta"><%= d.date %> · <%= d.kind %></span></h4>

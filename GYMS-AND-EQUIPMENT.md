@@ -11,8 +11,10 @@ Differs from the design, deliberately; the code wins:
 
 - **`content/equipment/catalogue.json` is the one equipment list** (stable ids, aliases,
   `provides`), read by `api/equipment.js`. The skill tree's tokens now derive from it;
-  cortex reads it via `GET /api/service/equipment`; octopus-mma holds a drift-tested
-  snapshot of the ids. `EquipmentModel`/`Movement` (load semantics, per-user custom
+  cortex reads it via `GET /api/service/equipment`; octopus-mma holds a
+  snapshot of the ids. mma's test compares it with a sibling health checkout, but that
+  comparison is skipped when there is no sibling checkout and mma has no CI, so the
+  snapshot can drift: update `lib/equipment-ids.json` by hand whenever ids change. `EquipmentModel`/`Movement` (load semantics, per-user custom
   models) are NOT built; an id is just a string.
 - **`Gym` + `GymEquipment` tables** (additive, per-user file), seeded Home / Park / Work
   gym. A gym also has `active` + `pausedUntil` (ET): paused locations are skipped by
