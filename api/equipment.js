@@ -130,10 +130,10 @@ function buyLink(itemOrId) {
   return { label: it.buy.label, url: withTag(`https://www.amazon.com/dp/${it.buy.asin}`) };
 }
 
-// The five single-item plans (templates with slugs "kit:<key>") and the item each is for.
+// The single-item plans (templates with slugs "kit:<key>") and the item each is for.
 const KIT_PLAN_ITEM = {
   'kit:power-tower': 'power-tower', 'kit:bands': 'resistance-bands', 'kit:parallettes': 'parallettes',
-  'kit:push-up-board': 'push-up-board', 'kit:mat': 'mat',
+  'kit:push-up-board': 'push-up-board', 'kit:mat': 'mat', 'kit:dip-belt': 'dip-belt', 'kit:ab-straps': 'ab-straps',
 };
 /** Buy link for a "kit:*" template slug; null for anything else (day plans, custom ones). */
 const kitBuyLink = slug => (KIT_PLAN_ITEM[slug] ? buyLink(KIT_PLAN_ITEM[slug]) : null);
