@@ -34,7 +34,7 @@
     .type-cooldown { background:#1f1d35; color:#b7a7ff; }
     .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.82); z-index:100; align-items:center; justify-content:center; }
     .modal-overlay.open { display:flex; }
-    .modal { background:#111; border:1px solid #222; border-radius:14px; padding:24px; width:min(560px,95vw); max-height:85vh; overflow-y:auto; }
+    .modal { background:#111; border:1px solid #222; border-radius:14px; padding:24px; width:min(560px,95vw); max-height:85vh; max-height:85dvh; overscroll-behavior:contain; overflow-y:auto; }
     .search-input { width:100%; background:#0d0d0d; border:1px solid #2a2a2a; border-radius:8px; padding:10px 14px; color:#e8e8e8; font-size:0.95rem; margin-bottom:12px; }
     .search-input:focus { outline:none; border-color:#2ecc71; }
     .cat-tabs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px; }
