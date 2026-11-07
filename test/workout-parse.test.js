@@ -432,3 +432,28 @@ test('inline: "30s" after NxM is not guessed, and a trailing colon is not part o
   assert.deepStrictEqual(shape(parseWorkout('Dumbbell bicep curls: 10 x 25lb')),
     [['Dumbbell Bicep Curls', [[10, 25, 'lbs', null, null]]]]);
 });
+
+test('matchExercise resolves shorthand aliases to the canonical library entry', () => {
+  const lib = [
+    { id: 1, name: 'Bench Press' }, { id: 2, name: 'Overhead Press' }, { id: 3, name: 'Deadlift' },
+    { id: 4, name: 'Romanian Deadlift' }, { id: 5, name: 'Bulgarian Split Squat' },
+    { id: 6, name: 'Stationary Bike' }, { id: 7, name: 'Inverted Row' },
+  ];
+  assert.deepStrictEqual(matchExercise('bench', lib), { id: 1, name: 'Bench Press' });
+  assert.deepStrictEqual(matchExercise('OHP', lib), { id: 2, name: 'Overhead Press' });
+  assert.deepStrictEqual(matchExercise('DL', lib), { id: 3, name: 'Deadlift' });
+  assert.deepStrictEqual(matchExercise('RDL', lib), { id: 4, name: 'Romanian Deadlift' });
+  assert.deepStrictEqual(matchExercise('BSS', lib), { id: 5, name: 'Bulgarian Split Squat' });
+  assert.deepStrictEqual(matchExercise('bike', lib), { id: 6, name: 'Stationary Bike' });
+  assert.strictEqual(matchExercise('row', lib), null); // still no substring grab
+});
+
+test('an alias never links when the library lacks the canonical exercise', () => {
+  assert.strictEqual(matchExercise('bench', [{ id: 9, name: 'Squat' }]), null);
+  assert.strictEqual(matchExercise('constructor', [{ id: 9, name: 'Squat' }]), null);
+});
+
+test('an exact library name wins over an alias', () => {
+  const lib = [{ id: 1, name: 'Bench Press' }, { id: 2, name: 'Bench' }];
+  assert.deepStrictEqual(matchExercise('bench', lib), { id: 2, name: 'Bench' });
+});
