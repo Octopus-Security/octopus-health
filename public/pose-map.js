@@ -183,6 +183,11 @@
     [/kick check/i, 'kick-check'],
     [/roundhouse|switch kick|low kick|kick work|shin conditioning/i, 'roundhouse'],
     [/ab strap/i, 'hanging-leg-raise'],
+    [/landmine punch/i, 'jab-cross'],
+    [/landmine (rotation|rotational|anti-rotation|deadlift to rotational)/i, 'wood-chop'],
+    [/landmine (push press|split jerk|thruster)/i, 'overhead-press'],
+    [/landmine meadows row/i, 'bent-row'],
+    [/landmine (reverse|lateral) lunge/i, 'lunge'],
     [/hanging knee raise|captain'?s chair/i, 'hanging-leg-raise'],   // before the knee-strike rule below, which would take any "knee"
     [/knee|clinch|plum|dteh chiang/i, 'knee-strike'],
     [/elbow|sok /i, 'elbow-strike'],

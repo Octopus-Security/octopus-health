@@ -392,6 +392,32 @@ test('plates, dip belt and ab straps: owned they stay, missing they swap, and a 
   assert.strictEqual(E.toId('ab straps'), 'ab-straps');
 });
 
+test('landmine work needs the landmine and a bar, and swaps to something real without it', () => {
+  const kept = (names, owned) => E.fitExercises(names.map(exerciseName => ({ exerciseName })), owned);
+  const gym = ['barbell', 'cable-machine'];
+  const names = ['Landmine Rotation', 'Landmine Punch', 'Landmine Push Press', 'Landmine Thruster'];
+  const on = kept(names, [...gym, 'landmine']);
+  assert.deepStrictEqual(on.omitted, []);
+  assert.strictEqual(on.exercises.length, 4);
+  const off = kept(['Landmine Push Press', 'Landmine Meadows Row', 'Landmine Thruster'], gym);
+  assert.deepStrictEqual(off.substitutions.map(s => s.to), ['Barbell Overhead Press', 'Barbell Bent-Over Row']);
+  assert.deepStrictEqual(off.omitted.map(o => o.name), ['Landmine Thruster']);
+  assert.deepStrictEqual(kept(['Landmine Rotation'], ['landmine']).omitted.map(o => o.name), ['Landmine Rotation'], 'a landmine with no bar is nothing');
+});
+
+test('every landmine exercise has a pose chosen on purpose, and the plan names real exercises', () => {
+  const PM = require('../public/pose-map.js');
+  const { ex, tpl } = seedArrays();
+  const want = { 'Landmine Punch': 'jab-cross', 'Landmine Rotation': 'wood-chop', 'Landmine Anti-Rotation': 'wood-chop', 'Landmine Rotational Press': 'wood-chop', 'Landmine Deadlift to Rotational Press': 'wood-chop', 'Landmine Push Press': 'overhead-press', 'Landmine Thruster': 'overhead-press', 'Landmine Split Jerk': 'overhead-press', 'Landmine Meadows Row': 'bent-row', 'Landmine Reverse Lunge': 'lunge', 'Landmine Lateral Lunge': 'lunge' };
+  const seeded = ex.filter(e => e.name.startsWith('Landmine ')).map(e => e.name).sort();
+  assert.deepStrictEqual(seeded, Object.keys(want).sort());
+  for (const [n, k] of Object.entries(want)) assert.strictEqual(PM.keyFor(n), k, n);
+  const plan = tpl.find(t => t.slug === 'kit:landmine-power');
+  assert.strictEqual(plan.location, 'gym');
+  const lib = new Set(ex.map(e => e.name));
+  for (const e of plan.exercises) assert.ok(lib.has(e.exerciseName), e.exerciseName);
+});
+
 test('ab strap raises show the hanging pose, not the knee strike', () => {
   const PM = require('../public/pose-map.js');
   for (const n of ['Ab Strap Knee Raise', 'Ab Strap Leg Raise', 'Ab Strap Oblique Knee Raise']) assert.strictEqual(PM.keyFor(n), 'hanging-leg-raise', n);
