@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "title": "Walking Stance (Ap Seogi)",
+  "view": "side",
+  "anchor": {
+    "joint": "ankleL",
+    "x": 48,
+    "y": 90
+  },
+  "static": true,
+  "frames": [
+    {"duration":3200,"label":"Walking stance: upright, 50/50, front knee soft","highlight":["kneeL","kneeR"],"pose":{"torso":180,"head":180,"upperArmL":-20,"forearmL":55,"upperArmR":-20,"forearmR":55,"thighL":28,"shinL":-6,"footL":90,"thighR":-20.5,"shinR":-20.5,"footR":90}}
+  ]
+}

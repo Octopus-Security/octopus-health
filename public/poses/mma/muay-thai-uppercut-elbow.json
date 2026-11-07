@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "title": "Uppercut Elbow (Sok Ngat)",
+  "view": "side",
+  "anchor": {
+    "joint": "ankleL",
+    "x": 56,
+    "y": 90
+  },
+  "frames": [
+    {"duration":450,"label":"Guard","highlight":[],"pose":{"torso":180,"head":177,"upperArmL":40,"forearmL":174,"upperArmR":30,"forearmR":174,"thighL":14,"shinL":-2,"footL":80,"thighR":-20,"shinR":-22,"footR":64}},
+    {"duration":260,"label":"Dip: knees bend, elbow drops low and in","highlight":["kneeL","kneeR"],"pose":{"torso":170,"head":172,"thighL":30,"shinL":-14,"thighR":-22,"shinR":-30,"footR":70,"upperArmL":16,"forearmL":176}},
+    {"duration":220,"label":"Drive up: the elbow rises up the centre line, fist past the ear","highlight":["shoulderL","elbowL"],"pose":{"torso":184,"head":180,"thighL":10,"shinL":-2,"thighR":-18,"shinR":-20,"footR":56,"upperArmL":142,"forearmL":288}},
+    {"duration":260,"label":"Bring it back down to the guard","highlight":[],"pose":{"torso":180,"upperArmL":70,"forearmL":210}},
+    {"duration":380,"label":"Guard","highlight":[],"pose":{"torso":180,"head":177,"upperArmL":40,"forearmL":174,"upperArmR":30,"forearmR":174,"thighL":14,"shinL":-2,"footL":80,"thighR":-20,"shinR":-22,"footR":64}}
+  ]
+}

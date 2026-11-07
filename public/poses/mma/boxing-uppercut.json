@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "title": "Rear Uppercut",
+  "view": "side",
+  "anchor": {
+    "joint": "ankleL",
+    "x": 56,
+    "y": 90
+  },
+  "frames": [
+    {"duration":450,"label":"Guard","pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"upperArmR":20,"forearmR":165,"thighL":12,"shinL":-4,"footL":90,"thighR":-22,"shinR":-20,"footR":70},"highlight":[]},
+    {"duration":330,"label":"Dip: bend the knees, drop the rear shoulder","highlight":["kneeL","kneeR"],"pose":{"torso":162,"head":166,"thighL":36,"shinL":-22,"thighR":48,"shinR":15,"footR":105,"upperArmR":15,"forearmR":150}},
+    {"duration":230,"label":"Drive up: legs push, fist rises on the centre line","highlight":["shoulderR","elbowR","hand"],"pose":{"torso":178,"head":176,"thighL":8,"shinL":-4,"thighR":-18,"shinR":-18,"upperArmR":70,"forearmR":160,"upperArmL":40,"forearmL":165}},
+    {"duration":450,"label":"Back to the guard","highlight":[],"pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"upperArmR":20,"forearmR":165,"thighL":12,"shinL":-4,"footL":90,"thighR":-22,"shinR":-20,"footR":70}}
+  ]
+}

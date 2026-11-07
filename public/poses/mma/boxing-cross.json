@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "title": "Cross",
+  "view": "side",
+  "anchor": {
+    "joint": "ankleL",
+    "x": 56,
+    "y": 90
+  },
+  "frames": [
+    {"duration":450,"label":"Guard","pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"upperArmR":20,"forearmR":165,"thighL":12,"shinL":-4,"footL":90,"thighR":-22,"shinR":-20,"footR":70}},
+    {"duration":240,"label":"Load: rear heel turns, hips set","highlight":["hipR","kneeR"],"pose":{"torso":176,"head":174,"footR":55,"thighR":-26,"shinR":-26}},
+    {"duration":190,"label":"Cross: rear leg drives, hips and shoulder turn through","highlight":["shoulderR","elbowR","hand","hipR"],"pose":{"torso":160,"head":164,"upperArmR":88,"forearmR":90,"thighL":20,"shinL":-10,"thighR":-34,"shinR":-34,"footR":40,"upperArmL":34,"forearmL":156}},
+    {"duration":260,"label":"Retract along the same line","highlight":[],"pose":{"torso":172,"head":172,"upperArmR":20,"forearmR":165,"thighL":12,"shinL":-4,"thighR":-22,"shinR":-20,"footR":70,"upperArmL":30,"forearmL":160}},
+    {"duration":350,"label":"Guard","pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"upperArmR":20,"forearmR":165,"thighL":12,"shinL":-4,"footL":90,"thighR":-22,"shinR":-20,"footR":70}}
+  ]
+}

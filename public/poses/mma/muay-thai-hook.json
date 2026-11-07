@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "title": "Hook: Lead and Rear (Mat Wiang San)",
+  "view": "side",
+  "anchor": {
+    "joint": "ankleL",
+    "x": 56,
+    "y": 90
+  },
+  "frames": [
+    {"duration":420,"label":"Guard","highlight":[],"pose":{"torso":180,"head":177,"upperArmL":40,"forearmL":174,"upperArmR":30,"forearmR":174,"thighL":14,"shinL":-2,"footL":80,"thighR":-20,"shinR":-22,"footR":64}},
+    {"duration":220,"label":"Lead hook: weight onto the lead foot, elbow lifts to shoulder height","highlight":["shoulderL","elbowL","spine"],"pose":{"torso":170,"head":172,"upperArmL":80,"forearmL":128,"thighL":18,"shinL":-6}},
+    {"duration":260,"label":"Back to the guard","highlight":[],"pose":{"torso":180,"head":177,"upperArmL":40,"forearmL":174,"upperArmR":30,"forearmR":174,"thighL":14,"shinL":-2,"footL":80,"thighR":-20,"shinR":-22,"footR":64}},
+    {"duration":220,"label":"Rear hook: rear heel turns, the hips swing the rear arm through","highlight":["shoulderR","elbowR","hipR","spine"],"pose":{"torso":166,"head":170,"upperArmR":82,"forearmR":130,"footR":45,"thighR":-26,"shinR":-26,"thighL":18,"shinL":-6}},
+    {"duration":380,"label":"Back to the guard","highlight":[],"pose":{"torso":180,"head":177,"upperArmL":40,"forearmL":174,"upperArmR":30,"forearmR":174,"thighL":14,"shinL":-2,"footL":80,"thighR":-20,"shinR":-22,"footR":64}}
+  ]
+}

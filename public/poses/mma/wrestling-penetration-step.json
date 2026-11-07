@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "title": "Penetration Step",
+  "view": "side",
+  "pins": ["ankleL","ankleR"],
+  "frames": [
+    {"duration":900,"label":"Stance","highlight":[],"pose":{"torso":140,"head":168,"upperArmL":-7.2,"forearmL":97.7,"thighL":58.6,"shinL":-11.7,"footL":90,"upperArmR":-22.9,"forearmR":81,"thighR":-9.7,"shinR":-68.6,"footR":64.4,"root":{"x":44,"y":60}}},
+    {"duration":700,"label":"Level change: hips drop first, head and chest stay up","highlight":["kneeL","kneeR"],"pose":{"torso":145,"head":172,"upperArmL":-7.2,"forearmL":97.7,"thighL":75.4,"shinL":-18.5,"footL":90,"upperArmR":-22.9,"forearmR":81,"thighR":-0.1,"shinR":-87.1,"footR":47.9,"root":{"x":42,"y":66}}},
+    {"duration":600,"label":"Step: a long, low step with the lead foot, driving off the rear foot","highlight":["hipR","kneeR"],"pose":{"torso":150,"head":175,"upperArmL":-3.7,"forearmL":85.8,"thighL":83.2,"shinL":-11.1,"footL":90,"upperArmR":-11.4,"forearmR":67.8,"thighR":-30.2,"shinR":-85.1,"footR":49.9,"root":{"x":52,"y":68}}},
+    {"duration":1100,"label":"Lead knee to the mat, rear leg driving, back straight, head up: you are still moving forward","highlight":["kneeL","hipR"],"pose":{"torso":155,"head":178,"upperArmL":-3.7,"forearmL":85.8,"thighL":23.4,"shinL":-93.9,"footL":41.1,"upperArmR":-11.4,"forearmR":67.8,"thighR":-51.5,"shinR":-75.4,"footR":59.6,"root":{"x":57,"y":69.5}}},
+    {"duration":900,"label":"Drill: drive back up into stance and repeat (in a takedown the rear leg steps up instead)","highlight":[],"pose":{"torso":145,"head":172,"upperArmL":-7.2,"forearmL":97.7,"thighL":70,"shinL":-16.8,"footL":90,"upperArmR":-22.9,"forearmR":81,"thighR":-6.4,"shinR":-81,"footR":54,"root":{"x":44,"y":64}}}
+  ]
+}

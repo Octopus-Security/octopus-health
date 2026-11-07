@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "title": "Front Stance (Apkubi)",
+  "view": "side",
+  "anchor": {
+    "joint": "ankleL",
+    "x": 44,
+    "y": 90
+  },
+  "static": true,
+  "frames": [
+    {"duration":3200,"label":"Front stance: front knee deep, back leg straight","highlight":["kneeL","hipL","kneeR"],"pose":{"torso":180,"head":180,"upperArmL":-20,"forearmL":55,"upperArmR":-20,"forearmR":55,"thighL":55,"shinL":-15,"footL":90,"thighR":-40.5,"shinR":-40.5,"footR":90}}
+  ]
+}

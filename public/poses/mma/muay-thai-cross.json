@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "title": "Cross (Mat Trong, rear hand)",
+  "view": "side",
+  "anchor": {
+    "joint": "ankleL",
+    "x": 56,
+    "y": 90
+  },
+  "frames": [
+    {"duration":450,"label":"Guard","highlight":[],"pose":{"torso":180,"head":177,"upperArmL":40,"forearmL":174,"upperArmR":30,"forearmR":174,"thighL":14,"shinL":-2,"footL":80,"thighR":-20,"shinR":-22,"footR":64}},
+    {"duration":220,"label":"Load: rear heel lifts and turns, hips begin to turn","highlight":["hipR","kneeR"],"pose":{"torso":178,"footR":50,"thighR":-24,"shinR":-24}},
+    {"duration":180,"label":"Cross: rear leg drives, hips and shoulder turn through, lead glove stays up","highlight":["shoulderR","elbowR","hand","hipR"],"pose":{"torso":164,"head":168,"upperArmR":88,"forearmR":90,"thighL":20,"shinL":-6,"thighR":-32,"shinR":-32,"footR":40,"upperArmL":36,"forearmL":176}},
+    {"duration":240,"label":"Retract along the same line","highlight":[],"pose":{"torso":178,"head":177,"upperArmL":40,"forearmL":174,"upperArmR":30,"forearmR":174,"thighL":14,"shinL":-2,"footL":80,"thighR":-20,"shinR":-22,"footR":64}},
+    {"duration":350,"label":"Guard","highlight":[],"pose":{"torso":180,"head":177,"upperArmL":40,"forearmL":174,"upperArmR":30,"forearmR":174,"thighL":14,"shinL":-2,"footL":80,"thighR":-20,"shinR":-22,"footR":64}}
+  ]
+}

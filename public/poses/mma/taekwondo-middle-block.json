@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "title": "Middle Block (Momtong Makgi)",
+  "view": "side",
+  "anchor": {
+    "joint": "ankleL",
+    "x": 50,
+    "y": 90
+  },
+  "frames": [
+    {"duration":600,"label":"Walking stance","highlight":[],"pose":{"thighL":28,"shinL":-6,"footL":90,"thighR":-20.5,"shinR":-20.5,"footR":90,"torso":180,"head":180,"upperArmL":30,"forearmL":120,"upperArmR":80,"forearmR":90}},
+    {"duration":380,"label":"Wind up: fist at the ear, elbow high","highlight":[],"pose":{"upperArmL":120,"forearmL":250,"upperArmR":80,"forearmR":90}},
+    {"duration":200,"label":"Block: forearm vertical, fist at shoulder height","highlight":["shoulderL","elbowL","hand"],"pose":{"upperArmL":55,"forearmL":178,"upperArmR":-20,"forearmR":55,"torso":178}},
+    {"duration":350,"label":"Hold: tighten at the finish","highlight":["shoulderL","elbowL","hand"],"pose":{"torso":178}},
+    {"duration":450,"label":"Return","highlight":[],"pose":{"thighL":28,"shinL":-6,"footL":90,"thighR":-20.5,"shinR":-20.5,"footR":90,"torso":180,"head":180,"upperArmL":30,"forearmL":120,"upperArmR":80,"forearmR":90}}
+  ]
+}

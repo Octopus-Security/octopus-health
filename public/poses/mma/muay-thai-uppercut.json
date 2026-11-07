@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "title": "Uppercut (Mat Seuy)",
+  "view": "side",
+  "anchor": {
+    "joint": "ankleL",
+    "x": 56,
+    "y": 90
+  },
+  "frames": [
+    {"duration":450,"label":"Guard","highlight":[],"pose":{"torso":180,"head":177,"upperArmL":40,"forearmL":174,"upperArmR":30,"forearmR":174,"thighL":14,"shinL":-2,"footL":80,"thighR":-20,"shinR":-22,"footR":64}},
+    {"duration":300,"label":"Dip: knees bend, rear shoulder drops, glove still at the chin","highlight":["kneeL","kneeR"],"pose":{"torso":168,"head":170,"thighL":34,"shinL":-18,"thighR":-20,"shinR":-32,"footR":84,"upperArmR":12,"forearmR":160}},
+    {"duration":220,"label":"Drive up: legs push, rear fist rises on the centre line","highlight":["shoulderR","elbowR","hand"],"pose":{"torso":180,"head":178,"thighL":10,"shinL":0,"thighR":-16,"shinR":-18,"footR":60,"upperArmR":62,"forearmR":162}},
+    {"duration":400,"label":"Back to the guard","highlight":[],"pose":{"torso":180,"head":177,"upperArmL":40,"forearmL":174,"upperArmR":30,"forearmR":174,"thighL":14,"shinL":-2,"footL":80,"thighR":-20,"shinR":-22,"footR":64}}
+  ]
+}
