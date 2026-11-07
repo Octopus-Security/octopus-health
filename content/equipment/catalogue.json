@@ -67,6 +67,9 @@
       "equipment": [ { "id": "dumbbell" }, { "id": "barbell" }, { "id": "kettlebell" }, { "id": "weight-bench" }, { "id": "cable-machine" }, { "id": "machine" }, { "id": "cardio-machine" }, { "id": "bar" }, { "id": "dip-bars" }, { "id": "captains-chair" }, { "id": "jump-rope" } ] }
   ],
   "exerciseRules": [
+    {"match": "^banded hip mobilization$", "requires": ["resistance-bands"], "substitutes": [{"name": "Half-Kneeling Hip Flexor Stretch", "requires": []}]},
+    {"match": "^band shoulder external rotation$", "requires": ["resistance-bands"], "substitutes": [{"name": "Side-Lying Shoulder External Rotation", "requires": []}]},
+    {"match": "^elbows-on-bench thoracic extension$", "requires": ["weight-bench|chair"], "substitutes": [{"name": "Thoracic Open Book", "requires": []}]},
     { "match": "^landmine (rotation|punch|rotational press|anti-rotation|deadlift to rotational press)$", "requires": ["landmine", "barbell"], "substitutes": [ { "name": "Wood Chop", "requires": ["cable-machine"] } ] },
     { "match": "^landmine push press$",  "requires": ["landmine", "barbell"], "substitutes": [ { "name": "Barbell Overhead Press", "requires": ["barbell"] } ] },
     { "match": "^landmine meadows row$", "requires": ["landmine", "barbell"], "substitutes": [ { "name": "Barbell Bent-Over Row", "requires": ["barbell"] } ] },
