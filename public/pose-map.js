@@ -33,6 +33,8 @@
     // test/stick-figure.test.js lists these in NEEDS_POSE; author the pose, then change null to its key.
     // Inside Clinch Sweep (Dteh Chiang) is a sweep; the clinch-knee figure below would be a different move.
     [/inside clinch sweep|dteh chiang/i, null],
+    // Gentle lymphatic drainage routine: skin strokes and neck movements; no figure drawn, and the neck-circle rule below must not claim them.
+    [/lymph drainage/i, null],
     [/lacrosse ball (hamstring|quad|calf|forearm|upper trap|lat)\b/i, null],
     [/tibialis raise|toe yoga|short foot|ankle eversion/i, null],
     [/wrist (extensor|curl)|wrist rocks/i, null],

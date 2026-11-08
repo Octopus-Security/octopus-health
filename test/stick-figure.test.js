@@ -255,7 +255,10 @@ test('every seeded exercise is matched by a name rule, not the category fallback
     'Scapular Pull-up', 'Short Foot Exercise', 'Single-Leg Reach', 'Single-Leg Stand', 'Spanish Squat', 'Tibialis Raise (Wall)',
     'Toe Yoga', 'Towel Hang', 'Wall Sit', 'Wrist Extensor Stretch',
     // a sweep: the clinch-knee figure it used to get is a different move (martial categories show "No diagram yet")
-    'Inside Clinch Sweep (Dteh Chiang)'];
+    'Inside Clinch Sweep (Dteh Chiang)',
+    // lymphatic drainage routine: skin strokes, deliberately no figure
+    'Lymph Drainage: Diaphragmatic Breathing', 'Lymph Drainage: Collarbone Strokes', 'Lymph Drainage: Side-of-Neck Strokes',
+    'Lymph Drainage: Ear and Jawline Strokes', 'Lymph Drainage: Shoulder Rolls', 'Lymph Drainage: Gentle Neck Tilts and Turns'];
   assert.deepStrictEqual(ex.filter((e) => !PM.match(e.name)).map((e) => e.name).sort(), [...NEEDS_POSE].sort());
 });
 
