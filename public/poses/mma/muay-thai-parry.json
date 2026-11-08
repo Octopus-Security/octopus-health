@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "title": "Parry (rear hand) and Counter Jab",
+  "view": "side",
+  "anchor": {
+    "joint": "ankleL",
+    "x": 38,
+    "y": 90
+  },
+  "frames": [
+    {"duration":500,"label":"Guard, at punching range","highlight":[],"partner":{"pose":{"torso":180,"head":177,"upperArmL":40,"forearmL":174,"upperArmR":30,"forearmR":174,"thighL":14,"shinL":-2,"footL":80,"thighR":-20,"shinR":-22,"footR":64},"anchor":{"joint":"ankleL","x":30,"y":90}},"contacts":[],"pose":{"torso":180,"head":177,"upperArmL":40,"forearmL":174,"upperArmR":30,"forearmR":174,"thighL":14,"shinL":-2,"footL":80,"thighR":-20,"shinR":-22,"footR":64}},
+    {"duration":200,"label":"Their jab comes: the rear glove meets it just in front of the face","highlight":["handR"],"partner":{"pose":{"torso":177,"head":176,"upperArmL":84,"forearmL":92,"thighL":14,"shinL":-2},"anchor":{"joint":"ankleL","x":30,"y":90}},"contacts":[{"a":"handR","b":"handL","tol":8}],"pose":{"upperArmR":40,"forearmR":148,"head":176}},
+    {"duration":200,"label":"Parry: a short slap knocks their glove down and across; no reaching","highlight":["shoulderR","handR"],"partner":{"pose":{"torso":170,"head":170,"upperArmL":58,"forearmL":62},"anchor":{"joint":"ankleL","x":30,"y":90}},"contacts":[{"a":"handR","b":"forearmL","tol":6}],"pose":{"upperArmR":26,"forearmR":118}},
+    {"duration":220,"label":"Counter: jab into the opening while their hand is down","highlight":["shoulderL","elbowL","hand"],"partner":{"pose":{"torso":172,"head":174,"upperArmL":44,"forearmL":70},"anchor":{"joint":"ankleL","x":30,"y":90}},"contacts":[{"a":"handL","b":"head","tol":9}],"pose":{"torso":168,"head":170,"upperArmL":88,"forearmL":92,"thighL":16,"shinL":-2,"upperArmR":30,"forearmR":174}},
+    {"duration":400,"label":"Both back to the guard","highlight":[],"partner":{"pose":{"torso":180,"head":177,"upperArmL":40,"forearmL":174,"upperArmR":30,"forearmR":174,"thighL":14,"shinL":-2,"footL":80,"thighR":-20,"shinR":-22,"footR":64},"anchor":{"joint":"ankleL","x":30,"y":90}},"pose":{"torso":180,"head":177,"upperArmL":40,"forearmL":174,"upperArmR":30,"forearmR":174,"thighL":14,"shinL":-2,"footL":80,"thighR":-20,"shinR":-22,"footR":64}}
+  ]
+}

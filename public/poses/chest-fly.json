@@ -1,0 +1,44 @@
+{
+  "version": 2,
+  "title": "Chest Fly",
+  "view": "front",
+  "hold": "dumbbell",
+  "highlight": [
+    "shoulderL",
+    "shoulderR"
+  ],
+  "frames": [
+    {
+      "duration": 1300,
+      "label": "Arms wide",
+      "pose": {
+        "root": {
+          "x": 50,
+          "y": 50
+        },
+        "torso": 180,
+        "head": 180,
+        "upperArmL": 90,
+        "forearmL": 75,
+        "upperArmR": -90,
+        "forearmR": -75,
+        "thighL": 0,
+        "shinL": 0,
+        "footL": 90,
+        "thighR": 0,
+        "shinR": 0,
+        "footR": -90
+      }
+    },
+    {
+      "duration": 800,
+      "label": "Hug together",
+      "pose": {
+        "upperArmL": 55,
+        "forearmL": -85,
+        "upperArmR": -55,
+        "forearmR": 85
+      }
+    }
+  ]
+}

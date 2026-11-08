@@ -1,0 +1,83 @@
+{
+ "version": 2,
+ "title": "Cossack squat",
+ "view": "front",
+ "highlight": [
+  "hipL",
+  "kneeL",
+  "hipR",
+  "kneeR"
+ ],
+ "frames": [
+  {
+   "duration": 800,
+   "label": "Wide stance",
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "thighL": 56.5,
+    "shinL": 45.7,
+    "footL": 90,
+    "upperArmL": 50,
+    "forearmL": 50,
+    "thighR": -56.5,
+    "shinR": -45.7,
+    "footR": -90,
+    "upperArmR": -50,
+    "forearmR": -50,
+    "root": {
+     "x": 50,
+     "y": 65
+    }
+   }
+  },
+  {
+   "duration": 1100,
+   "label": "Sink onto the left leg",
+   "pose": {
+    "torso": 176,
+    "thighL": 122.4,
+    "shinL": 19.4,
+    "thighR": -86,
+    "shinR": -68.1,
+    "footR": -135,
+    "root": {
+     "x": 57.5,
+     "y": 81.5
+    }
+   }
+  },
+  {
+   "duration": 800,
+   "label": "Back to centre",
+   "pose": {
+    "torso": 180,
+    "thighL": 56.5,
+    "shinL": 45.7,
+    "thighR": -56.5,
+    "shinR": -45.7,
+    "footR": -90,
+    "root": {
+     "x": 50,
+     "y": 65
+    }
+   }
+  },
+  {
+   "duration": 1100,
+   "label": "Sink onto the right leg",
+   "pose": {
+    "torso": 184,
+    "thighL": 86,
+    "shinL": 68.1,
+    "footL": 135,
+    "thighR": -122.4,
+    "shinR": -19.4,
+    "root": {
+     "x": 42.5,
+     "y": 81.5
+    }
+   }
+  }
+ ]
+}

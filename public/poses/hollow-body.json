@@ -1,0 +1,10 @@
+{
+ "version": 2,
+ "title": "Hollow Body Hold",
+ "static": true,
+ "view": "side",
+ "highlight": ["spine", "hipL"],
+ "frames": [
+  {"label":"Hollow hold","pose":{"torso":-112,"head":-106,"upperArmL":-147,"forearmL":-142,"upperArmR":-147,"forearmR":-142,"thighL":112,"shinL":112,"footL":142,"thighR":112,"shinR":112,"footR":142,"arch":18,"root":{"x":55,"y":87}}}
+ ]
+}

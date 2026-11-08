@@ -1,0 +1,10 @@
+{
+ "version": 2,
+ "title": "Overhead Shoulder Stretch",
+ "static": true,
+ "view": "side",
+ "highlight": ["shoulderL", "shoulderR"],
+ "frames": [
+  {"label":"Press the arms back, ribs down","anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":176,"head":176,"upperArmL":205,"forearmL":205,"upperArmR":205,"forearmR":205,"thighL":0,"shinL":0,"footL":90,"thighR":0,"shinR":0,"footR":90}}
+ ]
+}

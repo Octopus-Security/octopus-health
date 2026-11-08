@@ -40,17 +40,13 @@ const path = require('path');
 const TREE_PATH   = path.join(__dirname, '..', 'content', 'calisthenics', 'skill-tree.json');
 const CONTENT_DIR = path.join(__dirname, '..', 'content', 'calisthenics');
 
-const KNOWN_EQUIPMENT   = ['wall', 'chair', 'handles', 'dip-bars', 'bar', 'rings'];
+// The vocabulary is the estate-wide catalogue (content/equipment/catalogue.json via
+// api/equipment.js) - not a second list. Owning a power tower expands to a bar, dip
+// bars and handles, owning parallettes to handles, so a skill that needs "handles"
+// is satisfied either way.
+const EQ = require('./equipment');
+const KNOWN_EQUIPMENT   = EQ.IDS;
 const DEFAULT_EQUIPMENT = ['wall', 'chair'];
-
-const EQUIPMENT_ALIASES = {
-  'handles': 'handles', 'push-up handles': 'handles', 'pushup handles': 'handles', 'push up handles': 'handles',
-  'parallettes': 'handles', 'parallette': 'handles', 'push-up bars': 'handles', 'pushup bars': 'handles',
-  'bar': 'bar', 'pull-up bar': 'bar', 'pullup bar': 'bar', 'pull up bar': 'bar', 'chin-up bar': 'bar', 'chinup bar': 'bar',
-  'dip bars': 'dip-bars', 'dip bar': 'dip-bars', 'dip-bars': 'dip-bars', 'dip station': 'dip-bars', 'parallel bars': 'dip-bars', 'dip stand': 'dip-bars',
-  'wall': 'wall', 'chair': 'chair', 'box': 'chair', 'bench': 'chair', 'step': 'chair',
-  'rings': 'rings', 'gymnastic rings': 'rings',
-};
 
 const LINES = {
   handstand: { title: 'Handstand and handstand push-ups', aliases: ['handstand', 'handstands', 'pike', 'pike push-ups', 'hspu line', 'overhead pressing'] },
@@ -155,7 +151,7 @@ function normalizeEquipment(list) {
   for (const raw of arr) {
     const k = String(raw).trim().toLowerCase().replace(/^(a|an|the|my)\s+/, '');
     if (!k || k === 'none') continue;
-    const tok = EQUIPMENT_ALIASES[k] || EQUIPMENT_ALIASES[k.replace(/s$/, '')] || (KNOWN_EQUIPMENT.includes(k) ? k : null);
+    const tok = EQ.toId(k);
     if (tok) out.add(tok); else unknown.push(raw);
   }
   if (unknown.length) {
@@ -168,7 +164,7 @@ function normalizeEquipment(list) {
 
 /** Stored list (or null when never set) -> the Set the tree is checked against. */
 function effectiveEquipment(stored) {
-  return new Set(['none', ...(Array.isArray(stored) ? stored : DEFAULT_EQUIPMENT)]);
+  return new Set(['none', ...EQ.expand(Array.isArray(stored) ? stored : DEFAULT_EQUIPMENT)]);
 }
 
 function missingEquipment(skill, have) {

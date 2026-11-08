@@ -1,0 +1,76 @@
+{
+ "version": 2,
+ "title": "Thread the Needle",
+ "view": "side",
+ "anchor": {
+  "joint": "kneeL",
+  "x": 30,
+  "y": 89.5
+ },
+ "pins": [
+  "handR"
+ ],
+ "highlight": [
+  "shoulderL",
+  "spine"
+ ],
+ "frames": [
+  {
+   "duration": 1500,
+   "label": "Hands and knees",
+   "pose": {
+    "torso": 104,
+    "head": 150,
+    "upperArmL": 0,
+    "forearmL": 0,
+    "upperArmR": 0,
+    "forearmR": 0,
+    "thighL": 0,
+    "shinL": -90,
+    "footL": -72,
+    "thighR": 0,
+    "shinR": -90,
+    "footR": -72
+   }
+  },
+  {
+   "duration": 1600,
+   "label": "Lift the hand, reach under",
+   "pose": {
+    "torso": 94,
+    "arch": 4,
+    "head": 100,
+    "upperArmL": -60,
+    "forearmL": -50,
+    "upperArmR": -35,
+    "forearmR": 34
+   }
+  },
+  {
+   "duration": 2600,
+   "label": "Thread the arm under, shoulder down",
+   "pose": {
+    "torso": 84,
+    "arch": 8,
+    "head": 75,
+    "upperArmL": -85,
+    "forearmL": -4,
+    "upperArmR": -50,
+    "forearmR": 50
+   }
+  },
+  {
+   "duration": 2600,
+   "label": "Sweep it up and open to the ceiling",
+   "pose": {
+    "torso": 104,
+    "arch": -12,
+    "head": 160,
+    "upperArmL": -180,
+    "forearmL": -180,
+    "upperArmR": 0,
+    "forearmR": 0
+   }
+  }
+ ]
+}

@@ -1,0 +1,12 @@
+{
+ "version": 2,
+ "title": "Thoracic Open Book",
+ "view": "side",
+ "highlight": ["spine","shoulderL"],
+ "frames": [
+  {"duration":1300,"label":"On your side, knees bent and stacked, arms reaching forward","pose":{"torso":-90,"head":-80,"upperArmL":150,"forearmL":150,"thighL":120,"shinL":30,"footL":110,"upperArmR":150,"forearmR":150,"thighR":120,"shinR":30,"footR":110,"depth":{"thighL":0.45,"thighR":0.45,"shinL":0.6,"shinR":0.6,"upperArmL":0.3,"forearmL":0.3,"upperArmR":0.3,"forearmR":0.3},"root":{"x":56,"y":85}}},
+  {"duration":1000,"label":"Top arm rises to the ceiling, eyes follow","hold":0,"pose":{"torso":-90,"head":-110,"upperArmL":180,"forearmL":180,"thighL":120,"shinL":30,"footL":110,"upperArmR":150,"forearmR":150,"thighR":120,"shinR":30,"footR":110,"depth":{"upperArmL":1,"forearmL":1},"root":{"x":56,"y":85}}},
+  {"duration":1400,"label":"Open: arm falls behind, chest to the ceiling","hold":1200,"pose":{"torso":-90,"head":-140,"upperArmL":210,"forearmL":210,"thighL":120,"shinL":30,"footL":110,"upperArmR":150,"forearmR":150,"thighR":120,"shinR":30,"footR":110,"depth":{"upperArmL":0.35,"forearmL":0.35},"root":{"x":56,"y":85}}},
+  {"duration":1000,"label":"Bring it back up and over","hold":0,"pose":{"torso":-90,"head":-110,"upperArmL":180,"forearmL":180,"thighL":120,"shinL":30,"footL":110,"upperArmR":150,"forearmR":150,"thighR":120,"shinR":30,"footR":110,"depth":{"upperArmL":1,"forearmL":1},"root":{"x":56,"y":85}}}
+ ]
+}

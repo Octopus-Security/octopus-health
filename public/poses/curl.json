@@ -1,0 +1,45 @@
+{
+  "version": 2,
+  "title": "Biceps Curl",
+  "view": "side",
+  "hold": "dumbbell",
+  "anchor": {
+    "joint": "ankleL",
+    "x": 50,
+    "y": 90
+  },
+  "highlight": [
+    "elbowL",
+    "elbowR"
+  ],
+  "frames": [
+    {
+      "duration": 1300,
+      "label": "Arms down",
+      "pose": {
+        "torso": 180,
+        "head": 180,
+        "upperArmL": 4,
+        "forearmL": 6,
+        "upperArmR": 4,
+        "forearmR": 6,
+        "thighL": 0,
+        "shinL": 0,
+        "footL": 90,
+        "thighR": 0,
+        "shinR": 0,
+        "footR": 90
+      }
+    },
+    {
+      "duration": 900,
+      "label": "Curl up",
+      "pose": {
+        "upperArmL": 8,
+        "forearmL": 150,
+        "upperArmR": 8,
+        "forearmR": 150
+      }
+    }
+  ]
+}

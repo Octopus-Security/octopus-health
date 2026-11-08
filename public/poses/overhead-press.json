@@ -1,0 +1,46 @@
+{
+  "version": 2,
+  "title": "Overhead Press",
+  "view": "side",
+  "hold": "barbell",
+  "anchor": {
+    "joint": "ankleL",
+    "x": 50,
+    "y": 90
+  },
+  "highlight": [
+    "shoulderL",
+    "elbowL"
+  ],
+  "frames": [
+    {
+      "duration": 1300,
+      "label": "Bar at shoulders",
+      "pose": {
+        "torso": 180,
+        "head": 180,
+        "upperArmL": 20,
+        "forearmL": 175,
+        "upperArmR": 20,
+        "forearmR": 175,
+        "thighL": 0,
+        "shinL": 0,
+        "footL": 90,
+        "thighR": 0,
+        "shinR": 0,
+        "footR": 90
+      }
+    },
+    {
+      "duration": 900,
+      "label": "Press overhead",
+      "pose": {
+        "torso": 182,
+        "upperArmL": 178,
+        "forearmL": 180,
+        "upperArmR": 178,
+        "forearmR": 180
+      }
+    }
+  ]
+}

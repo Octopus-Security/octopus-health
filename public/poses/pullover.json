@@ -1,0 +1,12 @@
+{
+ "version": 2,
+ "title": "Dumbbell Pullover",
+ "view": "side",
+ "hold": "ball",
+ "props": [{"type":"box","x":12,"y":78,"w":62,"h":14}],
+ "highlight": ["shoulderL","spine"],
+ "frames": [
+  {"duration":1300,"label":"Weight over the chest","anchor":{"joint":"ankleL","x":72,"y":90},"pose":{"torso":-90,"head":-88,"upperArmL":180,"forearmL":185,"thighL":90,"shinL":-30,"footL":90,"upperArmR":180,"forearmR":185,"thighR":90,"shinR":-30,"footR":90}},
+  {"duration":1100,"label":"Arc it back behind the head","anchor":{"joint":"ankleL","x":72,"y":90},"pose":{"torso":-90,"head":-88,"upperArmL":265,"forearmL":280,"thighL":90,"shinL":-30,"footL":90,"upperArmR":265,"forearmR":280,"thighR":90,"shinR":-30,"footR":90}}
+ ]
+}

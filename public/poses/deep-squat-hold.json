@@ -1,0 +1,10 @@
+{
+ "version": 2,
+ "title": "Deep squat hold",
+ "static": true,
+ "view": "side",
+ "highlight": ["hipL", "kneeL"],
+ "frames": [
+  {"label":"Weight back","anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":142,"head":155,"upperArmL":3,"forearmL":150,"upperArmR":3,"forearmR":150,"thighL":105,"shinL":-32,"footL":90,"thighR":105,"shinR":-32,"footR":90}}
+ ]
+}

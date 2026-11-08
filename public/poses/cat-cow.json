@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "title": "Cat-Cow",
+  "view": "side",
+  "anchor": { "joint": "kneeL", "x": 30, "y": 89.5 },
+  "pins": ["handL", "handR"],
+  "highlight": ["spine"],
+  "frames": [
+    { "duration": 1800, "label": "Cow — drop the belly, look up",
+      "pose": { "torso": 104, "arch": -28, "head": 150, "upperArmL": 0, "forearmL": 0, "upperArmR": 0, "forearmR": 0,
+                "thighL": 0, "shinL": -90, "footL": -72, "thighR": 0, "shinR": -90, "footR": -72 } },
+    { "duration": 1800, "label": "Cat — round the back, chin to chest",
+      "pose": { "torso": 100, "arch": 30, "head": 45, "upperArmL": -18, "forearmL": 18, "upperArmR": -18, "forearmR": 18 } }
+  ]
+}

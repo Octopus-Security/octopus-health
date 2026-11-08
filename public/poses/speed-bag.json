@@ -1,0 +1,13 @@
+{
+ "version": 2,
+ "title": "Speed Bag",
+ "view": "side",
+ "props": [{"type":"ball","x":72,"y":-2,"r":6}],
+ "highlight": ["shoulderL","shoulderR"],
+ "frames": [
+  {"duration":160,"label":"Fists up at eye level","hold":0,"anchor":{"joint":"ankleL","x":42,"y":90},"pose":{"torso":176,"head":178,"upperArmL":95,"forearmL":150,"thighL":8,"shinL":-4,"footL":90,"upperArmR":110,"forearmR":250,"thighR":-12,"shinR":-14,"footR":76}},
+  {"duration":160,"hold":0,"anchor":{"joint":"ankleL","x":42,"y":90},"pose":{"torso":176,"head":178,"upperArmL":110,"forearmL":200,"thighL":8,"shinL":-4,"footL":90,"upperArmR":100,"forearmR":195,"thighR":-12,"shinR":-14,"footR":76}},
+  {"duration":160,"hold":0,"anchor":{"joint":"ankleL","x":42,"y":90},"pose":{"torso":176,"head":178,"upperArmL":100,"forearmL":250,"thighL":8,"shinL":-4,"footL":90,"upperArmR":85,"forearmR":150,"thighR":-12,"shinR":-14,"footR":76}},
+  {"duration":160,"hold":0,"anchor":{"joint":"ankleL","x":42,"y":90},"pose":{"torso":176,"head":178,"upperArmL":85,"forearmL":195,"thighL":8,"shinL":-4,"footL":90,"upperArmR":95,"forearmR":200,"thighR":-12,"shinR":-14,"footR":76}}
+ ]
+}

@@ -1,0 +1,59 @@
+{
+  "version": 2,
+  "title": "Pull-up",
+  "view": "side",
+  "grounded": false,
+  "anchor": {
+    "joint": "handL",
+    "x": 60,
+    "y": -3
+  },
+  "pins": [
+    "handR"
+  ],
+  "props": [
+    {
+      "type": "bar",
+      "x1": 36,
+      "y1": -3,
+      "x2": 84,
+      "y2": -3
+    }
+  ],
+  "highlight": [
+    "shoulderL",
+    "elbowL"
+  ],
+  "frames": [
+    {
+      "duration": 1400,
+      "label": "Dead hang",
+      "pose": {
+        "torso": 180,
+        "head": 180,
+        "upperArmL": 180,
+        "forearmL": 180,
+        "upperArmR": 180,
+        "forearmR": 180,
+        "thighL": 5,
+        "shinL": -85,
+        "footL": 0,
+        "thighR": 5,
+        "shinR": -85,
+        "footR": 0
+      }
+    },
+    {
+      "duration": 1100,
+      "label": "Chin over bar",
+      "pose": {
+        "torso": 188,
+        "head": 160,
+        "upperArmL": 85,
+        "forearmL": 215,
+        "upperArmR": 85,
+        "forearmR": 215
+      }
+    }
+  ]
+}

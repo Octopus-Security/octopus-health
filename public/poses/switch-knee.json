@@ -1,0 +1,15 @@
+{
+ "version": 2,
+ "title": "Switch Knee",
+ "view": "side",
+ "highlight": ["hipL","kneeL"],
+ "frames": [
+  {"duration":380,"label":"Guard","anchor":{"joint":"ankleL","x":56,"y":90},"pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"thighL":12,"shinL":-4,"footL":90,"upperArmR":20,"forearmR":165,"thighR":-22,"shinR":-20,"footR":70}},
+  {"duration":180,"label":"Switch: lead foot back, rear foot forward","hold":0,"air":true,"pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"thighL":-6,"shinL":-14,"footL":78,"upperArmR":20,"forearmR":165,"thighR":2,"shinR":-10,"footR":88,"root":{"x":47,"y":48}}},
+  {"duration":160,"label":"Land in the switched stance","hold":0,"anchor":{"joint":"ankleR","x":54,"y":89.5},"pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"thighL":-22,"shinL":-20,"footL":70,"upperArmR":20,"forearmR":165,"thighR":12,"shinR":-4,"footR":90}},
+  {"duration":200,"label":"Drive the knee: hips forward, hands pull down","hold":250,"highlight":["hipL","kneeL"],"anchor":{"joint":"ankleR","x":54,"y":89.5},"pose":{"torso":182,"head":172,"upperArmL":50,"forearmL":120,"thighL":130,"shinL":24,"footL":110,"upperArmR":46,"forearmR":116,"thighR":-6,"shinR":-6,"footR":84}},
+  {"duration":260,"label":"Lower the leg behind","hold":0,"highlight":[],"anchor":{"joint":"ankleR","x":54,"y":89.5},"pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"thighL":-22,"shinL":-20,"footL":70,"upperArmR":20,"forearmR":165,"thighR":12,"shinR":-4,"footR":90}},
+  {"duration":180,"label":"Switch back","hold":0,"air":true,"pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"thighL":-6,"shinL":-14,"footL":78,"upperArmR":20,"forearmR":165,"thighR":2,"shinR":-10,"footR":88,"root":{"x":47,"y":48}}},
+  {"duration":300,"label":"Guard","anchor":{"joint":"ankleL","x":56,"y":90},"pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"thighL":12,"shinL":-4,"footL":90,"upperArmR":20,"forearmR":165,"thighR":-22,"shinR":-20,"footR":70}}
+ ]
+}

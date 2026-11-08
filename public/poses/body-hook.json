@@ -1,0 +1,12 @@
+{
+ "version": 2,
+ "title": "Lead Hook to the Body",
+ "view": "side",
+ "highlight": ["shoulderL","spine"],
+ "frames": [
+  {"duration":420,"label":"Guard","anchor":{"joint":"ankleL","x":52,"y":90},"pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"thighL":12,"shinL":-4,"footL":90,"upperArmR":20,"forearmR":165,"thighR":-22,"shinR":-20,"footR":70}},
+  {"duration":200,"label":"Drop the level, lean onto the lead side","anchor":{"joint":"ankleL","x":52,"y":90},"pose":{"torso":160,"head":164,"upperArmL":22,"forearmL":150,"thighL":34,"shinL":-16,"footL":90,"upperArmR":20,"forearmR":165,"thighR":-8,"shinR":-44,"footR":52}},
+  {"duration":200,"label":"Dig the hook in under the ribs","hold":250,"highlight":["shoulderL","elbowL","spine"],"anchor":{"joint":"ankleL","x":52,"y":90},"pose":{"torso":150,"head":160,"upperArmL":22,"forearmL":104,"thighL":34,"shinL":-16,"footL":90,"upperArmR":24,"forearmR":170,"thighR":-8,"shinR":-44,"footR":52}},
+  {"duration":420,"label":"Back to guard","highlight":[],"anchor":{"joint":"ankleL","x":52,"y":90},"pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"thighL":12,"shinL":-4,"footL":90,"upperArmR":20,"forearmR":165,"thighR":-22,"shinR":-20,"footR":70}}
+ ]
+}

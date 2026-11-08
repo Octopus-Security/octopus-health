@@ -1,0 +1,12 @@
+{
+ "version": 2,
+ "title": "Single-Arm Dumbbell Row",
+ "view": "side",
+ "hold": "dumbbellL",
+ "props": [{"type":"box","x":20,"y":76,"w":56,"h":16}],
+ "highlight": ["shoulderL","elbowL","spine"],
+ "frames": [
+  {"duration":900,"label":"Arm long, full stretch","anchor":{"joint":"kneeR","x":31,"y":71},"pose":{"torso":105,"head":110,"upperArmL":0,"forearmL":0,"thighL":6,"shinL":-10,"footL":90,"upperArmR":-12,"forearmR":22,"thighR":0,"shinR":-90,"footR":-70}},
+  {"duration":800,"label":"Row to the ribs, elbow close","hold":300,"anchor":{"joint":"kneeR","x":31,"y":71},"pose":{"torso":105,"head":110,"upperArmL":-75,"forearmL":8,"thighL":6,"shinL":-10,"footL":90,"upperArmR":-12,"forearmR":22,"thighR":0,"shinR":-90,"footR":-70}}
+ ]
+}

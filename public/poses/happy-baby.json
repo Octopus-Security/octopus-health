@@ -1,0 +1,10 @@
+{
+ "version": 2,
+ "title": "Happy Baby",
+ "static": true,
+ "view": "side",
+ "highlight": ["hipL", "hipR"],
+ "frames": [
+  {"label":"Draw the knees toward the armpits","pose":{"torso":-90,"head":-88,"upperArmL":119,"forearmL":192,"upperArmR":118,"forearmR":188,"thighL":235,"shinL":200,"footL":290,"thighR":235,"shinR":200,"footR":290,"root":{"x":52,"y":87}}}
+ ]
+}

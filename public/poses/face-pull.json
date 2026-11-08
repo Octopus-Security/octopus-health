@@ -1,0 +1,62 @@
+{
+  "version": 2,
+  "title": "Face Pull",
+  "view": "side",
+  "anchor": {
+    "joint": "ankleL",
+    "x": 50,
+    "y": 90
+  },
+  "highlight": [
+    "shoulderL",
+    "elbowL"
+  ],
+  "frames": [
+    {
+      "duration": 600,
+      "label": "Reach",
+      "pose": {
+        "torso": 180,
+        "head": 180,
+        "upperArmL": 105,
+        "forearmL": 110,
+        "upperArmR": 105,
+        "forearmR": 110,
+        "thighL": 0,
+        "shinL": 0,
+        "footL": 90,
+        "thighR": 0,
+        "shinR": 0,
+        "footR": 90
+      }
+    },
+    {
+      "duration": 500,
+      "pose": {
+        "upperArmL": 10,
+        "forearmL": 95,
+        "upperArmR": 10,
+        "forearmR": 95
+      }
+    },
+    {
+      "duration": 900,
+      "label": "Pull, elbows high",
+      "pose": {
+        "upperArmL": -110,
+        "forearmL": 50,
+        "upperArmR": -110,
+        "forearmR": 50
+      }
+    },
+    {
+      "duration": 600,
+      "pose": {
+        "upperArmL": 10,
+        "forearmL": 95,
+        "upperArmR": 10,
+        "forearmR": 95
+      }
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+ "version": 2,
+ "title": "Thomas Stretch",
+ "view": "side",
+ "static": true,
+ "props": [{"type":"box","x":14,"y":60,"w":47,"h":32}],
+ "highlight": ["hipL","kneeL"],
+ "frames": [
+  {"label":"Hug one knee, let the other leg hang","pose":{"torso":-90,"head":-86,"upperArmL":90.1,"forearmL":175.9,"thighL":40,"shinL":-30,"footL":55,"upperArmR":90.1,"forearmR":175.9,"thighR":230,"shinR":88,"footR":150,"root":{"x":59,"y":55}}}
+ ]
+}

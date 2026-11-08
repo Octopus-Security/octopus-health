@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <%- include('partials/favicon') %>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="<%= asset('/theme.css') %>">
+</head>
+<body>
+<%- include('partials/nav') %>
+<div class="container">
+  <div class="card">
+    <h2>Coaching</h2>
+    <p class="fx-meta">Progress the movement pattern, not one exercise. When a variation has gone <%= plateauExposures %> sessions without a rep or load PR, rotate to one that works your weak point. Keep the same sets and reps, do not add sets, and stop a set when form slips. When a set fails, mark it failed in the <a href="/workout">workout logger</a> and tap where it gave out (<%= weakPoints.join(' / ') %>).</p>
+  </div>
+
+  <% patterns.forEach(function (p) { %>
+  <div class="card" id="pattern-<%= p.id %>">
+    <h2><%= p.name %>
+      <% if (p.plateau) { %><span class="fx-chip">Plateau</span><% } else if (p.current) { %><span class="fx-chip achieved">Moving</span><% } %>
+    </h2>
+    <% if (!p.current) { %>
+      <p class="fx-meta">Nothing logged yet. Log any of: <%= p.variations.map(function (v) { return v.name; }).join(', ') %>.</p>
+    <% } else { %>
+      <p><strong><%= p.current.name %></strong> - <%= p.current.exposures %> session<%= p.current.exposures === 1 ? '' : 's' %>, last <%= p.current.lastDate %>.
+        <% if (p.plateau) { %>No PR in the last <%= p.current.sinceLastPr %>.<% } else { %><%= p.current.exposuresToPlateau %> more without a PR and it counts as a plateau.<% } %></p>
+      <% if (p.weakPoint) { %>
+        <p class="fx-meta">Weak point: <strong><%= p.weakPoint.point %></strong>
+          (<%= weakPoints.map(function (w) { return w + ' ' + p.weakPoint.counts[w]; }).join(', ') %>).</p>
+      <% } else { %>
+        <p class="fx-meta">No failed sets tapped yet, so no weak point.</p>
+      <% } %>
+      <% if (p.recommendation) { %>
+        <div class="fx-msg">
+          <% if (p.recommendation.name) { %><strong>Next: <%= p.recommendation.name %></strong> (works <%= p.recommendation.bias.join(', ') %>).<br><% } %>
+          <%= p.recommendation.why %>
+          <% if (p.recommendation.rule) { %><br><%= p.recommendation.rule %><% } %>
+        </div>
+      <% } %>
+    <% } %>
+    <details><summary>All variations</summary>
+      <ul>
+        <% p.variations.forEach(function (v) { %>
+        <li><%= v.name %> <span class="fx-meta">(<%= v.bias.join(', ') %>)</span> - <%= v.exposures ? v.exposures + ' session' + (v.exposures === 1 ? '' : 's') + ', last ' + v.lastDate : 'not tried' %><%= v.available ? '' : ' - needs equipment your active gyms lack' %></li>
+        <% }) %>
+      </ul>
+    </details>
+  </div>
+  <% }) %>
+</div>
+</body>
+</html>

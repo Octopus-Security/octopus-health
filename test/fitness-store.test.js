@@ -10,6 +10,7 @@
  * Run: node --test test/fitness-store.test.js
  */
 
+require('./helpers/data-dir');
 const { test, before, after } = require('node:test');
 const assert = require('node:assert');
 const fs = require('node:fs');
@@ -32,7 +33,7 @@ async function fresh(tag) {
   return db;
 }
 after(() => {
-  for (const n of names) for (const ext of ['']) { try { fs.unlinkSync(path.join(__dirname, '..', 'data', `${n}_health.sqlite${ext}`)); } catch { /* not created */ } }
+  for (const n of names) for (const ext of ['']) { try { fs.unlinkSync(path.join(process.env.DATA_DIR, `${n}_health.sqlite${ext}`)); } catch { /* not created */ } }
 });
 
 const ET = iso => new Date(iso + '-04:00');

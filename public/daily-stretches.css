@@ -1,0 +1,60 @@
+/* Daily stretches. Dark, like the rest of the app. */
+.ds { margin-bottom: 20px; }
+/* The head row (title + Body map button) gets the same gap below it as between its own items,
+   so the button never sits flush against the note under it. The gap is PADDING, not margin:
+   a margin can be collapsed or zeroed by a reset or an inline style, padding cannot, and the
+   live page showed the note flush under the bar even though the margin was deployed. */
+.ds-head { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-3); flex-wrap: wrap; margin-bottom: 0; padding-bottom: var(--space-3); }
+.ds h2 { margin: 0 0 4px; color: #e8e8e8; }
+.ds h3 { font-size: 0.9rem; color: #e8e8e8; margin: 0 0 8px; }
+.ds-sub { color: #999; font-size: 0.85rem; margin: 0; }
+.ds-total { color: #2ecc71; font-weight: 600; margin-left: 6px; }
+.ds-note { color: #999; font-size: 0.82rem; margin: 0 0 var(--space-2); }
+.ds-msg { min-height: 1.1em; color: #2ecc71; font-size: 0.82rem; margin: 0 0 var(--space-2); }
+.ds-msg.ds-bad { color: #ff7b72; }
+.ds-list, .ds-lib { list-style: none; margin: 0 0 var(--space-3); padding: 0; }
+.ds-row, .ds-libitem { display: flex; align-items: center; gap: 10px; background: #0d0d0d; border: 1px solid #252525; border-radius: 10px; padding: 8px 12px; margin-bottom: var(--space-2); flex-wrap: wrap; }
+.ds-name { flex: 1 1 180px; color: #e8e8e8; font-size: 0.9rem; font-weight: 500; }
+/* The name is a button that opens the demo; it looks like a link, not like a green button. */
+.ds-demo-link { text-align: left; background: none; border: none; border-radius: 6px; padding: var(--space-2) var(--space-1); min-height: var(--tap); cursor: pointer; transform: none; text-decoration: underline; text-decoration-color: #3a3a3a; text-underline-offset: 3px; }
+.ds-demo-link:hover { background: none; transform: none; color: #2ecc71; text-decoration-color: #2ecc71; }
+.ds-field { display: inline-flex; align-items: center; gap: 4px; color: #999; font-size: 0.8rem; }
+.ds-hold { width: 70px; background: #0d0d0d; border: 1px solid #2a2a2a; border-radius: 6px; padding: 6px 8px; color: #e8e8e8; }
+.ds-sides, #ds-preset, .ds-search { background: #0d0d0d; border: 1px solid #2a2a2a; border-radius: 6px; padding: 6px 8px; color: #e8e8e8; }
+.ds-search { width: 100%; margin: 10px 0; padding: 9px 12px; }
+.ds-ctl { display: inline-flex; gap: 4px; }
+.ds-icon { min-width: 34px; padding: 6px 8px; background: #151515; border: 1px solid #2a2a2a; border-radius: 6px; color: #ccc; cursor: pointer; }
+.ds-icon:hover:not(:disabled) { border-color: #2ecc71; color: #2ecc71; }
+.ds-icon:disabled { opacity: 0.35; cursor: default; }
+.ds-remove:hover:not(:disabled) { border-color: #ff7b72; color: #ff7b72; }
+.ds-empty { color: #777; font-size: 0.88rem; padding: 8px 0; }
+.ds-block { margin-top: var(--space-4); border-top: 1px solid #1e1e1e; padding-top: 12px; }
+.ds-block summary { cursor: pointer; color: #e8e8e8; font-weight: 600; font-size: 0.9rem; }
+.ds-preset-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+/* The preset names are long ("Daily Starter Stretch (10 min) - 8 stretches, 8 ..."). The select takes the
+   row and truncates inside itself; it never gets wider than its card. */
+#ds-preset { flex: 1 1 240px; min-width: 0; max-width: 100%; width: 100%; text-overflow: ellipsis; }
+.ds-search { max-width: 100%; }
+.ds-radio { color: #bbb; font-size: 0.82rem; }
+.ds-lib { max-height: 320px; overflow-y: auto; }
+.ds-toggle { padding: 4px 12px; font-size: 0.78rem; background: transparent; color: #bbb; border: 1px solid #2f2f2f; border-radius: 16px; cursor: pointer; white-space: nowrap; }
+.ds-toggle:hover:not(:disabled) { border-color: #2ecc71; color: #2ecc71; }
+.ds-toggle[aria-pressed="true"] { background: #12301d; color: #2ecc71; border-color: #2ecc71; }
+.ds-toggle:disabled { opacity: 0.6; cursor: default; }
+.ds button:focus-visible, .ds select:focus-visible, .ds input:focus-visible, .ds summary:focus-visible, .bm-list .ds-toggle:focus-visible { outline: 2px solid #7fcbff; outline-offset: 2px; }
+
+/* Tap targets: 44px on phones and touch screens. */
+@media (max-width: 800px), (pointer: coarse) {
+  #ds-preset, .ds-hold, .ds-sides { font-size: 16px; }
+  .ds-icon, .ds-sides, .ds-hold, #ds-preset, .ds-toggle { min-height: var(--tap); }
+  .ds-icon { min-width: var(--tap); }
+  .ds-ctl { gap: var(--space-2); }
+  .ds-radio { display: inline-flex; align-items: center; min-height: var(--tap); gap: var(--space-2); }
+  .ds-block summary { display: flex; align-items: center; min-height: var(--tap); }
+  .ds-search { min-height: var(--tap); font-size: 16px; }
+}
+
+/* gear cue under a stretch's name (what to use, or what to do without it) */
+.ds-namewrap { flex: 1 1 180px; display: flex; flex-direction: column; align-items: flex-start; min-width: 0; }
+.ds-namewrap .ds-name { flex: none; }
+.ds-gear { color: #2ecc71; font-size: 0.78rem; margin-top: 2px; overflow-wrap: anywhere; }

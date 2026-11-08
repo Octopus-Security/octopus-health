@@ -1,0 +1,45 @@
+{
+  "version": 2,
+  "title": "Front Raise",
+  "view": "side",
+  "hold": "dumbbell",
+  "anchor": {
+    "joint": "ankleL",
+    "x": 50,
+    "y": 90
+  },
+  "highlight": [
+    "shoulderL",
+    "shoulderR"
+  ],
+  "frames": [
+    {
+      "duration": 1200,
+      "label": "Arms down",
+      "pose": {
+        "torso": 180,
+        "head": 180,
+        "upperArmL": 4,
+        "forearmL": 8,
+        "upperArmR": 4,
+        "forearmR": 8,
+        "thighL": 0,
+        "shinL": 0,
+        "footL": 90,
+        "thighR": 0,
+        "shinR": 0,
+        "footR": 90
+      }
+    },
+    {
+      "duration": 900,
+      "label": "To shoulder height",
+      "pose": {
+        "upperArmL": 90,
+        "forearmL": 86,
+        "upperArmR": 90,
+        "forearmR": 86
+      }
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+ "version": 2,
+ "title": "Backward Sled Drag",
+ "view": "side",
+ "props": [{"type":"box","x":82,"y":82,"w":16,"h":10},{"type":"bar","x1":53,"y1":47,"x2":82,"y2":84}],
+ "highlight": ["kneeL","hipL","shoulderL"],
+ "frames": [
+  {"duration":340,"label":"Near foot reaches back","hold":0,"pose":{"torso":198,"head":184,"upperArmL":37.6,"forearmL":40.6,"thighL":33.2,"shinL":-48.4,"footL":90,"upperArmR":33.7,"forearmR":36.6,"thighR":34.2,"shinR":-3.6,"footR":90,"root":{"x":44,"y":52}}},
+  {"duration":340,"label":"Plant it, pull through","hold":0,"pose":{"torso":198,"head":184,"upperArmL":37.6,"forearmL":40.6,"thighL":-8.8,"shinL":-33.2,"footL":90,"upperArmR":33.7,"forearmR":36.6,"thighR":24.1,"shinR":-24.1,"footR":90,"root":{"x":44,"y":52}}},
+  {"duration":340,"label":"Far foot reaches back","hold":0,"pose":{"torso":198,"head":184,"upperArmL":37.6,"forearmL":40.6,"thighL":34.2,"shinL":-3.6,"footL":90,"upperArmR":33.7,"forearmR":36.6,"thighR":33.2,"shinR":-48.4,"footR":90,"root":{"x":44,"y":52}}},
+  {"duration":340,"label":"Plant it, pull through","hold":0,"pose":{"torso":198,"head":184,"upperArmL":37.6,"forearmL":40.6,"thighL":24.1,"shinL":-24.1,"footL":90,"upperArmR":33.7,"forearmR":36.6,"thighR":-8.8,"shinR":-33.2,"footR":90,"root":{"x":44,"y":52}}}
+ ]
+}

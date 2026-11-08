@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "title": "Muay Thai Stance (Jot Muay)",
+  "view": "side",
+  "anchor": {
+    "joint": "ankleL",
+    "x": 56,
+    "y": 90
+  },
+  "static": true,
+  "idle": "breathe",
+  "frames": [
+    {"duration":2200,"label":"Guard: upright, weight on the rear leg, lead heel light, gloves at the brow","highlight":[],"pose":{"torso":180,"head":177,"upperArmL":40,"forearmL":174,"upperArmR":30,"forearmR":174,"thighL":14,"shinL":-2,"footL":80,"thighR":-20,"shinR":-22,"footR":64}}
+  ]
+}

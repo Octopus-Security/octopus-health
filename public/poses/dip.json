@@ -1,0 +1,59 @@
+{
+  "version": 2,
+  "title": "Dip",
+  "view": "side",
+  "grounded": false,
+  "anchor": {
+    "joint": "handL",
+    "x": 52,
+    "y": 45
+  },
+  "pins": [
+    "handR"
+  ],
+  "props": [
+    {
+      "type": "bar",
+      "x1": 38,
+      "y1": 45,
+      "x2": 66,
+      "y2": 45
+    }
+  ],
+  "highlight": [
+    "shoulderL",
+    "elbowL"
+  ],
+  "frames": [
+    {
+      "duration": 1000,
+      "label": "Straight arms",
+      "pose": {
+        "torso": 172,
+        "head": 170,
+        "upperArmL": 0,
+        "forearmL": 0,
+        "upperArmR": 0,
+        "forearmR": 0,
+        "thighL": 5,
+        "shinL": -85,
+        "footL": 0,
+        "thighR": 5,
+        "shinR": -85,
+        "footR": 0
+      }
+    },
+    {
+      "duration": 1100,
+      "label": "Elbows 90",
+      "pose": {
+        "torso": 160,
+        "head": 160,
+        "upperArmL": -85,
+        "forearmL": 5,
+        "upperArmR": -85,
+        "forearmR": 5
+      }
+    }
+  ]
+}

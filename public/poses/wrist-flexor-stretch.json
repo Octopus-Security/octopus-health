@@ -1,0 +1,10 @@
+{
+ "version": 2,
+ "title": "Wrist Flexor Stretch",
+ "static": true,
+ "view": "side",
+ "highlight": ["hand", "elbowL"],
+ "frames": [
+  {"label":"Pull the fingers back with the other hand","anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":180,"head":180,"upperArmL":88,"forearmL":92,"upperArmR":83,"forearmR":86,"thighL":0,"shinL":0,"footL":90,"thighR":0,"shinR":0,"footR":90}}
+ ]
+}

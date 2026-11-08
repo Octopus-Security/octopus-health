@@ -1,0 +1,67 @@
+{
+ "version": 2,
+ "title": "Cross-Body Shoulder Stretch",
+ "view": "front",
+ "frames": [
+  {
+   "duration": 1200,
+   "label": "Arms relaxed",
+   "highlight": [],
+   "pose": {
+    "root": {
+     "x": 50,
+     "y": 50
+    },
+    "torso": 180,
+    "head": 180,
+    "upperArmL": 8,
+    "forearmL": 5,
+    "upperArmR": -8,
+    "forearmR": -5,
+    "thighL": 0,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": 0,
+    "shinR": 0,
+    "footR": -90
+   }
+  },
+  {
+   "duration": 2500,
+   "label": "Pull the right arm across",
+   "highlight": [
+    "shoulderR"
+   ],
+   "pose": {
+    "upperArmR": 80,
+    "forearmR": 80,
+    "upperArmL": 5,
+    "forearmL": -140
+   }
+  },
+  {
+   "duration": 1200,
+   "label": "Release",
+   "highlight": [],
+   "pose": {
+    "upperArmL": 8,
+    "forearmL": 5,
+    "upperArmR": -8,
+    "forearmR": -5
+   }
+  },
+  {
+   "duration": 2500,
+   "label": "Pull the left arm across",
+   "highlight": [
+    "shoulderL"
+   ],
+   "pose": {
+    "upperArmL": -80,
+    "forearmL": -80,
+    "upperArmR": -5,
+    "forearmR": 140
+   }
+  }
+ ]
+}

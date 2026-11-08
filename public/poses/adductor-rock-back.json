@@ -1,0 +1,10 @@
+{
+ "version": 2,
+ "title": "Adductor Rock-Back",
+ "view": "side",
+ "highlight": ["hipL"],
+ "frames": [
+  {"duration":1300,"label":"All fours, one leg straight out to the side","hold":400,"pins":["handL","handR"],"anchor":{"joint":"kneeR","x":44,"y":88.5},"pose":{"torso":100,"head":140,"upperArmL":-30.3,"forearmL":21.1,"thighL":4,"shinL":4,"footL":90,"upperArmR":-30.3,"forearmR":21.1,"thighR":0,"shinR":-90,"footR":-72,"depth":{"thighL":0.534,"shinL":0.534}}},
+  {"duration":1500,"label":"Rock the hips back, back flat","hold":900,"pins":["handL","handR"],"anchor":{"joint":"kneeR","x":44,"y":88.5},"pose":{"torso":110,"head":145,"upperArmL":14.4,"forearmL":59.4,"thighL":57,"shinL":57,"footL":90,"upperArmR":14.4,"forearmR":59.4,"thighR":58,"shinR":-90,"footR":-72,"depth":{"thighL":0.55,"shinL":0.55}}}
+ ]
+}

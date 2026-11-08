@@ -1,0 +1,10 @@
+{
+ "version": 2,
+ "title": "Supine Hamstring Stretch",
+ "static": true,
+ "view": "side",
+ "highlight": ["kneeL", "hipL"],
+ "frames": [
+  {"label":"Raise one leg, hold behind the thigh","pose":{"torso":-90,"head":-88,"upperArmL":112,"forearmL":115,"upperArmR":110,"forearmR":112,"thighL":180,"shinL":180,"footL":270,"thighR":90,"shinR":90,"footR":180,"root":{"x":52,"y":87}}}
+ ]
+}

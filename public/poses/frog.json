@@ -1,0 +1,10 @@
+{
+ "version": 2,
+ "title": "Frog Stretch",
+ "static": true,
+ "view": "side",
+ "highlight": ["hipL", "hipR"],
+ "frames": [
+  {"label":"Rock the hips back, hold","anchor":{"joint":"kneeL","x":30,"y":89.5},"pose":{"torso":98,"head":80,"upperArmL":29,"forearmL":70,"upperArmR":29,"forearmR":70,"thighL":45,"shinL":-90,"footL":-72,"thighR":45,"shinR":-90,"footR":-72}}
+ ]
+}

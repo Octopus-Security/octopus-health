@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <%- include('partials/favicon') %>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="<%= asset('/theme.css') %>">
+  <link rel="stylesheet" href="<%= asset('/sessions.css') %>">
+</head>
+<body>
+<%- include('partials/nav') %>
+<div class="container" id="sx-root">
+  <p><a href="/sessions">&larr; All sessions</a></p>
+  <p class="sx-msg" id="sx-msg" role="status"></p>
+
+  <div class="card">
+    <h2>The session</h2>
+    <label class="sx-field">Title<input type="text" id="sx-title" maxlength="120"></label>
+    <label class="sx-field">Intro (shown to whoever has the link)<textarea id="sx-intro" rows="3" maxlength="2000"></textarea></label>
+  </div>
+
+  <div class="card">
+    <h2>Items</h2>
+    <p class="fx-meta">Name, figure and cues are copied in when you add an item. If the library is corrected later, an item here keeps the old text until you remove it and add it again. Sets, reps or time are yours.</p>
+    <ol id="sx-items" class="sx-items"></ol>
+    <p class="fx-meta" id="sx-items-empty">Nothing added yet. Search below.</p>
+  </div>
+
+  <div class="card">
+    <h2>Add from the library</h2>
+    <div class="sx-searchrow">
+      <input type="search" id="sx-q" placeholder="Search by name" aria-label="Search the library">
+      <select id="sx-type" aria-label="Kind"><option value="">All kinds</option><option value="exercise">Exercises</option><option value="routine">Mobility routines</option><option value="mma">Martial-arts moves</option></select>
+    </div>
+    <ul id="sx-results" class="sx-results"></ul>
+  </div>
+
+  <div class="card sx-private">
+    <h2>Tailoring <span class="fx-chip">private to you</span></h2>
+    <p class="fx-meta">Who it is for, their goal, limits and gear stay on this page. They are never shown on the shared page, in its title or in its data. The app narrows the library to match; you still choose every item.</p>
+    <label class="sx-field">Who is it for (your reference only)<input type="text" id="sx-for" maxlength="80"></label>
+    <label class="sx-field">Goal<input type="text" id="sx-goal" maxlength="300"></label>
+    <fieldset class="sx-field"><legend>Muscles or joints to work</legend><div id="sx-focus" class="sx-chips"></div></fieldset>
+    <fieldset class="sx-field"><legend>Joints with an injury or limit</legend><div id="sx-limits" class="sx-chips"></div></fieldset>
+    <label class="sx-field">More about limits (your reference only)<textarea id="sx-limitsnote" rows="2" maxlength="600"></textarea></label>
+    <fieldset class="sx-field"><legend>Equipment they have</legend><div id="sx-equip" class="sx-chips"></div></fieldset>
+    <p class="fx-meta">No equipment ticked means gear is not used to filter.</p>
+    <button type="button" id="sx-suggest" class="sx-btn">Suggest from the library</button>
+    <div id="sx-suggestions"></div>
+  </div>
+
+  <div class="card">
+    <h2>Sharing</h2>
+    <fieldset class="sx-field"><legend>Who can open it</legend>
+      <label class="sx-radio"><input type="radio" name="sx-vis" value="private"> Private: only you</label>
+      <label class="sx-radio"><input type="radio" name="sx-vis" value="unlisted"> Unlisted: anyone with the link, not listed or searchable</label>
+      <label class="sx-radio"><input type="radio" name="sx-vis" value="public"> Public: listed on the storefront and in the sitemap</label>
+    </fieldset>
+    <p class="fx-meta">Unlisted and public pages show the title, intro, items and your item notes, and nothing from the tailoring block.</p>
+    <div id="sx-link" class="sx-linkbox" hidden>
+      <input type="text" id="sx-url" readonly aria-label="Share link">
+      <button type="button" id="sx-copy" class="sx-btn">Copy link</button>
+      <a id="sx-open" class="sx-btn" target="_blank" rel="noopener noreferrer">Open as a visitor</a>
+      <button type="button" id="sx-rotate" class="sx-btn">New link (old one stops working)</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="btn-row">
+      <button type="button" id="sx-save" class="sx-btn sx-primary">Save</button>
+      <button type="button" id="sx-delete" class="sx-btn sx-danger">Delete session</button>
+    </div>
+  </div>
+</div>
+<script type="application/json" id="sx-data"><%- sessionJson %></script>
+<script src="<%= asset('/js/session-edit.js') %>"></script>
+</body>
+</html>

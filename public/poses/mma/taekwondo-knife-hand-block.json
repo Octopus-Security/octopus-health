@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "title": "Knife-hand Block (Sonkal Makgi)",
+  "view": "side",
+  "anchor": {
+    "joint": "ankleR",
+    "x": 46,
+    "y": 90
+  },
+  "frames": [
+    {"duration":600,"label":"Back stance","highlight":[],"pose":{"thighR":45,"shinR":-25,"footR":90,"thighL":40,"shinL":35,"footL":90,"torso":180,"head":180,"upperArmL":30,"forearmL":120,"upperArmR":85,"forearmR":90}},
+    {"duration":380,"label":"Wind up: open hand to the opposite ear","highlight":[],"pose":{"upperArmL":120,"forearmL":250,"upperArmR":85,"forearmR":90}},
+    {"duration":200,"label":"Block: knife edge at shoulder height, guard hand to the solar plexus","highlight":["shoulderL","elbowL","hand"],"pose":{"upperArmL":60,"forearmL":150,"upperArmR":30,"forearmR":120,"torso":178}},
+    {"duration":350,"label":"Hold: tighten at the finish","highlight":["shoulderL","elbowL","hand"],"pose":{"torso":178}},
+    {"duration":450,"label":"Return","highlight":[],"pose":{"thighR":45,"shinR":-25,"footR":90,"thighL":40,"shinL":35,"footL":90,"torso":180,"head":180,"upperArmL":30,"forearmL":120,"upperArmR":85,"forearmR":90}}
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "title": "Knee to Chest",
+  "view": "side",
+  "highlight": ["hipL", "hipR"],
+  "frames": [
+    { "duration": 1500, "label": "Lie flat",
+      "pose": { "root": { "x": 52, "y": 87 }, "torso": -90, "head": -88, "upperArmL": 90, "forearmL": 90, "upperArmR": 90, "forearmR": 90,
+                "thighL": 90, "shinL": 90, "footL": 180, "thighR": 90, "shinR": 90, "footR": 180 } },
+    { "duration": 2400, "label": "Hug the left knee in",
+      "pose": { "torso": -98, "head": -100, "upperArmL": 135, "forearmL": 160, "upperArmR": 135, "forearmR": 160,
+                "thighL": 230, "shinL": 170, "footL": 250 } },
+    { "duration": 1600, "label": "Release",
+      "pose": { "torso": -90, "head": -88, "upperArmL": 90, "forearmL": 90, "upperArmR": 90, "forearmR": 90,
+                "thighL": 90, "shinL": 90, "footL": 180 } },
+    { "duration": 2400, "label": "Hug the right knee in",
+      "pose": { "torso": -98, "head": -100, "upperArmL": 135, "forearmL": 160, "upperArmR": 135, "forearmR": 160,
+                "thighR": 230, "shinR": 170, "footR": 250 } }
+  ]
+}

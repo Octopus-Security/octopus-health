@@ -1,0 +1,11 @@
+{
+ "version": 2,
+ "title": "Supported Bridge",
+ "view": "side",
+ "static": true,
+ "props": [{"type":"box","x":45,"y":84,"w":15,"h":8}],
+ "highlight": ["hipL","spine"],
+ "frames": [
+  {"label":"Sacrum on the block, let the hips go heavy","anchor":{"joint":"neck","x":24,"y":87.5},"pose":{"torso":-74,"head":-88,"upperArmL":93,"forearmL":93,"thighL":111.4,"shinL":25.3,"footL":90,"upperArmR":95,"forearmR":95,"thighR":111.4,"shinR":25.3,"footR":90,"arch":-6}}
+ ]
+}

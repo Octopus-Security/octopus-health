@@ -1,0 +1,10 @@
+{
+ "version": 2,
+ "title": "Side Plank",
+ "static": true,
+ "view": "front",
+ "highlight": ["spine", "hipL"],
+ "frames": [
+  {"label":"Hips high, straight line","anchor":{"joint":"ankleL","x":11,"y":89.3},"pose":{"torso":104.6,"head":129.6,"upperArmL":0,"forearmL":-91.1,"upperArmR":170,"forearmR":170,"thighL":-75.4,"shinL":-75.4,"footL":-90,"thighR":-89.5,"shinR":-47.3,"footR":-90}}
+ ]
+}

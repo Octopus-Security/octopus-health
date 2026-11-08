@@ -96,7 +96,7 @@ async function skillState(db, equipmentOverride) {
   const tree = T.loadTree();
   const attempts = (await db.SkillAttempt.findAll({ order: [['date', 'ASC'], ['id', 'ASC']] })).map(a => a.toJSON());
   const st = T.statusMap(tree, attempts);
-  const eq = equipmentOverride ? new Set(['none', ...T.normalizeEquipment(equipmentOverride)]) : T.effectiveEquipment((await getEquipment(db)).stored);
+  const eq = equipmentOverride ? T.effectiveEquipment(T.normalizeEquipment(equipmentOverride)) : T.effectiveEquipment((await getEquipment(db)).stored);
   return { tree, attempts, st, have: eq };
 }
 

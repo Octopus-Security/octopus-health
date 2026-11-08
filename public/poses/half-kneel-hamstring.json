@@ -1,0 +1,10 @@
+{
+ "version": 2,
+ "title": "Hamstring Floss",
+ "view": "side",
+ "highlight": ["kneeL","hipL"],
+ "frames": [
+  {"duration":900,"label":"Half-kneel, front foot flat","pins":["ankleL"],"anchor":{"joint":"kneeR","x":38,"y":88.5},"pose":{"torso":178,"head":178,"upperArmL":15,"forearmL":60,"thighL":85.4,"shinL":5.9,"footL":90,"upperArmR":-10,"forearmR":20,"thighR":0,"shinR":-90,"footR":-70}},
+  {"duration":1000,"label":"Hips back, front knee straight, toes up","hold":500,"pins":["ankleL"],"anchor":{"joint":"kneeR","x":38,"y":88.5},"pose":{"torso":132,"head":135,"upperArmL":-10,"forearmL":5,"thighL":81.4,"shinL":37.7,"footL":160,"upperArmR":-10,"forearmR":5,"thighR":30,"shinR":-90,"footR":-70}}
+ ]
+}

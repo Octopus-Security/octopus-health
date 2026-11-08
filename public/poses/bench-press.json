@@ -1,0 +1,54 @@
+{
+  "version": 2,
+  "title": "Bench Press",
+  "view": "side",
+  "hold": "barbell",
+  "anchor": {
+    "joint": "ankleL",
+    "x": 72,
+    "y": 90
+  },
+  "props": [
+    {
+      "type": "box",
+      "x": 12,
+      "y": 78,
+      "w": 62,
+      "h": 14
+    }
+  ],
+  "highlight": [
+    "shoulderL",
+    "elbowL"
+  ],
+  "frames": [
+    {
+      "duration": 1300,
+      "label": "Lockout",
+      "pose": {
+        "torso": -90,
+        "head": -88,
+        "upperArmL": 180,
+        "forearmL": 180,
+        "upperArmR": 180,
+        "forearmR": 180,
+        "thighL": 90,
+        "shinL": -30,
+        "footL": 90,
+        "thighR": 90,
+        "shinR": -30,
+        "footR": 90
+      }
+    },
+    {
+      "duration": 800,
+      "label": "Bar to chest",
+      "pose": {
+        "upperArmL": 100,
+        "forearmL": 180,
+        "upperArmR": 100,
+        "forearmR": 180
+      }
+    }
+  ]
+}

@@ -10,7 +10,7 @@ services:
     container_name: octopus_health_tracker
     restart: always
     ports:
-      - "3002:3000"
+      - "127.0.0.1:3002:3000"
     volumes:
       - health_data:/usr/src/app/data
     environment:
@@ -72,6 +72,10 @@ services:
       # than guessing. ~3,600 requests/hour, and matches are cached per ingredient
       # so a repeated recipe needs no calls at all.
       - FDC_API_KEY=${FDC_API_KEY:-}
+      # Optional dedicated host for shared sessions (SESSIONS.md). Empty = off: /s is served on the
+      # app host only. When set, that host serves ONLY /s pages; point DNS and the proxy at it
+      # yourself, nothing here creates a domain.
+      - PUBLIC_HOST=${PUBLIC_HOST:-}
     networks:
       - octopus_network
     extra_hosts:

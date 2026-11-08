@@ -1,0 +1,11 @@
+{
+ "version": 2,
+ "title": "Kneeling Bench Lat Stretch",
+ "view": "side",
+ "static": true,
+ "props": [{"type":"box","x":54,"y":76.4,"w":28,"h":15.6}],
+ "highlight": ["shoulderL","spine"],
+ "frames": [
+  {"label":"Elbows on the bench, sink the chest","anchor":{"joint":"kneeL","x":32,"y":89.5},"pose":{"torso":75,"head":105,"upperArmL":125,"forearmL":238,"thighL":40,"shinL":-90,"footL":-72,"upperArmR":125,"forearmR":238,"thighR":40,"shinR":-90,"footR":-72,"arch":-12}}
+ ]
+}

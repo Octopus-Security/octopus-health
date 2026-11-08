@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "about": "Movement patterns and their variations, for the IP-method coaching engine (api/coaching.js). Progress the PATTERN, not one exercise: each variation biases a sector of the lift. `bias` uses the owner's weak-point vocabulary (bottom, middle, top, grip) plus stability, skill and power. `names` are logged exercise names (matched like the rest of the app, case/plural-insensitive); `requires` are equipment ids from content/equipment/catalogue.json, all needed, 'a|b' meaning either. Ladders are ordered easy to hard, but a plateau rotates by BIAS, not by rank. Edit freely: nothing is stored from this file.",
+  "patterns": [
+    { "id": "horizontal-push", "name": "Horizontal press", "variations": [
+      { "id": "push-up", "name": "Push-up", "names": ["Push-up", "Push Up"], "bias": ["middle"], "requires": [] },
+      { "id": "deficit-push-up", "name": "Deficit push-up", "names": ["Deficit Push-up", "Push-up on Handles", "Handle Push-up"], "bias": ["bottom"], "requires": ["handles|parallettes"] },
+      { "id": "decline-push-up", "name": "Decline push-up", "names": ["Decline Push-up", "Feet Elevated Push-up"], "bias": ["top", "middle"], "requires": ["chair|bar|power-tower"] },
+      { "id": "pseudo-planche-push-up", "name": "Pseudo planche push-up", "names": ["Pseudo Planche Push-up", "Planche Lean Push-up"], "bias": ["skill", "stability"], "requires": [] },
+      { "id": "explosive-push-up", "name": "Explosive push-up", "names": ["Explosive Push-up", "Clap Push-up"], "bias": ["power", "top"], "requires": [] },
+      { "id": "bench-press", "name": "Bench press", "names": ["Bench Press", "Barbell Bench Press", "Dumbbell Bench Press"], "bias": ["middle", "bottom"], "requires": ["weight-bench", "barbell|dumbbell"] }
+    ]},
+    { "id": "vertical-push", "name": "Vertical press", "variations": [
+      { "id": "pike-push-up", "name": "Pike push-up", "names": ["Pike Push-up"], "bias": ["middle"], "requires": [] },
+      { "id": "elevated-pike-push-up", "name": "Elevated pike push-up", "names": ["Elevated Pike Push-up", "Feet Elevated Pike Push-up"], "bias": ["top", "middle"], "requires": ["chair|bar|power-tower"] },
+      { "id": "deficit-pike-push-up", "name": "Deficit pike push-up", "names": ["Deficit Pike Push-up", "Parallette Pike Push-up"], "bias": ["bottom"], "requires": ["handles|parallettes"] },
+      { "id": "wall-handstand-push-up", "name": "Wall handstand push-up", "names": ["Wall Handstand Push-up", "Handstand Push-up"], "bias": ["skill", "stability", "top"], "requires": ["wall"] },
+      { "id": "overhead-press", "name": "Overhead press", "names": ["Overhead Press", "Dumbbell Shoulder Press", "Shoulder Press"], "bias": ["middle", "top"], "requires": ["barbell|dumbbell"] }
+    ]},
+    { "id": "horizontal-pull", "name": "Horizontal pull", "variations": [
+      { "id": "inverted-row", "name": "Inverted row", "names": ["Inverted Row", "Bodyweight Row"], "bias": ["middle"], "requires": ["bar|power-tower|rings"] },
+      { "id": "feet-elevated-row", "name": "Feet-elevated row", "names": ["Feet Elevated Inverted Row", "Elevated Row"], "bias": ["top", "middle"], "requires": ["bar|power-tower|rings", "chair"] },
+      { "id": "towel-row", "name": "Towel row", "names": ["Towel Row"], "bias": ["grip"], "requires": ["bar|power-tower"] },
+      { "id": "ring-row", "name": "Ring row", "names": ["Ring Row"], "bias": ["stability", "bottom"], "requires": ["rings"] },
+      { "id": "dumbbell-row", "name": "Dumbbell row", "names": ["Dumbbell Row", "One Arm Dumbbell Row"], "bias": ["bottom", "grip"], "requires": ["dumbbell"] }
+    ]},
+    { "id": "vertical-pull", "name": "Vertical pull", "variations": [
+      { "id": "pull-up", "name": "Pull-up", "names": ["Pull-up", "Pull Up"], "bias": ["middle"], "requires": ["bar|power-tower"] },
+      { "id": "chin-up", "name": "Chin-up", "names": ["Chin-up", "Chin Up"], "bias": ["bottom", "middle"], "requires": ["bar|power-tower"] },
+      { "id": "wide-pull-up", "name": "Wide-grip pull-up", "names": ["Wide Grip Pull-up", "Wide Pull-up"], "bias": ["top"], "requires": ["bar|power-tower"] },
+      { "id": "towel-pull-up", "name": "Towel pull-up", "names": ["Towel Pull-up"], "bias": ["grip"], "requires": ["bar|power-tower"] },
+      { "id": "archer-pull-up", "name": "Archer pull-up", "names": ["Archer Pull-up"], "bias": ["skill", "stability"], "requires": ["bar|power-tower"] },
+      { "id": "explosive-pull-up", "name": "Explosive pull-up", "names": ["Explosive Pull-up", "Chest to Bar Pull-up"], "bias": ["power", "top"], "requires": ["bar|power-tower"] }
+    ]},
+    { "id": "squat", "name": "Squat", "variations": [
+      { "id": "bodyweight-squat", "name": "Bodyweight squat", "names": ["Bodyweight Squat", "Air Squat", "Squat"], "bias": ["middle"], "requires": [] },
+      { "id": "split-squat", "name": "Split squat", "names": ["Split Squat", "Bulgarian Split Squat"], "bias": ["bottom", "stability"], "requires": [] },
+      { "id": "pistol-squat", "name": "Pistol squat", "names": ["Pistol Squat", "Assisted Pistol Squat"], "bias": ["skill", "stability", "bottom"], "requires": [] },
+      { "id": "jump-squat", "name": "Jump squat", "names": ["Jump Squat"], "bias": ["power", "top"], "requires": [] },
+      { "id": "goblet-squat", "name": "Goblet squat", "names": ["Goblet Squat"], "bias": ["bottom", "middle"], "requires": ["dumbbell|kettlebell"] },
+      { "id": "back-squat", "name": "Back squat", "names": ["Back Squat", "Barbell Squat"], "bias": ["middle", "top"], "requires": ["barbell"] }
+    ]},
+    { "id": "hinge", "name": "Hinge", "variations": [
+      { "id": "hip-hinge", "name": "Good morning (bodyweight)", "names": ["Good Morning", "Bodyweight Good Morning"], "bias": ["bottom"], "requires": [] },
+      { "id": "single-leg-rdl", "name": "Single-leg Romanian deadlift", "names": ["Single Leg RDL", "Single-leg Romanian Deadlift"], "bias": ["stability", "skill"], "requires": [] },
+      { "id": "glute-bridge", "name": "Glute bridge", "names": ["Glute Bridge", "Hip Thrust"], "bias": ["top"], "requires": [] },
+      { "id": "nordic-curl", "name": "Nordic curl", "names": ["Nordic Curl", "Nordic Hamstring Curl"], "bias": ["bottom", "skill"], "requires": [] },
+      { "id": "kettlebell-swing", "name": "Kettlebell swing", "names": ["Kettlebell Swing"], "bias": ["power", "top"], "requires": ["kettlebell"] },
+      { "id": "romanian-deadlift", "name": "Romanian deadlift", "names": ["Romanian Deadlift", "RDL"], "bias": ["bottom", "middle"], "requires": ["barbell|dumbbell"] },
+      { "id": "deadlift", "name": "Deadlift", "names": ["Deadlift", "Barbell Deadlift"], "bias": ["bottom", "grip", "middle"], "requires": ["barbell"] }
+    ]}
+  ]
+}

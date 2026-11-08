@@ -1,0 +1,13 @@
+{
+ "version": 2,
+ "title": "Superman Punch",
+ "view": "side",
+ "highlight": ["shoulderR","hipR"],
+ "frames": [
+  {"duration":420,"label":"Guard","anchor":{"joint":"ankleL","x":46,"y":90},"pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"thighL":12,"shinL":-4,"footL":90,"upperArmR":20,"forearmR":165,"thighR":-22,"shinR":-20,"footR":70}},
+  {"duration":200,"label":"Fake the rear knee forward","anchor":{"joint":"ankleL","x":46,"y":90},"pose":{"torso":176,"head":174,"upperArmL":30,"forearmL":160,"thighL":16,"shinL":-6,"footL":90,"upperArmR":20,"forearmR":165,"thighR":60,"shinR":-10,"footR":90}},
+  {"duration":180,"label":"Kick it back, spring off the lead foot","hold":0,"air":true,"pose":{"torso":162,"head":166,"upperArmL":30,"forearmL":160,"thighL":20,"shinL":-12,"footL":70,"upperArmR":60,"forearmR":120,"thighR":-40,"shinR":-70,"footR":30,"root":{"x":44,"y":47}}},
+  {"duration":200,"label":"Rear hand lands as the lead foot does","hold":250,"highlight":["shoulderR","elbowR"],"anchor":{"joint":"ankleL","x":56,"y":90},"pose":{"torso":160,"head":164,"upperArmL":28,"forearmL":170,"thighL":22,"shinL":-8,"footL":90,"upperArmR":90,"forearmR":92,"thighR":-30,"shinR":-44,"footR":50}},
+  {"duration":500,"label":"Step back to stance","highlight":[],"anchor":{"joint":"ankleL","x":46,"y":90},"pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"thighL":12,"shinL":-4,"footL":90,"upperArmR":20,"forearmR":165,"thighR":-22,"shinR":-20,"footR":70}}
+ ]
+}

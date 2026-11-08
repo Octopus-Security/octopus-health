@@ -6,6 +6,7 @@
 
 const express = require('express');
 const { Op } = require('sequelize');
+const goalsApi = require('../goals');
 const router  = express.Router();
 const getDatabase = require('../../database');
 const { partition } = require('../dedupe-sets');
@@ -148,7 +149,7 @@ router.post('/prs', requireToken, async (req, res) => {
       weight:       weight      != null ? parseFloat(weight)     : null,
       weightUnit:   weightUnit  || 'lbs',
       durationSecs: durationSecs != null ? parseInt(durationSecs) : null,
-      date:         date        || new Date().toISOString().slice(0, 10),
+      date:         date        || new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' }),
       notes:        notes       || null,
     });
     res.json({ ok: true, pr: row });
@@ -984,6 +985,15 @@ router.get('/nutrition-today', requireToken, async (req, res) => {
   } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
 });
 
+// GET /api/service/nutrition-targets - the caller's daily targets plus today and the last
+// 7 ET days. Read-only. Unlogged days are status "not_logged" with null totals, never 0.
+router.get('/nutrition-targets', requireToken, async (req, res) => {
+  try {
+    const db = await getDB(req);
+    res.json(await require('../nutrition-targets').overview(db));
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+
 // GET /api/service/templates?slug=mon:gym
 // Returns workout template by slug (dayKey:location), or all if no slug.
 router.get('/templates', requireToken, async (req, res) => {
@@ -1044,13 +1054,17 @@ router.post('/weight', requireToken, async (req, res) => {
   } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
 });
 
-// GET /api/service/goals?active=1  → goals for the service user (active = not completed)
+// GET /api/service/goals?active=1[&brief=1]  → goals, via api/goals.js (the one definition
+// of "active": status 'active' AND not past its deadline (ET)), ordered by priority then age.
+// ?brief=1 (with active) also requires inBrief, i.e. exactly what the Discord morning brief
+// lists. Without ?active the full list is returned, paused, done and expired included.
 router.get('/goals', requireToken, async (req, res) => {
   try {
     const { Goal } = await getDB(req);
-    const where = {};
-    if (req.query.active === '1' || req.query.active === 'true') where.completed = false;
-    const rows = await Goal.findAll({ where, order: [['deadline', 'ASC'], ['createdAt', 'DESC']] });
+    const on = v => v === '1' || v === 'true';
+    const rows = on(req.query.active)
+      ? await goalsApi.listActive(Goal, { brief: on(req.query.brief) })
+      : await goalsApi.listAll(Goal);
     res.json({ ok: true, goals: rows });
   } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
 });
@@ -1082,19 +1096,22 @@ function goalKey(title, exerciseName) {
 router.post('/goals', requireToken, async (req, res) => {
   try {
     const { Goal } = await getDB(req);
-    const b = req.body || {};
-    const type = ['weight', 'exercise', 'calories'].includes(b.type) ? b.type : 'exercise';
+    const b = { ...(req.body || {}) };
+    if (!goalsApi.TYPES.includes(b.type)) delete b.type;   // create has always defaulted a bad type to 'exercise'
+    let f;
+    try { f = goalsApi.fromBody(b); } catch (e) { return res.status(e.status || 400).json({ ok: false, error: e.message }); }
     const target = b.targetValue != null ? parseFloat(b.targetValue) : 0;
 
     // Update the matching goal rather than adding a second one. An ambition
     // restated is the same ambition — the newer wording and progression win,
     // and nothing is lost because this is an UPDATE, never a delete.
+    // (Open goals only: active and paused. A done goal restated is a new goal.)
     const key = goalKey(b.title, b.exerciseName);
     if (key) {
       const existing = (await Goal.findAll({ where: { completed: false } }))
         .find(g => goalKey(g.title, g.exerciseName) === key);
       if (existing) {
-        for (const [f, v] of Object.entries({
+        const upd = {
           title:        b.title        || existing.title,
           exerciseName: b.exerciseName || existing.exerciseName,
           targetValue:  Number.isFinite(target) && target ? target : existing.targetValue,
@@ -1103,14 +1120,19 @@ router.post('/goals', requireToken, async (req, res) => {
           deadline:     b.deadline     || existing.deadline,
           progression:  b.progression  || existing.progression,
           description:  b.description  || existing.description,
-        })) existing[f] = v;
+        };
+        // New fields are applied only when the caller actually sent them.
+        for (const k of ['kind', 'priority', 'inBrief', 'nudge']) if (b[k] !== undefined) upd[k] = f[k];
+        // A restated goal does not silently un-pause itself unless asked: status only if sent.
+        if (b.status !== undefined) { upd.status = f.status; upd.completed = f.completed; }
+        for (const [k, v] of Object.entries(upd)) existing[k] = v;
         await existing.save();
         return res.json({ ok: true, goal: existing, updatedExisting: true });
       }
     }
 
     const row = await Goal.create({
-      type,
+      type:         f.type || 'exercise',
       title:        b.title        || b.exerciseName || null,
       exerciseName: b.exerciseName || null,
       targetValue:  Number.isFinite(target) ? target : 0,
@@ -1119,25 +1141,37 @@ router.post('/goals', requireToken, async (req, res) => {
       deadline:     b.deadline     || null,
       progression:  b.progression  || null,
       description:  b.description   || null,
-      completed:    false,
+      status:       f.status, completed: f.completed,
+      priority:     f.priority !== undefined ? f.priority : null,
+      kind:         f.kind !== undefined ? f.kind : null,
+      inBrief:      f.inBrief !== undefined ? f.inBrief : true,
+      nudge:        f.nudge !== undefined ? f.nudge : false,
     });
     res.json({ ok: true, goal: row });
   } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
 });
 
-// PATCH /api/service/goals/:id  { currentValue, completed, progression, ... }
+// POST /api/service/goals/reorder  { ids: [3, 1, 2] }  → priorities 1..n in that order.
+router.post('/goals/reorder', requireToken, async (req, res) => {
+  try {
+    const { Goal } = await getDB(req);
+    const applied = await goalsApi.reorder(Goal, (req.body || {}).ids);
+    res.json({ ok: true, ids: applied });
+  } catch (e) { res.status(e.status || 500).json({ ok: false, error: e.message }); }
+});
+
+// PATCH /api/service/goals/:id  { status, priority, kind, inBrief, nudge, currentValue,
+//   progression, targetValue, deadline, title, description, completed, ... }
+// Only the fields sent are changed. `completed` and `status` are kept in step.
 router.patch('/goals/:id', requireToken, async (req, res) => {
   try {
     const { Goal } = await getDB(req);
     const row = await Goal.findByPk(req.params.id);
     if (!row) return res.status(404).json({ ok: false, error: 'goal not found' });
-    const b = req.body || {};
-    for (const f of ['title', 'exerciseName', 'unit', 'deadline', 'progression', 'description']) {
-      if (b[f] !== undefined) row[f] = b[f];
-    }
-    if (b.targetValue  !== undefined) row.targetValue  = parseFloat(b.targetValue);
-    if (b.currentValue !== undefined) row.currentValue = b.currentValue == null ? null : parseFloat(b.currentValue);
-    if (b.completed    !== undefined) row.completed    = !!b.completed;
+    let f;
+    try { f = goalsApi.fromBody(req.body || {}, row); } catch (e) { return res.status(e.status || 400).json({ ok: false, error: e.message }); }
+    delete f.type;   // a goal's type is fixed once created
+    Object.assign(row, f);
     await row.save();
     res.json({ ok: true, goal: row });
   } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
@@ -1188,10 +1222,9 @@ router.get('/plans/today', requireToken, async (req, res) => {
     const plan = await TrainingPlan.findByPk(assignment.planId);
     if (!plan) return res.json({ ok: true, active: false });
     const phases = JSON.parse(plan.phases || '[]');
-    const start = new Date(assignment.startDate);
-    const today = new Date();
-    const weekNumber = Math.floor((today - start) / (7 * 24 * 60 * 60 * 1000)) + 1;
-    const dayOfWeek = today.getDay();
+    const ET = require('../../lib/et');
+    const weekNumber = Math.floor(ET.daysBetween(assignment.startDate, ET.todayET()) / 7) + 1;
+    const dayOfWeek = ET.weekdayET();
     let currentPhase = phases[0];
     for (const phase of phases) {
       const [startW, endW] = String(phase.weeks).split('–').map(Number);
@@ -1203,8 +1236,29 @@ router.get('/plans/today', requireToken, async (req, res) => {
   } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
 });
 
+// ── Daily stretches (service side — cortex's morning message) ────────────────
+//
+// The acting account's own daily stretch list (api/daily-stretches.js). Scoped by
+// getDB(req), i.e. by X-Service-User, like every route here. An empty list is an
+// answer ({ items: [] }), not an error: cortex leaves the section out.
+
+// GET /api/service/stretches/daily → { ok, name, totalMinutes, items, url }
+router.get('/stretches/daily', requireToken, async (req, res) => {
+  try {
+    const db = await getDB(req);
+    const ds = require('../daily-stretches');
+    // An account that has never opened the web UI has no seeded starter plan yet.
+    // Seeding is additive and idempotent; skipped once the person has a list of
+    // their own, so an emptied list stays empty.
+    if (!(await ds.ownPlan(db))) await db.seedData().catch(() => {});
+    res.json({ ok: true, ...(await ds.serviceView(db)) });
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+
 // Skill tree, fitness tests, weekly benchmarks. Mounted here so they share this
 // router's token + X-Service-User guards and getDB(); see fitness-service.js.
 require('./fitness-service')(router, getDB);
+require('./gyms-service')(router, getDB);
+require('./constraints-service')(router, getDB);
 
 module.exports = router;

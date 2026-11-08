@@ -3,10 +3,11 @@
 <head>
   <meta charset="UTF-8">
     <%- include('partials/favicon') %>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title><%= title %></title>
   <link rel="stylesheet" href="<%= asset('/theme.css') %>">
   <script src="<%= asset('/stick-figure.js') %>" defer></script>
+  <script src="<%= asset('/pose-map.js') %>"></script>
   <style>
     .filter-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; align-items:center; }
     .filter-bar input { flex:1; min-width:180px; background:#0d0d0d; border:1px solid #2a2a2a; border-radius:8px; padding:8px 14px; color:#e8e8e8; font-size:0.9rem; }
@@ -95,6 +96,7 @@
     .ex-video-btn:hover .play-circle { transform:scale(1.1); }
 
     .sf-container { width:100%; height:100%; display:flex; align-items:center; justify-content:center; }
+    .ex-nodiagram { font-size:0.75rem; color:#8a8296; text-align:center; padding:4px 8px; user-select:none; }
     .sf-container svg { width:auto; height:100%; max-width:100%; }
     .sf-guide-link {
       position:absolute; bottom:6px; right:8px;
@@ -146,7 +148,7 @@
 
     .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:100; align-items:center; justify-content:center; }
     .modal-overlay.open { display:flex; }
-    .modal { background:#111; border:1px solid #222; border-radius:14px; padding:24px; width:min(480px,95vw); max-height:85vh; overflow-y:auto; }
+    .modal { background:#111; border:1px solid #222; border-radius:14px; padding:24px; width:min(480px,95vw); max-height:85vh; max-height:85dvh; overscroll-behavior:contain; overflow-y:auto; }
     .modal h3 { color:#e8e8e8; margin-bottom:16px; }
     .form-group { margin-bottom:12px; }
     .form-group label { display:block; font-size:0.8rem; color:#888; margin-bottom:4px; }
@@ -161,7 +163,10 @@
 <div class="container" style="padding-top:24px">
   <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px">
     <h2 style="margin:0">📚 <%= title %></h2>
-    <button onclick="document.getElementById('add-modal').classList.add('open')" class="btn">+ Custom Exercise</button>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <a href="/body" class="btn">Body map</a>
+      <button onclick="document.getElementById('add-modal').classList.add('open')" class="btn">+ Custom Exercise</button>
+    </div>
   </div>
 
   <div class="filter-bar">
@@ -170,6 +175,10 @@
       <option value="">All Equipment</option>
       <option value="barbell">Barbell</option>
       <option value="dumbbell">Dumbbell</option>
+      <option value="landmine">Landmine</option>
+      <option value="plate">Weight Plates</option>
+      <option value="dip_belt">Dip Belt</option>
+      <option value="ab_straps">Ab Straps</option>
       <option value="cable_machine">Cable Machine</option>
       <option value="machine">Machine</option>
       <option value="bodyweight">Bodyweight</option>
@@ -209,6 +218,7 @@
   <div style="margin-bottom:12px">
     <span class="count-badge" id="count-label"></span>
   </div>
+  <p id="rec-note" hidden style="color:#777;font-size:0.82rem;margin:0 0 12px"><%= locals.recoveryNote || "" %></p>
 
   <div class="lib-grid" id="lib-grid"></div>
 </div>
@@ -238,6 +248,10 @@
         <select name="equipment" required>
           <option value="barbell">Barbell</option>
           <option value="dumbbell">Dumbbell</option>
+          <option value="landmine">Landmine</option>
+          <option value="plate">Weight Plates</option>
+          <option value="dip_belt">Dip Belt</option>
+          <option value="ab_straps">Ab Straps</option>
           <option value="cable_machine">Cable Machine</option>
           <option value="machine">Machine</option>
           <option value="bodyweight">Bodyweight</option>
@@ -270,72 +284,24 @@
 <script>
 const ALL_EXERCISES = <%- JSON.stringify(exercises) %>;
 
-// Map exercise names to pose keys (loaded from /poses/<key>.json)
-const POSE_MAP = {
-  // Lunge / hip flexor / kneeling stretches
-  "World's Greatest Stretch":          'lunge',
-  "Couch Stretch":                     'lunge',
-  "Half-Kneeling Hip Flexor Stretch":  'lunge',
-  "Standing Hip Flexor PAILs/RAILs":   'lunge',
-  "Lizard Stretch":                    'lunge',
-  "Walking Lunge":                     'lunge',
-  "Reverse Lunge":                     'lunge',
-  "Bulgarian Split Squat":             'lunge',
-  // Squat / wide stance
-  "Frog Stretch":                      'squat',
-  "Sumo Squat":                        'squat',
-  "Goblet Squat":                      'squat',
-  "Back Squat":                        'squat',
-  "Front Squat":                       'squat',
-  "Bodyweight Squat":                  'squat',
-  "Air Squat":                         'squat',
-  "Squat":                             'squat',
-  // Seated floor stretches (folded legs)
-  "Butterfly Stretch":                 'seated-fold',
-  "Pigeon Stretch":                    'seated-fold',
-  "Supine Piriformis Stretch":         'seated-fold',
-  "Seated Forward Fold":               'seated-fold',
-  "90/90 Hip Stretch":                 'seated-fold',
-  // Quadruped (hands+knees) stretches
-  "Cat-Cow":                           'quadruped',
-  "Cat Cow":                           'quadruped',
-  "Bird Dog":                          'quadruped',
-  "Thoracic Open Book":                'quadruped',
-  "Thread the Needle":                 'quadruped',
-  // Standing forward fold / hamstring
-  "Standing Forward Fold":             'fold',
-  "Toe Touch":                         'fold',
-  "Standing Hamstring Stretch":        'fold',
-  "Hamstring Stretch":                 'fold',
-  // Side bend / overhead reach (lat, shoulder, side body)
-  "Lat Stretch on Pull-up Bar":        'side-bend',
-  "Overhead Banded Shoulder Stretch":  'side-bend',
-  "Standing Side Bend":                'side-bend',
-  "Doorway Chest Stretch":             'side-bend',
-  "Bretzel Stretch":                   'side-bend',
-  // Standing / breathing (default for many)
-  "Standing Figure-4 Stretch":         'stand',
-  "Cross-Body Shoulder Stretch":       'stand',
-  "Sleeper Stretch":                   'stand',
-  "Prone Shoulder ER Stretch":         'stand',
-  "Doorway Wrist Stretch":             'stand',
-  "Walk + Deep Breathing":             'stand',
-  "Deep Breathing":                    'stand',
-  "Box Breathing":                     'stand',
-  "Shadow Boxing":                     'stand',
-  "Jumping Jacks":                     'stand',
-  "High Knees":                        'stand',
-  "Arm Circles":                       'stand',
-};
-
-// Returns pose key for an exercise — by name, then default by category
+// Which animation each card shows: one shared rule set, public/pose-map.js.
+// A martial-arts technique with no pose of its own gets NO figure (the card says "No diagram yet"):
+// the category fallback is a generic stance, which shows a different move than the one named.
+const MARTIAL = ['mma', 'bjj', 'muay_thai'];
 function poseForExercise(e) {
-  if (POSE_MAP[e.name]) return POSE_MAP[e.name];
-  if (e.category === 'recovery') return 'stand';
-  return null;
+  if (typeof PoseMap === 'undefined') return null;
+  if (MARTIAL.indexOf(e.category) >= 0) return PoseMap.match(e.name);
+  return PoseMap.keyFor(e.name, e.category);
 }
 
-const _sfPlayers = {};
+// exId -> the Player drawing that card right now. Cleared with the grid: a re-render replaces every
+// card, so a player (and its "already drawn" flag) from the previous render must not outlive it.
+// (It used to, which left every card blank after any tab, search or filter change.)
+let _sfPlayers = {};
+function destroyFigures() {
+  Object.keys(_sfPlayers).forEach(function (k) { try { _sfPlayers[k].destroy(); } catch (e) { /* gone with its card */ } });
+  _sfPlayers = {};
+}
 let activeCat = '';
 
 document.querySelectorAll('.cat-tab').forEach(btn => {
@@ -368,7 +334,10 @@ const CAT_ICON = {
 
 function renderGrid(list) {
   document.getElementById('count-label').textContent = `${list.length} exercise${list.length !== 1 ? 's' : ''}`;
+  // One standing safety line for the page, shown only while recovery content is on screen.
+  document.getElementById('rec-note').hidden = !list.some(e => e.category === 'recovery');
   const grid = document.getElementById('lib-grid');
+  destroyFigures();
   grid.innerHTML = list.map(e => {
     const catClass   = 'tag-' + (e.category || 'strength');
     const equipLabel = (e.equipment || '').replace(/_/g,' ');
@@ -391,6 +360,7 @@ function renderGrid(list) {
 
     const poseKey   = poseForExercise(e);
     const mediaAttr = poseKey ? ` data-pose="${poseKey}" data-exid="${e.id}"` : '';
+    const noDiagram = !poseKey && MARTIAL.indexOf(e.category) >= 0;
     const guideLink = hasVideo
       ? `<a href="${escHtml(e.videoUrl)}" target="_blank" rel="noopener" class="sf-guide-link" title="Watch video guide">▶ Guide</a>`
       : '';
@@ -398,7 +368,9 @@ function renderGrid(list) {
       ? `<div class="sf-container" id="sf-${e.id}"></div>${guideLink}`
       : hasVideo
         ? `<a href="${escHtml(e.videoUrl)}" target="_blank" rel="noopener" class="ex-video-btn" title="Watch on YouTube"><div class="play-circle">▶</div></a><span class="ex-media-icon">${icon}</span>`
-        : `<span class="ex-media-icon">${icon}</span><span class="ex-media-label">no animation yet</span>`;
+        : noDiagram
+          ? `<span class="ex-nodiagram">No diagram yet</span>`
+          : `<span class="ex-media-icon">${icon}</span>`;
 
     return `
 <div class="ex-card" data-id="${e.id}" data-cat="${e.category}">
@@ -463,20 +435,43 @@ document.getElementById('add-form').addEventListener('submit', async e => {
   }
 });
 
-function initStickFigures() {
-  if (typeof StickFigurePlayer === 'undefined') return;
+function initStickFigures(tries) {
+  // stick-figure.js is deferred: on a slow connection it can arrive after this runs. Wait for it
+  // (up to ~10 s) rather than leaving every card blank.
+  if (typeof StickFigurePlayer === 'undefined') {
+    if ((tries || 0) < 100) setTimeout(function () { initStickFigures((tries || 0) + 1); }, 100);
+    else document.querySelectorAll('.ex-media[data-pose] .sf-container').forEach(function (c) { c.innerHTML = '<span class="ex-nodiagram">No diagram yet</span>'; });
+    return;
+  }
   document.querySelectorAll('.ex-media[data-pose]').forEach(function (el) {
-    var key = el.dataset.pose;
     var exId = el.dataset.exid;
     var container = document.getElementById('sf-' + exId);
-    if (!container || _sfPlayers[exId]) return;
-    StickFigurePlayer.load(container, key, { autoplay: true }, function (err) {
-      if (!err) _sfPlayers[exId] = true;
-    });
+    if (!container || container.dataset.sf) return;   // already drawn (or loading) on THIS render
+    container.dataset.sf = '1';
+    // One card at a time, caught per card: a bad pose shows "No diagram yet" there and touches no other.
+    try {
+      StickFigurePlayer.mount(container, el.dataset.pose, { autoplay: true }, function (err, p) {
+        if (!err && p) {
+          if (container.isConnected) _sfPlayers[exId] = p; else p.destroy();   // the grid was replaced while loading
+        }
+      });
+    } catch (err) {
+      container.innerHTML = '<span class="ex-nodiagram">No diagram yet</span>';
+    }
   });
 }
 
+// Deep link from the body map: /library?ex=<id> narrows to that exercise and opens its instructions.
+(function () {
+  var id = parseInt(new URLSearchParams(location.search).get('ex'), 10);
+  var hit = id ? ALL_EXERCISES.find(function (e) { return e.id === id; }) : null;
+  if (hit) document.getElementById('search-input').value = hit.name;
+})();
 filterExercises();
+(function () {
+  var id = parseInt(new URLSearchParams(location.search).get('ex'), 10);
+  if (id && document.getElementById('instr-wrap-' + id)) toggleInstructions(id);
+})();
 </script>
 </body>
 </html>

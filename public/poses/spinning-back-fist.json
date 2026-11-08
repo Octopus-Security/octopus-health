@@ -1,0 +1,12 @@
+{
+ "version": 2,
+ "title": "Spinning Back Fist",
+ "view": "side",
+ "highlight": ["shoulderL","spine"],
+ "frames": [
+  {"duration":420,"label":"Guard","anchor":{"joint":"ankleR","x":48,"y":90},"pose":{"torso":172,"head":172,"upperArmL":20,"forearmL":165,"thighL":-22,"shinL":-20,"footL":70,"upperArmR":30,"forearmR":160,"thighR":12,"shinR":-4,"footR":90}},
+  {"duration":240,"label":"Step across, turn the back, look over the shoulder","hold":0,"anchor":{"joint":"ankleR","x":48,"y":90},"pose":{"torso":188,"head":200,"upperArmL":76,"forearmL":222,"thighL":4,"shinL":-12,"footL":80,"upperArmR":10,"forearmR":150,"thighR":6,"shinR":-2,"footR":90}},
+  {"duration":200,"label":"Whip the backhand out at head height","hold":250,"highlight":["shoulderL","elbowL"],"anchor":{"joint":"ankleR","x":48,"y":90},"pose":{"torso":168,"head":170,"upperArmL":100,"forearmL":98,"thighL":-24,"shinL":-26,"footL":60,"upperArmR":28,"forearmR":165,"thighR":14,"shinR":-6,"footR":90}},
+  {"duration":450,"label":"Back to guard","highlight":[],"anchor":{"joint":"ankleR","x":48,"y":90},"pose":{"torso":172,"head":172,"upperArmL":20,"forearmL":165,"thighL":-22,"shinL":-20,"footL":70,"upperArmR":30,"forearmR":160,"thighR":12,"shinR":-4,"footR":90}}
+ ]
+}

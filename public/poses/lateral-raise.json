@@ -1,0 +1,44 @@
+{
+  "version": 2,
+  "title": "Lateral Raise",
+  "view": "front",
+  "hold": "dumbbell",
+  "highlight": [
+    "shoulderL",
+    "shoulderR"
+  ],
+  "frames": [
+    {
+      "duration": 1300,
+      "label": "Arms down",
+      "pose": {
+        "root": {
+          "x": 50,
+          "y": 50
+        },
+        "torso": 180,
+        "head": 180,
+        "upperArmL": 6,
+        "forearmL": 6,
+        "upperArmR": -6,
+        "forearmR": -6,
+        "thighL": 0,
+        "shinL": 0,
+        "footL": 90,
+        "thighR": 0,
+        "shinR": 0,
+        "footR": -90
+      }
+    },
+    {
+      "duration": 1000,
+      "label": "To shoulder height",
+      "pose": {
+        "upperArmL": 88,
+        "forearmL": 80,
+        "upperArmR": -88,
+        "forearmR": -80
+      }
+    }
+  ]
+}

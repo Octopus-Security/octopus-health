@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "title": "Horizontal Elbow (Sok Tat)",
+  "view": "side",
+  "anchor": {
+    "joint": "ankleL",
+    "x": 56,
+    "y": 90
+  },
+  "frames": [
+    {"duration":450,"label":"Guard","highlight":[],"pose":{"torso":180,"head":177,"upperArmL":40,"forearmL":174,"upperArmR":30,"forearmR":174,"thighL":14,"shinL":-2,"footL":80,"thighR":-20,"shinR":-22,"footR":64}},
+    {"duration":200,"label":"Step in: elbow rises to shoulder height, fist by the ear","highlight":["shoulderL"],"pose":{"torso":174,"head":174,"upperArmL":74,"forearmL":222,"thighL":18,"shinL":-4}},
+    {"duration":200,"label":"Slice: hips and shoulders turn, the point of the elbow cuts across at eye height","highlight":["shoulderL","elbowL","spine"],"pose":{"torso":166,"head":170,"upperArmL":90,"forearmL":244,"thighL":20,"shinL":-6,"thighR":-28,"shinR":-28,"footR":44,"upperArmR":28,"forearmR":182}},
+    {"duration":240,"label":"Follow through and cover","highlight":[],"pose":{"torso":172,"head":174,"upperArmL":60,"forearmL":210}},
+    {"duration":380,"label":"Guard","highlight":[],"pose":{"torso":180,"head":177,"upperArmL":40,"forearmL":174,"upperArmR":30,"forearmR":174,"thighL":14,"shinL":-2,"footL":80,"thighR":-20,"shinR":-22,"footR":64}}
+  ]
+}

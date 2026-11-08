@@ -1,0 +1,10 @@
+{
+ "version": 2,
+ "title": "Cable Crunch",
+ "view": "side",
+ "highlight": ["spine"],
+ "frames": [
+  {"duration":900,"label":"Kneel tall, rope by the head","anchor":{"joint":"kneeL","x":40,"y":88},"pose":{"torso":172,"head":170,"upperArmL":150,"forearmL":250,"thighL":12,"shinL":-90,"footL":-60,"upperArmR":150,"forearmR":250,"thighR":12,"shinR":-90,"footR":-60}},
+  {"duration":1000,"label":"Curl elbows toward the knees","hold":300,"anchor":{"joint":"kneeL","x":40,"y":88},"pose":{"torso":115,"head":95,"upperArmL":70,"forearmL":200,"thighL":12,"shinL":-90,"footL":-60,"upperArmR":70,"forearmR":200,"thighR":12,"shinR":-90,"footR":-60,"arch":24}}
+ ]
+}

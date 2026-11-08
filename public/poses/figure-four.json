@@ -1,0 +1,10 @@
+{
+ "version": 2,
+ "title": "Standing Figure-4 Stretch",
+ "static": true,
+ "view": "side",
+ "highlight": ["hipR", "kneeR"],
+ "frames": [
+  {"label":"Sit the hips back","anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":150,"head":155,"upperArmL":60,"forearmL":85,"upperArmR":0,"forearmR":0,"thighL":50,"shinL":-10,"footL":90,"thighR":120,"shinR":-9,"footR":81}}
+ ]
+}

@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "title": "Bulgarian Split Squat",
+  "view": "side",
+  "anchor": {"joint":"ankleL","x":52,"y":90},
+  "pins": ["ankleR"],
+  "hold": "dumbbell",
+  "props": [{"type":"box","x":4,"y":73,"w":20,"h":19}],
+  "grounded": true,
+  "highlight": ["kneeL","hipL"],
+  "frames": [
+    {"duration":1200,"label":"Back foot on the bench, stand tall","pose":{"torso":180,"head":180,"upperArmL":0,"forearmL":0,"upperArmR":0,"forearmR":0,"thighL":0,"shinL":0,"footL":90,"thighR":-32,"shinR":-75,"footR":45}},
+    {"duration":1500,"label":"Drop straight down","pose":{"torso":168,"head":168,"upperArmL":0,"forearmL":0,"upperArmR":0,"forearmR":0,"thighL":75,"shinL":-20,"footL":90,"thighR":-9,"shinR":-134,"footR":-14}},
+    {"duration":1200,"label":"Drive up","pose":{"torso":180,"head":180,"upperArmL":0,"forearmL":0,"upperArmR":0,"forearmR":0,"thighL":0,"shinL":0,"footL":90,"thighR":-32,"shinR":-75,"footR":45}}
+  ]
+}

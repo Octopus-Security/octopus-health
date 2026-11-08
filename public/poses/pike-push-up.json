@@ -1,0 +1,56 @@
+{
+  "version": 2,
+  "title": "Pike Push-up",
+  "view": "side",
+  "anchor": {
+    "joint": "toeL",
+    "x": 22,
+    "y": 91.5
+  },
+  "pins": [
+    "handL",
+    "handR"
+  ],
+  "highlight": [
+    "shoulderL",
+    "elbowL"
+  ],
+  "frames": [
+    {
+      "duration": 1100,
+      "label": "Inverted V",
+      "pose": {
+        "torso": 72,
+        "head": 100,
+        "thighL": -20,
+        "shinL": -20,
+        "footL": 60,
+        "thighR": -20,
+        "shinR": -20,
+        "footR": 60,
+        "upperArmL": -0.8,
+        "forearmL": 2.2,
+        "upperArmR": -0.8,
+        "forearmR": 2.2
+      }
+    },
+    {
+      "duration": 1100,
+      "label": "Head toward floor",
+      "pose": {
+        "torso": 35,
+        "head": 60,
+        "thighL": -20,
+        "shinL": -20,
+        "footL": 60,
+        "thighR": -20,
+        "shinR": -20,
+        "footR": 60,
+        "upperArmL": -8.8,
+        "forearmL": 93.3,
+        "upperArmR": -8.8,
+        "forearmR": 93.3
+      }
+    }
+  ]
+}

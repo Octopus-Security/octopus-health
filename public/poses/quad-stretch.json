@@ -1,0 +1,10 @@
+{
+ "version": 2,
+ "title": "Standing Quad Stretch",
+ "static": true,
+ "view": "side",
+ "highlight": ["kneeR", "hipR"],
+ "frames": [
+  {"label":"Knees together, push the hip forward","anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":184,"head":184,"upperArmL":70,"forearmL":80,"upperArmR":-16,"forearmR":-13,"thighL":0,"shinL":0,"footL":90,"thighR":-18,"shinR":-170,"footR":210}}
+ ]
+}

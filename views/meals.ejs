@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <%- include('partials/favicon') %>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title><%= title %></title>
     <link rel="stylesheet" href="<%= asset('/theme.css') %>">
 </head>
@@ -12,17 +12,21 @@
 
     <div class="container">
         <div class="card">
+            <h2>🎯 Daily targets</h2>
+            <p style="margin-top:-.4rem;"><a href="/nutrition/targets">Set calorie and protein targets and see today and the last 7 days</a></p>
+        </div>
+        <div class="card">
             <h2>🍽️ Log Meal</h2>
             <p style="margin-top:-.4rem;"><a href="/meal-templates">🥤 Saved meals</a> — log a shake or a repeat meal in one click.</p>
             <form method="POST" action="/meals">
                 <div class="form-grid">
                     <div class="form-group">
                         <label>Date</label>
-                        <input type="date" name="date" value="<%= new Date().toISOString().split('T')[0] %>" required>
+                        <input type="date" name="date" value="<%= todayET() %>" required>
                     </div>
                     <div class="form-group">
                         <label>Time</label>
-                        <input type="time" name="time" value="<%= new Date().toTimeString().slice(0,5) %>" required>
+                        <input type="time" name="time" value="<%= new Date().toLocaleTimeString('en-GB', { timeZone: 'America/New_York', hour12: false }).slice(0,5) %>" required>
                     </div>
                     <div class="form-group">
                         <label>Meal Type</label>

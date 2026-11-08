@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "title": "Fighting Stance (Gyorugi Junbi)",
+  "view": "side",
+  "anchor": {
+    "joint": "ankleL",
+    "x": 52,
+    "y": 90
+  },
+  "static": true,
+  "idle": "bounce",
+  "frames": [
+    {"duration":1400,"label":"Guard: angled, knees soft, weight 50/50","highlight":[],"pose":{"torso":176,"head":176,"upperArmL":40,"forearmL":150,"upperArmR":25,"forearmR":160,"thighL":14,"shinL":-6,"footL":90,"thighR":-20,"shinR":-18,"footR":72}}
+  ]
+}

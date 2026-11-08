@@ -1,0 +1,12 @@
+{
+ "version": 2,
+ "title": "Bear Crawl",
+ "view": "side",
+ "highlight": ["shoulderL","hipL","kneeL"],
+ "frames": [
+  {"duration":260,"label":"Near hand and far foot step","hold":0,"pose":{"torso":100,"head":130,"upperArmL":-28.5,"forearmL":38,"thighL":5.6,"shinL":-94,"footL":30,"upperArmR":-12.1,"forearmR":-9.2,"thighR":18.6,"shinR":-104.3,"footR":30,"root":{"x":40,"y":66}}},
+  {"duration":260,"label":"Plant them","hold":0,"pose":{"torso":100,"head":130,"upperArmL":10.9,"forearmL":13.8,"thighL":5.6,"shinL":-94,"footL":30,"upperArmR":-12.1,"forearmR":-9.2,"thighR":33.1,"shinR":-85,"footR":30,"root":{"x":40,"y":66}}},
+  {"duration":260,"label":"Far hand and near foot step","hold":0,"pose":{"torso":100,"head":130,"upperArmL":-12.1,"forearmL":-9.2,"thighL":18.6,"shinL":-104.3,"footL":30,"upperArmR":-28.5,"forearmR":38,"thighR":5.6,"shinR":-94,"footR":30,"root":{"x":40,"y":66}}},
+  {"duration":260,"label":"Plant them","hold":0,"pose":{"torso":100,"head":130,"upperArmL":-12.1,"forearmL":-9.2,"thighL":33.1,"shinL":-85,"footL":30,"upperArmR":10.9,"forearmR":13.8,"thighR":5.6,"shinR":-94,"footR":30,"root":{"x":40,"y":66}}}
+ ]
+}

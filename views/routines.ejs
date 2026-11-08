@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <%- include('partials/favicon') %>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title><%= title %></title>
     <link rel="stylesheet" href="<%= asset('/theme.css') %>">
 </head>
@@ -11,6 +11,8 @@
     <%- include('partials/nav') %>
 
     <div class="container">
+
+        <p style="color:#777;font-size:0.82rem;margin:0 0 12px"><%= locals.recoveryNote || "" %></p>
 
         <% if (success) { %>
             <div class="success">Routine saved.</div>

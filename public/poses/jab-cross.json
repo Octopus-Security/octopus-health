@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "title": "Jab–Cross",
+  "view": "side",
+  "anchor": { "joint": "ankleL", "x": 56, "y": 90 },
+  "frames": [
+    { "duration": 500, "label": "Guard",
+      "pose": { "torso": 172, "head": 172, "upperArmL": 30, "forearmL": 160, "upperArmR": 20, "forearmR": 165,
+                "thighL": 12, "shinL": -4, "footL": 90, "thighR": -22, "shinR": -20, "footR": 70 } },
+    { "duration": 250, "label": "Jab", "highlight": ["shoulderL", "elbowL"],
+      "pose": { "upperArmL": 90, "forearmL": 92 } },
+    { "duration": 350, "label": "Guard", "highlight": [],
+      "pose": { "upperArmL": 30, "forearmL": 160 } },
+    { "duration": 300, "label": "Cross", "highlight": ["shoulderR", "elbowR"],
+      "pose": { "torso": 165, "head": 168, "upperArmR": 88, "forearmR": 90 } },
+    { "duration": 600, "label": "Guard", "highlight": [],
+      "pose": { "torso": 172, "head": 172, "upperArmR": 20, "forearmR": 165 } }
+  ]
+}

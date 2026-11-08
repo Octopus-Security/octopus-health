@@ -1,0 +1,64 @@
+{
+ "version": 2,
+ "title": "Leg extension",
+ "view": "side",
+ "props": [
+  {
+   "type": "box",
+   "x": 28,
+   "y": 66,
+   "w": 30,
+   "h": 26
+  },
+  {
+   "type": "bar",
+   "x1": 33,
+   "y1": 66,
+   "x2": 34,
+   "y2": 26
+  }
+ ],
+ "grounded": false,
+ "highlight": [
+  "kneeL",
+  "kneeR"
+ ],
+ "frames": [
+  {
+   "duration": 900,
+   "label": "Shins hanging",
+   "pose": {
+    "torso": 178,
+    "head": 180,
+    "thighL": 90,
+    "shinL": 0,
+    "footL": 90,
+    "upperArmL": -13.6,
+    "forearmL": 27.6,
+    "thighR": 90,
+    "shinR": 0,
+    "footR": 90,
+    "upperArmR": -13.6,
+    "forearmR": 27.6,
+    "root": {
+     "x": 40,
+     "y": 61
+    }
+   }
+  },
+  {
+   "duration": 900,
+   "label": "Kick to straight",
+   "pose": {
+    "shinL": 88,
+    "footL": 130,
+    "shinR": 88,
+    "footR": 130,
+    "root": {
+     "x": 40,
+     "y": 61
+    }
+   }
+  }
+ ]
+}

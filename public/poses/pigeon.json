@@ -1,0 +1,10 @@
+{
+ "version": 2,
+ "title": "Pigeon Pose",
+ "static": true,
+ "view": "side",
+ "highlight": ["hipL"],
+ "frames": [
+  {"label":"Hold the fold","pose":{"torso":100,"head":80,"upperArmL":5,"forearmL":95,"upperArmR":5,"forearmR":95,"thighL":82,"shinL":-80,"footL":-62,"thighR":-80,"shinR":-90,"footR":-60,"arch":20,"root":{"x":50,"y":82}}}
+ ]
+}

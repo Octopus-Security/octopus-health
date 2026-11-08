@@ -1,0 +1,10 @@
+{
+ "version": 2,
+ "title": "Child's Pose",
+ "static": true,
+ "view": "side",
+ "highlight": ["spine", "hipL"],
+ "frames": [
+  {"label":"Sit back to the heels","anchor":{"joint":"kneeL","x":30,"y":89.5},"pose":{"torso":95,"head":55,"upperArmL":60,"forearmL":87,"upperArmR":60,"forearmR":87,"thighL":75,"shinL":-90,"footL":-72,"thighR":75,"shinR":-90,"footR":-72,"arch":14}}
+ ]
+}

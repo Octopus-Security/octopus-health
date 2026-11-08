@@ -1,0 +1,10 @@
+{
+ "version": 2,
+ "title": "Plank",
+ "static": true,
+ "view": "side",
+ "highlight": ["spine", "hipL"],
+ "frames": [
+  {"label":"Straight line, shoulders over elbows","anchor":{"joint":"toeL","x":5,"y":91.5},"pose":{"torso":98.3,"head":104.3,"upperArmL":0,"forearmL":90,"upperArmR":0,"forearmR":90,"thighL":-81.7,"shinL":-81.7,"footL":-10,"thighR":-81.7,"shinR":-81.7,"footR":-10}}
+ ]
+}

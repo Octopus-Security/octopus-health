@@ -1,0 +1,12 @@
+{
+ "version": 2,
+ "title": "Neck Bridge",
+ "view": "side",
+ "highlight": ["neck","spine"],
+ "frames": [
+  {"duration":900,"label":"On the back, feet planted","pins":["ankleL","ankleR"],"anchor":{"joint":"head","x":24,"y":86.2},"pose":{"torso":-82,"head":-74,"upperArmL":-252,"forearmL":-117,"thighL":-256.5,"shinL":-399.7,"footL":-270,"upperArmR":-252,"forearmR":-117,"thighR":-256.5,"shinR":-399.7,"footR":-270,"arch":0}},
+  {"duration":900,"label":"Push up onto the head","pins":["ankleL","ankleR"],"anchor":{"joint":"head","x":24,"y":86.2},"pose":{"torso":-68,"head":-16,"upperArmL":-238,"forearmL":-103,"thighL":-284.6,"shinL":-371.3,"footL":-270,"upperArmR":-238,"forearmR":-103,"thighR":-284.6,"shinR":-371.3,"footR":-270,"arch":-14}},
+  {"duration":800,"label":"Rock toward the forehead","pins":["ankleL","ankleR"],"anchor":{"joint":"head","x":24,"y":86.2},"pose":{"torso":-62,"head":-2,"upperArmL":-232,"forearmL":-97,"thighL":-293.2,"shinL":-357.7,"footL":-270,"upperArmR":-232,"forearmR":-97,"thighR":-293.2,"shinR":-357.7,"footR":-270,"arch":-18}},
+  {"duration":800,"label":"Rock back toward the crown","pins":["ankleL","ankleR"],"anchor":{"joint":"head","x":24,"y":86.2},"pose":{"torso":-74,"head":-34,"upperArmL":-244,"forearmL":-109,"thighL":-276.2,"shinL":-384.6,"footL":-270,"upperArmR":-244,"forearmR":-109,"thighR":-276.2,"shinR":-384.6,"footR":-270,"arch":-10}}
+ ]
+}

@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "title": "Mount",
+  "view": "side",
+  "static": true,
+  "frames": [
+    {"duration":3200,"label":"Mount: sit on their belly, knees on the floor either side, hands posted","highlight":["hipL","hipR"],"pose":{"torso":140,"head":150,"upperArmL":-1.9,"forearmL":21.9,"thighL":58,"shinL":-92,"footL":-77,"upperArmR":20.5,"forearmR":17.9,"thighR":55,"shinR":-90,"footR":-75,"root":{"x":66,"y":77}},"partner":{"pose":{"torso":-90,"head":-92,"upperArmL":82.2,"forearmL":158.5,"thighL":90,"shinL":90,"footL":180,"upperArmR":90,"forearmR":90,"thighR":88,"shinR":92,"footR":180,"root":{"x":38,"y":87}},"highlight":[]},"contacts":[{"a":"hip","b":"torso","tol":12},{"a":"kneeL","b":"torso","tol":12},{"a":"handL","b":"neck","tol":12}]}
+  ]
+}

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <%- include('partials/favicon') %>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title><%= title %></title>
     <link rel="stylesheet" href="<%= asset('/theme.css') %>">
     <style>
@@ -53,7 +53,7 @@
                         </h3>
                         <div class="log-form">
                             <form method="POST" action="/meal-preps/<%= p.id %>/log" class="log-form">
-                                <input type="date" name="date" value="<%= new Date().toISOString().split('T')[0] %>">
+                                <input type="date" name="date" value="<%= todayET() %>">
                                 <button type="submit">Eat one</button>
                             </form>
                             <button type="button" class="toggle-btn"
@@ -108,7 +108,7 @@
                         <div class="log-form">
                             <form method="POST" action="/meal-templates/<%= t.id %>/log" class="log-form">
                                 <input type="number" name="servings" value="1" step="0.25" min="0.25" style="width:4.5rem;" title="servings">
-                                <input type="date" name="date" value="<%= new Date().toISOString().split('T')[0] %>">
+                                <input type="date" name="date" value="<%= todayET() %>">
                                 <button type="submit">Log it</button>
                             </form>
                             <form method="POST" action="/meal-templates/<%= t.id %>/prep" class="log-form"

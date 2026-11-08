@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "title": "90/90 Hip Switch",
+  "view": "side",
+  "pins": ["ankleL", "ankleR"],
+  "highlight": ["hipL", "hipR"],
+  "frames": [
+    { "duration": 1800, "label": "Left knee in front, right knee out to the side",
+      "pose": { "root": { "x": 24, "y": 86 }, "torso": 184, "head": 182, "upperArmL": -6, "forearmL": -2, "upperArmR": -6, "forearmR": -2,
+                "thighL": 125, "shinL": 50, "footL": 90, "thighR": 115, "shinR": -50, "footR": 85 } },
+    { "duration": 1500, "label": "Both knees up, rotate across",
+      "pose": { "thighL": 125, "shinL": 50, "footL": 90, "thighR": 125, "shinR": 50, "footR": 90 } },
+    { "duration": 1800, "label": "Right knee in front, left knee out to the side",
+      "pose": { "thighL": 115, "shinL": -50, "footL": 85, "thighR": 125, "shinR": 50, "footR": 90 } },
+    { "duration": 1500, "label": "Both knees up, rotate back",
+      "pose": { "thighL": 125, "shinL": 50, "footL": 90, "thighR": 125, "shinR": 50, "footR": 90 } }
+  ]
+}

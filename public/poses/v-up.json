@@ -1,0 +1,11 @@
+{
+ "version": 2,
+ "title": "V-Up",
+ "view": "side",
+ "highlight": ["spine","hipL"],
+ "frames": [
+  {"duration":900,"label":"Flat, arms overhead","pose":{"root":{"x":52,"y":87},"torso":-90,"head":-88,"upperArmL":-150,"forearmL":-150,"upperArmR":-150,"forearmR":-150,"thighL":90,"shinL":90,"footL":180,"thighR":90,"shinR":90,"footR":180,"arch":0}},
+  {"duration":1000,"label":"Fold, hands to toes","pose":{"root":{"x":52,"y":86},"torso":-150,"head":-136,"upperArmL":-248.1,"forearmL":-245.7,"upperArmR":-248.1,"forearmR":-245.7,"thighL":150,"shinL":150,"footL":180,"thighR":150,"shinR":150,"footR":180,"arch":-4}},
+  {"duration":1500,"label":"Lower with control","pose":{"root":{"x":52,"y":87},"torso":-90,"head":-88,"upperArmL":-150,"forearmL":-150,"upperArmR":-150,"forearmR":-150,"thighL":90,"shinL":90,"footL":180,"thighR":90,"shinR":90,"footR":180,"arch":0}}
+ ]
+}

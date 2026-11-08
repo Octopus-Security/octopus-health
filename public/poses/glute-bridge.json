@@ -1,0 +1,48 @@
+{
+ "version": 2,
+ "title": "Glute bridge",
+ "view": "side",
+ "anchor": {
+  "joint": "ankleL",
+  "x": 80,
+  "y": 89.5
+ },
+ "highlight": [
+  "hipL",
+  "hipR"
+ ],
+ "frames": [
+  {
+   "duration": 900,
+   "label": "Feet flat, knees bent",
+   "pose": {
+    "torso": -90,
+    "head": -88,
+    "thighL": 137,
+    "shinL": 31.2,
+    "footL": 90,
+    "upperArmL": 90,
+    "forearmL": 90,
+    "thighR": 137,
+    "shinR": 31.2,
+    "footR": 90,
+    "upperArmR": 90,
+    "forearmR": 90,
+    "arch": 0
+   }
+  },
+  {
+   "duration": 800,
+   "label": "Hips up: straight line",
+   "pose": {
+    "torso": -72,
+    "head": -96,
+    "thighL": 109.7,
+    "shinL": 19.5,
+    "thighR": 109.7,
+    "shinR": 19.5,
+    "arch": -8
+   }
+  }
+ ]
+}

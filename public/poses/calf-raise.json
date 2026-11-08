@@ -1,0 +1,42 @@
+{
+ "version": 2,
+ "title": "Calf raise",
+ "view": "side",
+ "anchor": {
+  "joint": "toeL",
+  "x": 57,
+  "y": 90.3
+ },
+ "highlight": [
+  "ankleL",
+  "ankleR"
+ ],
+ "frames": [
+  {
+   "duration": 900,
+   "label": "Heels down",
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "thighL": 0,
+    "shinL": 0,
+    "footL": 90,
+    "upperArmL": 3,
+    "forearmL": 6,
+    "thighR": 0,
+    "shinR": 0,
+    "footR": 90,
+    "upperArmR": 3,
+    "forearmR": 6
+   }
+  },
+  {
+   "duration": 900,
+   "label": "Up on the toes",
+   "pose": {
+    "footL": 16,
+    "footR": 16
+   }
+  }
+ ]
+}

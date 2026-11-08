@@ -1,0 +1,64 @@
+{
+ "version": 2,
+ "title": "Cobra",
+ "view": "side",
+ "anchor": {
+  "joint": "handL",
+  "x": 70,
+  "y": 89.5
+ },
+ "pins": [
+  "handR"
+ ],
+ "highlight": [
+  "spine",
+  "neck"
+ ],
+ "frames": [
+  {
+   "duration": 1800,
+   "label": "Lie face down, hands under shoulders",
+   "pose": {
+    "torso": 116,
+    "head": 110,
+    "upperArmL": -80,
+    "forearmL": 20,
+    "upperArmR": -80,
+    "forearmR": 20,
+    "thighL": -90,
+    "shinL": -90,
+    "footL": -60,
+    "thighR": -90,
+    "shinR": -90,
+    "footR": -60,
+    "arch": -5
+   }
+  },
+  {
+   "duration": 2400,
+   "label": "Press the chest up",
+   "pose": {
+    "torso": 150,
+    "arch": -32,
+    "head": 165,
+    "upperArmL": 0,
+    "forearmL": 0,
+    "upperArmR": 0,
+    "forearmR": 0
+   }
+  },
+  {
+   "duration": 2000,
+   "label": "Lower with control",
+   "pose": {
+    "torso": 128,
+    "arch": -20,
+    "head": 140,
+    "upperArmL": -60,
+    "forearmL": 15,
+    "upperArmR": -60,
+    "forearmR": 15
+   }
+  }
+ ]
+}

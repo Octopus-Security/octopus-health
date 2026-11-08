@@ -1,0 +1,54 @@
+{
+ "version": 2,
+ "title": "Ankle Dorsiflexion",
+ "view": "side",
+ "anchor": {
+  "joint": "kneeR",
+  "x": 29,
+  "y": 89.5
+ },
+ "pins": [
+  "ankleL"
+ ],
+ "highlight": [
+  "ankleL",
+  "kneeL"
+ ],
+ "props": [
+  {
+   "type": "wall",
+   "x": 62
+  }
+ ],
+ "frames": [
+  {
+   "duration": 1500,
+   "label": "Shin upright, heel down",
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "upperArmL": 30,
+    "forearmL": 100,
+    "upperArmR": 30,
+    "forearmR": 100,
+    "thighL": 90,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": 0,
+    "shinR": -90,
+    "footR": -72
+   }
+  },
+  {
+   "duration": 2200,
+   "label": "Drive the knee over the toes",
+   "pose": {
+    "torso": 172,
+    "head": 172,
+    "thighL": 90,
+    "shinL": -30,
+    "thighR": -30
+   }
+  }
+ ]
+}

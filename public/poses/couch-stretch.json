@@ -1,0 +1,11 @@
+{
+ "version": 2,
+ "title": "Couch Stretch",
+ "static": true,
+ "view": "side",
+ "props": [{ "type": "wall", "x": 21 }],
+ "highlight": ["hipR", "kneeR"],
+ "frames": [
+  {"label":"Hold, ribs down","anchor":{"joint":"kneeR","x":30,"y":89.5},"pose":{"torso":172,"head":172,"upperArmL":0,"forearmL":25,"upperArmR":168,"forearmR":172,"thighL":91,"shinL":-24,"footL":90,"thighR":-24,"shinR":-165,"footR":-150,"arch":-8}}
+ ]
+}

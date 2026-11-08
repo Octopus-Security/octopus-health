@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <%- include('partials/favicon') %>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title><%= title %></title>
   <link rel="stylesheet" href="<%= asset('/theme.css') %>">
   <style>
@@ -148,7 +148,7 @@
       const w = document.getElementById('addPRWrap');
       w.style.display = w.style.display === 'none' ? 'block' : 'none';
       if (w.style.display === 'block') {
-        document.getElementById('prDate').value = new Date().toISOString().slice(0,10);
+        document.getElementById('prDate').value = new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
       }
     }
 
@@ -275,7 +275,7 @@
     loadPRs();
 
     // Pre-fill date
-    document.getElementById('prDate').value = new Date().toISOString().slice(0,10);
+    document.getElementById('prDate').value = new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
   </script>
 </body>
 </html>

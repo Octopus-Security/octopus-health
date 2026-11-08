@@ -1,0 +1,21 @@
+{
+ "version": 2,
+ "title": "Double-Leg Shot",
+ "view": "side",
+ "highlight": ["hipL","kneeL","shoulderL"],
+ "frames": [
+  {"duration":600,"label":"Stance","anchor":{"joint":"ankleL","x":43,"y":90},"pose":{"torso":168,"head":173,"upperArmL":28,"forearmL":148,"thighL":13,"shinL":-7,"footL":93,"upperArmR":18,"forearmR":153,"thighR":-22,"shinR":-32,"footR":58}},
+  {"duration":150,"label":"Level change: hips drop, head up","anchor":{"joint":"ankleL","x":45,"y":85.9},"pose":{"torso":150,"head":170,"upperArmL":30,"forearmL":100,"thighL":50,"shinL":-35,"footL":80,"upperArmR":25,"forearmR":105,"thighR":10,"shinR":-60,"footR":50}},
+  {"duration":155,"hold":0,"anchor":{"joint":"toeR","x":24.4,"y":90.9},"pose":{"torso":145.7,"head":168.6,"upperArmL":30.6,"forearmL":92.8,"upperArmR":26.6,"forearmR":96.8,"thighL":48.6,"shinL":-46.1,"footL":51.4,"thighR":-6.9,"shinR":-67.2,"footR":31.1}},
+  {"duration":150,"hold":0,"anchor":{"joint":"toeL","x":42.2,"y":90.9},"pose":{"torso":137.2,"head":165.9,"upperArmL":31.8,"forearmL":78.4,"upperArmR":29.7,"forearmR":80.5,"thighL":45.9,"shinL":-68.2,"footL":-5.7,"thighR":-40.7,"shinR":-81.6,"footR":-6.6}},
+  {"duration":150,"hold":0,"anchor":{"joint":"toeL","x":39.2,"y":90.9},"pose":{"torso":132.6,"head":164.5,"upperArmL":32.4,"forearmL":70.7,"upperArmR":31.4,"forearmR":71.8,"thighL":44.5,"shinL":-80.1,"footL":-36.3,"thighR":-58.8,"shinR":-89.3,"footR":-26.8}},
+  {"duration":150,"hold":0,"anchor":{"joint":"toeL","x":36.9,"y":90.9},"pose":{"torso":130.3,"head":163.8,"upperArmL":32.7,"forearmL":66.9,"upperArmR":32.2,"forearmR":67.4,"thighL":43.8,"shinL":-86,"footL":-51.6,"thighR":-67.9,"shinR":-93.1,"footR":-36.9}},
+  {"duration":150,"label":"Penetration step: lead knee to the mat","anchor":{"joint":"kneeL","x":60,"y":88.8},"pose":{"torso":128,"head":163,"upperArmL":33,"forearmL":63,"thighL":43,"shinL":-92,"footL":-67,"upperArmR":33,"forearmR":63,"thighR":-77,"shinR":-97,"footR":-47}},
+  {"duration":150,"hold":0,"anchor":{"joint":"toeL","x":39.6,"y":90.9},"pose":{"torso":130.8,"head":163.3,"upperArmL":33.9,"forearmL":72.7,"upperArmR":33.9,"forearmR":72.7,"thighL":42.7,"shinL":-84.8,"footL":-49.2,"thighR":-71.7,"shinR":-93,"footR":-40.5}},
+  {"duration":150,"hold":0,"anchor":{"joint":"toeL","x":44.4,"y":90.9},"pose":{"torso":133.5,"head":163.5,"upperArmL":34.8,"forearmL":82.3,"upperArmR":34.8,"forearmR":82.3,"thighL":42.3,"shinL":-77.7,"footL":-31.5,"thighR":-66.5,"shinR":-89,"footR":-34}},
+  {"duration":150,"hold":0,"anchor":{"joint":"toeL","x":52,"y":90.9},"pose":{"torso":139,"head":164,"upperArmL":36.5,"forearmL":101.5,"upperArmR":36.5,"forearmR":101.5,"thighL":41.5,"shinL":-63.5,"footL":4,"thighR":-56,"shinR":-81,"footR":-21}},
+  {"duration":150,"hold":0,"anchor":{"joint":"toeL","x":60.2,"y":90.9},"pose":{"torso":145.4,"head":164.6,"upperArmL":38.5,"forearmL":124,"upperArmR":38.5,"forearmR":124,"thighL":40.6,"shinL":-46.9,"footL":45.4,"thighR":-43.7,"shinR":-71.7,"footR":-5.8}},
+  {"duration":700,"label":"Drive through, hands lock behind the legs","anchor":{"joint":"ankleL","x":61,"y":89.1},"pose":{"torso":150,"head":165,"upperArmL":40,"forearmL":140,"thighL":40,"shinL":-35,"footL":75,"upperArmR":40,"forearmR":140,"thighR":-35,"shinR":-65,"footR":5}},
+  {"duration":700,"label":"Reset to stance","anchor":{"joint":"ankleL","x":43,"y":90},"pose":{"torso":168,"head":173,"upperArmL":28,"forearmL":148,"thighL":13,"shinL":-7,"footL":93,"upperArmR":18,"forearmR":153,"thighR":-22,"shinR":-32,"footR":58}}
+ ]
+}

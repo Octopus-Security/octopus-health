@@ -1,0 +1,13 @@
+{
+ "version": 2,
+ "title": "Side Kick",
+ "view": "side",
+ "highlight": ["hipL","kneeL"],
+ "frames": [
+  {"duration":420,"label":"Guard","anchor":{"joint":"ankleR","x":36,"y":88.5},"pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"thighL":12,"shinL":-4,"footL":90,"upperArmR":20,"forearmR":165,"thighR":-22,"shinR":-20,"footR":70}},
+  {"duration":240,"label":"Chamber the lead knee high","anchor":{"joint":"ankleR","x":36,"y":88.5},"pose":{"torso":186,"head":180,"upperArmL":30,"forearmL":160,"thighL":96,"shinL":-30,"footL":60,"upperArmR":20,"forearmR":165,"thighR":-12,"shinR":-12,"footR":78}},
+  {"duration":200,"label":"Turn the hip over, drive the heel out","hold":250,"highlight":["hipL","kneeL"],"anchor":{"joint":"ankleR","x":36,"y":88.5},"pose":{"torso":228,"head":206,"upperArmL":60,"forearmL":200,"thighL":98,"shinL":96,"footL":186,"upperArmR":20,"forearmR":165,"thighR":-6,"shinR":-6,"footR":84}},
+  {"duration":220,"label":"Re-chamber","hold":0,"anchor":{"joint":"ankleR","x":36,"y":88.5},"pose":{"torso":186,"head":180,"upperArmL":30,"forearmL":160,"thighL":96,"shinL":-30,"footL":60,"upperArmR":20,"forearmR":165,"thighR":-6,"shinR":-6,"footR":84}},
+  {"duration":420,"label":"Back to guard","highlight":[],"anchor":{"joint":"ankleR","x":36,"y":88.5},"pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"thighL":12,"shinL":-4,"footL":90,"upperArmR":20,"forearmR":165,"thighR":-22,"shinR":-20,"footR":70}}
+ ]
+}

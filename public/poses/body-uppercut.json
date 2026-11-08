@@ -1,0 +1,12 @@
+{
+ "version": 2,
+ "title": "Rear Uppercut to the Body",
+ "view": "side",
+ "highlight": ["shoulderL","hipL"],
+ "frames": [
+  {"duration":420,"label":"Guard","anchor":{"joint":"ankleR","x":54,"y":90},"pose":{"torso":172,"head":172,"upperArmL":20,"forearmL":165,"thighL":-22,"shinL":-20,"footL":70,"upperArmR":30,"forearmR":160,"thighR":12,"shinR":-4,"footR":90}},
+  {"duration":220,"label":"Sit down on the rear leg, fist drops to the hip","anchor":{"joint":"ankleR","x":54,"y":90},"pose":{"torso":158,"head":164,"upperArmL":-8,"forearmL":112,"thighL":7.5,"shinL":-47.3,"footL":62,"upperArmR":30,"forearmR":160,"thighR":34,"shinR":-18,"footR":90}},
+  {"duration":200,"label":"Drive the hip through: fist up into the solar plexus","hold":250,"highlight":["shoulderL","elbowL","hipL"],"anchor":{"joint":"ankleR","x":54,"y":90},"pose":{"torso":166,"head":168,"upperArmL":16,"forearmL":146,"thighL":1,"shinL":-39.9,"footL":50,"upperArmR":30,"forearmR":160,"thighR":26,"shinR":-12,"footR":90}},
+  {"duration":420,"label":"Back to guard","highlight":[],"anchor":{"joint":"ankleR","x":54,"y":90},"pose":{"torso":172,"head":172,"upperArmL":20,"forearmL":165,"thighL":-22,"shinL":-20,"footL":70,"upperArmR":30,"forearmR":160,"thighR":12,"shinR":-4,"footR":90}}
+ ]
+}

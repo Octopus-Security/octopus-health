@@ -1,0 +1,11 @@
+{
+ "version": 2,
+ "title": "90/90 Breathing",
+ "view": "side",
+ "static": true,
+ "props": [{"type":"wall","x":76}],
+ "highlight": ["spine"],
+ "frames": [
+  {"label":"Feet on the wall, low back down, breathe out fully","pose":{"torso":-90,"head":-88,"upperArmL":-270,"forearmL":-208,"thighL":-180,"shinL":-270,"footL":-180,"upperArmR":-262,"forearmR":-190,"thighR":-180,"shinR":-270,"footR":-180,"arch":6,"root":{"x":52,"y":87}}}
+ ]
+}

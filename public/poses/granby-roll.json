@@ -1,0 +1,17 @@
+{
+ "version": 2,
+ "title": "Granby Roll",
+ "view": "front",
+ "highlight": ["spine","neck"],
+ "frames": [
+  {"duration":600,"label":"Seated base","pose":{"torso":180,"head":180,"upperArmL":20,"forearmL":160,"upperArmR":-20,"forearmR":-160,"thighL":80,"shinL":-85,"footL":180,"thighR":-80,"shinR":85,"footR":180,"root":{"x":50,"y":84.8}}},
+  {"duration":175,"label":"Drop onto one shoulder","hold":0,"pose":{"torso":255,"head":255,"upperArmL":95,"forearmL":235,"upperArmR":55,"forearmR":-85,"thighL":225,"shinL":55,"footL":195,"thighR":-75,"shinR":95,"footR":315,"root":{"x":71,"y":77.7}}},
+  {"duration":163,"hold":0,"anchor":{"joint":"handR","x":45.4,"y":90.5},"pose":{"torso":298.8,"head":298.8,"upperArmL":138.8,"forearmL":278.8,"upperArmR":98.8,"forearmR":-41.2,"thighL":268.8,"shinL":98.8,"footL":238.8,"thighR":-31.2,"shinR":138.8,"footR":358.8}},
+  {"duration":150,"hold":0,"anchor":{"joint":"head","x":35,"y":86.2},"pose":{"torso":339.6,"head":339.6,"upperArmL":179.6,"forearmL":319.6,"upperArmR":139.6,"forearmR":-0.4,"thighL":309.6,"shinL":139.6,"footL":279.6,"thighR":9.6,"shinR":179.6,"footR":399.6}},
+  {"duration":150,"label":"Roll across the upper back, hips over","hold":0,"pose":{"torso":360,"head":360,"upperArmL":200,"forearmL":340,"upperArmR":160,"forearmR":20,"thighL":330,"shinL":160,"footL":300,"thighR":30,"shinR":200,"footR":420,"root":{"x":50,"y":46.2}}},
+  {"duration":163,"hold":0,"anchor":{"joint":"head","x":65,"y":86.2},"pose":{"torso":380.4,"head":380.4,"upperArmL":220.4,"forearmL":360.4,"upperArmR":180.4,"forearmR":40.4,"thighL":350.4,"shinL":180.4,"footL":320.4,"thighR":50.4,"shinR":220.4,"footR":440.4}},
+  {"duration":175,"hold":0,"anchor":{"joint":"handL","x":54.6,"y":90.5},"pose":{"torso":421.3,"head":421.3,"upperArmL":261.3,"forearmL":401.3,"upperArmR":221.3,"forearmR":81.3,"thighL":391.3,"shinL":221.3,"footL":361.3,"thighR":91.3,"shinR":261.3,"footR":481.3}},
+  {"duration":420,"label":"Onto the other shoulder","hold":0,"pose":{"torso":465,"head":465,"upperArmL":305,"forearmL":445,"upperArmR":265,"forearmR":125,"thighL":435,"shinL":265,"footL":405,"thighR":135,"shinR":305,"footR":525,"root":{"x":29,"y":77.7}}},
+  {"duration":700,"label":"Back to base, facing the same way","pose":{"torso":540,"head":540,"upperArmL":380,"forearmL":520,"upperArmR":340,"forearmR":200,"thighL":440,"shinL":275,"footL":540,"thighR":280,"shinR":445,"footR":540,"root":{"x":50,"y":84.8}}}
+ ]
+}

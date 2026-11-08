@@ -1,0 +1,15 @@
+{
+ "version": 2,
+ "title": "Squat to Stand",
+ "view": "side",
+ "highlight": ["hipL","kneeL"],
+ "frames": [
+  {"duration":1200,"label":"Stand tall","anchor":{"joint":"ankleL","x":46,"y":90},"pose":{"torso":180,"head":180,"upperArmL":0,"forearmL":5,"thighL":0,"shinL":0,"footL":90,"upperArmR":0,"forearmR":5,"thighR":0,"shinR":0,"footR":90}},
+  {"duration":1300,"label":"Fold, knees soft, hold the toes","pins":["handL","handR"],"anchor":{"joint":"ankleL","x":46,"y":90},"pose":{"torso":58,"head":35,"upperArmL":-59,"forearmL":8.2,"thighL":18,"shinL":4,"footL":90,"upperArmR":-59,"forearmR":8.2,"thighR":18,"shinR":4,"footR":90,"arch":16}},
+  {"duration":1400,"label":"Drop the hips, chest up, elbows push the knees out","hold":900,"pins":["handL","handR"],"anchor":{"joint":"ankleL","x":46,"y":90},"pose":{"torso":125,"head":150,"upperArmL":-19.6,"forearmL":-16.6,"thighL":102,"shinL":-34,"footL":90,"upperArmR":-19.6,"forearmR":-16.6,"thighR":102,"shinR":-34,"footR":90,"arch":0}},
+  {"duration":1200,"label":"Straighten the legs, still holding the toes","hold":700,"pins":["handL","handR"],"anchor":{"joint":"ankleL","x":46,"y":90},"pose":{"torso":58,"head":35,"upperArmL":-59,"forearmL":8.2,"thighL":18,"shinL":4,"footL":90,"upperArmR":-59,"forearmR":8.2,"thighR":18,"shinR":4,"footR":90,"arch":16}},
+  {"duration":900,"label":"Roll up","hold":0,"anchor":{"joint":"ankleL","x":46,"y":90},"pose":{"torso":130,"head":130,"upperArmL":60,"forearmL":70,"thighL":6,"shinL":0,"footL":90,"upperArmR":60,"forearmR":70,"thighR":6,"shinR":0,"footR":90,"arch":8}},
+  {"duration":1300,"label":"Stand and reach overhead","hold":500,"anchor":{"joint":"ankleL","x":46,"y":90},"pose":{"torso":182,"head":184,"upperArmL":176,"forearmL":178,"thighL":0,"shinL":0,"footL":90,"upperArmR":176,"forearmR":178,"thighR":0,"shinR":0,"footR":90,"arch":-4}},
+  {"duration":900,"label":"Lower the arms in front","hold":0,"anchor":{"joint":"ankleL","x":46,"y":90},"pose":{"torso":180,"head":180,"upperArmL":90,"forearmL":95,"thighL":0,"shinL":0,"footL":90,"upperArmR":90,"forearmR":95,"thighR":0,"shinR":0,"footR":90,"arch":0}}
+ ]
+}

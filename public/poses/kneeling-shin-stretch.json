@@ -1,0 +1,10 @@
+{
+ "version": 2,
+ "title": "Kneeling Shin Stretch",
+ "view": "side",
+ "static": true,
+ "highlight": ["ankleL","kneeL"],
+ "frames": [
+  {"label":"Sit back toward the heels, tops of the feet flat","anchor":{"joint":"kneeL","x":52,"y":87.8},"pose":{"torso":184,"head":182,"upperArmL":22,"forearmL":78,"thighL":76,"shinL":-88,"footL":-70,"upperArmR":22,"forearmR":78,"thighR":76,"shinR":-88,"footR":-70}}
+ ]
+}

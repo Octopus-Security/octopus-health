@@ -1,0 +1,11 @@
+{
+ "version": 2,
+ "title": "Ab Wheel Rollout",
+ "view": "side",
+ "hold": "ball",
+ "highlight": ["spine","shoulderL"],
+ "frames": [
+  {"duration":1500,"label":"Kneel, wheel under shoulders","anchor":{"joint":"kneeL","x":31,"y":89.5},"pins":["handL","handR"],"pose":{"torso":112,"head":125,"upperArmL":-12.7,"forearmL":13.6,"upperArmR":-12.7,"forearmR":13.6,"thighL":0,"shinL":-90,"footL":-72,"thighR":0,"shinR":-90,"footR":-72,"arch":0}},
+  {"duration":1500,"label":"Roll out, body nearly straight","anchor":{"joint":"kneeL","x":31,"y":89.5},"pose":{"torso":118,"head":132,"upperArmL":7.8,"forearmL":66.4,"upperArmR":7.8,"forearmR":66.4,"thighL":-62,"shinL":-90,"footL":-72,"thighR":-62,"shinR":-90,"footR":-72,"arch":0}}
+ ]
+}

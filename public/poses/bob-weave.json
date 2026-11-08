@@ -1,0 +1,12 @@
+{
+ "version": 2,
+ "title": "Bob and Weave",
+ "view": "side",
+ "highlight": ["kneeL","kneeR"],
+ "frames": [
+  {"duration":340,"label":"Guard","anchor":{"joint":"ankleL","x":52,"y":90},"pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"thighL":12,"shinL":-4,"footL":90,"upperArmR":20,"forearmR":165,"thighR":-22,"shinR":-20,"footR":70}},
+  {"duration":260,"label":"Bend the knees, head drops","hold":0,"anchor":{"joint":"ankleL","x":52,"y":90},"pose":{"torso":160,"head":164,"upperArmL":24,"forearmL":166,"thighL":40,"shinL":-28,"footL":90,"upperArmR":20,"forearmR":165,"thighR":8.8,"shinR":-56.6,"footR":60}},
+  {"duration":260,"label":"Under the punch","hold":0,"anchor":{"joint":"ankleL","x":52,"y":90},"pose":{"torso":150,"head":156,"upperArmL":24,"forearmL":166,"thighL":56,"shinL":-36,"footL":90,"upperArmR":20,"forearmR":165,"thighR":19.6,"shinR":-71.6,"footR":60}},
+  {"duration":300,"label":"Come up on the other side","hold":0,"anchor":{"joint":"ankleL","x":52,"y":90},"pose":{"torso":166,"head":170,"upperArmL":24,"forearmL":166,"thighL":30,"shinL":-20,"footL":90,"upperArmR":20,"forearmR":165,"thighR":1.2,"shinR":-45.9,"footR":60}}
+ ]
+}

@@ -1,0 +1,10 @@
+{
+ "version": 2,
+ "title": "Lying Leg Raise",
+ "view": "side",
+ "highlight": ["hipL","spine"],
+ "frames": [
+  {"duration":1000,"label":"Legs just off the floor","pose":{"root":{"x":52,"y":87},"torso":-90,"head":-88,"upperArmL":90,"forearmL":90,"upperArmR":90,"forearmR":90,"thighL":96,"shinL":96,"footL":186,"thighR":96,"shinR":96,"footR":186,"arch":0}},
+  {"duration":1800,"label":"Legs to vertical","ease":"ease-in-out","pose":{"root":{"x":52,"y":87},"torso":-90,"head":-88,"upperArmL":90,"forearmL":90,"upperArmR":90,"forearmR":90,"thighL":180,"shinL":180,"footL":270,"thighR":180,"shinR":180,"footR":270,"arch":0}}
+ ]
+}

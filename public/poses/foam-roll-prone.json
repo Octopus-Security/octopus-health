@@ -1,0 +1,11 @@
+{
+ "version": 2,
+ "title": "Foam Roll (face down)",
+ "view": "side",
+ "props": [{"type":"roller","x":38,"y":87.5,"r":5.5}],
+ "highlight": ["hipL","kneeL"],
+ "frames": [
+  {"duration":1400,"label":"Roller just below the hip","anchor":{"joint":"elbowL","x":68,"y":89.6},"pose":{"torso":94,"head":96,"upperArmL":0,"forearmL":90,"thighL":-94,"shinL":-150,"footL":-120,"upperArmR":0,"forearmR":90,"thighR":-94,"shinR":-150,"footR":-120}},
+  {"duration":1400,"label":"Slide forward: roll toward the knee","anchor":{"joint":"elbowL","x":80,"y":89.6},"pose":{"torso":94,"head":96,"upperArmL":0,"forearmL":90,"thighL":-94,"shinL":-150,"footL":-120,"upperArmR":0,"forearmR":90,"thighR":-94,"shinR":-150,"footR":-120}}
+ ]
+}

@@ -85,6 +85,14 @@ function buildPlan(ctx) {
     return blocks;
   };
   const week = B.buildWeek({ date, benchmarks, lastByItem, benchmarkDay, trainingBlocks });
+  // Days A and C (the 1st and 3rd training days) also carry the ~15 min injury-prevention
+  // routine (api/mobility.js). A day-level field, not a block: blocks are skills.
+  let ti = 0;
+  for (const d of week.days) {
+    if (d.kind !== 'train') continue;
+    if (ti % DAY_SLOTS.length === 0 || ti % DAY_SLOTS.length === 2) d.routines = ['injury-prevention'];
+    ti++;
+  }
   return {
     ...week, focus,
     routines: ROUTINES,
@@ -92,4 +100,24 @@ function buildPlan(ctx) {
   };
 }
 
-module.exports = { buildPlan, frontier, ROUTINES, DAY_SLOTS };
+/**
+ * A deload view of a plan: the same days and blocks with about half the sets (never fewer than 1),
+ * an easy-effort instruction, and no benchmark testing. PURE and derived on demand: it returns a
+ * copy, never edits the plan it is given, and nothing stores it, so the real weekly plan is
+ * untouched and the next week is built normally. The label says so.
+ */
+const DELOAD_LABEL = 'Deload week: about half the usual sets at an easy effort, no benchmark tests. Your normal plan is unchanged.';
+function deloadWeek(plan) {
+  const days = (plan.days || []).map(d => ({
+    ...d,
+    blocks: (d.blocks || []).map(b => {
+      const sets = Math.max(1, Math.ceil((Number(b.sets) || 1) / 2));
+      return { ...b, sets, instruction: `${sets} easy ${sets === 1 ? 'set' : 'sets'}, well short of failure (usual: ${b.sets})`, deloaded: true };
+    }),
+    benchmarks: [],
+    ...(d.kind === 'benchmarks' ? { kind: 'rest' } : {}),
+  }));
+  return { ...plan, days, benchmarksDue: [], deload: true, deloadLabel: DELOAD_LABEL };
+}
+
+module.exports = { buildPlan, frontier, deloadWeek, DELOAD_LABEL, ROUTINES, DAY_SLOTS };

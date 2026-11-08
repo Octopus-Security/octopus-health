@@ -1,0 +1,11 @@
+{
+ "version": 2,
+ "title": "Prone Quad Stretch",
+ "view": "side",
+ "static": true,
+ "props": [{"type":"bar","x1":55.4,"y1":75.4,"x2":47.8,"y2":74.7}],
+ "highlight": ["kneeL","hipL"],
+ "frames": [
+  {"label":"Heel toward the glute, hip pressed down","pose":{"torso":90,"head":96,"upperArmL":-115,"forearmL":-112,"thighL":-90,"shinL":-232,"footL":-120,"upperArmR":-90,"forearmR":-90,"thighR":-90,"shinR":-90,"footR":-60,"root":{"x":52,"y":87}}}
+ ]
+}

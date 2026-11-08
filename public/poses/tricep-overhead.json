@@ -1,0 +1,45 @@
+{
+  "version": 2,
+  "title": "Overhead Triceps Extension",
+  "view": "side",
+  "hold": "dumbbell",
+  "anchor": {
+    "joint": "ankleL",
+    "x": 50,
+    "y": 90
+  },
+  "highlight": [
+    "elbowL",
+    "elbowR"
+  ],
+  "frames": [
+    {
+      "duration": 1000,
+      "label": "Press up",
+      "pose": {
+        "torso": 180,
+        "head": 150,
+        "upperArmL": 195,
+        "forearmL": 198,
+        "upperArmR": 195,
+        "forearmR": 198,
+        "thighL": 0,
+        "shinL": 0,
+        "footL": 90,
+        "thighR": 0,
+        "shinR": 0,
+        "footR": 90
+      }
+    },
+    {
+      "duration": 1300,
+      "label": "Lower behind head",
+      "pose": {
+        "upperArmL": 195,
+        "forearmL": 340,
+        "upperArmR": 195,
+        "forearmR": 340
+      }
+    }
+  ]
+}

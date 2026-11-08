@@ -1,0 +1,13 @@
+{
+ "version": 2,
+ "title": "Catch and Return",
+ "view": "side",
+ "highlight": ["shoulderL","elbowL"],
+ "frames": [
+  {"duration":380,"label":"Guard","anchor":{"joint":"ankleL","x":56,"y":90},"pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"thighL":12,"shinL":-4,"footL":90,"upperArmR":20,"forearmR":165,"thighR":-22,"shinR":-20,"footR":70}},
+  {"duration":220,"label":"Absorb: lead arm scoops under the kick","highlight":["shoulderL","elbowL"],"anchor":{"joint":"ankleL","x":56,"y":90},"pose":{"torso":178,"head":174,"upperArmL":16,"forearmL":96,"thighL":16,"shinL":-8,"footL":90,"upperArmR":44,"forearmR":118,"thighR":-22,"shinR":-20,"footR":70}},
+  {"duration":220,"label":"Clamp it to the ribs, load the rear hip","hold":0,"anchor":{"joint":"ankleL","x":56,"y":90},"pose":{"torso":184,"head":178,"upperArmL":16,"forearmL":96,"thighL":16,"shinL":-8,"footL":90,"upperArmR":44,"forearmR":118,"thighR":40,"shinR":-30,"footR":90}},
+  {"duration":240,"label":"Return the rear low kick to the standing leg","hold":250,"highlight":["hipR","kneeR"],"anchor":{"joint":"ankleL","x":56,"y":90},"pose":{"torso":198,"head":188,"upperArmL":16,"forearmL":96,"thighL":16,"shinL":-8,"footL":90,"upperArmR":-20,"forearmR":10,"thighR":78,"shinR":72,"footR":150}},
+  {"duration":420,"label":"Release, back to guard","highlight":[],"anchor":{"joint":"ankleL","x":56,"y":90},"pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"thighL":12,"shinL":-4,"footL":90,"upperArmR":20,"forearmR":165,"thighR":-22,"shinR":-20,"footR":70}}
+ ]
+}

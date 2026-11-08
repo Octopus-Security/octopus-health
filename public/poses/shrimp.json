@@ -1,0 +1,21 @@
+{
+  "version": 2,
+  "title": "Shrimp (Hip Escape)",
+  "view": "side",
+  "highlight": ["hipL", "hipR"],
+  "frames": [
+    { "duration": 700, "label": "On your back, feet planted, hands framing",
+      "pose": { "torso": -90, "head": -88, "upperArmL": 125, "forearmL": 200, "upperArmR": 110, "forearmR": 195,
+                "thighL": 135, "shinL": 25, "footL": 115, "thighR": 135, "shinR": 25, "footR": 115,
+                "root": { "x": 62, "y": 86.5 } } },
+    { "duration": 500, "label": "Push off the feet: bridge the hips up", "highlight": ["hipL", "hipR", "kneeL"],
+      "pose": { "torso": -75, "head": -80, "thighL": 105, "shinL": 8, "footL": 100, "thighR": 105, "shinR": 8, "footR": 100,
+                "root": { "x": 62.4, "y": 76 } } },
+    { "duration": 600, "label": "Drive the hips away, back toward the head", "highlight": ["hipL", "hipR", "kneeL"],
+      "pose": { "torso": -90, "head": -92, "thighL": 115, "shinL": 55, "footL": 135, "thighR": 115, "shinR": 55, "footR": 135,
+                "root": { "x": 50, "y": 85.5 } } },
+    { "duration": 600, "label": "Pull the heels back in, reset", "highlight": [],
+      "pose": { "thighL": 135, "shinL": 25, "footL": 115, "thighR": 135, "shinR": 25, "footR": 115,
+                "root": { "x": 50, "y": 85.5 } } }
+  ]
+}

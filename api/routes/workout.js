@@ -142,7 +142,7 @@ router.post('/sessions/:id/sets', async (req, res) => {
         let newPR = null;
         try {
             const session = await WorkoutSession.findByPk(req.params.id);
-            const sessionDate = session?.date || new Date().toISOString().slice(0, 10);
+            const sessionDate = session?.date || require('../../lib/et').todayET();
             newPR = await detectPR({ PersonalRecord },
                 { exerciseName, reps, weight, weightUnit, duration, distance, distanceUnit },
                 sessionDate);
@@ -243,10 +243,9 @@ router.get('/plans/today', async (req, res) => {
         const plan = await TrainingPlan.findByPk(assignment.planId);
         if (!plan) return res.json({ success: true, data: null });
         const phases = JSON.parse(plan.phases || '[]');
-        const start = new Date(assignment.startDate);
-        const today = new Date();
-        const weekNumber = Math.floor((today - start) / (7 * 24 * 60 * 60 * 1000)) + 1;
-        const dayOfWeek = today.getDay();
+        const ET = require('../../lib/et');
+        const weekNumber = Math.floor(ET.daysBetween(assignment.startDate, ET.todayET()) / 7) + 1;
+        const dayOfWeek = ET.weekdayET();
         // Find current phase
         let currentPhase = phases[0];
         for (const phase of phases) {

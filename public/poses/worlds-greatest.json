@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "title": "World's Greatest Stretch",
+  "view": "side",
+  "highlight": ["hipR","spine"],
+  "frames": [
+    {"duration":1500,"label":"Lunge, both hands down","pose":{"root":{"x":40,"y":72},"torso":105,"head":125,"upperArmL":-36,"forearmL":25,"upperArmR":-35,"forearmR":26,"thighL":95,"shinL":6,"footL":90,"thighR":-30,"shinR":-90,"footR":-75}},
+    {"duration":1800,"label":"Elbow toward the instep","pose":{"torso":112,"head":125,"upperArmL":20,"forearmL":80,"upperArmR":-16,"forearmR":9,"thighL":95,"shinL":6,"footL":90,"thighR":-30,"shinR":-90,"footR":-75}},
+    {"duration":2600,"label":"Rotate and reach to the ceiling","pose":{"torso":150,"head":170,"upperArmL":180,"forearmL":180,"upperArmR":-40,"forearmR":-30,"thighL":95,"shinL":6,"footL":90,"thighR":-30,"shinR":-90,"footR":-75,"arch":-8}},
+    {"duration":1500,"label":"Back down","pose":{"torso":112,"head":125,"upperArmL":0,"forearmL":0,"upperArmR":-16,"forearmR":9,"thighL":95,"shinL":6,"footL":90,"thighR":-30,"shinR":-90,"footR":-75}}
+  ]
+}

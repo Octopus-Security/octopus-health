@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "title": "Jab",
+  "view": "side",
+  "anchor": {
+    "joint": "ankleL",
+    "x": 56,
+    "y": 90
+  },
+  "frames": [
+    {"duration":450,"label":"Guard","pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"upperArmR":20,"forearmR":165,"thighL":12,"shinL":-4,"footL":90,"thighR":-22,"shinR":-20,"footR":70}},
+    {"duration":170,"label":"Jab: snap the lead hand straight out","highlight":["shoulderL","elbowL","hand"],"pose":{"torso":168,"head":168,"upperArmL":90,"forearmL":92,"thighL":16,"shinL":-6}},
+    {"duration":150,"label":"Hold at full reach","highlight":["shoulderL","elbowL","hand"],"pose":{"torso":167,"head":167}},
+    {"duration":230,"label":"Snap back to the cheek","highlight":[],"pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"thighL":12,"shinL":-4}},
+    {"duration":350,"label":"Guard","pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"upperArmR":20,"forearmR":165,"thighL":12,"shinL":-4,"footL":90,"thighR":-22,"shinR":-20,"footR":70}}
+  ]
+}

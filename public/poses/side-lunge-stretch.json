@@ -1,0 +1,10 @@
+{
+ "version": 2,
+ "title": "Side Lunge Adductor Stretch",
+ "view": "front",
+ "static": true,
+ "highlight": ["hipL","kneeL"],
+ "frames": [
+  {"label":"Sit into one hip, other leg long","anchor":{"joint":"ankleR","x":27,"y":90},"pose":{"torso":183,"head":180,"upperArmL":25,"forearmL":12,"upperArmR":-25,"forearmR":-12,"thighL":52,"shinL":52,"footL":90,"thighR":-60,"shinR":-6,"footR":-90}}
+ ]
+}

@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "title": "Oi-zuki (Lunge Punch)",
+  "view": "side",
+  "anchor": {
+    "joint": "ankleL",
+    "x": 40,
+    "y": 90
+  },
+  "pins": [
+    "ankleR"
+  ],
+  "frames": [
+    {"duration":700,"label":"Left zenkutsu-dachi, right fist out","highlight":[],"pose":{"thighL":55,"shinL":-15,"footL":90,"thighR":-40.5,"shinR":-40.5,"footR":90,"torso":180,"head":180,"upperArmL":-20,"forearmL":55,"upperArmR":90,"forearmR":90}},
+    {"duration":260,"label":"Step through: right foot travels, fist chambers","highlight":["hipR","kneeR"],"pose":{"thighL":10,"shinL":10,"footL":90,"thighR":80,"shinR":30,"footR":110,"torso":180,"head":180,"upperArmL":-20,"forearmL":55,"upperArmR":-20,"forearmR":55}},
+    {"duration":170,"label":"Right foot lands: lunge punch, left fist to the hip","highlight":["shoulderR","elbowR","hand","hipR"],"pose":{"thighR":55,"shinR":-15,"footR":90,"thighL":-40.5,"shinL":-40.5,"footL":90,"torso":176,"head":178,"upperArmL":-20,"forearmL":55,"upperArmR":90,"forearmR":90}},
+    {"duration":260,"label":"Hold: lock at the moment the foot lands","highlight":["shoulderR","elbowR","hand"],"pose":{"torso":174}},
+    {"duration":450,"label":"Step back and reset","highlight":[],"pose":{"thighL":55,"shinL":-15,"footL":90,"thighR":-40.5,"shinR":-40.5,"footR":90,"torso":180,"head":180,"upperArmL":-20,"forearmL":55,"upperArmR":90,"forearmR":90}}
+  ]
+}
