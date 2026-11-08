@@ -550,12 +550,36 @@ function parseWorkout(text) {
 function normKey(s) {
   return String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '').replace(/s$/, '');
 }
+// Shorthand → canonical library name. Consulted only AFTER the exact-normalised
+// match fails, and only resolves when the library really holds the canonical
+// exercise, so an alias can never invent a link. Keys are run through normKey() below (so 'bss' is stored as 'bs').
+// Deliberately no substring matching ("row" must not grab "Inverted Row").
+const RAW_ALIASES = {
+  bench: 'Bench Press', flatbench: 'Bench Press', bp: 'Bench Press',
+  ohp: 'Overhead Press',
+  dl: 'Deadlift', deads: 'Deadlift',
+  rdl: 'Romanian Deadlift',
+  bss: 'Bulgarian Split Squat',
+  bike: 'Stationary Bike', cycling: 'Stationary Bike',
+  pullup: 'Pull-up', chinup: 'Chin-up',
+};
+
+const EXERCISE_ALIASES = {};
+for (const k of Object.keys(RAW_ALIASES)) EXERCISE_ALIASES[normKey(k)] = RAW_ALIASES[k];
+
 function matchExercise(name, library) {
   if (!name || !Array.isArray(library)) return null;
   const key = normKey(name);
   if (!key) return null;
   for (const e of library) {
     if (normKey(e.name) === key) return { id: e.id != null ? e.id : null, name: e.name };
+  }
+  const canon = Object.prototype.hasOwnProperty.call(EXERCISE_ALIASES, key) ? EXERCISE_ALIASES[key] : null;
+  if (canon) {
+    const ck = normKey(canon);
+    for (const e of library) {
+      if (normKey(e.name) === ck) return { id: e.id != null ? e.id : null, name: e.name };
+    }
   }
   return null;
 }
@@ -585,4 +609,4 @@ function buildPreview(parsed, library) {
   });
 }
 
-module.exports = { parseWorkout, expandPlusBar, expandBarWords, buildPreview, parseSets, parseClause, matchExercise, normKey, splitSegments, pickLoad };
+module.exports = { parseWorkout, expandPlusBar, expandBarWords, buildPreview, parseSets, parseClause, matchExercise, EXERCISE_ALIASES, normKey, splitSegments, pickLoad };
