@@ -126,3 +126,13 @@ test('GET joint lists the drills for it', { skip }, async () => {
   assert.ok(r.j.items.some(i => i.id === 'heel-drop'));
   assert.ok(r.j.note);
 });
+
+test('the lymphatic drainage routine ships with its safety note, seeded cards and no figures', () => {
+  const r = mob.ROUTINES.find(x => x.id === 'lymph-head-neck');
+  assert.ok(r && r.items.length >= 6);
+  for (const re of [/supports?|supportive/i, /stop if it hurts/i, /infected, hot, red or newly swollen/i, /fever/i, /swallowing or breathing/i, /ask(ing)? the ENT/i]) assert.match(r.safety, re);
+  const PM = require('../public/pose-map');
+  const names = new Set(require('../database').SEED_EXERCISES.map(e => e.name));
+  for (const it of r.items) { assert.ok(names.has(it.demo), it.demo); assert.strictEqual(PM.match(it.demo), null); }
+  assert.match(fs.readFileSync(path.join(__dirname, '..', 'views', 'today.ejs'), 'utf8'), /r\.safety/);
+});
