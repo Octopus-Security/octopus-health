@@ -20,6 +20,25 @@
   'use strict';
 
   var RULES = [
+    // Mobility drills that reuse the closest existing figure.
+    [/hip airplane/i, 'hip-circle'],
+    [/fire hydrant/i, 'quadruped-hip-cars'],
+    [/clamshell/i, 'open-book'],
+    [/banded hip mobilization/i, 'kneeling-hip-flexor'],
+    [/leg swing/i, 'hip-circle'],
+    [/low lunge with twist/i, 'worlds-greatest'],
+    [/windshield/i, 'supine-twist'],
+    [/hurdle step/i, 'hip-circle'],
+    [/walking knee hug/i, 'hip-circle'],
+    [/walking quad pull/i, 'quad-stretch'],
+    [/half-kneeling side bend/i, 'kneeling-hip-flexor'],
+    [/crab reach/i, 'crab-walk'],
+    [/kick chamber/i, 'kick-check'],
+    [/quadruped thoracic rotation/i, 'thread-needle'],
+    [/reverse tabletop/i, 'crab-walk'],
+    [/y-t-w/i, 'cobra'],
+    [/shoulder external rotation/i, 'prone-shoulder-er'],
+    [/inchworm/i, 'downward-dog'],
     // ── movements that used to borrow a neighbour's figure (audit 2026-10-26) ──
     // massage-ball work (2026-11): no ball figure exists, so each reuses the closest existing pose
     [/peanut ball upper back/i, 'thoracic-extension'],
