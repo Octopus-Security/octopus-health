@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "title": "Side Control",
+  "view": "side",
+  "static": true,
+  "frames": [
+    {"duration":3200,"label":"Side control: chest across theirs, hips low, knees on the floor (the T is drawn side-on)","highlight":["spine"],"pose":{"torso":110,"head":118,"upperArmL":9.8,"forearmL":108.8,"thighL":-69,"shinL":-92,"footL":-75,"upperArmR":-42,"forearmR":81.3,"thighR":-66,"shinR":-90,"footR":-72,"root":{"x":54,"y":82}},"partner":{"pose":{"torso":-90,"head":-92,"upperArmL":71.2,"forearmL":-170.9,"thighL":90,"shinL":90,"footL":180,"upperArmR":90,"forearmR":90,"thighR":88,"shinR":92,"footR":180,"root":{"x":38,"y":87}},"highlight":[]},"contacts":[{"a":"neck","b":"torso","tol":18},{"a":"handL","b":"head","tol":8}]}
+  ]
+}

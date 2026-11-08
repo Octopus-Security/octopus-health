@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "title": "Jab (Mat Trong)",
+  "view": "side",
+  "anchor": {
+    "joint": "ankleL",
+    "x": 56,
+    "y": 90
+  },
+  "frames": [
+    {"duration":450,"label":"Guard","highlight":[],"pose":{"torso":180,"head":177,"upperArmL":40,"forearmL":174,"upperArmR":30,"forearmR":174,"thighL":14,"shinL":-2,"footL":80,"thighR":-20,"shinR":-22,"footR":64}},
+    {"duration":170,"label":"Jab: lead hand shoots straight out, a small step with the lead foot","highlight":["shoulderL","elbowL","hand"],"pose":{"torso":174,"head":174,"upperArmL":90,"forearmL":92,"thighL":16,"shinL":-2}},
+    {"duration":150,"label":"Full reach: rear glove stays on the brow","highlight":["shoulderL","elbowL","hand"],"pose":{"torso":173,"head":173}},
+    {"duration":230,"label":"Snap back to the brow on the same line","highlight":[],"pose":{"torso":178,"head":177,"upperArmL":40,"forearmL":174,"thighL":14,"shinL":-2}},
+    {"duration":350,"label":"Guard","highlight":[],"pose":{"torso":180,"head":177,"upperArmL":40,"forearmL":174,"upperArmR":30,"forearmR":174,"thighL":14,"shinL":-2,"footL":80,"thighR":-20,"shinR":-22,"footR":64}}
+  ]
+}

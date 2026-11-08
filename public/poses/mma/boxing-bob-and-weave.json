@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "title": "Bob and Weave",
+  "view": "side",
+  "anchor": {
+    "joint": "ankleL",
+    "x": 56,
+    "y": 90
+  },
+  "frames": [
+    {"duration":450,"label":"Guard: a hook is coming","pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"upperArmR":20,"forearmR":165,"thighL":12,"shinL":-4,"footL":90,"thighR":-22,"shinR":-20,"footR":70},"highlight":[]},
+    {"duration":280,"label":"Bob: bend the knees, back stays straight","highlight":["kneeL","kneeR","hipL"],"pose":{"torso":168,"head":170,"thighL":45,"shinL":-25,"thighR":30,"shinR":-40,"footR":85}},
+    {"duration":280,"label":"Weave: head travels under the punch","highlight":["kneeL","spine"],"pose":{"torso":148,"head":156,"thighL":52,"shinL":-28,"thighR":38,"shinR":-45,"footR":85}},
+    {"duration":280,"label":"Rise on the far side, weight loaded","highlight":["kneeR","hipR"],"pose":{"torso":176,"head":176,"thighL":18,"shinL":-8,"thighR":-26,"shinR":-24,"footR":78}},
+    {"duration":400,"label":"Back to the guard","pose":{"torso":172,"head":172,"upperArmL":30,"forearmL":160,"upperArmR":20,"forearmR":165,"thighL":12,"shinL":-4,"footL":90,"thighR":-22,"shinR":-20,"footR":70}}
+  ]
+}

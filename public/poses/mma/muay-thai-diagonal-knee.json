@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "title": "Diagonal Knee (Khao Chiang)",
+  "view": "side",
+  "anchor": {
+    "joint": "toeL",
+    "x": 62.89,
+    "y": 91.22
+  },
+  "frames": [
+    {"duration":450,"label":"Guard","highlight":[],"pose":{"torso":180,"head":177,"upperArmL":40,"forearmL":174,"upperArmR":30,"forearmR":174,"thighL":14,"shinL":-2,"footL":80,"thighR":-20,"shinR":-22,"footR":64}},
+    {"duration":240,"label":"Load: rear leg cocks back and out, hips turn away","highlight":["hipR"],"pose":{"torso":174,"head":175,"thighR":-26,"shinR":-48,"footR":24,"footL":66,"upperArmL":70,"forearmL":110}},
+    {"duration":240,"label":"Knee arcs in at 45 degrees to the ribs, hips turn over, lean away (the angle toward the camera is not drawn)","highlight":["hipR","kneeR","spine"],"pose":{"torso":210,"head":190,"thighL":0,"shinL":-2,"footL":54,"thighR":84,"shinR":-46,"footR":-20,"upperArmL":62,"forearmL":70,"upperArmR":40,"forearmR":182}},
+    {"duration":260,"label":"Foot back down behind you","highlight":[],"pose":{"torso":182,"head":179,"thighL":10,"shinL":-2,"footL":70,"thighR":10,"shinR":-40,"footR":30,"upperArmL":50,"forearmL":150,"upperArmR":30,"forearmR":174}},
+    {"duration":400,"label":"Guard","highlight":[],"pose":{"torso":180,"head":177,"upperArmL":40,"forearmL":174,"upperArmR":30,"forearmR":174,"thighL":14,"shinL":-2,"footL":80,"thighR":-20,"shinR":-22,"footR":64}}
+  ]
+}

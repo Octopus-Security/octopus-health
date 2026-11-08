@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title><%= title %></title>
+  <%# PRIVACY: this template receives only the whitelist from sessions-store.publicView(). The private
+      tailoring block (who it is for, goal, limits, equipment) is never passed in, so it cannot be printed
+      here, in a meta tag or in the title. test/sessions.test.js proves it with a marker. %>
+  <meta name="referrer" content="no-referrer">
+  <% if (unlisted) { %><meta name="robots" content="noindex, nofollow, noarchive"><% } else { %>
+  <meta name="description" content="<%= String(s.intro || 'A training session.').replace(/\s+/g, ' ').slice(0, 160) %>">
+  <link rel="canonical" href="<%= canonical %>"><% } %>
+  <link rel="stylesheet" href="<%= asset('/sessions-public.css') %>">
+  <script src="<%= asset('/stick-figure.js') %>" defer></script>
+  <script src="<%= asset('/js/session-public.js') %>" defer></script>
+</head>
+<body>
+<main class="sp-wrap">
+  <header class="sp-head">
+    <h1><%= s.title %></h1>
+    <p class="sp-by">Shared by Serpopard</p>
+    <% if (s.intro) { %><p class="sp-intro"><%= s.intro %></p><% } %>
+    <p class="sp-actions"><button type="button" class="sp-btn" data-print>Print or save as PDF</button></p>
+  </header>
+
+  <% if (!s.items.length) { %><p class="sp-empty">This session has no exercises yet.</p><% } %>
+  <ol class="sp-items">
+    <% s.items.forEach(function (it, n) { %>
+    <li class="sp-item">
+      <h2><span class="sp-n"><%= n + 1 %>.</span> <%= it.name %></h2>
+      <% if (it.dose) { %><p class="sp-dose"><%= it.dose %></p><% } %>
+      <% if (it.poseKey && !(stills[n] || []).length) { %>
+      <p class="sp-nodiagram">No diagram yet</p>
+      <% } else if (it.poseKey) { %>
+      <div class="sp-fig">
+        <div class="sp-live" data-pose="<%= it.poseKey %>" aria-hidden="true"></div>
+        <div class="sp-stills">
+          <% (stills[n] || []).forEach(function (st, k) { %>
+          <figure class="sp-still">
+            <%- st.svg %>
+            <figcaption><%= (k + 1) + (st.label ? '. ' + st.label : '') %></figcaption>
+          </figure>
+          <% }) %>
+        </div>
+      </div>
+      <% } %>
+      <% if (it.cues.length) { %><ul class="sp-cues"><% it.cues.forEach(function (c) { %><li><%= c %></li><% }) %></ul><% } %>
+      <% if (it.instructions) { %><p class="sp-how"><%= it.instructions %></p><% } %>
+      <% if (it.note) { %><p class="sp-note"><%= it.note %></p><% } %>
+    </li>
+    <% }) %>
+  </ol>
+
+  <footer class="sp-foot">
+    <p>This is general information, not medical advice. It is not written for any one person's medical situation. Stop if something hurts in a way that feels wrong, and check with a doctor or physiotherapist before starting if you are injured, ill, pregnant or unsure.</p>
+  </footer>
+</main>
+</body>
+</html>

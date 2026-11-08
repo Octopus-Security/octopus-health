@@ -7,10 +7,12 @@
  *
  * Who reads this list: the skill tree (api/skill-tree.js derives its tokens from
  * it), the gyms page, plan fitting below, cortex (GET /api/service/equipment) and
- * octopus-mma (a snapshot of the ids in lib/equipment-ids.json). mma's test compares
- * the snapshot with a sibling health checkout, but it is skipped when there is none and
- * mma has no CI, so the snapshot can drift: it is a check you run, not a guarantee.
- * A new piece of equipment goes in the JSON, then the snapshot is updated by hand.
+ * octopus-mma (a snapshot of the ids in lib/equipment-ids.json). mma's test
+ * (test/equipment-ids.test.js) compares the snapshot with this catalogue, but only where
+ * octopus-health is checked out beside octopus-mma; it skips otherwise, and nothing runs
+ * it on push (mma has no CI), so the snapshot can drift. When an equipment id is added or
+ * renamed here, check out both repos side by side, run `node --test test/equipment-ids.test.js`
+ * in octopus-mma, and update lib/equipment-ids.json there.
  *
  * Four ideas:
  *   - an id is stable forever; names and aliases change freely;

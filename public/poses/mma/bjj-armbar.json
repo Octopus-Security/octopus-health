@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "title": "Armbar from Guard",
+  "view": "side",
+  "frames": [
+    {"duration":1000,"label":"Closed guard: grab the wrist, legs locked round the waist","highlight":["hand"],"pose":{"torso":-92,"head":-100,"upperArmL":108.3,"forearmL":140.1,"thighL":132.4,"shinL":74.1,"footL":164.1,"upperArmR":108.3,"forearmR":140.1,"thighR":127.9,"shinR":65.6,"footR":155.6,"root":{"x":40,"y":87}},"partner":{"pose":{"torso":150,"head":-232,"upperArmL":22.5,"forearmL":25.5,"thighL":18.2,"shinL":-90,"footL":-75,"upperArmR":-24.1,"forearmR":-21.7,"thighR":14.2,"shinR":-88,"footR":-73,"root":{"x":40,"y":70}},"highlight":["elbowL"]},"contacts":[{"a":"handL","b":"handL","tol":5}]},
+    {"duration":900,"label":"Hips lift and turn: one foot on their hip","highlight":["hipR","kneeR"],"pose":{"torso":-82,"head":-92,"upperArmL":97.4,"forearmL":152.5,"thighL":183.9,"shinL":104.6,"footL":194.6,"upperArmR":97.4,"forearmR":152.5,"thighR":180.9,"shinR":66.4,"footR":156.4,"root":{"x":40,"y":83}},"partner":{"pose":{"torso":142,"head":-236,"upperArmL":29.9,"forearmL":27.2,"thighL":25.8,"shinL":-90,"footL":-75,"upperArmR":-30.7,"forearmR":-28.4,"thighR":21.8,"shinR":-88,"footR":-73,"root":{"x":36,"y":71}},"highlight":["elbowL"]}},
+    {"duration":1000,"label":"Swing the leg over their head","highlight":["hipL","kneeL"],"pose":{"torso":-78,"head":-92,"upperArmL":87.8,"forearmL":170.3,"thighL":198.4,"shinL":113.7,"footL":203.7,"upperArmR":87.8,"forearmR":170.3,"thighR":149.4,"shinR":52.3,"footR":142.3,"root":{"x":44,"y":81}},"partner":{"pose":{"torso":112.9,"head":-252,"upperArmL":25.2,"forearmL":93.6,"thighL":36.9,"shinL":-90,"footL":-75,"upperArmR":-34.9,"forearmR":-37.5,"thighR":32.9,"shinR":-88,"footR":-73,"root":{"x":20,"y":73}},"highlight":[],"over":["armL"]}},
+    {"duration":1300,"label":"Arm straight between your legs, thumb up: lift the hips","highlight":[],"pose":{"torso":-72,"head":-92,"upperArmL":91.4,"forearmL":173.7,"thighL":209,"shinL":100.1,"footL":190.1,"upperArmR":91.4,"forearmR":173.7,"thighR":129.4,"shinR":42.7,"footR":132.7,"root":{"x":46,"y":78}},"partner":{"pose":{"torso":105.9,"head":-255,"upperArmL":63,"forearmL":80,"thighL":31.8,"shinL":-90,"footL":-75,"upperArmR":-42.5,"forearmR":-19.7,"thighR":27.8,"shinR":-88,"footR":-73,"root":{"x":10,"y":72}},"highlight":["elbowL"],"over":["armL"]}}
+  ]
+}

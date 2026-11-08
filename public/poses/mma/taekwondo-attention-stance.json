@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "title": "Attention Stance (Charyot)",
+  "view": "front",
+  "anchor": {
+    "joint": "hip",
+    "x": 50,
+    "y": 50
+  },
+  "static": true,
+  "frames": [
+    {"duration":3200,"label":"Attention: heels together, toes out, arms straight, chin level","highlight":["spine"],"pose":{"torso":180,"head":180,"upperArmL":0,"forearmL":0,"upperArmR":0,"forearmR":0,"thighL":0,"shinL":0,"footL":75,"thighR":0,"shinR":0,"footR":-75}}
+  ]
+}

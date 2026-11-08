@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "title": "Clinch (Plum) and Knee",
+  "view": "side",
+  "anchor": {
+    "joint": "toeL",
+    "x": 39,
+    "y": 91.2
+  },
+  "frames": [
+    {"duration":600,"label":"Plum: both hands on the back of their head, forearms on their collarbones, elbows squeezed","highlight":["hand"],"partner":{"pose":{"torso":162,"head":150,"upperArmL":34,"forearmL":84,"upperArmR":28,"forearmR":80,"thighL":20,"shinL":2,"footL":80,"thighR":-20,"shinR":-22,"footR":64},"anchor":{"joint":"ankleL","x":46,"y":90}},"contacts":[{"a":"handL","b":"head","tol":9}],"pose":{"torso":186,"head":172,"upperArmL":52,"forearmL":140,"upperArmR":48,"forearmR":142,"thighL":14,"shinL":-2,"footL":80,"thighR":-20,"shinR":-22,"footR":64}},
+    {"duration":300,"label":"Pull their head down and step the rear foot back to load the knee","highlight":["shoulderL","hand"],"partner":{"pose":{"torso":146,"head":132,"upperArmL":20,"forearmL":70,"upperArmR":14,"forearmR":66,"thighL":24,"shinL":4},"anchor":{"joint":"ankleL","x":46,"y":90}},"contacts":[{"a":"handL","b":"head","tol":9}],"pose":{"torso":190,"head":174,"upperArmL":40,"forearmL":140,"upperArmR":36,"forearmR":142,"thighR":-24,"shinR":-26,"footR":66}},
+    {"duration":320,"label":"Knee: hips drive forward, the rear knee spears up into their body","highlight":["hipR","kneeR"],"partner":{"pose":{"torso":140,"head":128},"anchor":{"joint":"ankleL","x":46,"y":90}},"contacts":[{"a":"handL","b":"head","tol":9},{"a":"kneeR","b":"torso","tol":7}],"pose":{"torso":196,"head":176,"upperArmL":20,"forearmL":150,"upperArmR":16,"forearmR":152,"thighL":-2,"shinL":-4,"footL":60,"thighR":98,"shinR":-12,"footR":6}},
+    {"duration":300,"label":"Foot back down, keep the plum","highlight":[],"partner":{"pose":{"torso":156,"head":144},"anchor":{"joint":"ankleL","x":46,"y":90}},"contacts":[{"a":"handL","b":"head","tol":9}],"pose":{"torso":186,"head":172,"thighL":14,"shinL":-2,"footL":80,"thighR":-20,"shinR":-22,"footR":84,"upperArmL":52,"forearmL":140,"upperArmR":48,"forearmR":142}}
+  ]
+}

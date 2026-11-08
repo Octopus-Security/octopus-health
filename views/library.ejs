@@ -96,6 +96,7 @@
     .ex-video-btn:hover .play-circle { transform:scale(1.1); }
 
     .sf-container { width:100%; height:100%; display:flex; align-items:center; justify-content:center; }
+    .ex-nodiagram { font-size:0.75rem; color:#8a8296; text-align:center; padding:4px 8px; user-select:none; }
     .sf-container svg { width:auto; height:100%; max-width:100%; }
     .sf-guide-link {
       position:absolute; bottom:6px; right:8px;
@@ -147,7 +148,7 @@
 
     .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:100; align-items:center; justify-content:center; }
     .modal-overlay.open { display:flex; }
-    .modal { background:#111; border:1px solid #222; border-radius:14px; padding:24px; width:min(480px,95vw); max-height:85vh; overflow-y:auto; }
+    .modal { background:#111; border:1px solid #222; border-radius:14px; padding:24px; width:min(480px,95vw); max-height:85vh; max-height:85dvh; overscroll-behavior:contain; overflow-y:auto; }
     .modal h3 { color:#e8e8e8; margin-bottom:16px; }
     .form-group { margin-bottom:12px; }
     .form-group label { display:block; font-size:0.8rem; color:#888; margin-bottom:4px; }
@@ -284,11 +285,23 @@
 const ALL_EXERCISES = <%- JSON.stringify(exercises) %>;
 
 // Which animation each card shows: one shared rule set, public/pose-map.js.
+// A martial-arts technique with no pose of its own gets NO figure (the card says "No diagram yet"):
+// the category fallback is a generic stance, which shows a different move than the one named.
+const MARTIAL = ['mma', 'bjj', 'muay_thai'];
 function poseForExercise(e) {
-  return typeof PoseMap !== 'undefined' ? PoseMap.keyFor(e.name, e.category) : null;
+  if (typeof PoseMap === 'undefined') return null;
+  if (MARTIAL.indexOf(e.category) >= 0) return PoseMap.match(e.name);
+  return PoseMap.keyFor(e.name, e.category);
 }
 
-const _sfPlayers = {};
+// exId -> the Player drawing that card right now. Cleared with the grid: a re-render replaces every
+// card, so a player (and its "already drawn" flag) from the previous render must not outlive it.
+// (It used to, which left every card blank after any tab, search or filter change.)
+let _sfPlayers = {};
+function destroyFigures() {
+  Object.keys(_sfPlayers).forEach(function (k) { try { _sfPlayers[k].destroy(); } catch (e) { /* gone with its card */ } });
+  _sfPlayers = {};
+}
 let activeCat = '';
 
 document.querySelectorAll('.cat-tab').forEach(btn => {
@@ -324,6 +337,7 @@ function renderGrid(list) {
   // One standing safety line for the page, shown only while recovery content is on screen.
   document.getElementById('rec-note').hidden = !list.some(e => e.category === 'recovery');
   const grid = document.getElementById('lib-grid');
+  destroyFigures();
   grid.innerHTML = list.map(e => {
     const catClass   = 'tag-' + (e.category || 'strength');
     const equipLabel = (e.equipment || '').replace(/_/g,' ');
@@ -346,6 +360,7 @@ function renderGrid(list) {
 
     const poseKey   = poseForExercise(e);
     const mediaAttr = poseKey ? ` data-pose="${poseKey}" data-exid="${e.id}"` : '';
+    const noDiagram = !poseKey && MARTIAL.indexOf(e.category) >= 0;
     const guideLink = hasVideo
       ? `<a href="${escHtml(e.videoUrl)}" target="_blank" rel="noopener" class="sf-guide-link" title="Watch video guide">▶ Guide</a>`
       : '';
@@ -353,7 +368,9 @@ function renderGrid(list) {
       ? `<div class="sf-container" id="sf-${e.id}"></div>${guideLink}`
       : hasVideo
         ? `<a href="${escHtml(e.videoUrl)}" target="_blank" rel="noopener" class="ex-video-btn" title="Watch on YouTube"><div class="play-circle">▶</div></a><span class="ex-media-icon">${icon}</span>`
-        : `<span class="ex-media-icon">${icon}</span>`;
+        : noDiagram
+          ? `<span class="ex-nodiagram">No diagram yet</span>`
+          : `<span class="ex-media-icon">${icon}</span>`;
 
     return `
 <div class="ex-card" data-id="${e.id}" data-cat="${e.category}">
@@ -418,16 +435,29 @@ document.getElementById('add-form').addEventListener('submit', async e => {
   }
 });
 
-function initStickFigures() {
-  if (typeof StickFigurePlayer === 'undefined') return;
+function initStickFigures(tries) {
+  // stick-figure.js is deferred: on a slow connection it can arrive after this runs. Wait for it
+  // (up to ~10 s) rather than leaving every card blank.
+  if (typeof StickFigurePlayer === 'undefined') {
+    if ((tries || 0) < 100) setTimeout(function () { initStickFigures((tries || 0) + 1); }, 100);
+    else document.querySelectorAll('.ex-media[data-pose] .sf-container').forEach(function (c) { c.innerHTML = '<span class="ex-nodiagram">No diagram yet</span>'; });
+    return;
+  }
   document.querySelectorAll('.ex-media[data-pose]').forEach(function (el) {
-    var key = el.dataset.pose;
     var exId = el.dataset.exid;
     var container = document.getElementById('sf-' + exId);
-    if (!container || _sfPlayers[exId]) return;
-    StickFigurePlayer.load(container, key, { autoplay: true }, function (err) {
-      if (!err) _sfPlayers[exId] = true;
-    });
+    if (!container || container.dataset.sf) return;   // already drawn (or loading) on THIS render
+    container.dataset.sf = '1';
+    // One card at a time, caught per card: a bad pose shows "No diagram yet" there and touches no other.
+    try {
+      StickFigurePlayer.mount(container, el.dataset.pose, { autoplay: true }, function (err, p) {
+        if (!err && p) {
+          if (container.isConnected) _sfPlayers[exId] = p; else p.destroy();   // the grid was replaced while loading
+        }
+      });
+    } catch (err) {
+      container.innerHTML = '<span class="ex-nodiagram">No diagram yet</span>';
+    }
   });
 }
 

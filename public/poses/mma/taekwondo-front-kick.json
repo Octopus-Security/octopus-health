@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "title": "Front Kick (Ap Chagi)",
+  "view": "side",
+  "anchor": {
+    "joint": "ankleL",
+    "x": 52,
+    "y": 90
+  },
+  "frames": [
+    {"duration":500,"label":"Fighting stance","highlight":[],"pose":{"torso":176,"head":176,"upperArmL":40,"forearmL":150,"upperArmR":25,"forearmR":160,"thighL":14,"shinL":-6,"footL":90,"thighR":-20,"shinR":-18,"footR":72}},
+    {"duration":280,"label":"Chamber: rear knee lifts to the chest","highlight":["hipR","kneeR"],"pose":{"torso":178,"head":176,"thighL":8,"shinL":-2,"thighR":100,"shinR":-25,"footR":100}},
+    {"duration":160,"label":"Extend: snap the leg out, strike with the ball of the foot","highlight":["kneeR","ankleR"],"pose":{"torso":186,"head":182,"thighL":8,"shinL":-2,"thighR":92,"shinR":95,"footR":170}},
+    {"duration":150,"label":"Hold at contact","highlight":["kneeR","ankleR"],"pose":{"torso":187}},
+    {"duration":250,"label":"Retract through the chamber","highlight":["hipR"],"pose":{"torso":178,"head":176,"thighL":8,"shinL":-2,"thighR":100,"shinR":-25,"footR":100}},
+    {"duration":450,"label":"Back to the stance","highlight":[],"pose":{"torso":176,"head":176,"upperArmL":40,"forearmL":150,"upperArmR":25,"forearmR":160,"thighL":14,"shinL":-6,"footL":90,"thighR":-20,"shinR":-18,"footR":72}}
+  ]
+}

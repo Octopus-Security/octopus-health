@@ -110,6 +110,8 @@
       <% group.forEach(function (r) { %>
         <details class="mob-routine" data-routine="<%= r.id %>" <%= r.id === mobility.dailyId ? 'open' : '' %>>
           <summary><strong><%= r.name %></strong> <span class="today-meta">· <%= r.minutes %> min<%= r.perWeek ? ' · ' + r.perWeek + 'x/week' : '' %> · <%= r.blurb %></span></summary>
+          <% if (r.safety) { %><div class="today-left" data-safety="1"><%= r.safety %></div><% } %>
+          <% if (r.notes) { %><div class="today-meta" style="margin:6px 0"><%= r.notes %></div><% } %>
           <ul class="today-list">
             <% r.items.forEach(function (it, i) { %>
               <li class="today-item">

@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "title": "Gedan-barai (Low Block)",
+  "view": "side",
+  "anchor": {
+    "joint": "ankleL",
+    "x": 46,
+    "y": 90
+  },
+  "frames": [
+    {"duration":600,"label":"Zenkutsu-dachi","highlight":[],"pose":{"thighL":55,"shinL":-15,"footL":90,"thighR":-40.5,"shinR":-40.5,"footR":90,"torso":180,"head":180,"upperArmL":30,"forearmL":120,"upperArmR":80,"forearmR":90}},
+    {"duration":380,"label":"Wind up: fist to the opposite shoulder","highlight":[],"pose":{"upperArmL":90,"forearmL":190,"upperArmR":80,"forearmR":90}},
+    {"duration":200,"label":"Gedan-barai: sweep down, fist above the front thigh","highlight":["shoulderL","elbowL","hand"],"pose":{"upperArmL":20,"forearmL":45,"upperArmR":-20,"forearmR":55,"torso":178}},
+    {"duration":350,"label":"Hold: tighten at the finish","highlight":["shoulderL","elbowL","hand"],"pose":{"torso":178}},
+    {"duration":450,"label":"Return","highlight":[],"pose":{"thighL":55,"shinL":-15,"footL":90,"thighR":-40.5,"shinR":-40.5,"footR":90,"torso":180,"head":180,"upperArmL":30,"forearmL":120,"upperArmR":80,"forearmR":90}}
+  ]
+}

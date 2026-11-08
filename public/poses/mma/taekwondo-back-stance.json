@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "title": "Back Stance (Dwitkubi)",
+  "view": "side",
+  "anchor": {
+    "joint": "ankleR",
+    "x": 46,
+    "y": 90
+  },
+  "static": true,
+  "frames": [
+    {"duration":3200,"label":"Back stance: 70% on the bent rear leg, front leg long","highlight":["kneeR","hipR"],"pose":{"torso":180,"head":180,"upperArmL":70,"forearmL":150,"upperArmR":75,"forearmR":100,"thighL":40,"shinL":35,"footL":90,"thighR":45,"shinR":-25,"footR":90}}
+  ]
+}

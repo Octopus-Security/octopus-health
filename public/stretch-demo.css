@@ -9,7 +9,7 @@
 .sd-media { height: 220px; background: linear-gradient(135deg, #111 0%, #0a0a0a 100%); border: 1px solid #1a1a1a; border-radius: 10px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
 .sd-media .sf-container { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
 .sd-media .sf-container svg { width: auto; height: 100%; max-width: 100%; }
-.sd-nopose { font-size: 2.2rem; opacity: 0.25; }
+.sd-nopose { font-size: 0.85rem; color: #8a8296; }
 .sd-how { color: #bbb; font-size: 0.88rem; line-height: 1.55; margin: 0; white-space: pre-line; }
 .sd-how.sd-muted { color: #777; }
 .sd-actions { display: flex; flex-wrap: wrap; gap: var(--space-3); }

@@ -68,6 +68,14 @@ test('nav renders every link and marks the active one', async () => {
   assert.strictEqual((html.match(/<a href="\/[a-z-]*"/g) || []).length, 19 + 1 + 1); // 19 links (Today added 2026-10-26, Gyms 2026-10-27, Coaching 2026-10-27, Week and Limits 2026-11) + title + logout
   assert.match(html, /<a href="\/stretch" class="active" aria-current="page">Stretch<\/a>/);
   assert.match(html, /class="nav-current"[^>]*>Stretch</);
+  assert.doesNotMatch(html, /href="\/sessions"/, 'Sessions is offered to admins only (phase 1)');
+});
+
+test('nav offers Sessions to an admin: one more link, and it is marked current on /sessions', async () => {
+  const ejs = require('ejs');
+  const html = await ejs.renderFile(path.join(root, 'views', 'partials', 'nav.ejs'), { activeTab: 'sessions', user: { username: 'x', role: 'admin' } });
+  assert.strictEqual((html.match(/<a href="\/[a-z-]*"/g) || []).length, 20 + 1 + 1);
+  assert.match(html, /<a href="\/sessions" class="active" aria-current="page">Sessions<\/a>/);
 });
 
 test('Shadow Boxing has its own pose with real punches; footwork keeps the old one', () => {
@@ -95,4 +103,18 @@ test('Hip escape pose is valid and lifts the hips', () => {
   const f = SF.resolveFrames(data);
   assert.ok(f[1].pose.root.y < f[0].pose.root.y - 8, 'bridge lifts the hips');
   assert.ok(f[2].pose.root.x < f[0].pose.root.x - 8, 'hips slide back toward the head');
+});
+
+test('mobile nav panel scrolls inside itself and can never overflow upward behind the header', () => {
+  const mobile = css.slice(css.indexOf('@media (max-width: 800px)'));
+  const m = mobile.match(/nav \.nav-panel \{([^}]*)\}/);
+  assert.ok(m, 'missing mobile nav-panel rule');
+  const panel = m[1];
+  // The desktop rule is justify-content: flex-end; in a column that overflows upward, unreachably.
+  assert.match(panel, /justify-content: flex-start/);
+  assert.match(panel, /overflow-y: auto/);
+  assert.match(panel, /overscroll-behavior: contain/);
+  assert.match(panel, /max-height: calc\(100vh - var\(--nav-h\)/);
+  assert.match(panel, /max-height: calc\(100dvh - var\(--nav-h\) - env\(safe-area-inset-top\)\)/);
+  assert.match(mobile, /nav\.site-nav \{[^}]*position: sticky; top: 0/);
 });

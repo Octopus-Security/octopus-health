@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "title": "Straight Knee (Khao Trong)",
+  "view": "side",
+  "anchor": {
+    "joint": "toeL",
+    "x": 62.89,
+    "y": 91.22
+  },
+  "frames": [
+    {"duration":450,"label":"Guard","highlight":[],"pose":{"torso":180,"head":177,"upperArmL":40,"forearmL":174,"upperArmR":30,"forearmR":174,"thighL":14,"shinL":-2,"footL":80,"thighR":-20,"shinR":-22,"footR":64}},
+    {"duration":220,"label":"Reach: both hands go to the back of their head","highlight":["shoulderL","shoulderR"],"pose":{"torso":178,"upperArmL":76,"forearmL":104,"upperArmR":70,"forearmR":104,"footR":66,"thighR":-24,"shinR":-24}},
+    {"duration":260,"label":"Knee: pull down with the hands, hips drive forward, rear knee spears straight up the middle","highlight":["hipR","kneeR"],"pose":{"torso":200,"head":184,"upperArmL":60,"forearmL":62,"upperArmR":54,"forearmR":58,"thighL":-4,"shinL":-4,"footL":58,"thighR":100,"shinR":-14,"footR":4}},
+    {"duration":260,"label":"Foot back down behind you","highlight":[],"pose":{"torso":182,"head":179,"thighL":10,"shinL":-2,"footL":70,"thighR":10,"shinR":-40,"footR":30,"upperArmL":60,"forearmL":120,"upperArmR":50,"forearmR":130}},
+    {"duration":400,"label":"Guard","highlight":[],"pose":{"torso":180,"head":177,"upperArmL":40,"forearmL":174,"upperArmR":30,"forearmR":174,"thighL":14,"shinL":-2,"footL":80,"thighR":-20,"shinR":-22,"footR":64}}
+  ]
+}

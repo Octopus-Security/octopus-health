@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "title": "Level Change",
+  "view": "side",
+  "pins": ["ankleL","ankleR"],
+  "frames": [
+    {"duration":1000,"label":"Stance: hips at the height you wrestle from, hands in front","highlight":[],"pose":{"torso":140,"head":168,"upperArmL":-7.2,"forearmL":97.7,"thighL":58.6,"shinL":-11.7,"footL":90,"upperArmR":-22.9,"forearmR":81,"thighR":-9.7,"shinR":-68.6,"footR":64.4,"root":{"x":48,"y":60}}},
+    {"duration":1100,"label":"Level change: bend the KNEES, not the waist: hips drop, back angle and head stay up","highlight":["kneeL","kneeR","hipL","hipR"],"pose":{"torso":145,"head":172,"upperArmL":-7.2,"forearmL":97.7,"thighL":78.1,"shinL":-19.2,"footL":90,"upperArmR":-22.9,"forearmR":81,"thighR":-2.9,"shinR":-89.9,"footR":45.1,"root":{"x":47,"y":67}}}
+  ]
+}

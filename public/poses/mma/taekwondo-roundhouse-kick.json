@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "title": "Roundhouse Kick (Dollyo Chagi)",
+  "view": "side",
+  "anchor": {
+    "joint": "ankleL",
+    "x": 52,
+    "y": 90
+  },
+  "frames": [
+    {"duration":500,"label":"Fighting stance","highlight":[],"pose":{"torso":176,"head":176,"upperArmL":40,"forearmL":150,"upperArmR":25,"forearmR":160,"thighL":14,"shinL":-6,"footL":90,"thighR":-20,"shinR":-18,"footR":72}},
+    {"duration":300,"label":"Chamber: knee up and pointing at the target, pivot on the standing foot","highlight":["hipR","kneeR"],"pose":{"torso":182,"head":176,"thighL":8,"shinL":-2,"thighR":102,"shinR":-12,"footR":100,"upperArmR":-15,"forearmR":30}},
+    {"duration":160,"label":"Hip turns over, the lower leg snaps out in an arc","highlight":["kneeR","ankleR","toeR"],"pose":{"torso":198,"head":190,"thighR":102,"shinR":103,"footR":190,"upperArmR":-30,"forearmR":0,"upperArmL":30,"forearmL":165}},
+    {"duration":260,"label":"Snap back, do not push through","highlight":["hipR"],"pose":{"torso":182,"head":176,"thighL":8,"shinL":-2,"thighR":102,"shinR":-12,"footR":100}},
+    {"duration":450,"label":"Back to the stance","highlight":[],"pose":{"torso":176,"head":176,"upperArmL":40,"forearmL":150,"upperArmR":25,"forearmR":160,"thighL":14,"shinL":-6,"footL":90,"thighR":-20,"shinR":-18,"footR":72}}
+  ]
+}

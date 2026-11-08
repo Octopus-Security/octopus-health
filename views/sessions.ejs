@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <%- include('partials/favicon') %>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="<%= asset('/theme.css') %>">
+  <link rel="stylesheet" href="<%= asset('/sessions.css') %>">
+</head>
+<body>
+<%- include('partials/nav') %>
+<div class="container">
+  <div class="card">
+    <h2>Sessions</h2>
+    <p class="fx-meta">Build a session from the exercise library, the mobility routines and the martial-arts moves, tailor it to one person, and send them a link. New sessions are private until you change that.</p>
+    <p class="sx-msg" id="sx-msg" role="status"></p>
+    <button type="button" id="sx-new" class="sx-btn">New session</button>
+  </div>
+
+  <% if (!sessions.length) { %><div class="card"><p class="fx-meta">No sessions yet.</p></div><% } %>
+  <% sessions.forEach(function (s) { %>
+  <div class="card sx-row">
+    <h3><a href="/sessions/<%= s.id %>"><%= s.title %></a>
+      <span class="fx-chip sx-vis sx-vis-<%= s.visibility %>"><%= s.visibility %></span></h3>
+    <p class="fx-meta"><%= s.items.length %> item<%= s.items.length === 1 ? '' : 's' %><% if (s.tailoring.forName) { %> · for <%= s.tailoring.forName %><% } %></p>
+  </div>
+  <% }) %>
+</div>
+<script src="<%= asset('/js/session-list.js') %>"></script>
+</body>
+</html>
