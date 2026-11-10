@@ -405,3 +405,20 @@ test('Body Map is a top-level nav tab and lights up on /body', () => {
   const idx = fs.readFileSync(path.join(__dirname, '..', 'index.js'), 'utf8');
   assert.match(idx, /return 'body'/);
 });
+
+// A foot must not travel through a box prop on the way between two legal key poses (a straight-line move from
+// the floor to the box top goes through its front face). The first step-up figures did exactly that.
+test('a foot that passes through a box between two key poses is rejected; the fixed step-ups are not', () => {
+  const stand = { torso: 180, head: 180, upperArmL: 0, forearmL: 5, upperArmR: 0, forearmR: 5, thighL: 0, shinL: 0, footL: 90, thighR: 0, shinR: 0, footR: 90 };
+  const oldStepUp = { version: 2, title: 'Step-up (old)', view: 'side', grounded: false, props: [{ type: 'box', x: 54, y: 72, w: 30, h: 20 }], frames: [
+    { duration: 700, label: 'Stand facing the box', anchor: { joint: 'ankleR', x: 36, y: 90 }, pose: stand },
+    { duration: 600, label: 'Plant the whole foot on the box', anchor: { joint: 'ankleL', x: 66, y: 70 }, pose: { torso: 160, head: 162, thighL: 50, shinL: -30, footL: 80, thighR: -30, shinR: -35, footR: 60 } },
+  ] };
+  const errs = SF.validate(oldStepUp);
+  assert.ok(errs.some((e) => /passes through a box/.test(e)), errs.join('\n'));
+  // legs resting on or beside a bench the figure lies on are not a violation (both ends overlap on purpose)
+  for (const k of ['bench-press', 'bench-row', 'hip-abduction-machine', 'back-extension', 'step-up', 'step-up-db', 'step-up-barbell', 'lateral-step-up', 'box-jump', 'depth-jump']) {
+    const errs2 = SF.validate(JSON.parse(fs.readFileSync(path.join(POSES, k + '.json'), 'utf8')));
+    assert.deepStrictEqual(errs2.filter((e) => /box/.test(e)), [], k);
+  }
+});

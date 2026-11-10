@@ -7,7 +7,7 @@
  "props": [
   {
    "type": "box",
-   "x": 54,
+   "x": 48,
    "y": 72,
    "w": 30,
    "h": 20
@@ -19,11 +19,11 @@
  ],
  "frames": [
   {
-   "duration": 700,
+   "duration": 600,
    "label": "Stand facing the box",
    "anchor": {
     "joint": "ankleR",
-    "x": 36,
+    "x": 32,
     "y": 90
    },
    "pose": {
@@ -33,83 +33,326 @@
     "forearmL": 88,
     "upperArmR": -75,
     "forearmR": 88,
-    "thighL": 0,
-    "shinL": 0,
+    "thighL": 12.3,
+    "shinL": -3.6,
     "footL": 90,
-    "thighR": 0,
-    "shinR": 0,
+    "thighR": 3.6,
+    "shinR": -12.3,
     "footR": 90
-   }
+   },
+   "hold": 200
+  },
+  {
+   "duration": 300,
+   "label": "Lift the foot straight up",
+   "anchor": {
+    "joint": "ankleR",
+    "x": 32,
+    "y": 90
+   },
+   "pose": {
+    "torso": 176,
+    "head": 176,
+    "upperArmL": -75,
+    "forearmL": 88,
+    "upperArmR": -75,
+    "forearmR": 88,
+    "thighL": 80,
+    "shinL": -56.6,
+    "footL": 28.4,
+    "thighR": 3.6,
+    "shinR": -12.3,
+    "footR": 90
+   },
+   "hold": 0
+  },
+  {
+   "duration": 450,
+   "label": "Lift the knee high, foot above the box edge",
+   "anchor": {
+    "joint": "ankleR",
+    "x": 32,
+    "y": 90
+   },
+   "pose": {
+    "torso": 172,
+    "head": 172,
+    "upperArmL": -75,
+    "forearmL": 88,
+    "upperArmR": -75,
+    "forearmR": 88,
+    "thighL": 117.2,
+    "shinL": -10.9,
+    "footL": 74.1,
+    "thighR": 1.2,
+    "shinR": -12.8,
+    "footR": 90
+   },
+   "hold": 0
+  },
+  {
+   "duration": 400,
+   "label": "Plant the whole foot on top",
+   "anchor": {
+    "joint": "ankleR",
+    "x": 32,
+    "y": 90
+   },
+   "pose": {
+    "torso": 168,
+    "head": 168,
+    "upperArmL": -75,
+    "forearmL": 88,
+    "upperArmR": -75,
+    "forearmR": 88,
+    "thighL": 92.6,
+    "shinL": 5.8,
+    "footL": 90,
+    "thighR": -6,
+    "shinR": -17.1,
+    "footR": 90
+   },
+   "hold": 100
+  },
+  {
+   "duration": 350,
+   "label": "Plant the whole foot on top",
+   "anchor": {
+    "joint": "ankleL",
+    "x": 62,
+    "y": 70
+   },
+   "pose": {
+    "torso": 168,
+    "head": 168,
+    "upperArmL": -75,
+    "forearmL": 88,
+    "upperArmR": -75,
+    "forearmR": 88,
+    "thighL": 92.6,
+    "shinL": 5.8,
+    "footL": 90,
+    "thighR": -6,
+    "shinR": -17.1,
+    "footR": 90
+   },
+   "hold": 0
+  },
+  {
+   "duration": 300,
+   "label": "Plant, trailing foot lifts straight up",
+   "anchor": {
+    "joint": "ankleL",
+    "x": 62,
+    "y": 70
+   },
+   "pose": {
+    "torso": 170,
+    "head": 170,
+    "upperArmL": -75,
+    "forearmL": 88,
+    "upperArmR": -75,
+    "forearmR": 88,
+    "thighL": 74.7,
+    "shinL": -9.5,
+    "footL": 90,
+    "thighR": 35,
+    "shinR": -76.7,
+    "footR": 8.3
+   },
+   "hold": 0
+  },
+  {
+   "duration": 450,
+   "label": "Drive up, trailing leg comes through",
+   "anchor": {
+    "joint": "ankleL",
+    "x": 62,
+    "y": 70
+   },
+   "pose": {
+    "torso": 172,
+    "head": 172,
+    "upperArmL": -75,
+    "forearmL": 88,
+    "upperArmR": -75,
+    "forearmR": 88,
+    "thighL": 56.2,
+    "shinL": -19.3,
+    "footL": 90,
+    "thighR": 56.6,
+    "shinR": -56.6,
+    "footR": 28.4
+   },
+   "hold": 0
   },
   {
    "duration": 600,
-   "label": "Plant the whole foot on the box",
+   "label": "Stand tall on the box",
    "anchor": {
     "joint": "ankleL",
-    "x": 66,
+    "x": 62,
     "y": 70
    },
-   "pose": {
-    "torso": 160,
-    "head": 162,
-    "thighL": 50,
-    "shinL": -30,
-    "footL": 80,
-    "thighR": -30,
-    "shinR": -35,
-    "footR": 60,
-    "upperArmL": -75,
-    "forearmL": 88,
-    "upperArmR": -75,
-    "forearmR": 88
-   }
-  },
-  {
-   "duration": 700,
-   "label": "Drive up to stand tall",
-   "anchor": {
-    "joint": "ankleL",
-    "x": 66,
-    "y": 70
-   },
-   "hold": 250,
    "pose": {
     "torso": 180,
     "head": 180,
-    "thighL": 0,
-    "shinL": 0,
-    "footL": 90,
-    "thighR": 25,
-    "shinR": -5,
-    "footR": 90,
     "upperArmL": -75,
     "forearmL": 88,
     "upperArmR": -75,
-    "forearmR": 88
-   }
+    "forearmR": 88,
+    "thighL": 4.1,
+    "shinL": -4.1,
+    "footL": 90,
+    "thighR": 78.3,
+    "shinR": -4.5,
+    "footR": 80.5
+   },
+   "hold": 250
   },
   {
-   "duration": 900,
-   "label": "Lower back with control",
+   "duration": 300,
+   "label": "Free leg swings back over the edge",
    "anchor": {
     "joint": "ankleL",
-    "x": 66,
+    "x": 62,
     "y": 70
    },
    "pose": {
-    "torso": 150,
-    "head": 158,
-    "thighL": 80,
-    "shinL": -40,
-    "footL": 80,
-    "thighR": -20,
-    "shinR": -22,
-    "footR": 70,
+    "torso": 180,
+    "head": 180,
     "upperArmL": -75,
     "forearmL": 88,
     "upperArmR": -75,
-    "forearmR": 88
-   }
+    "forearmR": 88,
+    "thighL": 4.1,
+    "shinL": -4.1,
+    "footL": 90,
+    "thighR": 60,
+    "shinR": -60,
+    "footR": 25
+   },
+   "hold": 0
+  },
+  {
+   "duration": 450,
+   "label": "Free leg swings back over the edge",
+   "anchor": {
+    "joint": "ankleL",
+    "x": 62,
+    "y": 70
+   },
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "upperArmL": -75,
+    "forearmL": 88,
+    "upperArmR": -75,
+    "forearmR": 88,
+    "thighL": 4.1,
+    "shinL": -4.1,
+    "footL": 90,
+    "thighR": 0.9,
+    "shinR": -66.4,
+    "footR": 18.6
+   },
+   "hold": 0
+  },
+  {
+   "duration": 550,
+   "label": "Lower: reach the floor behind the box",
+   "anchor": {
+    "joint": "ankleL",
+    "x": 62,
+    "y": 70
+   },
+   "pose": {
+    "torso": 162,
+    "head": 162,
+    "upperArmL": -75,
+    "forearmL": 88,
+    "upperArmR": -75,
+    "forearmR": 88,
+    "thighL": 93.1,
+    "shinL": -17.4,
+    "footL": 90,
+    "thighR": -4.5,
+    "shinR": -31.5,
+    "footR": 90
+   },
+   "hold": 100
+  },
+  {
+   "duration": 300,
+   "label": "Lower: reach the floor behind the box",
+   "anchor": {
+    "joint": "ankleR",
+    "x": 36,
+    "y": 89
+   },
+   "pose": {
+    "torso": 162,
+    "head": 162,
+    "upperArmL": -75,
+    "forearmL": 88,
+    "upperArmR": -75,
+    "forearmR": 88,
+    "thighL": 93.1,
+    "shinL": -17.4,
+    "footL": 90,
+    "thighR": -4.5,
+    "shinR": -31.5,
+    "footR": 90
+   },
+   "hold": 0
+  },
+  {
+   "duration": 400,
+   "label": "Lift the box foot up and back over the edge",
+   "anchor": {
+    "joint": "ankleR",
+    "x": 36,
+    "y": 89
+   },
+   "pose": {
+    "torso": 168,
+    "head": 168,
+    "upperArmL": -75,
+    "forearmL": 88,
+    "upperArmR": -75,
+    "forearmR": 88,
+    "thighL": 122.7,
+    "shinL": -20,
+    "footL": 65,
+    "thighR": 6.6,
+    "shinR": -31,
+    "footR": 90
+   },
+   "hold": 0
+  },
+  {
+   "duration": 350,
+   "label": "Back clear of the box, then down",
+   "anchor": {
+    "joint": "ankleR",
+    "x": 36,
+    "y": 89
+   },
+   "pose": {
+    "torso": 174,
+    "head": 174,
+    "upperArmL": -75,
+    "forearmL": 88,
+    "upperArmR": -75,
+    "forearmR": 88,
+    "thighL": 71.7,
+    "shinL": -64.1,
+    "footL": 20.9,
+    "thighR": 18.2,
+    "shinR": -18.2,
+    "footR": 90
+   },
+   "hold": 0
   }
  ]
 }

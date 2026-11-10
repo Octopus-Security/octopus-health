@@ -42,7 +42,7 @@
   },
   {
    "duration": 300,
-   "label": "Step off, do not jump",
+   "label": "Step off the edge, do not jump",
    "air": true,
    "hold": 0,
    "pose": {
@@ -59,8 +59,8 @@
     "upperArmR": 20,
     "forearmR": 30,
     "root": {
-     "x": 44,
-     "y": 40
+     "x": 46,
+     "y": 30
     }
    }
   },
@@ -159,8 +159,28 @@
    }
   },
   {
+   "duration": 420,
+   "label": "Reset: hop back up over the box edge",
+   "hold": 0,
+   "air": true,
+   "pose": {
+    "torso": 176,
+    "head": 176,
+    "thighL": 45,
+    "shinL": -30,
+    "footL": 60,
+    "thighR": 45,
+    "shinR": -30,
+    "footR": 60,
+    "root": {
+     "x": 40,
+     "y": 34
+    }
+   }
+  },
+  {
    "duration": 900,
-   "label": "Back onto the box",
+   "label": "Back on the box",
    "anchor": {
     "joint": "ankleL",
     "x": 26,
