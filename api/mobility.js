@@ -71,7 +71,7 @@ const ROUTINES = [
     ],
   },
   {
-    id: 'injury-prevention', name: 'Injury-prevention strength', minutes: 15, kind: 'strength', perWeek: 2,
+    id: 'injury-prevention', name: 'Durability strength', minutes: 15, kind: 'strength', perWeek: 2,
     blurb: 'About 15 minutes, twice a week (attached to training days A and C of the week plan).',
     items: [
       item('copenhagen', 'Copenhagen side plank', '2 x 20 s each side', ['hip', 'knee'], ['adductors'], 'Bottom leg supported on a bench, short lever first. Stop if the groin or hip hurts.', 'Side Plank',
@@ -379,18 +379,18 @@ const ROUTINES = [
     ],
   },
   {
-    id: 'lymph-head-neck', name: 'Lymphatic drainage: head and neck', minutes: 9, kind: 'selfcare',
-    blurb: 'Very light skin strokes, breathing and easy movement. Once a day is fine.',
-    safety: 'Supportive self-care alongside your ENT care, not a replacement for it. Stop if it hurts. Do not massage over skin that is infected, hot, red or newly swollen. See a doctor promptly, without waiting for the scheduled appointment, for a lump that is hard, fixed or growing, a fever, swelling lasting more than about 2-3 weeks, trouble swallowing or breathing, unexplained weight loss or night sweats. It is worth asking the ENT whether self-massage suits your situation.',
-    notes: 'Pressure is very light: just enough to stretch the skin, never to press muscle; slow and rhythmic, no pain, no redness. Order matters: clear the area nearest the collarbone first, then work outward, always moving fluid DOWN toward the collarbone. Do both sides; the left side can get a few extra slow passes with no extra pressure. Sources: general lymphoedema self-care guidance (NHS lymphoedema treatment page, nhs.uk/conditions/lymphoedema/treatment, which describes simple lymphatic drainage taught by a therapist). The step order follows widely published self-massage leaflets (NHS, Macmillan, Cleveland Clinic style); those pages were not checked live, so ask the ENT or a lymphoedema therapist to confirm the technique.',
+    id: 'lymph-head-neck', name: 'Gentle head and neck self-massage', minutes: 9, kind: 'selfcare',
+    blurb: 'General information, not medical treatment: very light skin strokes, slow breathing and easy movement, sometimes called lymphatic massage. Once a day is fine.',
+    safety: 'General information only, not medical treatment. It does not treat, cure or prevent anything. Ask your doctor first if you have swelling, an infection, recent surgery, a history of cancer, or a heart or kidney condition. Stop if it hurts, and do not massage skin that is infected, hot, red or newly swollen. See a doctor for swollen glands that keep getting bigger or have not gone down within a week, feel hard or do not move when pressed, come with night sweats or a very high temperature, or sit just above or below the collarbone, and for any trouble swallowing or breathing.',
+    notes: 'Pressure is very light: just enough to move the skin, never to press into muscle. Go slowly, with no pain and no redness, and do both sides alike. Sources read: NHS, Lymphoedema treatment (nhs.uk/conditions/lymphoedema/treatment), which says a therapist can teach simple massage techniques; NHS, Swollen glands (nhs.uk/conditions/swollen-glands), for the see-a-GP signs above; MedlinePlus, Lymphatic diseases (medlineplus.gov/lymphaticdiseases.html), for what the lymphatic system is. None of these says self-massage achieves any particular effect, and neither does this routine; a therapist or doctor can advise on technique.',
     items: [
       item('lh-breath-start', 'Diaphragmatic breathing', '5 slow breaths', ['thoracic_spine'], ['abs'], 'In through the nose so the belly rises, out slower. Jaw and shoulders loose.', 'Lymph Drainage: Diaphragmatic Breathing'),
-      item('lh-collar', 'Collarbone (supraclavicular) strokes', '5-10 slow strokes each side', ['neck'], ['traps'], 'Fingertips in the hollow above the collarbone, skin-stretch only, drawn gently down and in.', 'Lymph Drainage: Collarbone Strokes'),
-      item('lh-side-neck', 'Side-of-neck strokes', '5-10 slow strokes each side', ['neck'], ['traps'], 'Start below the ear and stroke down toward the collarbone, a little at a time. Very light.', 'Lymph Drainage: Side-of-Neck Strokes'),
-      item('lh-ear-jaw', 'In front of and behind the ears, and along the jaw', '5-10 slow strokes each side', ['neck'], ['traps'], 'Skin-stretch only, moving down toward the neck, then finish with collarbone strokes.', 'Lymph Drainage: Ear and Jawline Strokes'),
+      item('lh-collar', 'Collarbone-area strokes', '5-10 slow strokes each side', ['neck'], ['traps'], 'Fingertips just above the collarbone, light skin movement only, slow and easy.', 'Lymph Drainage: Collarbone Strokes'),
+      item('lh-side-neck', 'Side-of-neck strokes', '5-10 slow strokes each side', ['neck'], ['traps'], 'Flat fingers on the side of the neck, slow and very light.', 'Lymph Drainage: Side-of-Neck Strokes'),
+      item('lh-ear-jaw', 'Around the ears and along the jaw', '5-10 slow strokes each side', ['neck'], ['traps'], 'Light skin movement only, slow and easy.', 'Lymph Drainage: Ear and Jawline Strokes'),
       item('lh-shoulders', 'Slow shoulder rolls', '5 each way', ['shoulder', 'neck'], ['traps'], 'Up, back and down in a smooth circle. Easy breathing.', 'Lymph Drainage: Shoulder Rolls'),
       item('lh-neck-move', 'Gentle neck tilts and turns', '5 each way', ['neck'], ['neck', 'traps'], 'Mild stretch only. Stop for dizziness, sharp pain or tingling in the arms.', 'Lymph Drainage: Gentle Neck Tilts and Turns'),
-      item('lh-breath-end', 'Diaphragmatic breathing to finish', '5 slow breaths', ['thoracic_spine'], ['abs'], 'Same as the start. A short easy walk afterwards also helps.', 'Lymph Drainage: Diaphragmatic Breathing'),
+      item('lh-breath-end', 'Diaphragmatic breathing to finish', '5 slow breaths', ['thoracic_spine'], ['abs'], 'Same as the start. A short easy walk is a pleasant way to finish.', 'Lymph Drainage: Diaphragmatic Breathing'),
     ],
   },
 ];

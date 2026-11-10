@@ -7,7 +7,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const path = require('path');
 const { ratchet } = require('./helpers/ratchet');
-const { BANNED } = require('./helpers/banned');
+const { BANNED, stripDisclaimers } = require('./helpers/banned');
 const K = require('./helpers/exercise-ratchet');
 const INV = require('../scripts/exercise-inventory.cjs');
 const M = require('../lib/muscles.js');
@@ -52,7 +52,7 @@ test('every quick-log alias resolves to a name in the REAL seed library', () => 
 });
 
 test('no banned claim word in any exercise name, cue, routine, template or description', () => {
-  const bad = INV.copy().filter(c => BANNED.test(c.text)).map(c => `${c.source}|${c.id}`);
+  const bad = INV.copy().filter(c => BANNED.test(stripDisclaimers(c.text))).map(c => `${c.source}|${c.id}`);
   ratchet('banned claims', bad, K.CLAIMS);
 });
 

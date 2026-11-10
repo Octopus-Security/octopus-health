@@ -69,8 +69,12 @@ test('joint words resolve to joints, and some words are both', () => {
 });
 
 test('non-regional words are known but resolve to nothing; gibberish is reported, not guessed', () => {
-  const full = M.normalize(['full_body', 'balance']);
+  const full = M.normalize(['balance', 'cardio']);
   assert.deepStrictEqual([full.muscles, full.joints, full.unknown], [[], [], []]);
+  // full_body is spread over the major working muscles so burpees, get-ups and rowing show on the Body Map
+  const fb = M.normalize(['full_body']);
+  assert.ok(fb.muscles.length >= 6 && fb.unknown.length === 0);
+  for (const m of fb.muscles) assert.ok(M.isMuscle(m), m);
   const bad = M.normalize(['wibble', 'glutes']);
   assert.deepStrictEqual(bad.muscles, ['glutes']);
   assert.deepStrictEqual(bad.unknown, ['wibble']);

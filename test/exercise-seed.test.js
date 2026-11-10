@@ -68,7 +68,7 @@ test('copy no longer makes treatment or structural claims', () => {
 test('risky entries carry a caution', () => {
   const by = new Map(SEED_EXERCISES.map(e => [e.name, e.instructions]));
   const need = ['Cervical Spine CARS', 'Neck Isometric Holds', "Wrestler's Bridge", 'Neck Bridge', 'Jefferson Curl',
-    'Shoulder Dislocates', 'Sleeper Stretch', 'Scorpion Stretch', 'Lumbar Decompression Hang', 'Pigeon Stretch', 'Deep Squat Hold'];
+    'Shoulder Dislocates', 'Sleeper Stretch', 'Scorpion Stretch', 'Relaxed Dead Hang', 'Pigeon Stretch', 'Deep Squat Hold'];
   for (const n of need) assert.ok(/stop|never force|back off|skip|ease off|pinch|come up|step down/i.test(by.get(n) || ''), `${n} has no caution`);
 });
 

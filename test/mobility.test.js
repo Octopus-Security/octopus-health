@@ -130,7 +130,10 @@ test('GET joint lists the drills for it', { skip }, async () => {
 test('the lymphatic drainage routine ships with its safety note, seeded cards and no figures', () => {
   const r = mob.ROUTINES.find(x => x.id === 'lymph-head-neck');
   assert.ok(r && r.items.length >= 6);
-  for (const re of [/supports?|supportive/i, /stop if it hurts/i, /infected, hot, red or newly swollen/i, /fever/i, /swallowing or breathing/i, /ask(ing)? the ENT/i]) assert.match(r.safety, re);
+  for (const re of [/not medical treatment/i, /does not treat, cure or prevent/i, /ask your doctor first/i, /recent surgery/i, /history of cancer/i, /heart or kidney/i, /stop if it hurts/i, /infected, hot, red or newly swollen/i, /swallowing or breathing/i]) assert.match(r.safety, re);
+  // general information for everyone: nothing tied to one person's care, no directional or treatment claims
+  const all = [r.name, r.blurb, r.safety, r.notes, ...r.items.flatMap(i => [i.name, i.cue])].join(' ');
+  assert.doesNotMatch(all, /\bENT\b|\bmy\b|left side|move fluid|clear the area|detox/i);
   const PM = require('../public/pose-map');
   const names = new Set(require('../database').SEED_EXERCISES.map(e => e.name));
   for (const it of r.items) { assert.ok(names.has(it.demo), it.demo); assert.strictEqual(PM.match(it.demo), null); }

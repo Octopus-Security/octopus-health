@@ -136,6 +136,7 @@
     { "match": "^banded ankle dorsiflexion$", "requires": ["resistance-bands"], "tool": "Use a band", "substitutes": [ { "name": "Ankle Dorsiflexion Wall Drill", "requires": [] } ] },
     { "match": "^lat stretch on pull-up bar$", "requires": ["bar"], "substitutes": [ { "name": "Overhead Triceps Stretch", "requires": [] } ] },
     { "match": "^lumbar decompression hang$",  "requires": ["bar"] },
+    { "match": "^relaxed dead hang$",  "requires": ["bar"] },
     { "match": "^supine hamstring stretch$", "optional": ["strap|resistance-bands"], "tool": "Use a strap or band", "without": "No strap? Loop a towel around the foot." },
     { "match": "^prone quad stretch$",       "optional": ["strap|resistance-bands"], "tool": "Use a strap or band", "without": "No strap? Hold the ankle with your hand or loop a towel around it." },
     { "match": "^pnf hamstring contract-relax$", "optional": ["strap|resistance-bands"], "tool": "Use a strap or band", "without": "No strap? Loop a towel around the foot." },
