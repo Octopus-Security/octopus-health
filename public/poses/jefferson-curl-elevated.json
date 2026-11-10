@@ -1,0 +1,204 @@
+{
+ "version": 2,
+ "title": "Jefferson Curl (Elevated)",
+ "view": "side",
+ "grounded": false,
+ "anchor": {
+  "joint": "ankleL",
+  "x": 42,
+  "y": 78
+ },
+ "props": [
+  {
+   "type": "box",
+   "x": 14,
+   "y": 80,
+   "w": 36,
+   "h": 12
+  }
+ ],
+ "highlight": [
+  "hipL",
+  "spine"
+ ],
+ "frames": [
+  {
+   "duration": 900,
+   "label": "Stand tall on the box",
+   "hold": 300,
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "upperArmL": 0,
+    "forearmL": 5,
+    "upperArmR": 0,
+    "forearmR": 5,
+    "thighL": 0,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": 0,
+    "shinR": 0,
+    "footR": 90
+   }
+  },
+  {
+   "duration": 700,
+   "label": "Tuck the chin",
+   "hold": 0,
+   "pose": {
+    "torso": 180,
+    "head": 150,
+    "upperArmL": 0,
+    "forearmL": 5,
+    "upperArmR": 0,
+    "forearmR": 5,
+    "thighL": 0,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": 0,
+    "shinR": 0,
+    "footR": 90
+   }
+  },
+  {
+   "duration": 900,
+   "label": "Start rolling down",
+   "hold": 0,
+   "pose": {
+    "torso": 150,
+    "arch": 8,
+    "head": 110,
+    "upperArmL": 5,
+    "forearmL": 10,
+    "upperArmR": 5,
+    "forearmR": 10,
+    "thighL": 0,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": 0,
+    "shinR": 0,
+    "footR": 90
+   }
+  },
+  {
+   "duration": 900,
+   "label": "Roll down, one vertebra at a time",
+   "hold": 0,
+   "pose": {
+    "torso": 118,
+    "arch": 16,
+    "head": 80,
+    "upperArmL": 5,
+    "forearmL": 10,
+    "upperArmR": 5,
+    "forearmR": 10,
+    "thighL": 0,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": 0,
+    "shinR": 0,
+    "footR": 90
+   }
+  },
+  {
+   "duration": 900,
+   "label": "Hands pass the toes",
+   "hold": 0,
+   "pose": {
+    "torso": 80,
+    "arch": 22,
+    "head": 40,
+    "upperArmL": 15,
+    "forearmL": 20,
+    "upperArmR": 15,
+    "forearmR": 20,
+    "thighL": 0,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": 0,
+    "shinR": 0,
+    "footR": 90
+   }
+  },
+  {
+   "duration": 1000,
+   "label": "Bottom, hands below the box top",
+   "hold": 700,
+   "pose": {
+    "torso": 45,
+    "arch": 28,
+    "head": 10,
+    "upperArmL": 8,
+    "forearmL": 8,
+    "upperArmR": 8,
+    "forearmR": 8,
+    "thighL": 0,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": 0,
+    "shinR": 0,
+    "footR": 90
+   }
+  },
+  {
+   "duration": 1000,
+   "label": "Roll up from the bottom of the spine",
+   "hold": 0,
+   "pose": {
+    "torso": 80,
+    "arch": 22,
+    "head": 40,
+    "upperArmL": 15,
+    "forearmL": 20,
+    "upperArmR": 15,
+    "forearmR": 20,
+    "thighL": 0,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": 0,
+    "shinR": 0,
+    "footR": 90
+   }
+  },
+  {
+   "duration": 900,
+   "label": "Keep rolling up, head last",
+   "hold": 0,
+   "pose": {
+    "torso": 118,
+    "arch": 14,
+    "head": 95,
+    "upperArmL": 5,
+    "forearmL": 10,
+    "upperArmR": 5,
+    "forearmR": 10,
+    "thighL": 0,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": 0,
+    "shinR": 0,
+    "footR": 90
+   }
+  },
+  {
+   "duration": 800,
+   "label": "Tall again",
+   "hold": 0,
+   "pose": {
+    "torso": 172,
+    "arch": 2,
+    "head": 170,
+    "upperArmL": 0,
+    "forearmL": 5,
+    "upperArmR": 0,
+    "forearmR": 5,
+    "thighL": 0,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": 0,
+    "shinR": 0,
+    "footR": 90
+   }
+  }
+ ]
+}

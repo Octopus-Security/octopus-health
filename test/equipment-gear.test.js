@@ -111,3 +111,18 @@ test('bench and sandbag exercises need their item', () => {
   assert.strictEqual(E.fitExercises([{ exerciseName: 'Decline Sit-up' }], ['mat']).substitutions[0].to, 'Sit-up');
   assert.strictEqual(E.fitExercises([{ exerciseName: 'Decline Sit-up' }], ['weight-bench']).exercises[0].exerciseName, 'Decline Sit-up');
 });
+
+test('the elevated Jefferson curl needs a box, step or bench, never a chair alone, and falls back to the floor version', () => {
+  const n = 'Jefferson Curl (Elevated)';
+  assert.deepStrictEqual(need(n), ['plyo-box|step|weight-bench']);
+  for (const owned of [['chair'], ['mat'], ['dumbbell'], ['chair', 'dumbbell']]) {
+    const f = E.fitExercises([{ exerciseName: n }], owned);
+    assert.deepStrictEqual(f.substitutions, [{ from: n, to: 'Jefferson Curl' }], JSON.stringify(owned));
+    assert.ok(!f.exercises.some(x => x.exerciseName === n));
+  }
+  for (const owned of [['plyo-box'], ['step'], ['weight-bench']]) {
+    assert.strictEqual(E.fitExercises([{ exerciseName: n }], owned).exercises[0].exerciseName, n, JSON.stringify(owned));
+  }
+  // the floor version stays available to everyone
+  assert.strictEqual(E.fitExercises([{ exerciseName: 'Jefferson Curl' }], ['chair']).exercises[0].exerciseName, 'Jefferson Curl');
+});

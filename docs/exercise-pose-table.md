@@ -5,7 +5,7 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 
 "how": `rule` = a name rule matched; `category fallback` = no rule, the category figure is shown; `null rule -> category fallback` = a rule says "no figure yet" but the category figure is still shown; `none (martial: no figure)` = the card says "No diagram yet".
 
-555 library exercises, 182 mobility items.
+556 library exercises, 182 mobility items.
 
 | source | id | name | category | figure | how |
 |---|---|---|---|---|---|
@@ -120,6 +120,7 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | library | Supine Hip Internal Rotation | Supine Hip Internal Rotation | recovery | supine-twist | rule |
 | library | Cossack Squat | Cossack Squat | recovery | cossack | rule |
 | library | Jefferson Curl | Jefferson Curl | recovery | forward-fold | rule |
+| library | Jefferson Curl (Elevated) | Jefferson Curl (Elevated) | recovery | jefferson-curl-elevated | rule |
 | library | Shoulder CARS | Shoulder CARS | recovery | arm-circle | rule |
 | library | Shoulder Dislocates | Shoulder Dislocates | recovery | arm-circle | rule |
 | library | Wall Slide | Wall Slide | recovery | wall-slide | rule |

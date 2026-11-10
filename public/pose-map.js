@@ -248,6 +248,7 @@
     [/knee-to-chest|knee to chest|piriformis/i, 'knee-to-chest'],
     [/seated forward fold/i, 'seated-fold'],
     [/side bend/i, 'side-bend'],
+    [/jefferson curl.*elevat|elevated jefferson|jefferson.*box/i, 'jefferson-curl-elevated'],
     [/forward fold|toe touch|jefferson/i, 'forward-fold'],
     [/deep squat hold/i, 'deep-squat-hold'],
     [/cossack/i, 'cossack'],
