@@ -401,7 +401,11 @@ async function weekPlan(db, now = new Date(), { equipment } = {}) {
   const rem = await getReminder(db);
   const s = await skillState(db, equipment);
   const rows = (await db.Benchmark.findAll({ order: [['position', 'ASC']] })).map(b => b.toJSON());
+  const A = require('./addons');
+  let addonStates = [];
+  try { addonStates = await A.activeStates(db); } catch { addonStates = []; }   // the plan still builds without add-ons
   return W.buildPlan({
+    addonStates,
     tree: s.tree, st: s.st, have: s.have, focus: await getSetting(db, 'focus', 'balanced'),
     benchmarks: rows, lastByItem: await lastByItem(db), date: B.localParts(now, rem.tz).date, benchmarkDay: await benchmarkDayOf(db),
   });

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <%- include('partials/favicon') %>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="<%= asset('/theme.css') %>">
+  <style>
+    .ao-card h3 { margin: 0 0 6px; overflow-wrap: anywhere; }
+    .ao-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
+    .ao-row .btn { min-height: var(--tap); }
+    .ao-honest { margin: 8px 0; padding: 10px 12px; border-radius: 8px; background: #1a1f26; color: #cfd6de; overflow-wrap: anywhere; }
+    .ao-bar { height: 8px; border-radius: 4px; background: #222; overflow: hidden; margin: 6px 0; }
+    .ao-bar > span { display: block; height: 100%; background: #2ecc71; }
+    .ao-time { min-height: var(--tap); font-size: 16px; }
+    .ao-msg { color: #d4a537; min-height: 1.2em; }
+  </style>
+</head>
+<body>
+<%- include('partials/nav') %>
+<div class="container">
+  <div class="card">
+    <h2>Goal add-ons</h2>
+    <p class="fx-meta">An add-on adds a fixed amount of work for one goal on top of your weekly plan, and gets a little harder over the weeks. Start as many as you like; each puts at most one session on a day. Everything here works without Discord or Telegram; reminders are an extra.</p>
+    <div class="ao-row">
+      <label for="ao-remind-at">Reminder time (ET)</label>
+      <input type="time" id="ao-remind-at" class="ao-time" value="<%= remindAt || '' %>">
+      <button type="button" class="btn" id="ao-remind-save">Save</button>
+      <button type="button" class="btn" id="ao-remind-clear">No reminders</button>
+    </div>
+    <p class="fx-meta">Reminders need a time here and the bell switched on for an add-on below.</p>
+    <p class="ao-msg" id="ao-msg" role="status"></p>
+  </div>
+
+  <% cards.forEach(function (c) { var st = c.state; %>
+  <div class="card ao-card" id="addon-<%= c.id %>" data-addon="<%= c.id %>">
+    <h3><%= c.title %>
+      <% if (st) { %><span class="fx-chip <%= st.status === 'active' ? 'achieved' : '' %>"><%= st.status %></span><% } %>
+    </h3>
+    <p><%= c.summary %></p>
+    <p class="ao-honest"><strong>What this can and cannot do.</strong> <%= c.honesty %></p>
+    <% if (c.requiresNote) { %><p class="fx-meta"><%= c.requiresNote %></p><% } %>
+    <% if (st) { %>
+      <p class="fx-meta">Started <%= st.startDate %> - week <%= st.weekIndex %> - <%= c.phase.label %>: <%= c.phase.focus %></p>
+      <% if (st.status === 'active' && c.quota) { var pct = c.quota.planned ? Math.round(100 * c.quota.done / c.quota.planned) : 0; %>
+        <div>This week: <strong><%= c.quota.done %> of <%= c.quota.planned %></strong> sessions done</div>
+        <div class="ao-bar" role="progressbar" aria-valuemin="0" aria-valuemax="<%= c.quota.planned %>" aria-valuenow="<%= c.quota.done %>"><span style="width:<%= pct %>%"></span></div>
+      <% } %>
+      <% if (st.status === 'active' && c.today.length) { %>
+        <p class="fx-meta" style="margin-top:12px"><strong>Today</strong></p>
+        <%- include('partials/addon-list', { entries: c.today, date: today, canMark: true }) %>
+      <% } else if (st.status === 'active') { %>
+        <p class="fx-meta">No session today.</p>
+      <% } %>
+      <% if (c.nutritionLink && nutrition && st.status === 'active') { %>
+        <div class="ao-honest">
+          <% if (nutrition.targets) { %>Your nutrition targets: <%= nutrition.targets.calories %> kcal and <%= nutrition.targets.protein %> g protein a day.
+          <% } else { %>No nutrition targets are set yet.<% } %>
+          <a href="/nutrition/targets">Open nutrition targets</a>
+        </div>
+      <% } %>
+    <% } else { %>
+      <p class="fx-meta">First phase (<%= c.phase.label %>): <%= c.phase.focus %>. <%= c.phase.tracks.map(function (t) { return t.sessionsPerWeek + ' a week (' + (t.placement === 'training' ? 'training days' : t.placement === 'daily' ? 'daily' : t.placement === 'rest' ? 'rest days' : 'any day') + ')'; }).join('; ') %>.</p>
+    <% } %>
+    <% if (c.nutritionLink && (!st || st.status !== 'active')) { %><p class="fx-meta">Pairs with your <a href="/nutrition/targets">nutrition targets</a>.</p><% } %>
+    <div class="ao-row">
+      <% if (!st) { %>
+        <button type="button" class="btn ao-act" data-act="start">Start</button>
+      <% } else if (st.status === 'active') { %>
+        <button type="button" class="btn ao-act" data-act="pause">Pause</button>
+        <button type="button" class="btn ao-act" data-act="stop">Stop</button>
+        <label><input type="checkbox" class="ao-rem" <%= st.reminder ? 'checked' : '' %>> Daily reminder</label>
+      <% } else { %>
+        <button type="button" class="btn ao-act" data-act="resume">Resume</button>
+        <button type="button" class="btn ao-act" data-act="stop">Stop</button>
+      <% } %>
+    </div>
+  </div>
+  <% }) %>
+</div>
+<script>
+(function () {
+  var msg = document.getElementById('ao-msg');
+  function say(t) { msg.textContent = t || ''; }
+  async function send(method, url, body) {
+    var r = await fetch(url, { method: method, credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    var j = await r.json().catch(function () { return {}; });
+    if (!r.ok || !j.ok) throw new Error(j.error || 'failed');
+    return j;
+  }
+  document.querySelectorAll('.ao-act').forEach(function (b) {
+    b.addEventListener('click', async function () {
+      var id = b.closest('.ao-card').dataset.addon, act = b.dataset.act;
+      if (act === 'stop' && !confirm('Stop this add-on? Its history stays, and you can start it again later.')) return;
+      b.disabled = true; say('');
+      try { await send('POST', '/addons/api/' + act, { addonId: id }); location.reload(); }
+      catch (e) { say('Could not do that: ' + e.message); b.disabled = false; }
+    });
+  });
+  document.querySelectorAll('.ao-rem').forEach(function (c) {
+    c.addEventListener('change', async function () {
+      var id = c.closest('.ao-card').dataset.addon;
+      try { await send('PUT', '/addons/api/reminder', { addonId: id, reminder: c.checked }); say(c.checked ? 'Reminder on.' : 'Reminder off.'); }
+      catch (e) { c.checked = !c.checked; say('Could not save: ' + e.message); }
+    });
+  });
+  var t = document.getElementById('ao-remind-at');
+  document.getElementById('ao-remind-save').addEventListener('click', async function () {
+    try { await send('PUT', '/addons/api/remind-at', { time: t.value || null }); say(t.value ? 'Reminder time saved.' : 'Reminders off.'); }
+    catch (e) { say('Could not save: ' + e.message); }
+  });
+  document.getElementById('ao-remind-clear').addEventListener('click', async function () {
+    try { await send('PUT', '/addons/api/remind-at', { time: null }); t.value = ''; say('Reminders off.'); }
+    catch (e) { say('Could not save: ' + e.message); }
+  });
+})();
+</script>
+</body>
+</html>

@@ -52,6 +52,10 @@
     <% } else { %>
       <p class="fx-meta">Nothing planned<%= d.where ? ' at ' + d.where : '' %>. Rest day, or <a href="/workout">log something anyway</a>.</p>
     <% } %>
+    <% if (d.addons && d.addons.length) { %>
+      <p class="fx-meta" style="margin-top:12px"><strong>Goal add-ons</strong> - <a href="/addons">manage</a></p>
+      <%- include('partials/addon-list', { entries: d.addons, date: d.date, canMark: d.date <= today }) %>
+    <% } %>
   </div>
   <% }) %>
 </div>

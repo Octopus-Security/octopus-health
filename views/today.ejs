@@ -99,6 +99,13 @@
       </ul>
     </div>
   <% } %>
+  <% if (typeof addons !== 'undefined' && addons.length) { %>
+    <div class="card" id="addons-card">
+      <h2 style="margin-bottom:6px">➕ Goal add-ons</h2>
+      <div class="today-meta" style="margin-bottom:8px">On top of today's plan. <a href="/addons">Manage add-ons</a></div>
+      <%- include('partials/addon-list', { entries: addons, date: today, canMark: true }) %>
+    </div>
+  <% } %>
   <% if (mobility) { %>
     <div class="card" id="mob-card">
       <h2 style="margin-bottom:6px">🤸 Mobility &amp; prep</h2>

@@ -1,0 +1,45 @@
+{
+  "id": "pull-up",
+  "title": "Pull-up",
+  "goalKind": "skill",
+  "summary": "Your first pull-up, then more reps: hangs, shoulder-blade pulls, slow lowering and band help, three times a week.",
+  "honesty": "Most people need a few months to a first clean pull-up, and it depends on body weight and starting strength. Stop sets short of failure and leave a rest day between sessions. Needs a bar: without one you get rows instead, which build the same pulling muscles but are not a pull-up. A sturdy table or rings work for rows.",
+  "requires": ["bar"],
+  "requiresNote": "Needs a pull-up bar. Without one the bar exercises are swapped for rows (inverted row on a sturdy table or rings, or a band row).",
+  "deload": "follow",
+  "weeks": [
+    {
+      "from": 1, "to": 2, "focus": "Learn to hang and pull the shoulder blades down",
+      "tracks": [ { "id": "pull", "sessionsPerWeek": 3, "placement": "training", "sessions": [[
+        { "exercise": "Dead Hang", "sets": 3, "duration": 20, "requires": ["bar"], "substitutes": [ { "name": "Inverted Row", "requires": [] } ] },
+        { "exercise": "Scapular Pull-up", "sets": 3, "reps": 6, "requires": ["bar"], "substitutes": [ { "name": "Resistance Band Row", "requires": ["resistance-bands"] } ] }
+      ]] } ]
+    },
+    {
+      "from": 3, "to": 4, "focus": "Add slow lowering and a flexed-arm hold",
+      "tracks": [ { "id": "pull", "sessionsPerWeek": 3, "placement": "training", "sessions": [[
+        { "exercise": "Dead Hang", "sets": 2, "duration": 30, "requires": ["bar"], "substitutes": [ { "name": "Inverted Row", "requires": [] } ] },
+        { "exercise": "Scapular Pull-up", "sets": 3, "reps": 8, "requires": ["bar"], "substitutes": [ { "name": "Resistance Band Row", "requires": ["resistance-bands"] } ] },
+        { "exercise": "Pull-up", "sets": 3, "reps": 3, "note": "Negatives: step or jump to the top, then lower for about 5 seconds.", "requires": ["bar"], "substitutes": [ { "name": "Inverted Row", "requires": [] } ] },
+        { "exercise": "Flexed-Arm Hang", "sets": 2, "duration": 10, "requires": ["bar"] }
+      ]] } ]
+    },
+    {
+      "from": 5, "to": 8, "focus": "Band-assisted pulls and rows",
+      "tracks": [ { "id": "pull", "sessionsPerWeek": 3, "placement": "training", "sessions": [[
+        { "exercise": "Band-Assisted Pull-up", "sets": 4, "reps": 5, "requires": ["bar", "resistance-bands"], "substitutes": [ { "name": "Resistance Band Row", "requires": ["resistance-bands"] } ] },
+        { "exercise": "Pull-up", "sets": 3, "reps": 3, "note": "Negatives: lower for about 5 seconds. Count a clean pull-up if you get one.", "requires": ["bar"] },
+        { "exercise": "Inverted Row", "sets": 3, "reps": 10 },
+        { "exercise": "Dead Hang", "sets": 2, "duration": 30, "requires": ["bar"] }
+      ]] } ]
+    },
+    {
+      "from": 9, "to": null, "focus": "Ongoing: sets of pull-ups; add a rep when every set is clean",
+      "tracks": [ { "id": "pull", "sessionsPerWeek": 3, "placement": "training", "sessions": [[
+        { "exercise": "Pull-up", "sets": 4, "reps": 3, "requires": ["bar"], "substitutes": [ { "name": "Inverted Row", "requires": [] } ] },
+        { "exercise": "Band-Assisted Pull-up", "sets": 2, "reps": 6, "requires": ["bar", "resistance-bands"], "substitutes": [ { "name": "Resistance Band Row", "requires": ["resistance-bands"] } ] },
+        { "exercise": "Inverted Row", "sets": 3, "reps": 10 }
+      ]] } ]
+    }
+  ]
+}

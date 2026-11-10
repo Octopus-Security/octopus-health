@@ -49,9 +49,17 @@ function mount(app, { requireLogin, getDatabase }) {
       days.push(dayRow(d, plan, T.dayKeyET()));
     }
     for (const row of days) if (row.slug) row.label = displayName(row.slug, { label: row.label });
+    // Goal add-ons (api/addons.js), placed on this ISO week's dates; Monday first like ORDER.
+    let addonWeek = null;
+    try {
+      const B = require('./benchmarks'), { addDays } = require('../lib/et');
+      const ws = B.weekStart(G.todayET());
+      addonWeek = await require('./addons').addonsForWeek(db, ws);
+      days.forEach((row, i) => { row.date = addDays(ws, i); row.addons = addonWeek.days[row.date] || []; });
+    } catch { days.forEach(row => { row.addons = []; }); }
     const paused = gyms.filter(g => !g.active).map(g => ({ slug: g.slug, name: g.name, until: g.pausedUntil }));
     const constraints = await C.list(db);
-    res.render('week', { title: 'Week', user: req.user, activeTab: 'week', days, paused, constraints, today: G.todayET() });
+    res.render('week', { title: 'Week', user: req.user, activeTab: 'week', days, paused, constraints, today: G.todayET(), addonSummary: addonWeek ? addonWeek.summary : [] });
   });
 }
 

@@ -5,6 +5,8 @@
 'use strict';
 
 const express = require('express');
+const fs = require('fs');
+const path = require('path');
 const { Op } = require('sequelize');
 const goalsApi = require('../goals');
 const router  = express.Router();
@@ -992,6 +994,26 @@ router.get('/nutrition-targets', requireToken, async (req, res) => {
     const db = await getDB(req);
     res.json(await require('../nutrition-targets').overview(db));
   } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+
+// GET /api/service/addons/today - the goal add-ons due today and a ready-to-send reminder.
+// Auth: X-Service-Token, account from X-Service-User (like every route here). ET date. Read-only;
+// it never creates an account's database: an unknown user or no database is a 404.
+//
+// Response (the contract cortex is built against - do not change the shape):
+//   { "user": "<username>", "date": "YYYY-MM-DD", "remindAt": "HH:MM" | null, "reminders": true|false,
+//     "items": [ { "addonId", "title", "phase", "sessionDone": bool, "summary": "<one line>",
+//                  "entries": [ { "kind": "routine"|"exercise", "name", "detail": "3x8" | "10 min" } ] } ],
+//     "text": "<a ready-to-send plain-text reminder, <=900 chars, or empty when nothing is due or everything is done>" }
+// `reminders` = remindAt is set AND at least one active add-on has reminder=true. `items` holds only
+// add-ons with reminder=true that have a session today (sessionDone says whether it is already ticked).
+router.get('/addons/today', requireToken, async (req, res) => {
+  try {
+    const file = path.join(require('../../lib/dataDir')(), `${req.serviceUser}_health.sqlite`);
+    if (!fs.existsSync(file)) return res.status(404).json({ ok: false, error: 'no such user' });
+    const db = await getDB(req);
+    res.json(await require('../addons').todayPayload(db, req.serviceUser));
+  } catch (e) { res.status(e.status || 500).json({ ok: false, error: e.message }); }
 });
 
 // GET /api/service/templates?slug=mon:gym

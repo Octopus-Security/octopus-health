@@ -1,0 +1,69 @@
+{
+  "id": "splits",
+  "title": "Splits (front and side)",
+  "goalKind": "mobility",
+  "summary": "Short, regular holds for the front split and the side split, alternating through the week and building up over eight weeks.",
+  "honesty": "Full splits take many months, often longer, and how deep you can go also depends on your own hip structure. Warm up first, stay at a mild stretch, and never bounce. Consistency matters more than intensity.",
+  "deload": "follow",
+  "weeks": [
+    {
+      "from": 1, "to": 2, "focus": "Short holds, four days a week",
+      "tracks": [ { "id": "holds", "sessionsPerWeek": 4, "placement": "any", "sessions": [
+        [
+          { "exercise": "Half-Kneeling Hip Flexor Stretch", "sets": 2, "duration": 30 },
+          { "exercise": "Supine Hamstring Stretch", "sets": 2, "duration": 30 }
+        ],
+        [
+          { "exercise": "Butterfly Stretch", "sets": 2, "duration": 30 },
+          { "exercise": "Seated Straddle Stretch (Pancake)", "sets": 2, "duration": 30 }
+        ]
+      ] } ]
+    },
+    {
+      "from": 3, "to": 4, "focus": "A third hold per session, five days a week",
+      "tracks": [ { "id": "holds", "sessionsPerWeek": 5, "placement": "any", "sessions": [
+        [
+          { "exercise": "Half-Kneeling Hip Flexor Stretch", "sets": 2, "duration": 40 },
+          { "exercise": "Supine Hamstring Stretch", "sets": 2, "duration": 40 },
+          { "exercise": "Lizard Stretch", "sets": 2, "duration": 30 }
+        ],
+        [
+          { "exercise": "Butterfly Stretch", "sets": 2, "duration": 40 },
+          { "exercise": "Seated Straddle Stretch (Pancake)", "sets": 2, "duration": 40 },
+          { "exercise": "Side Lunge Adductor Stretch", "sets": 2, "duration": 30 }
+        ]
+      ] } ]
+    },
+    {
+      "from": 5, "to": 8, "focus": "Longer holds and contract-relax work",
+      "tracks": [ { "id": "holds", "sessionsPerWeek": 5, "placement": "any", "sessions": [
+        [
+          { "exercise": "Couch Stretch", "sets": 2, "duration": 45 },
+          { "exercise": "PNF Hamstring Contract-Relax", "sets": 2, "reps": 3 },
+          { "exercise": "Lizard Stretch", "sets": 2, "duration": 45 }
+        ],
+        [
+          { "exercise": "Frog Stretch", "sets": 2, "duration": 45 },
+          { "exercise": "Seated Straddle Stretch (Pancake)", "sets": 2, "duration": 45 },
+          { "exercise": "Adductor Rock-Back", "sets": 2, "reps": 8 }
+        ]
+      ] } ]
+    },
+    {
+      "from": 9, "to": null, "focus": "Ongoing: four days a week with a hip session mixed in",
+      "tracks": [ { "id": "holds", "sessionsPerWeek": 4, "placement": "any", "sessions": [
+        [
+          { "exercise": "Couch Stretch", "sets": 2, "duration": 60 },
+          { "exercise": "PNF Hamstring Contract-Relax", "sets": 3, "reps": 3 },
+          { "exercise": "Lizard Stretch", "sets": 2, "duration": 60 }
+        ],
+        [
+          { "exercise": "Frog Stretch", "sets": 2, "duration": 60 },
+          { "exercise": "Seated Straddle Stretch (Pancake)", "sets": 2, "duration": 60 },
+          { "exercise": "Cossack Squat", "sets": 2, "reps": 8 }
+        ],
+        [ { "routine": "hips-20" } ]
+      ] } ]
+    }
+  ]
+}

@@ -130,7 +130,10 @@ function mount(app, { requireLogin, getDatabase }) {
       mobility = { note: mob.NOTE, routines: mob.publicRoutines(gear && gear.have), gym: gear && gear.gym, done: await mob.doneToday(db), dailyId: mob.DAILY_ID };
     } catch { mobility = null; }   // the page still works without routines
 
-    res.render('today', { title: 'Today', user: req.user, activeTab: 'today', plan, stretches, mobility, fitNotes, pausedNote,
+    let addons = [];
+    try { addons = (await require('./addons').addonsForDay(db, todayET())).entries; } catch { addons = []; }   // the page works without them
+
+    res.render('today', { title: 'Today', user: req.user, activeTab: 'today', plan, stretches, mobility, addons, fitNotes, pausedNote,
       today: todayET(), dayKey: day, requested: req.query.slug || null });
   });
 }
