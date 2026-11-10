@@ -1,0 +1,58 @@
+{
+ "version": 2,
+ "title": "Plate Goblet Squat",
+ "view": "side",
+ "highlight": [
+  "kneeL",
+  "hipL"
+ ],
+ "frames": [
+  {
+   "duration": 1100,
+   "label": "Stand, weight at the chest",
+   "anchor": {
+    "joint": "ankleL",
+    "x": 50,
+    "y": 90
+   },
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "upperArmL": 35,
+    "forearmL": 160,
+    "thighL": 0,
+    "shinL": 0,
+    "footL": 90,
+    "upperArmR": 35,
+    "forearmR": 160,
+    "thighR": 0,
+    "shinR": 0,
+    "footR": 90
+   }
+  },
+  {
+   "duration": 900,
+   "label": "Sit down between the knees, elbows inside them",
+   "hold": 350,
+   "anchor": {
+    "joint": "ankleL",
+    "x": 50,
+    "y": 90
+   },
+   "pose": {
+    "torso": 152,
+    "head": 160,
+    "upperArmL": 7,
+    "forearmL": 132,
+    "thighL": 85,
+    "shinL": -30,
+    "footL": 90,
+    "upperArmR": 7,
+    "forearmR": 132,
+    "thighR": 85,
+    "shinR": -30,
+    "footR": 90
+   }
+  }
+ ]
+}

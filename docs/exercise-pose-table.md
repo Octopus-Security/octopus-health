@@ -9,27 +9,27 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 
 | source | id | name | category | figure | how |
 |---|---|---|---|---|---|
-| library | Barbell Back Squat | Barbell Back Squat | strength | squat | rule |
+| library | Barbell Back Squat | Barbell Back Squat | strength | back-squat | rule |
 | library | Barbell Deadlift | Barbell Deadlift | strength | deadlift | rule |
-| library | Barbell Front Squat | Barbell Front Squat | strength | squat | rule |
+| library | Barbell Front Squat | Barbell Front Squat | strength | front-squat | rule |
 | library | Barbell Bench Press | Barbell Bench Press | strength | bench-press | rule |
 | library | Barbell Overhead Press | Barbell Overhead Press | strength | overhead-press | rule |
 | library | Barbell Bent-Over Row | Barbell Bent-Over Row | strength | bent-row | rule |
-| library | Romanian Deadlift (RDL) | Romanian Deadlift (RDL) | strength | rdl | rule |
+| library | Romanian Deadlift (RDL) | Romanian Deadlift (RDL) | strength | rdl-barbell | rule |
 | library | Barbell Hip Thrust | Barbell Hip Thrust | strength | hip-thrust | rule |
-| library | Barbell Good Morning | Barbell Good Morning | strength | rdl | rule |
-| library | Barbell Pendulum Squat | Barbell Pendulum Squat | strength | squat | rule |
-| library | Barbell Hack Squat | Barbell Hack Squat | strength | squat | rule |
-| library | Dumbbell Bench Press | Dumbbell Bench Press | strength | bench-press | rule |
+| library | Barbell Good Morning | Barbell Good Morning | strength | good-morning | rule |
+| library | Barbell Pendulum Squat | Barbell Pendulum Squat | strength | back-squat | rule |
+| library | Barbell Hack Squat | Barbell Hack Squat | strength | barbell-hack-squat | rule |
+| library | Dumbbell Bench Press | Dumbbell Bench Press | strength | bench-press-db | rule |
 | library | Incline Dumbbell Press | Incline Dumbbell Press | strength | incline-press | rule |
-| library | Decline Dumbbell Press | Decline Dumbbell Press | strength | bench-press | rule |
-| library | Dumbbell Shoulder Press | Dumbbell Shoulder Press | strength | overhead-press | rule |
-| library | Dumbbell Arnold Press | Dumbbell Arnold Press | strength | overhead-press | rule |
+| library | Decline Dumbbell Press | Decline Dumbbell Press | strength | bench-press-db | rule |
+| library | Dumbbell Shoulder Press | Dumbbell Shoulder Press | strength | overhead-press-db | rule |
+| library | Dumbbell Arnold Press | Dumbbell Arnold Press | strength | overhead-press-db | rule |
 | library | Dumbbell Row | Dumbbell Row | strength | bench-row | rule |
 | library | Dumbbell Single-Arm Row | Dumbbell Single-Arm Row | strength | renegade-row | rule |
 | library | Dumbbell Pullovers | Dumbbell Pullovers | strength | pullover | rule |
 | library | Dumbbell Lateral Raise | Dumbbell Lateral Raise | strength | lateral-raise | rule |
-| library | Dumbbell Rear Delt Fly | Dumbbell Rear Delt Fly | strength | chest-fly | rule |
+| library | Dumbbell Rear Delt Fly | Dumbbell Rear Delt Fly | strength | rear-delt-fly | rule |
 | library | Dumbbell Front Raise | Dumbbell Front Raise | strength | front-raise | rule |
 | library | Dumbbell Bicep Curl | Dumbbell Bicep Curl | strength | curl | rule |
 | library | Dumbbell Hammer Curl | Dumbbell Hammer Curl | strength | curl | rule |
@@ -38,9 +38,9 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | library | Dumbbell Tricep Overhead Press | Dumbbell Tricep Overhead Press | strength | tricep-overhead | rule |
 | library | Dumbbell Romanian Deadlift | Dumbbell Romanian Deadlift | strength | rdl | rule |
 | library | Dumbbell Bulgarian Split Squat | Dumbbell Bulgarian Split Squat | strength | bulgarian-split-squat | rule |
-| library | Dumbbell Lunge | Dumbbell Lunge | strength | lunge | rule |
-| library | Dumbbell Walking Lunge | Dumbbell Walking Lunge | strength | lunge | rule |
-| library | Goblet Squat | Goblet Squat | strength | squat | rule |
+| library | Dumbbell Lunge | Dumbbell Lunge | strength | forward-lunge-db | rule |
+| library | Dumbbell Walking Lunge | Dumbbell Walking Lunge | strength | walking-lunge-db | rule |
+| library | Goblet Squat | Goblet Squat | strength | goblet-squat | rule |
 | library | Farmer's Carry | Farmer's Carry | strength | walk | rule |
 | library | Dumbbell Shrug | Dumbbell Shrug | strength | shrug | rule |
 | library | Dumbbell Suitcase Carry | Dumbbell Suitcase Carry | strength | walk | rule |
@@ -48,11 +48,11 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | library | Seated Cable Row | Seated Cable Row | strength | seated-row | rule |
 | library | Cable Chest Fly | Cable Chest Fly | strength | chest-fly | rule |
 | library | Cable Tricep Pushdown | Cable Tricep Pushdown | strength | pushdown | rule |
-| library | Cable Bicep Curl | Cable Bicep Curl | strength | curl | rule |
+| library | Cable Bicep Curl | Cable Bicep Curl | strength | curl-bare | rule |
 | library | Cable Face Pull | Cable Face Pull | strength | face-pull | rule |
-| library | Cable Lateral Raise | Cable Lateral Raise | strength | lateral-raise | rule |
+| library | Cable Lateral Raise | Cable Lateral Raise | strength | lateral-raise-bare | rule |
 | library | Cable Crunch | Cable Crunch | strength | cable-crunch | rule |
-| library | Wood Chop | Wood Chop | strength | wood-chop | rule |
+| library | Wood Chop | Wood Chop | strength | wood-chop-cable | rule |
 | library | Leg Press | Leg Press | strength | leg-press | rule |
 | library | Leg Extension | Leg Extension | strength | leg-extension | rule |
 | library | Leg Curl | Leg Curl | strength | leg-curl | rule |
@@ -126,10 +126,10 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | library | Sleeper Stretch | Sleeper Stretch | recovery | sleeper | rule |
 | library | Cross-Body Shoulder Stretch | Cross-Body Shoulder Stretch | recovery | cross-body | rule |
 | library | Thread the Needle | Thread the Needle | recovery | thread-needle | rule |
-| library | Band Pull-Apart | Band Pull-Apart | recovery | chest-fly | rule |
+| library | Band Pull-Apart | Band Pull-Apart | recovery | band-pull-apart | rule |
 | library | Doorway Chest Stretch | Doorway Chest Stretch | recovery | doorway-chest | rule |
 | library | Overhead Banded Shoulder Stretch | Overhead Banded Shoulder Stretch | recovery | overhead-shoulder-stretch | rule |
-| library | Shoulder Elevation Shrug Rolls | Shoulder Elevation Shrug Rolls | recovery | shrug | rule |
+| library | Shoulder Elevation Shrug Rolls | Shoulder Elevation Shrug Rolls | recovery | shrug-bare | rule |
 | library | Lat Stretch on Pull-up Bar | Lat Stretch on Pull-up Bar | recovery | dead-hang | rule |
 | library | Prone Shoulder ER Stretch | Prone Shoulder ER Stretch | recovery | prone-shoulder-er | rule |
 | library | Supine Shoulder Windmill | Supine Shoulder Windmill | recovery | open-book | rule |
@@ -169,13 +169,13 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | library | Ab Roller Rollout | Ab Roller Rollout | strength | rollout | rule |
 | library | Ab Roller Knee Tuck | Ab Roller Knee Tuck | strength | rollout | rule |
 | library | Resistance Band Row | Resistance Band Row | strength | seated-row | rule |
-| library | Resistance Band Bicep Curl | Resistance Band Bicep Curl | strength | curl | rule |
+| library | Resistance Band Bicep Curl | Resistance Band Bicep Curl | strength | curl-bare | rule |
 | library | Resistance Band Tricep Extension | Resistance Band Tricep Extension | strength | pushdown | rule |
-| library | Resistance Band Lateral Raise | Resistance Band Lateral Raise | strength | lateral-raise | rule |
+| library | Resistance Band Lateral Raise | Resistance Band Lateral Raise | strength | lateral-raise-bare | rule |
 | library | Resistance Band Face Pull | Resistance Band Face Pull | strength | face-pull | rule |
 | library | Bodyweight Squat | Bodyweight Squat | strength | squat | rule |
-| library | Bodyweight Bulgarian Split Squat | Bodyweight Bulgarian Split Squat | strength | bulgarian-split-squat | rule |
-| library | Reverse Lunge | Reverse Lunge | strength | lunge | rule |
+| library | Bodyweight Bulgarian Split Squat | Bodyweight Bulgarian Split Squat | strength | bulgarian-split-squat-bare | rule |
+| library | Reverse Lunge | Reverse Lunge | strength | reverse-lunge | rule |
 | library | Jump Rope | Jump Rope | conditioning | jump-rope | rule |
 | library | Weighted Jump Rope | Weighted Jump Rope | conditioning | jump-rope | rule |
 | library | Hollow Body Hold | Hollow Body Hold | strength | hollow-body | rule |
@@ -186,42 +186,42 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | library | Band-Assisted Pull-up | Band-Assisted Pull-up | strength | pull-up | rule |
 | library | Hanging Knee Raise | Hanging Knee Raise | strength | hanging-leg-raise | rule |
 | library | Dead Hang | Dead Hang | strength | dead-hang | rule |
-| library | Tuck L-sit Hold | Tuck L-sit Hold | strength | squat | category fallback |
+| library | Tuck L-sit Hold | Tuck L-sit Hold | strength | tuck-l-sit | rule |
 | library | Parallette Push-up | Parallette Push-up | strength | push-up | rule |
-| library | Pseudo-Planche Lean | Pseudo-Planche Lean | strength | squat | category fallback |
+| library | Pseudo-Planche Lean | Pseudo-Planche Lean | strength | pseudo-planche-lean | rule |
 | library | Plank Shoulder Taps | Plank Shoulder Taps | strength | plank | rule |
 | library | Glute Bridge | Glute Bridge | strength | glute-bridge | rule |
 | library | Calf Raise (bodyweight) | Calf Raise (bodyweight) | strength | calf-raise | rule |
-| library | EZ-Bar Curl | EZ-Bar Curl | strength | curl | rule |
+| library | EZ-Bar Curl | EZ-Bar Curl | strength | curl-barbell | rule |
 | library | Calf Raise (machine) | Calf Raise (machine) | strength | calf-raise | rule |
-| library | Plate Goblet Squat | Plate Goblet Squat | strength | squat | rule |
+| library | Plate Goblet Squat | Plate Goblet Squat | strength | goblet-squat-plate | rule |
 | library | Plate Push-up | Plate Push-up | strength | push-up | rule |
 | library | Plate Glute Bridge | Plate Glute Bridge | strength | glute-bridge | rule |
 | library | Plate Calf Raise | Plate Calf Raise | strength | calf-raise | rule |
 | library | Plate Sit-up | Plate Sit-up | strength | crunch | rule |
-| library | Plate Pinch Carry | Plate Pinch Carry | strength | walk | rule |
+| library | Plate Pinch Carry | Plate Pinch Carry | strength | walk-bare | rule |
 | library | Weighted Pull-up | Weighted Pull-up | strength | pull-up | rule |
 | library | Weighted Chin-up | Weighted Chin-up | strength | pull-up | rule |
 | library | Weighted Dip | Weighted Dip | strength | dip | rule |
 | library | Ab Strap Knee Raise | Ab Strap Knee Raise | strength | hanging-leg-raise | rule |
 | library | Ab Strap Leg Raise | Ab Strap Leg Raise | strength | hanging-leg-raise | rule |
 | library | Ab Strap Oblique Knee Raise | Ab Strap Oblique Knee Raise | strength | hanging-leg-raise | rule |
-| library | Landmine Rotation | Landmine Rotation | strength | wood-chop | rule |
-| library | Landmine Rotational Press | Landmine Rotational Press | strength | wood-chop | rule |
+| library | Landmine Rotation | Landmine Rotation | strength | landmine-rotation | rule |
+| library | Landmine Rotational Press | Landmine Rotational Press | strength | landmine-press | rule |
 | library | Landmine Punch | Landmine Punch | strength | jab-cross | rule |
-| library | Landmine Deadlift to Rotational Press | Landmine Deadlift to Rotational Press | strength | wood-chop | rule |
-| library | Landmine Push Press | Landmine Push Press | strength | overhead-press | rule |
-| library | Landmine Thruster | Landmine Thruster | strength | overhead-press | rule |
-| library | Landmine Split Jerk | Landmine Split Jerk | strength | overhead-press | rule |
-| library | Landmine Meadows Row | Landmine Meadows Row | strength | bent-row | rule |
-| library | Landmine Reverse Lunge | Landmine Reverse Lunge | strength | lunge | rule |
-| library | Landmine Lateral Lunge | Landmine Lateral Lunge | strength | lunge | rule |
-| library | Landmine Anti-Rotation | Landmine Anti-Rotation | strength | wood-chop | rule |
-| library | Overhead Tricep Extension | Overhead Tricep Extension | strength | tricep-overhead | rule |
+| library | Landmine Deadlift to Rotational Press | Landmine Deadlift to Rotational Press | strength | landmine-deadlift-press | rule |
+| library | Landmine Push Press | Landmine Push Press | strength | landmine-press | rule |
+| library | Landmine Thruster | Landmine Thruster | strength | landmine-thruster | rule |
+| library | Landmine Split Jerk | Landmine Split Jerk | strength | split-jerk | rule |
+| library | Landmine Meadows Row | Landmine Meadows Row | strength | bent-row-bare | rule |
+| library | Landmine Reverse Lunge | Landmine Reverse Lunge | strength | reverse-lunge | rule |
+| library | Landmine Lateral Lunge | Landmine Lateral Lunge | strength | lateral-lunge | rule |
+| library | Landmine Anti-Rotation | Landmine Anti-Rotation | strength | landmine-anti-rotation | rule |
+| library | Overhead Tricep Extension | Overhead Tricep Extension | strength | tricep-overhead-bare | rule |
 | library | Pec Deck | Pec Deck | strength | chest-fly | rule |
-| library | Dumbbell Overhead Press | Dumbbell Overhead Press | strength | overhead-press | rule |
+| library | Dumbbell Overhead Press | Dumbbell Overhead Press | strength | overhead-press-db | rule |
 | library | Single-Arm Dumbbell Row | Single-Arm Dumbbell Row | strength | bench-row | rule |
-| library | Cable Wood Chop (High) | Cable Wood Chop (High) | strength | wood-chop | rule |
+| library | Cable Wood Chop (High) | Cable Wood Chop (High) | strength | wood-chop-cable | rule |
 | library | Jab Drill | Jab Drill | muay_thai | mma/muay-thai-jab | rule |
 | library | Cross Drill | Cross Drill | muay_thai | mma/muay-thai-cross | rule |
 | library | Hook Drill | Hook Drill | muay_thai | hook | rule |
@@ -307,7 +307,7 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | library | Battle Ropes | Battle Ropes | conditioning | battle-ropes | rule |
 | library | Jump Rope — Double Unders | Jump Rope — Double Unders | conditioning | jump-rope | rule |
 | library | Wall Walks | Wall Walks | conditioning | wall-walk | rule |
-| library | Sandbag Carry | Sandbag Carry | conditioning | walk | rule |
+| library | Sandbag Carry | Sandbag Carry | conditioning | walk-bare | rule |
 | library | Wrist CARS | Wrist CARS | recovery | wrist-circle | rule |
 | library | Wrist Flexor Stretch | Wrist Flexor Stretch | recovery | wrist-flexor-stretch | rule |
 | library | Pronation/Supination Circles | Pronation/Supination Circles | recovery | wrist-circle | rule |
@@ -332,14 +332,14 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | library | Peanut Ball Upper Back Release | Peanut Ball Upper Back Release | recovery | thoracic-extension | rule |
 | library | Lacrosse Ball Glute Release | Lacrosse Ball Glute Release | recovery | figure-four | rule |
 | library | Lacrosse Ball Chest and Shoulder Release | Lacrosse Ball Chest and Shoulder Release | recovery | doorway-chest | rule |
-| library | Wall Biceps Stretch | Wall Biceps Stretch | recovery | stand-breathe | category fallback |
+| library | Wall Biceps Stretch | Wall Biceps Stretch | recovery | wall-biceps-stretch | rule |
 | library | Overhead Triceps Stretch | Overhead Triceps Stretch | recovery | triceps-stretch | rule |
 | library | Supine Hamstring Stretch | Supine Hamstring Stretch | recovery | supine-hamstring | rule |
 | library | Standing Calf Stretch (Wall) | Standing Calf Stretch (Wall) | recovery | calf-stretch | rule |
 | library | Wall Calf Stretch (Bent Knee) | Wall Calf Stretch (Bent Knee) | recovery | calf-stretch | rule |
 | library | Standing Quad Stretch | Standing Quad Stretch | recovery | quad-stretch | rule |
-| library | Behind-the-Back Chest Opener | Behind-the-Back Chest Opener | recovery | stand-breathe | category fallback |
-| library | Standing Crossover IT Band Stretch | Standing Crossover IT Band Stretch | recovery | stand-breathe | category fallback |
+| library | Behind-the-Back Chest Opener | Behind-the-Back Chest Opener | recovery | chest-opener | rule |
+| library | Standing Crossover IT Band Stretch | Standing Crossover IT Band Stretch | recovery | standing-it-band | rule |
 | library | Downward Dog | Downward Dog | recovery | downward-dog | rule |
 | library | Seated Straddle Stretch (Pancake) | Seated Straddle Stretch (Pancake) | recovery | pancake | rule |
 | library | Prone Quad Stretch | Prone Quad Stretch | recovery | prone-quad | rule |
@@ -356,46 +356,46 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | library | Kneeling Shin Stretch | Kneeling Shin Stretch | recovery | kneeling-shin-stretch | rule |
 | library | Thomas Stretch (Bench) | Thomas Stretch (Bench) | recovery | thomas-stretch | rule |
 | library | Squat to Stand | Squat to Stand | recovery | squat-to-stand | rule |
-| library | Lacrosse Ball Hamstring Roll | Lacrosse Ball Hamstring Roll | recovery | stand-breathe | null rule -> category fallback |
-| library | Lacrosse Ball Quad Roll | Lacrosse Ball Quad Roll | recovery | stand-breathe | null rule -> category fallback |
-| library | Lacrosse Ball Calf Roll | Lacrosse Ball Calf Roll | recovery | stand-breathe | null rule -> category fallback |
-| library | Lacrosse Ball Forearm Roll | Lacrosse Ball Forearm Roll | recovery | stand-breathe | null rule -> category fallback |
-| library | Lacrosse Ball Upper Trap Wall Roll | Lacrosse Ball Upper Trap Wall Roll | recovery | stand-breathe | null rule -> category fallback |
-| library | Lacrosse Ball Lat Wall Roll | Lacrosse Ball Lat Wall Roll | recovery | stand-breathe | null rule -> category fallback |
+| library | Lacrosse Ball Hamstring Roll | Lacrosse Ball Hamstring Roll | recovery | ball-roll-hamstring | rule |
+| library | Lacrosse Ball Quad Roll | Lacrosse Ball Quad Roll | recovery | ball-roll-quad | rule |
+| library | Lacrosse Ball Calf Roll | Lacrosse Ball Calf Roll | recovery | ball-roll-calf | rule |
+| library | Lacrosse Ball Forearm Roll | Lacrosse Ball Forearm Roll | recovery | ball-roll-forearm | rule |
+| library | Lacrosse Ball Upper Trap Wall Roll | Lacrosse Ball Upper Trap Wall Roll | recovery | wall-ball-roll | rule |
+| library | Lacrosse Ball Lat Wall Roll | Lacrosse Ball Lat Wall Roll | recovery | wall-ball-roll | rule |
 | library | Lacrosse Ball Foot Roll | Lacrosse Ball Foot Roll | recovery | stand-breathe | rule |
 | library | Supine Chin Tuck | Supine Chin Tuck | recovery | chin-tuck | rule |
 | library | Neck Rotation Turns | Neck Rotation Turns | recovery | neck-circle | rule |
 | library | Neck Isometric Side Press | Neck Isometric Side Press | recovery | neck-isometric | rule |
-| library | Wrist Extensor Stretch | Wrist Extensor Stretch | recovery | stand-breathe | null rule -> category fallback |
-| library | Band Wrist Curl | Band Wrist Curl | strength | squat | null rule -> category fallback |
-| library | Band Reverse Wrist Curl | Band Reverse Wrist Curl | strength | squat | null rule -> category fallback |
-| library | Quadruped Wrist Rocks | Quadruped Wrist Rocks | recovery | stand-breathe | null rule -> category fallback |
-| library | Spanish Squat | Spanish Squat | strength | squat | null rule -> category fallback |
-| library | Wall Sit | Wall Sit | strength | squat | null rule -> category fallback |
+| library | Wrist Extensor Stretch | Wrist Extensor Stretch | recovery | wrist-flexor-stretch | rule |
+| library | Band Wrist Curl | Band Wrist Curl | strength | wrist-curl | rule |
+| library | Band Reverse Wrist Curl | Band Reverse Wrist Curl | strength | wrist-curl | rule |
+| library | Quadruped Wrist Rocks | Quadruped Wrist Rocks | recovery | wrist-rocks | rule |
+| library | Spanish Squat | Spanish Squat | strength | spanish-squat | rule |
+| library | Wall Sit | Wall Sit | strength | wall-sit | rule |
 | library | Tempo Bodyweight Squat | Tempo Bodyweight Squat | strength | squat | rule |
-| library | Tibialis Raise (Wall) | Tibialis Raise (Wall) | strength | squat | null rule -> category fallback |
+| library | Tibialis Raise (Wall) | Tibialis Raise (Wall) | strength | tibialis-raise | rule |
 | library | Ankle Alphabet | Ankle Alphabet | recovery | ankle-circle | rule |
 | library | Toe Yoga | Toe Yoga | recovery | stand-breathe | null rule -> category fallback |
 | library | Short Foot Exercise | Short Foot Exercise | recovery | stand-breathe | null rule -> category fallback |
 | library | Banded Ankle Eversion | Banded Ankle Eversion | recovery | stand-breathe | null rule -> category fallback |
-| library | Scapular Pull-up | Scapular Pull-up | strength | squat | null rule -> category fallback |
-| library | Towel Hang | Towel Hang | strength | squat | null rule -> category fallback |
-| library | Flexed-Arm Hang | Flexed-Arm Hang | strength | squat | null rule -> category fallback |
-| library | Single-Leg Stand | Single-Leg Stand | recovery | stand-breathe | null rule -> category fallback |
-| library | Single-Leg Reach | Single-Leg Reach | recovery | stand-breathe | null rule -> category fallback |
-| library | Single-Leg RDL (Bodyweight) | Single-Leg RDL (Bodyweight) | strength | rdl | rule |
-| library | Heel-to-Toe Walk | Heel-to-Toe Walk | recovery | stand-breathe | null rule -> category fallback |
+| library | Scapular Pull-up | Scapular Pull-up | strength | scapular-pull-up | rule |
+| library | Towel Hang | Towel Hang | strength | dead-hang | rule |
+| library | Flexed-Arm Hang | Flexed-Arm Hang | strength | flexed-arm-hang | rule |
+| library | Single-Leg Stand | Single-Leg Stand | recovery | single-leg-stand | rule |
+| library | Single-Leg Reach | Single-Leg Reach | recovery | single-leg-reach | rule |
+| library | Single-Leg RDL (Bodyweight) | Single-Leg RDL (Bodyweight) | strength | single-leg-rdl | rule |
+| library | Heel-to-Toe Walk | Heel-to-Toe Walk | recovery | walk-bare | rule |
 | library | Jump Rope: Room Intervals | Jump Rope: Room Intervals | conditioning | jump-rope | rule |
 | library | Jump Rope: Boxer Skip | Jump Rope: Boxer Skip | conditioning | jump-rope | rule |
 | library | Box Breathing | Box Breathing | recovery | stand-breathe | rule |
 | library | Extended Exhale Breathing | Extended Exhale Breathing | recovery | stand-breathe | rule |
 | library | Belly Breathing (Lying) | Belly Breathing (Lying) | recovery | stand-breathe | rule |
-| library | Progressive Muscle Relaxation | Progressive Muscle Relaxation | recovery | stand-breathe | null rule -> category fallback |
+| library | Progressive Muscle Relaxation | Progressive Muscle Relaxation | recovery | supine-relax | rule |
 | library | Hip Airplane | Hip Airplane | recovery | hip-circle | rule |
 | library | 90/90 Hip Lift-Off | 90/90 Hip Lift-Off | recovery | ninety-ninety | rule |
 | library | Banded Hip Mobilization | Banded Hip Mobilization | recovery | kneeling-hip-flexor | rule |
 | library | Fire Hydrant | Fire Hydrant | recovery | quadruped-hip-cars | rule |
-| library | Clamshell | Clamshell | recovery | open-book | rule |
+| library | Clamshell | Clamshell | recovery | clamshell | rule |
 | library | Front-to-Back Leg Swing | Front-to-Back Leg Swing | recovery | hip-circle | rule |
 | library | Lateral Leg Swing | Lateral Leg Swing | recovery | hip-circle | rule |
 | library | Low Lunge with Twist | Low Lunge with Twist | recovery | worlds-greatest | rule |
@@ -405,15 +405,15 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | library | Walking Knee Hug | Walking Knee Hug | recovery | hip-circle | rule |
 | library | Walking Quad Pull | Walking Quad Pull | recovery | quad-stretch | rule |
 | library | Half-Kneeling Side Bend | Half-Kneeling Side Bend | recovery | kneeling-hip-flexor | rule |
-| library | Crab Reach | Crab Reach | recovery | crab-walk | rule |
+| library | Crab Reach | Crab Reach | recovery | crab-reach | rule |
 | library | Kick Chamber Hold | Kick Chamber Hold | recovery | kick-check | rule |
 | library | Quadruped Thoracic Rotation | Quadruped Thoracic Rotation | recovery | thread-needle | rule |
 | library | Elbows-on-Bench Thoracic Extension | Elbows-on-Bench Thoracic Extension | recovery | thoracic-extension | rule |
-| library | Reverse Tabletop | Reverse Tabletop | recovery | crab-walk | rule |
-| library | Scapular Push-up | Scapular Push-up | recovery | push-up | rule |
+| library | Reverse Tabletop | Reverse Tabletop | recovery | reverse-tabletop | rule |
+| library | Scapular Push-up | Scapular Push-up | recovery | scapular-push-up | rule |
 | library | Prone Y-T-W Raise | Prone Y-T-W Raise | recovery | cobra | rule |
-| library | Band Shoulder External Rotation | Band Shoulder External Rotation | recovery | prone-shoulder-er | rule |
-| library | Side-Lying Shoulder External Rotation | Side-Lying Shoulder External Rotation | recovery | prone-shoulder-er | rule |
+| library | Band Shoulder External Rotation | Band Shoulder External Rotation | recovery | shoulder-er-band | rule |
+| library | Side-Lying Shoulder External Rotation | Side-Lying Shoulder External Rotation | recovery | side-lying-er | rule |
 | library | Inchworm | Inchworm | recovery | downward-dog | rule |
 | library | Standing Hamstring Stretch | Standing Hamstring Stretch | recovery | standing-hamstring | rule |
 | library | Lymph Drainage: Diaphragmatic Breathing | Lymph Drainage: Diaphragmatic Breathing | recovery | stand-breathe | null rule -> category fallback |
@@ -434,23 +434,23 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | mobility | shoulder-cars | Shoulder CARs | recovery | arm-circle | rule |
 | mobility | leg-swings | Leg swings | recovery | hip-circle | rule |
 | mobility | ankle-rocks | Ankle rocks | recovery | ankle-dorsiflexion | rule |
-| mobility | band-pull-aparts | Band pull-aparts | recovery | chest-fly | rule |
+| mobility | band-pull-aparts | Band pull-aparts | recovery | band-pull-apart | rule |
 | mobility | band-pull-aparts/alt | Wall slides | recovery | wall-slide | rule |
 | mobility | copenhagen | Copenhagen side plank | recovery | side-plank | rule |
 | mobility | copenhagen/alt | Side-lying inner-thigh raise | recovery | side-plank | rule |
-| mobility | tib-raise | Tibialis raises | recovery | stand-breathe | null rule -> category fallback |
-| mobility | band-er | Band external rotations | recovery | prone-shoulder-er | rule |
-| mobility | band-er/alt | Side-lying external rotation | recovery | prone-shoulder-er | rule |
+| mobility | tib-raise | Tibialis raises | recovery | tibialis-raise | rule |
+| mobility | band-er | Band external rotations | recovery | shoulder-er-band | rule |
+| mobility | band-er/alt | Side-lying external rotation | recovery | side-lying-er | rule |
 | mobility | face-pull | Face pulls | recovery | face-pull | rule |
 | mobility | sl-bridge | Single-leg bridge or hamstring walkouts | recovery | glute-bridge | rule |
-| mobility | finger-wrist | Band finger extensions + wrist curls | recovery | stand-breathe | null rule -> category fallback |
+| mobility | finger-wrist | Band finger extensions + wrist curls | recovery | wrist-curl | rule |
 | mobility | finger-wrist/alt | Finger spreads + wrist curls | recovery | wrist-flexor-stretch | rule |
 | mobility | side-plank | Side plank | recovery | side-plank | rule |
 | mobility | dead-bug | Dead bug | recovery | dead-bug | rule |
 | mobility | 9090 | 90/90 hip switches | recovery | ninety-ninety | rule |
 | mobility | pigeon | Pigeon | recovery | pigeon | rule |
 | mobility | cossack | Cossack squat | recovery | cossack | rule |
-| mobility | pancake | Pancake | recovery | stand-breathe | category fallback |
+| mobility | pancake | Pancake | recovery | pancake | rule |
 | mobility | ball-foot | Spiky ball foot roll | recovery | stand-breathe | rule |
 | mobility | ball-upper-back | Peanut ball upper-back release | recovery | thoracic-extension | rule |
 | mobility | ball-upper-back/alt | Open book | recovery | open-book | rule |
@@ -481,7 +481,7 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | mobility | ld-hip-cars | Hip CARs | recovery | quadruped-hip-cars | rule |
 | mobility | ld-shoulder-cars | Shoulder CARs | recovery | arm-circle | rule |
 | mobility | ld-ankle-cars | Ankle CARs | recovery | ankle-circle | rule |
-| mobility | ld-pullaparts | Band pull-aparts | recovery | chest-fly | rule |
+| mobility | ld-pullaparts | Band pull-aparts | recovery | band-pull-apart | rule |
 | mobility | ld-pullaparts/alt | Wall slides | recovery | wall-slide | rule |
 | mobility | ld-hang | Easy hang | recovery | dead-hang | rule |
 | mobility | ld-bridge | Glute bridge | recovery | glute-bridge | rule |
@@ -503,7 +503,7 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | mobility | sl-twist | Supine spinal twist | recovery | supine-twist | rule |
 | mobility | sl-kneechest | Knee-to-chest | recovery | knee-to-chest | rule |
 | mobility | sl-legsup | Legs up the wall | recovery | legs-up-wall | rule |
-| mobility | sl-pmr | Progressive muscle relaxation | recovery | stand-breathe | null rule -> category fallback |
+| mobility | sl-pmr | Progressive muscle relaxation | recovery | supine-relax | rule |
 | mobility | sl-belly | Belly breathing, lying down | recovery | stand-breathe | rule |
 | mobility | dr-chin | Chin tucks | recovery | chin-tuck | rule |
 | mobility | dr-trap | Upper trap stretch | recovery | neck-side-stretch | rule |
@@ -522,45 +522,45 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | mobility | pg-wristcars | Wrist CARs | recovery | wrist-circle | rule |
 | mobility | pg-finger | Finger extension stretch | recovery | wrist-flexor-stretch | rule |
 | mobility | wp-cars | Wrist CARs | recovery | wrist-circle | rule |
-| mobility | wp-rocks | Quadruped wrist rocks | recovery | stand-breathe | null rule -> category fallback |
+| mobility | wp-rocks | Quadruped wrist rocks | recovery | wrist-rocks | rule |
 | mobility | wp-pronsup | Pronation and supination circles | recovery | wrist-circle | rule |
 | mobility | wp-flexor | Wrist flexor stretch | recovery | wrist-flexor-stretch | rule |
-| mobility | wp-extensor | Wrist extensor stretch | recovery | stand-breathe | null rule -> category fallback |
-| mobility | wp-curl | Band wrist curls, light | recovery | stand-breathe | null rule -> category fallback |
+| mobility | wp-extensor | Wrist extensor stretch | recovery | wrist-flexor-stretch | rule |
+| mobility | wp-curl | Band wrist curls, light | recovery | wrist-curl | rule |
 | mobility | hh-glute | Lacrosse ball on the glute | recovery | figure-four | rule |
 | mobility | hh-glute/alt | Figure-4 stretch, standing | recovery | figure-four | rule |
-| mobility | hh-ham | Lacrosse ball hamstring roll | recovery | stand-breathe | null rule -> category fallback |
+| mobility | hh-ham | Lacrosse ball hamstring roll | recovery | ball-roll-hamstring | rule |
 | mobility | hh-ham/alt | Supine hamstring stretch | recovery | supine-hamstring | rule |
-| mobility | hh-quad | Lacrosse ball quad roll | recovery | stand-breathe | null rule -> category fallback |
+| mobility | hh-quad | Lacrosse ball quad roll | recovery | ball-roll-quad | rule |
 | mobility | hh-quad/alt | Prone quad stretch | recovery | prone-quad | rule |
-| mobility | hh-calf | Lacrosse ball calf roll | recovery | stand-breathe | null rule -> category fallback |
+| mobility | hh-calf | Lacrosse ball calf roll | recovery | ball-roll-calf | rule |
 | mobility | hh-calf/alt | Calf wall stretch | recovery | calf-stretch | rule |
 | mobility | hh-hipflexor | Half-kneeling hip-flexor stretch | recovery | kneeling-hip-flexor | rule |
 | mobility | hh-9090 | 90/90 hip switches | recovery | ninety-ninety | rule |
 | mobility | fb-upper | Peanut ball upper-back work | recovery | thoracic-extension | rule |
 | mobility | fb-upper/alt | Open book | recovery | open-book | rule |
-| mobility | fb-trap | Lacrosse ball upper trap wall roll | recovery | stand-breathe | null rule -> category fallback |
+| mobility | fb-trap | Lacrosse ball upper trap wall roll | recovery | wall-ball-roll | rule |
 | mobility | fb-trap/alt | Upper trap stretch | recovery | neck-side-stretch | rule |
-| mobility | fb-lat | Lacrosse ball lat wall roll | recovery | stand-breathe | null rule -> category fallback |
+| mobility | fb-lat | Lacrosse ball lat wall roll | recovery | wall-ball-roll | rule |
 | mobility | fb-lat/alt | Child's pose | recovery | childs-pose | rule |
 | mobility | fb-chest | Lacrosse ball chest and shoulder work | recovery | doorway-chest | rule |
 | mobility | fb-chest/alt | Doorway chest stretch | recovery | doorway-chest | rule |
-| mobility | fb-forearm | Lacrosse ball forearm roll | recovery | stand-breathe | null rule -> category fallback |
+| mobility | fb-forearm | Lacrosse ball forearm roll | recovery | ball-roll-forearm | rule |
 | mobility | fb-forearm/alt | Doorway wrist stretch | recovery | wrist-flexor-stretch | rule |
 | mobility | fb-glute | Lacrosse ball on the glute | recovery | figure-four | rule |
 | mobility | fb-glute/alt | Figure-4 stretch, standing | recovery | figure-four | rule |
-| mobility | fb-ham | Lacrosse ball hamstring roll | recovery | stand-breathe | null rule -> category fallback |
+| mobility | fb-ham | Lacrosse ball hamstring roll | recovery | ball-roll-hamstring | rule |
 | mobility | fb-ham/alt | Supine hamstring stretch | recovery | supine-hamstring | rule |
-| mobility | fb-quad | Lacrosse ball quad roll | recovery | stand-breathe | null rule -> category fallback |
+| mobility | fb-quad | Lacrosse ball quad roll | recovery | ball-roll-quad | rule |
 | mobility | fb-quad/alt | Prone quad stretch | recovery | prone-quad | rule |
-| mobility | fb-calf | Lacrosse ball calf roll | recovery | stand-breathe | null rule -> category fallback |
+| mobility | fb-calf | Lacrosse ball calf roll | recovery | ball-roll-calf | rule |
 | mobility | fb-calf/alt | Calf wall stretch | recovery | calf-stretch | rule |
 | mobility | fb-foot | Spiky ball foot roll | recovery | stand-breathe | rule |
 | mobility | fb-foot/alt | Ankle alphabet | recovery | ankle-circle | rule |
 | mobility | hm-cars | Quadruped Hip CARs | recovery | quadruped-hip-cars | rule |
 | mobility | hm-airplane | Hip Airplane | recovery | hip-circle | rule |
 | mobility | hm-hydrant | Fire Hydrant | recovery | quadruped-hip-cars | rule |
-| mobility | hm-clam | Clamshell | recovery | open-book | rule |
+| mobility | hm-clam | Clamshell | recovery | clamshell | rule |
 | mobility | hm-9090 | 90/90 Hip Switch | recovery | ninety-ninety | rule |
 | mobility | hm-liftoff | 90/90 Hip Lift-Off | recovery | ninety-ninety | rule |
 | mobility | hm-banded | Banded Hip Mobilization | recovery | kneeling-hip-flexor | rule |
@@ -584,7 +584,7 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | mobility | kr-wgs | World's Greatest Stretch | recovery | worlds-greatest | rule |
 | mobility | kr-tspine | Quadruped Thoracic Rotation | recovery | thread-needle | rule |
 | mobility | kr-chamber | Kick Chamber Hold | recovery | kick-check | rule |
-| mobility | kr-crab | Crab Reach | recovery | crab-walk | rule |
+| mobility | kr-crab | Crab Reach | recovery | crab-reach | rule |
 | mobility | gh-9090 | 90/90 Hip Switch | recovery | ninety-ninety | rule |
 | mobility | gh-liftoff | 90/90 Hip Lift-Off | recovery | ninety-ninety | rule |
 | mobility | gh-wipers | Windshield Wipers (Lying) | recovery | supine-twist | rule |
@@ -592,9 +592,9 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | mobility | gh-happy | Happy Baby | recovery | happy-baby | rule |
 | mobility | gh-frog | Frog Stretch | recovery | frog | rule |
 | mobility | gh-rockback | Adductor Rock-Back | recovery | adductor-rock-back | rule |
-| mobility | gh-clam | Clamshell | recovery | open-book | rule |
+| mobility | gh-clam | Clamshell | recovery | clamshell | rule |
 | mobility | gh-bridge | Glute Bridge | recovery | glute-bridge | rule |
-| mobility | gh-tabletop | Reverse Tabletop | recovery | crab-walk | rule |
+| mobility | gh-tabletop | Reverse Tabletop | recovery | reverse-tabletop | rule |
 | mobility | gh-shrimp | Hip Escape (Shrimp) | recovery | shrimp | rule |
 | mobility | gh-cars | Quadruped Hip CARs | recovery | quadruped-hip-cars | rule |
 | mobility | lh-breath-start | Diaphragmatic breathing | recovery | stand-breathe | null rule -> category fallback |

@@ -1,0 +1,11 @@
+{
+ "version": 2,
+ "title": "Landmine Deadlift to Rotational Press",
+ "view": "side",
+ "highlight": ["hipL","shoulderL"],
+ "frames": [
+  {"duration":1000,"label":"Hinge, flat back, hands on the bar end","hold":300,"anchor":{"joint":"ankleL","x":38,"y":90},"pose":{"torso":112,"head":127,"upperArmL":0,"forearmL":0,"thighL":2,"shinL":-28,"footL":90,"upperArmR":0,"forearmR":0,"thighR":2,"shinR":-28,"footR":90}},
+  {"duration":800,"label":"Stand tall, bar at the shoulder","hold":100,"anchor":{"joint":"ankleL","x":38,"y":90},"pose":{"torso":180,"head":180,"upperArmL":30,"forearmL":160,"thighL":0,"shinL":0,"footL":90,"upperArmR":30,"forearmR":160,"thighR":0,"shinR":0,"footR":90}},
+  {"duration":800,"label":"Turn and press up and forward","hold":450,"anchor":{"joint":"ankleL","x":38,"y":90},"pose":{"torso":180,"head":180,"upperArmL":150,"forearmL":155,"thighL":0,"shinL":0,"footL":90,"upperArmR":150,"forearmR":155,"thighR":0,"shinR":0,"footR":90}}
+ ]
+}

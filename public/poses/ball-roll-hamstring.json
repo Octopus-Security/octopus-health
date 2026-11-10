@@ -1,0 +1,11 @@
+{
+ "version": 2,
+ "title": "Hamstring Ball Roll",
+ "view": "side",
+ "props": [{"type":"ball","x":56,"y":88,"r":4}],
+ "highlight": ["hipL","kneeL"],
+ "frames": [
+  {"duration":1800,"label":"Ball under the thigh, hips lifted on the hands","hold":300,"pose":{"torso":222,"head":216,"upperArmL":-3,"forearmL":-3,"thighL":82,"shinL":82,"footL":172,"upperArmR":-3,"forearmR":-3,"thighR":82,"shinR":82,"footR":172,"root":{"x":38,"y":82}}},
+  {"duration":2000,"label":"Slide the hips toward the ball: it rolls up toward the sit bone","hold":400,"pose":{"torso":222,"head":216,"upperArmL":-3,"forearmL":-3,"thighL":82,"shinL":82,"footL":172,"upperArmR":-3,"forearmR":-3,"thighR":82,"shinR":82,"footR":172,"root":{"x":46,"y":82}}}
+ ]
+}

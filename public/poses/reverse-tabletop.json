@@ -1,0 +1,10 @@
+{
+ "version": 2,
+ "title": "Reverse Tabletop",
+ "view": "side",
+ "highlight": ["hipL","shoulderL"],
+ "frames": [
+  {"duration":1200,"label":"Seated, hands behind, feet flat","hold":300,"anchor":{"joint":"ankleL","x":68,"y":90},"pose":{"torso":192,"head":188,"upperArmL":-12,"forearmL":-12,"thighL":130,"shinL":38,"footL":90,"upperArmR":-12,"forearmR":-12,"thighR":130,"shinR":38,"footR":90}},
+  {"duration":1200,"label":"Hips up: shoulders, hips and knees level","hold":700,"anchor":{"joint":"ankleL","x":68,"y":90},"pose":{"torso":255,"head":238,"upperArmL":0,"forearmL":0,"thighL":90,"shinL":0,"footL":90,"upperArmR":0,"forearmR":0,"thighR":90,"shinR":0,"footR":90}}
+ ]
+}

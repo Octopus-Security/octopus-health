@@ -1,0 +1,16 @@
+{
+ "version": 2,
+ "title": "Walking Lunge",
+ "view": "side",
+ "highlight": ["kneeL","kneeR","hipL"],
+ "frames": [
+  {"duration":600,"label":"Left leg forward, back knee near the floor","hold":300,"pose":{"torso":180,"head":180,"upperArmL":0,"forearmL":0,"thighL":90,"shinL":0,"footL":90,"upperArmR":0,"forearmR":0,"thighR":-5,"shinR":-105,"footR":33,"root":{"x":48,"y":69.3}}},
+  {"duration":350,"label":"Push up, back foot leaves the floor","hold":0,"pose":{"torso":180,"head":180,"upperArmL":0,"forearmL":0,"thighL":40,"shinL":8,"footL":90,"upperArmR":0,"forearmR":0,"thighR":-12,"shinR":-62,"footR":40,"root":{"x":48,"y":54.9}}},
+  {"duration":350,"label":"Bring the back leg through","hold":0,"pose":{"torso":180,"head":180,"upperArmL":0,"forearmL":0,"thighL":5,"shinL":0,"footL":90,"upperArmR":0,"forearmR":0,"thighR":55,"shinR":-15,"footR":70,"root":{"x":48,"y":50.1}}},
+  {"duration":350,"label":"Step into the right leg","hold":0,"pose":{"torso":180,"head":180,"upperArmL":0,"forearmL":0,"thighL":-14,"shinL":-52,"footL":58,"upperArmR":0,"forearmR":0,"thighR":45,"shinR":5,"footR":90,"root":{"x":48,"y":55.5}}},
+  {"duration":600,"label":"Right leg forward","hold":300,"pose":{"torso":180,"head":180,"upperArmL":0,"forearmL":0,"thighL":-5,"shinL":-105,"footL":33,"upperArmR":0,"forearmR":0,"thighR":90,"shinR":0,"footR":90,"root":{"x":48,"y":69.3}}},
+  {"duration":350,"label":"Push up, back foot leaves the floor","hold":0,"pose":{"torso":180,"head":180,"upperArmL":0,"forearmL":0,"thighL":-12,"shinL":-62,"footL":40,"upperArmR":0,"forearmR":0,"thighR":40,"shinR":8,"footR":90,"root":{"x":48,"y":54.9}}},
+  {"duration":350,"label":"Bring the back leg through","hold":0,"pose":{"torso":180,"head":180,"upperArmL":0,"forearmL":0,"thighL":55,"shinL":-15,"footL":70,"upperArmR":0,"forearmR":0,"thighR":5,"shinR":0,"footR":90,"root":{"x":48,"y":50.1}}},
+  {"duration":350,"label":"Step into the left leg","hold":0,"pose":{"torso":180,"head":180,"upperArmL":0,"forearmL":0,"thighL":45,"shinL":5,"footL":90,"upperArmR":0,"forearmR":0,"thighR":-14,"shinR":-52,"footR":58,"root":{"x":48,"y":55.5}}}
+ ]
+}

@@ -2,7 +2,7 @@
  "version": 2,
  "title": "Dumbbell Pullover",
  "view": "side",
- "hold": "ball",
+ "hold": "dumbbell",
  "props": [{"type":"box","x":12,"y":78,"w":62,"h":14}],
  "highlight": ["shoulderL","spine"],
  "frames": [

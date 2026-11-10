@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "title": "Bent-over Row",
+  "title": "Barbell Bent-Over Row",
   "view": "side",
-  "hold": "dumbbell",
+  "hold": "barbell",
   "anchor": {
     "joint": "ankleL",
     "x": 40,

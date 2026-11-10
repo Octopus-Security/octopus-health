@@ -1,0 +1,10 @@
+{
+ "version": 2,
+ "title": "Scapular Push-up",
+ "view": "side",
+ "highlight": ["shoulderL","spine"],
+ "frames": [
+  {"duration":1100,"label":"Arms locked, chest sinks between the shoulder blades","hold":400,"anchor":{"joint":"toeL","x":10,"y":91.5},"pose":{"torso":108,"head":122,"upperArmL":0,"forearmL":0,"thighL":-72,"shinL":-72,"footL":-10,"upperArmR":0,"forearmR":0,"thighR":-72,"shinR":-72,"footR":-10,"arch":-8,"shrug":0}},
+  {"duration":1100,"label":"Push the floor away, upper back rounds, arms still locked","hold":400,"anchor":{"joint":"toeL","x":10,"y":91.5},"pose":{"torso":108,"head":108,"upperArmL":0,"forearmL":0,"thighL":-72,"shinL":-72,"footL":-10,"upperArmR":0,"forearmR":0,"thighR":-72,"shinR":-72,"footR":-10,"arch":12,"shrug":2}}
+ ]
+}

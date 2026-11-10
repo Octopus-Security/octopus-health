@@ -1,0 +1,11 @@
+{
+ "version": 2,
+ "title": "Wall Sit",
+ "view": "side",
+ "static": true,
+ "props": [{"type":"wall","x":36}],
+ "highlight": ["kneeL","hipL"],
+ "frames": [
+  {"label":"Thighs level, back on the wall","anchor":{"joint":"ankleL","x":62,"y":90},"pose":{"torso":180,"head":180,"upperArmL":0,"forearmL":0,"thighL":90,"shinL":0,"footL":90,"upperArmR":0,"forearmR":0,"thighR":90,"shinR":0,"footR":90}}
+ ]
+}

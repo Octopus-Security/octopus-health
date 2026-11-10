@@ -247,13 +247,9 @@ test('every seeded exercise is matched by a name rule, not the category fallback
   assert.ok(ex.length > 250, `found ${ex.length} seeded exercises — the parser is broken`);
   // Exercises with NO correct pose yet. They fall to the category figure (a squat), which is wrong for
   // both. Author a pose, map it in pose-map.js, then delete the name here (the test below fails until you do).
-  const NEEDS_POSE = ['Pseudo-Planche Lean', 'Tuck L-sit Hold',
-    // variety audit (step 3): rules with a null key in pose-map.js stop a looser rule giving these a wrong figure
-    'Band Reverse Wrist Curl', 'Band Wrist Curl', 'Banded Ankle Eversion', 'Flexed-Arm Hang', 'Heel-to-Toe Walk',
-    'Lacrosse Ball Calf Roll', 'Lacrosse Ball Forearm Roll', 'Lacrosse Ball Hamstring Roll', 'Lacrosse Ball Lat Wall Roll',
-    'Lacrosse Ball Quad Roll', 'Lacrosse Ball Upper Trap Wall Roll', 'Progressive Muscle Relaxation', 'Quadruped Wrist Rocks',
-    'Scapular Pull-up', 'Short Foot Exercise', 'Single-Leg Reach', 'Single-Leg Stand', 'Spanish Squat', 'Tibialis Raise (Wall)',
-    'Toe Yoga', 'Towel Hang', 'Wall Sit', 'Wrist Extensor Stretch',
+  const NEEDS_POSE = [
+    // small-joint foot drills: the stick figure has no toe or arch segment, so a null rule stops a looser rule giving them a wrong figure
+    'Banded Ankle Eversion', 'Short Foot Exercise', 'Toe Yoga',
     // a sweep: the clinch-knee figure it used to get is a different move (martial categories show "No diagram yet")
     'Inside Clinch Sweep (Dteh Chiang)',
     // lymphatic drainage routine: skin strokes, deliberately no figure
@@ -267,12 +263,12 @@ test('rules route the names that used to collide', () => {
     'Mountain Climber': 'mountain-climber',  // "mount" is BJJ
     'Cable Crunch': 'cable-crunch',          // contains "run"; kneeling, not the floor crunch
     'Leg Curl': 'leg-curl',                  // contains "curl"
-    'Romanian Deadlift (RDL)': 'rdl',
+    'Romanian Deadlift (RDL)': 'rdl-barbell',   // a barbell figure: the dumbbell one is 'rdl'
     'Barbell Deadlift': 'deadlift',
     'Muay Thai Footwork — Triangle': 'fight-stance',
     'Triangle Choke Setup': 'mma/bjj-triangle-choke',   // the two-figure mma pose; it used to fall to the one-figure guard
     'Jump Squat': 'jump-squat',
-    'Goblet Squat': 'squat',
+    'Goblet Squat': 'goblet-squat',
     'Pike Push-up': 'pike-push-up',
     'Side Plank': 'side-plank',
     'Hanging Leg Raise': 'hanging-leg-raise',
@@ -294,7 +290,7 @@ test('rules route the names that used to collide', () => {
     'Wrist Flexor Stretch': 'wrist-flexor-stretch',
     'Overhead Banded Shoulder Stretch': 'overhead-shoulder-stretch',
     'Dumbbell Bulgarian Split Squat': 'bulgarian-split-squat',
-    'Dumbbell Lunge': 'lunge',
+    'Dumbbell Lunge': 'forward-lunge-db',
     // stretches & mobility added 2026-10-26: each contains a word an older, more general rule matches
     '90/90 Breathing': 'ninety-ninety-breathing',          // "90/90" is the hip switch
     'Side Lunge Adductor Stretch': 'side-lunge-stretch',   // "lunge"

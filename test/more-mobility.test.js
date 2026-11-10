@@ -35,7 +35,7 @@ test('the three new routines use real library exercises, by name and by demo', (
 test('kicking and leg-raise drills do not fall through to a strike pose', () => {
   const want = {
     'Kick Chamber Hold': 'kick-check', 'Walking Knee Hug': 'hip-circle', 'Fire Hydrant': 'quadruped-hip-cars',
-    'Front-to-Back Leg Swing': 'hip-circle', 'Lateral Leg Swing': 'hip-circle', 'Reverse Tabletop': 'crab-walk',
+    'Front-to-Back Leg Swing': 'hip-circle', 'Lateral Leg Swing': 'hip-circle', 'Reverse Tabletop': 'reverse-tabletop',
     'Banded Hip Mobilization': 'kneeling-hip-flexor', 'Prone Y-T-W Raise': 'cobra',
   };
   for (const [n, k] of Object.entries(want)) assert.strictEqual(PM.keyFor(n), k, n);

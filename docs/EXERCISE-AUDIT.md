@@ -49,6 +49,10 @@ The aim: the app can be shown to real customers by a personal trainer, so conten
 23. Three orphan poses used by no exercise; a typo in one cue.
 24. 97 poses are shared by two or more items. Fine for variants of one movement, wrong for the cases above.
 
+## Status of the figure findings (#8-#15)
+
+Fixed on branch `fix/exercise-figures`: #8 to #13 (Clamshell, Rear Delt Fly, Band Pull-Apart, Scapular Push-up, the external-rotation drills, Reverse Tabletop, Crab Reach, the landmine items, the lunges), #10 (every static hold and hang now has its own figure) and #14 (implement mismatches: `IMPLEMENT` is empty). #15: the category-fallback list went from 57 to 16, all of them either the lymphatic routine (no figure on purpose) or three foot drills the stick figure has no segments to show. The Prone Shoulder ER Stretch keeps its figure; the cue-wording half of #12 is copy, not a figure, and is not changed here.
+
 ## Guards
 
 All in `test/exercise-guards.test.js`, as **ratchets**: known offenders live in `test/helpers/exercise-ratchet.js`, each with a reason and the finding id above. The suite passes today, fails on any new offender, and fails on a known entry that has since been fixed and not removed, so the lists only shrink.

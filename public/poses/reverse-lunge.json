@@ -1,0 +1,11 @@
+{
+ "version": 2,
+ "title": "Reverse Lunge",
+ "view": "side",
+ "highlight": ["kneeL","hipL"],
+ "frames": [
+  {"duration":700,"label":"Stand tall on the front foot","hold":300,"anchor":{"joint":"ankleL","x":66,"y":90},"pose":{"torso":180,"head":180,"upperArmL":0,"forearmL":0,"thighL":0,"shinL":0,"footL":90,"upperArmR":0,"forearmR":0,"thighR":0,"shinR":0,"footR":90}},
+  {"duration":500,"label":"Step back","hold":0,"anchor":{"joint":"ankleL","x":66,"y":90},"pose":{"torso":180,"head":180,"upperArmL":0,"forearmL":0,"thighL":0,"shinL":0,"footL":90,"upperArmR":0,"forearmR":0,"thighR":-30,"shinR":-45,"footR":30}},
+  {"duration":700,"label":"Lower: front shin vertical, back knee near the floor","hold":500,"anchor":{"joint":"ankleL","x":66,"y":90},"pose":{"torso":180,"head":180,"upperArmL":0,"forearmL":0,"thighL":90,"shinL":0,"footL":90,"upperArmR":0,"forearmR":0,"thighR":-5,"shinR":-105,"footR":33}}
+ ]
+}

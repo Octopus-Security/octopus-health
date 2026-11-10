@@ -1,0 +1,78 @@
+// Poses that are the SAME movement as another pose but hold a different implement (or none).
+//   node scripts/pose-variants.cjs          write/refresh every variant file
+//   node scripts/pose-variants.cjs --check  exit 1 if a file differs from what this table produces
+//
+// Why this exists: a figure carries its implement in the file (`"hold"`), and an exercise's implement is
+// in its equipment. A barbell bench press and a dumbbell bench press are one movement but two figures
+// (test/exercise-guards.test.js checks the match). Keeping them as generated copies of one base means the
+// movement cannot drift between them: edit the BASE pose, run this, commit both.
+//
+//   VARIANTS  [key, base, hold|null, title, patch?]  a new file: base's frames with hold replaced (null = holds nothing)
+//   IN_PLACE  key -> {hold, title?}                 the base is only ever used with this implement, so edit the file itself
+const fs = require('fs');
+const path = require('path');
+const DIR = path.join(__dirname, '..', 'public', 'poses');
+
+const VARIANTS = [
+  ['bench-press-db', 'bench-press', 'dumbbell', 'Dumbbell Bench Press'],
+  ['overhead-press-db', 'overhead-press', 'dumbbell', 'Dumbbell Overhead Press'],
+  ['rdl-barbell', 'rdl', 'barbell', 'Barbell Romanian Deadlift'],
+  ['bent-row-bare', 'bent-row', null, 'Bent-Over Row'],
+  ['forward-lunge-db', 'forward-lunge', 'dumbbell', 'Dumbbell Forward Lunge'],
+  ['walking-lunge-db', 'walking-lunge', 'dumbbell', 'Dumbbell Walking Lunge'],
+  ['goblet-squat-plate', 'goblet-squat', null, 'Plate Goblet Squat'],
+  ['bulgarian-split-squat-bare', 'bulgarian-split-squat', null, 'Bulgarian Split Squat'],
+  ['curl-bare', 'curl', null, 'Curl (cable or band)'],
+  ['curl-barbell', 'curl', 'barbell', 'Bar Curl'],
+  ['lateral-raise-bare', 'lateral-raise', null, 'Lateral Raise (cable or band)'],
+  ['tricep-overhead-bare', 'tricep-overhead', null, 'Overhead Triceps Extension (cable)'],
+  ['shrug-bare', 'shrug', null, 'Shrug Roll'],
+  ['wood-chop-cable', 'wood-chop', null, 'Cable Wood Chop'],
+  ['walk-bare', 'walk', null, 'Walk'],
+  // the same figures with a lacrosse ball instead of a foam roller
+  ['ball-roll-calf', 'foam-roll-calf', null, 'Calf Ball Roll', { ball: true }],
+  ['ball-roll-quad', 'foam-roll-prone', null, 'Quad Ball Roll (face down)', { ball: true }],
+];
+const IN_PLACE = {
+  'bent-row': { hold: 'barbell', title: 'Barbell Bent-Over Row' },
+  pullover: { hold: 'dumbbell', title: 'Dumbbell Pullover' },
+  'lat-pulldown': { hold: null },
+  'chest-fly': { hold: null, title: 'Chest Fly (cable or machine)' },
+};
+
+const read = (k) => JSON.parse(fs.readFileSync(path.join(DIR, k + '.json'), 'utf8'));
+const out = {};
+
+for (const [key, base, hold, title, patch] of VARIANTS) {
+  const d = read(base);
+  const o = {};
+  for (const [k, v] of Object.entries(d)) {
+    if (k === 'hold') continue;
+    o[k] = k === 'title' ? title : v;
+    if (k === 'view' && hold) o.hold = hold;
+  }
+  if (patch && patch.ball) {
+    if (o.props) o.props = o.props.map((p) => (p.type === 'roller' ? { ...p, type: 'ball' } : p));
+    if (o.frames) o.frames = o.frames.map((f) => (f.label ? { ...f, label: f.label.replace(/Roller/g, 'Ball').replace(/roller/g, 'ball') } : f));
+  }
+  out[key] = JSON.stringify(o, null, 1) + '\n';
+}
+
+// In place: a textual edit so the diff is only the hold line (and title), not a reformat of the file.
+for (const [key, spec] of Object.entries(IN_PLACE)) {
+  const file = path.join(DIR, key + '.json');
+  let t = fs.readFileSync(file, 'utf8');
+  if (spec.hold) t = t.replace(/"hold": "[a-zA-Z]+"/, `"hold": "${spec.hold}"`);
+  else t = t.replace(/\n\s*"hold": "[a-zA-Z]+",?/, '');
+  if (spec.title) t = t.replace(/"title": "[^"]*"/, `"title": "${spec.title}"`);
+  out[key] = t;
+}
+
+let bad = 0;
+for (const [key, text] of Object.entries(out)) {
+  const file = path.join(DIR, key + '.json');
+  if (process.argv.includes('--check')) {
+    if (!fs.existsSync(file) || fs.readFileSync(file, 'utf8') !== text) { console.error('stale: ' + key); bad++; }
+  } else { fs.writeFileSync(file, text); }
+}
+if (process.argv.includes('--check')) { if (bad) process.exit(1); console.log('pose variants are current'); } else console.log('wrote', Object.keys(out).length, 'variant files');

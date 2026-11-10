@@ -1,8 +1,7 @@
 {
   "version": 2,
-  "title": "Chest Fly",
+  "title": "Chest Fly (cable or machine)",
   "view": "front",
-  "hold": "dumbbell",
   "highlight": [
     "shoulderL",
     "shoulderR"

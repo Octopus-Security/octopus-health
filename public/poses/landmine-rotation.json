@@ -1,0 +1,10 @@
+{
+ "version": 2,
+ "title": "Landmine Rotation",
+ "view": "front",
+ "highlight": ["spine","shoulderL","shoulderR"],
+ "frames": [
+  {"duration":900,"label":"Bar out to one side, feet planted","hold":300,"pose":{"torso":180,"head":180,"upperArmL":70,"forearmL":70,"upperArmR":70,"forearmR":70,"thighL":20,"shinL":10,"footL":90,"thighR":-20,"shinR":-10,"footR":-90,"root":{"x":50,"y":53}}},
+  {"duration":900,"label":"Swing across, hips and shoulders turn together","hold":300,"pose":{"torso":180,"head":180,"upperArmL":-70,"forearmL":-70,"upperArmR":-70,"forearmR":-70,"thighL":20,"shinL":10,"footL":90,"thighR":-20,"shinR":-10,"footR":-90}}
+ ]
+}

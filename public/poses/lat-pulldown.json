@@ -2,7 +2,6 @@
   "version": 2,
   "title": "Lat Pulldown",
   "view": "side",
-  "hold": "barbell",
   "grounded": true,
   "anchor": {
     "joint": "ankleL",

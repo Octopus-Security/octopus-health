@@ -1,0 +1,11 @@
+{
+ "version": 2,
+ "title": "Tibialis Raise",
+ "view": "side",
+ "props": [{"type":"wall","x":42}],
+ "highlight": ["ankleL","ankleR"],
+ "frames": [
+  {"duration":900,"label":"Toes up","hold":350,"anchor":{"joint":"ankleL","x":62,"y":90},"pose":{"torso":190,"head":190,"upperArmL":0,"forearmL":0,"thighL":10,"shinL":10,"footL":140,"upperArmR":0,"forearmR":0,"thighR":10,"shinR":10,"footR":140}},
+  {"duration":900,"label":"Toes down","hold":150,"pose":{"torso":190,"head":190,"upperArmL":0,"forearmL":0,"thighL":10,"shinL":10,"footL":100,"upperArmR":0,"forearmR":0,"thighR":10,"shinR":10,"footR":100}}
+ ]
+}

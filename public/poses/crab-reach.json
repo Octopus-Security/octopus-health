@@ -1,0 +1,10 @@
+{
+ "version": 2,
+ "title": "Crab Reach",
+ "view": "side",
+ "highlight": ["shoulderL","spine"],
+ "frames": [
+  {"duration":1000,"label":"Reverse tabletop","hold":400,"anchor":{"joint":"ankleL","x":68,"y":90},"pose":{"torso":255,"head":238,"upperArmL":0,"forearmL":0,"thighL":90,"shinL":0,"footL":90,"upperArmR":0,"forearmR":0,"thighR":90,"shinR":0,"footR":90}},
+  {"duration":1300,"label":"Reach the near arm up and over","hold":600,"pose":{"torso":255,"head":250,"upperArmL":170,"forearmL":170,"thighL":90,"shinL":0,"footL":90,"upperArmR":0,"forearmR":0,"thighR":90,"shinR":0,"footR":90}}
+ ]
+}

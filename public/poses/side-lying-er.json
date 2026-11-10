@@ -1,0 +1,10 @@
+{
+ "version": 2,
+ "title": "Side-Lying Shoulder External Rotation",
+ "view": "front",
+ "highlight": ["shoulderR","elbowR"],
+ "frames": [
+  {"duration":1300,"label":"Forearm resting on the belly","hold":400,"pose":{"torso":-90,"head":-90,"upperArmL":90,"forearmL":90,"upperArmR":90,"forearmR":100,"thighL":80,"shinL":-100,"footL":-100,"thighR":80,"shinR":-100,"footR":-100,"depth":{"forearmR":0.3,"upperArmL":0.35,"forearmL":0.35},"root":{"x":52,"y":82}}},
+  {"duration":1300,"label":"Rotate the forearm up, elbow stays on the ribs","hold":500,"pose":{"torso":-90,"head":-90,"upperArmL":90,"forearmL":90,"upperArmR":90,"forearmR":180,"thighL":80,"shinL":-100,"footL":-100,"thighR":80,"shinR":-100,"footR":-100,"depth":{"forearmR":1}}}
+ ]
+}

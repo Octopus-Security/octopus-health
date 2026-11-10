@@ -1,0 +1,11 @@
+{
+ "version": 2,
+ "title": "Split Jerk",
+ "view": "side",
+ "highlight": ["shoulderL","kneeL"],
+ "frames": [
+  {"duration":800,"label":"Stand, bar at the shoulders","hold":300,"anchor":{"joint":"toeR","x":35,"y":91},"pose":{"torso":180,"head":180,"upperArmL":30,"forearmL":160,"thighL":0,"shinL":0,"footL":90,"upperArmR":30,"forearmR":160,"thighR":0,"shinR":0,"footR":90}},
+  {"duration":400,"label":"Dip: knees bend, torso stays upright","hold":0,"anchor":{"joint":"toeR","x":35,"y":91},"pose":{"torso":180,"head":180,"upperArmL":30,"forearmL":160,"thighL":30,"shinL":-20,"footL":85,"upperArmR":30,"forearmR":160,"thighR":30,"shinR":-20,"footR":85}},
+  {"duration":600,"label":"Split under the bar, arms locked overhead","hold":600,"anchor":{"joint":"toeR","x":35,"y":91},"pose":{"torso":180,"head":180,"upperArmL":172,"forearmL":175,"thighL":29.9,"shinL":27.6,"footL":90,"upperArmR":172,"forearmR":175,"thighR":-18,"shinR":-36,"footR":40}}
+ ]
+}

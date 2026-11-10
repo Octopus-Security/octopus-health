@@ -1,0 +1,11 @@
+{
+ "version": 2,
+ "title": "Barbell Hack Squat",
+ "view": "side",
+ "hold": "barbell",
+ "highlight": ["kneeL","hipL"],
+ "frames": [
+  {"duration":1100,"label":"Stand, bar behind the legs","anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":180,"head":180,"upperArmL":-10,"forearmL":-10,"thighL":0,"shinL":0,"footL":90,"upperArmR":-10,"forearmR":-10,"thighR":0,"shinR":0,"footR":90}},
+  {"duration":900,"label":"Squat down, chest up, bar drags down the legs","hold":350,"anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":150,"head":158,"upperArmL":-8,"forearmL":-8,"thighL":78,"shinL":-32,"footL":88,"upperArmR":-8,"forearmR":-8,"thighR":78,"shinR":-32,"footR":88}}
+ ]
+}
