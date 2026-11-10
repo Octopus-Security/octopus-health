@@ -18,3 +18,4 @@ package-lock.json
 *.sqlite-shm
 data/*
 !data/.gitkeep
+pose-contact-sheet.html

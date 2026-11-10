@@ -48,7 +48,7 @@ const NEW_TPL = ['kit:ab-roller-core', 'kit:rope-conditioning', 'kit:tower-bands
 
 // Claims this app does not make about what a movement does to the body, as words. Tested below on
 // sample strings so the list itself cannot silently stop matching.
-const BANNED = /\b(treat(s|ed|ing|ment)?|fix(es|ed|ing)?|prevent(s|ed|ing|ion)?|correct(s|ed|ing|ion)?|heal(s|ed|ing)?|cure[sd]?|releas(e|es|ed|ing)|fascia|fascial|adhesions?|knots?|scar tissue|toxins?|flush(es|ed)?|detox|rehab|rehabilitat\w*|therap\w*|inflammation|studies|research|proven|clinically|scientific\w*|nervous system|parasympathetic|cortisol|stress hormones?|reduces?|relieves?|relief|lengthens?|realign\w*|decompress\w*|break(s)? up|lubricat\w*|alleviat\w*|diagnos\w*)\b/i;
+const { BANNED } = require('./helpers/banned');
 
 test('the banned-word list catches what it is meant to, and not plain description', () => {
   for (const bad of ['releases fascia', 'treats knee pain', 'prevents injury', 'fixes posture', 'breaks up knots', 'heals the tendon', 'studies show', 'calms the nervous system', 'cures tightness', 'corrects form', 'reduces stress', 'relieves pain', 'breaks up adhesions'])
