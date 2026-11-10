@@ -1,0 +1,51 @@
+{
+ "version": 2,
+ "title": "Side-Lying Shoulder Internal Rotation",
+ "view": "front",
+ "hold": "dumbbellL",
+ "highlight": [
+  "shoulderL",
+  "elbowL"
+ ],
+ "frames": [
+  {
+   "duration": 1300,
+   "label": "Elbow on the ribs, forearm rotated out",
+   "hold": 400,
+   "pose": {
+    "torso": -90,
+    "head": -90,
+    "upperArmL": 90,
+    "forearmL": 180,
+    "upperArmR": 90,
+    "forearmR": 90,
+    "thighL": 80,
+    "shinL": -100,
+    "footL": -100,
+    "thighR": 80,
+    "shinR": -100,
+    "footR": -100,
+    "depth": {
+     "forearmL": 1,
+     "upperArmR": 0.35,
+     "forearmR": 0.35
+    },
+    "root": {
+     "x": 52,
+     "y": 82
+    }
+   }
+  },
+  {
+   "duration": 1300,
+   "label": "Rotate the forearm in toward the stomach",
+   "hold": 500,
+   "pose": {
+    "forearmL": 100,
+    "depth": {
+     "forearmL": 0.3
+    }
+   }
+  }
+ ]
+}

@@ -1,0 +1,256 @@
+{
+ "version": 2,
+ "title": "Depth Jump",
+ "view": "side",
+ "grounded": false,
+ "props": [
+  {
+   "type": "box",
+   "x": 6,
+   "y": 72,
+   "w": 30,
+   "h": 20
+  }
+ ],
+ "highlight": [
+  "hipL",
+  "kneeL"
+ ],
+ "frames": [
+  {
+   "duration": 700,
+   "label": "Ready stance on the box: soft knees, chest up, arms back",
+   "hold": 100,
+   "anchor": {
+    "joint": "ankleL",
+    "x": 24,
+    "y": 70
+   },
+   "pose": {
+    "torso": 168,
+    "head": 172,
+    "thighL": 25,
+    "shinL": -15,
+    "footL": 90,
+    "thighR": 25,
+    "shinR": -15,
+    "footR": 90,
+    "upperArmL": -35,
+    "forearmL": -10,
+    "upperArmR": -35,
+    "forearmR": -10
+   }
+  },
+  {
+   "duration": 380,
+   "label": "Reach one foot off the edge, knees soft",
+   "hold": 0,
+   "anchor": {
+    "joint": "ankleL",
+    "x": 24,
+    "y": 70
+   },
+   "pose": {
+    "torso": 168,
+    "head": 172,
+    "thighL": 30,
+    "shinL": -20,
+    "footL": 90,
+    "thighR": 40,
+    "shinR": 10,
+    "footR": 80,
+    "upperArmL": -40,
+    "forearmL": -15,
+    "upperArmR": -40,
+    "forearmR": -15
+   }
+  },
+  {
+   "duration": 320,
+   "label": "Drop: feet together under the hips, knees ready",
+   "hold": 0,
+   "air": true,
+   "pose": {
+    "torso": 172,
+    "head": 174,
+    "thighL": 12,
+    "shinL": -8,
+    "footL": 75,
+    "thighR": 12,
+    "shinR": -8,
+    "footR": 75,
+    "upperArmL": -50,
+    "forearmL": -30,
+    "upperArmR": -50,
+    "forearmR": -30,
+    "root": {
+     "x": 46,
+     "y": 30
+    }
+   }
+  },
+  {
+   "duration": 150,
+   "label": "Contact on the balls of the feet",
+   "hold": 0,
+   "anchor": {
+    "joint": "toeL",
+    "x": 58,
+    "y": 90.3
+   },
+   "pose": {
+    "torso": 160,
+    "head": 165,
+    "thighL": 40,
+    "shinL": -25,
+    "footL": 50,
+    "thighR": 40,
+    "shinR": -25,
+    "footR": 50,
+    "upperArmL": -45,
+    "forearmL": -25,
+    "upperArmR": -45,
+    "forearmR": -25
+   },
+   "ease": "linear"
+  },
+  {
+   "duration": 150,
+   "label": "Heels down, shallow dip: arms already driving up",
+   "hold": 0,
+   "anchor": {
+    "joint": "ankleL",
+    "x": 54,
+    "y": 90
+   },
+   "pose": {
+    "torso": 158,
+    "head": 164,
+    "thighL": 45,
+    "shinL": -25,
+    "footL": 85,
+    "thighR": 45,
+    "shinR": -25,
+    "footR": 85,
+    "upperArmL": 40,
+    "forearmL": 55,
+    "upperArmR": 40,
+    "forearmR": 55
+   },
+   "ease": "ease-in"
+  },
+  {
+   "duration": 330,
+   "label": "Takeoff: extend and reach",
+   "hold": 0,
+   "air": true,
+   "pose": {
+    "torso": 182,
+    "head": 182,
+    "thighL": 2,
+    "shinL": 0,
+    "footL": 30,
+    "thighR": 2,
+    "shinR": 0,
+    "footR": 30,
+    "upperArmL": 115,
+    "forearmL": 125,
+    "upperArmR": 115,
+    "forearmR": 125,
+    "root": {
+     "x": 54,
+     "y": 38
+    }
+   }
+  },
+  {
+   "duration": 450,
+   "label": "Land soft",
+   "anchor": {
+    "joint": "ankleL",
+    "x": 54,
+    "y": 90
+   },
+   "pose": {
+    "torso": 150,
+    "head": 158,
+    "thighL": 65,
+    "shinL": -30,
+    "footL": 90,
+    "thighR": 65,
+    "shinR": -30,
+    "footR": 90,
+    "upperArmL": 40,
+    "forearmL": 50,
+    "upperArmR": 40,
+    "forearmR": 50
+   }
+  },
+  {
+   "duration": 600,
+   "label": "Stand, then reset",
+   "anchor": {
+    "joint": "ankleL",
+    "x": 54,
+    "y": 90
+   },
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "thighL": 0,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": 0,
+    "shinR": 0,
+    "footR": 90,
+    "upperArmL": 0,
+    "forearmL": 5,
+    "upperArmR": 0,
+    "forearmR": 5
+   }
+  },
+  {
+   "duration": 420,
+   "label": "Reset: hop back up over the box edge",
+   "hold": 0,
+   "air": true,
+   "pose": {
+    "torso": 176,
+    "head": 176,
+    "thighL": 45,
+    "shinL": -30,
+    "footL": 60,
+    "thighR": 45,
+    "shinR": -30,
+    "footR": 60,
+    "root": {
+     "x": 40,
+     "y": 34
+    }
+   }
+  },
+  {
+   "duration": 900,
+   "label": "Back on the box: ready stance",
+   "anchor": {
+    "joint": "ankleL",
+    "x": 24,
+    "y": 70
+   },
+   "pose": {
+    "torso": 168,
+    "head": 172,
+    "thighL": 25,
+    "shinL": -15,
+    "footL": 90,
+    "thighR": 25,
+    "shinR": -15,
+    "footR": 90,
+    "upperArmL": -35,
+    "forearmL": -10,
+    "upperArmR": -35,
+    "forearmR": -10
+   }
+  }
+ ]
+}

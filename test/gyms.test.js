@@ -53,7 +53,8 @@ test('old names resolve through aliases (nothing already stored is orphaned)', (
   assert.strictEqual(E.toId('push-up handles'), 'handles');
   assert.strictEqual(E.toId('Pull-up bar'), 'bar');
   assert.strictEqual(E.toId('dip station'), 'dip-bars');
-  assert.strictEqual(E.toId('a box'), 'chair');
+  assert.strictEqual(E.toId('a box'), null, 'a bare box is ambiguous: neither a chair nor a plyo box');
+  assert.strictEqual(E.toId('a plyo box'), 'plyo-box');
   assert.strictEqual(E.toId('cable_machine'), 'cable-machine');
   assert.strictEqual(E.toId('Dumbbells'), 'dumbbell');
   assert.strictEqual(E.toId('captain\'s chair'), 'captains-chair');

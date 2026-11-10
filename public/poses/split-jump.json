@@ -1,0 +1,103 @@
+{
+ "version": 2,
+ "title": "Split Jump (jumping lunge)",
+ "view": "side",
+ "highlight": [
+  "kneeL",
+  "hipL",
+  "kneeR",
+  "hipR"
+ ],
+ "frames": [
+  {
+   "duration": 500,
+   "label": "Lunge, left leg in front",
+   "anchor": {
+    "joint": "ankleL",
+    "x": 62,
+    "y": 90
+   },
+   "hold": 80,
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "thighL": 80,
+    "shinL": 8,
+    "footL": 90,
+    "thighR": 1,
+    "shinR": -99,
+    "footR": 38,
+    "upperArmL": -30,
+    "forearmL": 30,
+    "upperArmR": 35,
+    "forearmR": 75
+   }
+  },
+  {
+   "duration": 380,
+   "label": "Switch in the air",
+   "air": true,
+   "hold": 0,
+   "pose": {
+    "thighL": 12,
+    "shinL": -40,
+    "footL": 50,
+    "thighR": 12,
+    "shinR": -40,
+    "footR": 50,
+    "upperArmL": 30,
+    "forearmL": 75,
+    "upperArmR": -30,
+    "forearmR": 30,
+    "root": {
+     "x": 60,
+     "y": 36
+    }
+   }
+  },
+  {
+   "duration": 500,
+   "label": "Land in the opposite lunge",
+   "anchor": {
+    "joint": "ankleR",
+    "x": 62,
+    "y": 90
+   },
+   "hold": 80,
+   "pose": {
+    "thighL": 1,
+    "shinL": -99,
+    "footL": 38,
+    "thighR": 80,
+    "shinR": 8,
+    "footR": 90,
+    "upperArmL": 35,
+    "forearmL": 75,
+    "upperArmR": -30,
+    "forearmR": 30
+   }
+  },
+  {
+   "duration": 380,
+   "label": "Switch in the air",
+   "air": true,
+   "hold": 0,
+   "pose": {
+    "thighL": 12,
+    "shinL": -40,
+    "footL": 50,
+    "thighR": 12,
+    "shinR": -40,
+    "footR": 50,
+    "upperArmL": -30,
+    "forearmL": 30,
+    "upperArmR": 30,
+    "forearmR": 75,
+    "root": {
+     "x": 60,
+     "y": 36
+    }
+   }
+  }
+ ]
+}

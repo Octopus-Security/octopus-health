@@ -1,0 +1,64 @@
+{
+ "version": 2,
+ "title": "Seated Hip Adduction (machine)",
+ "view": "front",
+ "props": [
+  {
+   "type": "box",
+   "x": 34,
+   "y": 67,
+   "w": 32,
+   "h": 8
+  }
+ ],
+ "highlight": [
+  "hipL",
+  "hipR"
+ ],
+ "frames": [
+  {
+   "duration": 1100,
+   "label": "Knees apart, pads on the inner knees",
+   "hold": 300,
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "upperArmL": 12,
+    "forearmL": 14,
+    "upperArmR": -12,
+    "forearmR": -14,
+    "thighL": 42,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": -42,
+    "shinR": 0,
+    "footR": -90,
+    "root": {
+     "x": 50,
+     "y": 63
+    },
+    "depth": {
+     "thighL": 0.6,
+     "thighR": 0.6,
+     "shinL": 0.9,
+     "shinR": 0.9
+    }
+   }
+  },
+  {
+   "duration": 1000,
+   "label": "Squeeze the knees together",
+   "hold": 350,
+   "pose": {
+    "thighL": 8,
+    "thighR": -8,
+    "depth": {
+     "thighL": 0.45,
+     "thighR": 0.45,
+     "shinL": 0.9,
+     "shinR": 0.9
+    }
+   }
+  }
+ ]
+}

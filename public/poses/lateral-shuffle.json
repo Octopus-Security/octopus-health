@@ -1,0 +1,106 @@
+{
+ "version": 2,
+ "title": "Lateral Shuffle",
+ "view": "front",
+ "grounded": false,
+ "highlight": [
+  "hipL",
+  "hipR",
+  "kneeL",
+  "kneeR"
+ ],
+ "frames": [
+  {
+   "duration": 260,
+   "label": "Athletic stance, push off the trailing foot",
+   "hold": 0,
+   "pose": {
+    "torso": 176,
+    "head": 178,
+    "thighL": 28,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": -28,
+    "shinR": 0,
+    "footR": -90,
+    "upperArmL": 35,
+    "forearmL": 25,
+    "upperArmR": -35,
+    "forearmR": -25,
+    "root": {
+     "x": 62,
+     "y": 52
+    }
+   }
+  },
+  {
+   "duration": 220,
+   "label": "Feet close, stay low",
+   "hold": 0,
+   "pose": {
+    "torso": 176,
+    "head": 178,
+    "thighL": 14,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": -14,
+    "shinR": 0,
+    "footR": -90,
+    "upperArmL": 35,
+    "forearmL": 25,
+    "upperArmR": -35,
+    "forearmR": -25,
+    "root": {
+     "x": 50,
+     "y": 51
+    }
+   }
+  },
+  {
+   "duration": 260,
+   "label": "Slide to the other side",
+   "hold": 0,
+   "pose": {
+    "torso": 176,
+    "head": 178,
+    "thighL": 28,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": -28,
+    "shinR": 0,
+    "footR": -90,
+    "upperArmL": 35,
+    "forearmL": 25,
+    "upperArmR": -35,
+    "forearmR": -25,
+    "root": {
+     "x": 38,
+     "y": 52
+    }
+   }
+  },
+  {
+   "duration": 220,
+   "label": "Feet close, stay low",
+   "hold": 0,
+   "pose": {
+    "torso": 176,
+    "head": 178,
+    "thighL": 14,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": -14,
+    "shinR": 0,
+    "footR": -90,
+    "upperArmL": 35,
+    "forearmL": 25,
+    "upperArmR": -35,
+    "forearmR": -25,
+    "root": {
+     "x": 50,
+     "y": 51
+    }
+   }
+  }
+ ]
+}

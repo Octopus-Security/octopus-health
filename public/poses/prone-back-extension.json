@@ -1,0 +1,53 @@
+{
+ "version": 2,
+ "title": "Prone Back Extension",
+ "view": "side",
+ "highlight": [
+  "spine"
+ ],
+ "frames": [
+  {
+   "duration": 1300,
+   "label": "Face down, neck long",
+   "pose": {
+    "torso": 90,
+    "head": 92,
+    "upperArmL": -90,
+    "forearmL": -90,
+    "upperArmR": -90,
+    "forearmR": -90,
+    "thighL": -90,
+    "shinL": -90,
+    "footL": -60,
+    "thighR": -90,
+    "shinR": -90,
+    "footR": -60,
+    "arch": 0,
+    "root": {
+     "x": 50,
+     "y": 87
+    }
+   }
+  },
+  {
+   "duration": 1300,
+   "label": "Lift the chest and legs a little",
+   "hold": 350,
+   "pose": {
+    "torso": 108,
+    "head": 112,
+    "arch": -12,
+    "upperArmL": -98,
+    "forearmL": -98,
+    "upperArmR": -98,
+    "forearmR": -98,
+    "thighL": -100,
+    "shinL": -100,
+    "footL": -72,
+    "thighR": -100,
+    "shinR": -100,
+    "footR": -72
+   }
+  }
+ ]
+}

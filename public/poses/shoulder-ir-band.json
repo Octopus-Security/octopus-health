@@ -1,0 +1,42 @@
+{
+ "version": 2,
+ "title": "Band Shoulder Internal Rotation",
+ "view": "front",
+ "highlight": [
+  "shoulderL",
+  "elbowL"
+ ],
+ "frames": [
+  {
+   "duration": 1100,
+   "label": "Forearm out, elbow on the ribs",
+   "hold": 300,
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "upperArmL": 4,
+    "forearmL": 92,
+    "upperArmR": -4,
+    "forearmR": -4,
+    "thighL": 5,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": -5,
+    "shinR": 0,
+    "footR": -90,
+    "root": {
+     "x": 50,
+     "y": 50
+    }
+   }
+  },
+  {
+   "duration": 1100,
+   "label": "Rotate in across the belly, elbow stays put",
+   "hold": 400,
+   "pose": {
+    "forearmL": -88
+   }
+  }
+ ]
+}

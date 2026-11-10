@@ -1,0 +1,53 @@
+{
+ "version": 2,
+ "title": "EZ-Bar Skull Crusher",
+ "view": "side",
+ "hold": "barbell",
+ "anchor": {
+  "joint": "ankleL",
+  "x": 72,
+  "y": 90
+ },
+ "props": [
+  {
+   "type": "box",
+   "x": 12,
+   "y": 78,
+   "w": 62,
+   "h": 14
+  }
+ ],
+ "highlight": [
+  "elbowL",
+  "elbowR"
+ ],
+ "frames": [
+  {
+   "duration": 1200,
+   "label": "Bar over the chest, arms vertical",
+   "pose": {
+    "torso": -90,
+    "head": -88,
+    "upperArmL": 182,
+    "forearmL": 182,
+    "upperArmR": 182,
+    "forearmR": 182,
+    "thighL": 90,
+    "shinL": -30,
+    "footL": 90,
+    "thighR": 90,
+    "shinR": -30,
+    "footR": 90
+   }
+  },
+  {
+   "duration": 900,
+   "label": "Bend the elbows: bar toward the forehead",
+   "hold": 300,
+   "pose": {
+    "forearmL": 255,
+    "forearmR": 255
+   }
+  }
+ ]
+}

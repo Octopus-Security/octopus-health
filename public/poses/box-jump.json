@@ -12,6 +12,7 @@
   {"duration":350,"label":"Jump: arms drive up","air":true,"pose":{"torso":170,"head":175,"upperArmL":110,"forearmL":120,"thighL":60,"shinL":-30,"footL":80,"upperArmR":110,"forearmR":120,"thighR":60,"shinR":-30,"footR":80,"root":{"x":42,"y":34}}},
   {"duration":400,"label":"Land soft on the box","anchor":{"joint":"ankleL","x":62,"y":70},"pose":{"torso":145,"head":160,"upperArmL":35,"forearmL":55,"thighL":55,"shinL":-40,"footL":80,"upperArmR":35,"forearmR":55,"thighR":55,"shinR":-40,"footR":80}},
   {"duration":500,"label":"Stand tall on top","anchor":{"joint":"ankleL","x":62,"y":70},"pose":{"torso":180,"head":180,"upperArmL":0,"forearmL":5,"thighL":0,"shinL":0,"footL":90,"upperArmR":0,"forearmR":5,"thighR":0,"shinR":0,"footR":90}},
+  {"duration":350,"label":"Step back off the edge, above the box top","hold":0,"air":true,"pose":{"root":{"x":44,"y":28}}},
   {"duration":700,"label":"Step back down","anchor":{"joint":"ankleL","x":24,"y":90},"pose":{"torso":180,"head":180,"upperArmL":0,"forearmL":5,"thighL":0,"shinL":0,"footL":90,"upperArmR":0,"forearmR":5,"thighR":0,"shinR":0,"footR":90}}
  ]
 }

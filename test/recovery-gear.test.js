@@ -41,7 +41,8 @@ test('new ids exist, are kebab-case, and the aliases people say resolve', () => 
   assert.strictEqual(E.toId('stretching strap'), 'strap');
   assert.strictEqual(E.toId('stairs'), 'step');
   assert.strictEqual(E.toId('step'), 'step', 'a step is now its own item (stored data holds ids, so nothing is orphaned)');
-  assert.strictEqual(E.toId('a box'), 'chair');
+  assert.strictEqual(E.toId('a box'), null, 'a bare box is ambiguous: neither a chair nor a plyo box');
+  assert.strictEqual(E.toId('a plyo box'), 'plyo-box');
   assert.strictEqual(E.toId('bench'), 'chair');
 });
 

@@ -1,0 +1,49 @@
+{
+ "version": 2,
+ "title": "Dumbbell Upright Row",
+ "view": "front",
+ "hold": "dumbbell",
+ "highlight": [
+  "shoulderL",
+  "shoulderR",
+  "elbowL",
+  "elbowR"
+ ],
+ "frames": [
+  {
+   "duration": 1200,
+   "label": "Hang in front of the thighs",
+   "hold": 300,
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "thighL": 5,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": -5,
+    "shinR": 0,
+    "footR": -90,
+    "upperArmL": 8,
+    "forearmL": -6,
+    "upperArmR": -8,
+    "forearmR": 6,
+    "root": {
+     "x": 50,
+     "y": 50
+    }
+   }
+  },
+  {
+   "duration": 1000,
+   "label": "Elbows lead out and up, above the wrists",
+   "hold": 400,
+   "pose": {
+    "upperArmL": 100,
+    "forearmL": -40,
+    "upperArmR": -100,
+    "forearmR": 40,
+    "shrug": 2
+   }
+  }
+ ]
+}

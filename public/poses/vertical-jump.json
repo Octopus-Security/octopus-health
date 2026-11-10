@@ -1,0 +1,127 @@
+{
+ "version": 2,
+ "title": "Vertical Jump",
+ "view": "side",
+ "anchor": {
+  "joint": "ankleL",
+  "x": 50,
+  "y": 90
+ },
+ "highlight": [
+  "kneeL",
+  "hipL"
+ ],
+ "frames": [
+  {
+   "duration": 500,
+   "label": "Quarter dip, arms swing back",
+   "pose": {
+    "torso": 152,
+    "head": 160,
+    "thighL": 62,
+    "shinL": -28,
+    "footL": 90,
+    "upperArmL": -75,
+    "forearmL": -60,
+    "thighR": 62,
+    "shinR": -28,
+    "footR": 90,
+    "upperArmR": -75,
+    "forearmR": -60
+   }
+  },
+  {
+   "duration": 220,
+   "label": "Explode: arms swing up",
+   "ease": "ease-in",
+   "anchor": {
+    "joint": "toeL",
+    "x": 52.4,
+    "y": 90.3
+   },
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "thighL": 0,
+    "shinL": 0,
+    "footL": 20,
+    "upperArmL": 95,
+    "forearmL": 105,
+    "thighR": 0,
+    "shinR": 0,
+    "footR": 20,
+    "upperArmR": 95,
+    "forearmR": 105
+   }
+  },
+  {
+   "duration": 450,
+   "label": "Reach at the top",
+   "ease": "ease-out",
+   "air": true,
+   "pose": {
+    "torso": 182,
+    "head": 182,
+    "thighL": 4,
+    "footL": 30,
+    "thighR": -3,
+    "shinR": 0,
+    "footR": 30,
+    "root": {
+     "x": 50,
+     "y": 40
+    },
+    "upperArmL": 150,
+    "forearmL": 155,
+    "upperArmR": 150,
+    "forearmR": 155
+   }
+  },
+  {
+   "duration": 200,
+   "label": "Touch down",
+   "ease": "ease-in",
+   "anchor": {
+    "joint": "ankleL",
+    "x": 50,
+    "y": 90
+   },
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "thighL": 0,
+    "footL": 90,
+    "upperArmL": 60,
+    "forearmL": 70,
+    "thighR": 0,
+    "shinR": 0,
+    "footR": 90,
+    "upperArmR": 60,
+    "forearmR": 70
+   }
+  },
+  {
+   "duration": 450,
+   "label": "Absorb the landing",
+   "anchor": {
+    "joint": "ankleL",
+    "x": 50,
+    "y": 90
+   },
+   "pose": {
+    "torso": 152,
+    "head": 160,
+    "thighL": 62,
+    "shinL": -28,
+    "upperArmL": 40,
+    "forearmL": 50,
+    "thighR": 62,
+    "shinR": -28,
+    "upperArmR": 40,
+    "forearmR": 50,
+    "footL": 90,
+    "footR": 90
+   }
+  }
+ ]
+}

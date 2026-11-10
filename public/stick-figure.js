@@ -506,6 +506,24 @@
           if (edge > SURFACE + 1.5) note(worst, at, n, 'goes through the floor', edge, 'bottom edge ' + edge.toFixed(1) + ', floor surface ' + SURFACE, pct);
           lowest = Math.max(lowest, edge);
         });
+        // A foot, ankle, toe or knee must not PASS THROUGH a box prop (a plyo box, a step) on the way between two
+        // legal key poses: a foot that travels in a straight line from the floor to the box top goes through its
+        // front face. Scoped to in-betweens whose two ends are both outside the box, so a bench the figure lies
+        // on or a seat its legs hang beside (a key pose that overlaps on purpose) is not flagged. Resting ON the
+        // top is fine (2.5 of tolerance, like the floor) and so is a limb beside it (1 of margin).
+        if (s > 0 && s < 6 && data.props) {
+          var j0 = solve(between(fr, nx, 0, view), view), j1 = solve(between(fr, nx, 1, view), view);
+          data.props.forEach(function (pr) {
+            if (!pr || pr.type !== 'box') return;
+            ['kneeL', 'kneeR', 'ankleL', 'ankleR', 'toeL', 'toeR'].forEach(function (n) {
+              var r = RADIUS[n];
+              var inBox = function (pt) { return pt.x + r - 1 > pr.x && pt.x - r + 1 < pr.x + pr.w && pt.y + r - 2.5 > pr.y && pt.y - r + 1 < pr.y + pr.h; };
+              if (inBox(jt[n]) && !inBox(j0[n]) && !inBox(j1[n])) {
+                note(worst, at, n, 'passes through a box', Math.min(jt[n].x + r - pr.x, pr.x + pr.w - jt[n].x + r), 'inside the box at x=' + jt[n].x.toFixed(1) + ', y=' + jt[n].y.toFixed(1) + ': lift it clear and over the edge', pct);
+              }
+            });
+          });
+        }
         if (view === 'side') {
           ['L', 'R'].forEach(function (sd) {
             hingeErrors(q, sd).forEach(function (h) { note(worst, at, h[0], h[1], Math.abs(h[2]), h[3], pct); });

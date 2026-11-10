@@ -1,0 +1,80 @@
+{
+ "version": 2,
+ "title": "A-Skip",
+ "view": "side",
+ "grounded": false,
+ "highlight": [
+  "hipL",
+  "hipR"
+ ],
+ "frames": [
+  {
+   "duration": 260,
+   "label": "Drive the left knee up, opposite arm forward",
+   "hold": 60,
+   "pose": {
+    "torso": 174,
+    "head": 176,
+    "thighL": 88,
+    "shinL": 4,
+    "footL": 74,
+    "thighR": -6,
+    "shinR": -8,
+    "footR": 40,
+    "upperArmL": -50,
+    "forearmL": 40,
+    "upperArmR": 50,
+    "forearmR": 140,
+    "root": {
+     "x": 50,
+     "y": 46
+    }
+   }
+  },
+  {
+   "duration": 200,
+   "label": "Small hop on the right foot",
+   "air": true,
+   "hold": 0,
+   "pose": {
+    "root": {
+     "x": 50,
+     "y": 39
+    }
+   }
+  },
+  {
+   "duration": 260,
+   "label": "Drive the right knee up",
+   "hold": 60,
+   "pose": {
+    "thighL": -6,
+    "shinL": -8,
+    "footL": 40,
+    "thighR": 88,
+    "shinR": 4,
+    "footR": 74,
+    "upperArmL": 50,
+    "forearmL": 140,
+    "upperArmR": -50,
+    "forearmR": 40,
+    "root": {
+     "x": 50,
+     "y": 46
+    }
+   }
+  },
+  {
+   "duration": 200,
+   "label": "Small hop on the left foot",
+   "air": true,
+   "hold": 0,
+   "pose": {
+    "root": {
+     "x": 50,
+     "y": 39
+    }
+   }
+  }
+ ]
+}

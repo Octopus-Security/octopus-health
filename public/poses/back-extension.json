@@ -1,0 +1,72 @@
+{
+ "version": 2,
+ "title": "Back Extension (bench)",
+ "view": "side",
+ "grounded": false,
+ "anchor": {
+  "joint": "ankleL",
+  "x": 20,
+  "y": 78
+ },
+ "props": [
+  {
+   "type": "box",
+   "x": 42,
+   "y": 58,
+   "w": 14,
+   "h": 10
+  },
+  {
+   "type": "bar",
+   "x1": 49,
+   "y1": 68,
+   "x2": 49,
+   "y2": 92
+  },
+  {
+   "type": "box",
+   "x": 10,
+   "y": 80,
+   "w": 14,
+   "h": 12
+  }
+ ],
+ "highlight": [
+  "spine",
+  "hipL"
+ ],
+ "frames": [
+  {
+   "duration": 1200,
+   "label": "Straight line from head to heels",
+   "hold": 400,
+   "pose": {
+    "torso": 135,
+    "head": 135,
+    "upperArmL": -45,
+    "forearmL": 90,
+    "upperArmR": -45,
+    "forearmR": 90,
+    "thighL": -45,
+    "shinL": -45,
+    "footL": 45,
+    "thighR": -45,
+    "shinR": -45,
+    "footR": 45
+   }
+  },
+  {
+   "duration": 1500,
+   "label": "Hinge down until the hamstrings stretch",
+   "hold": 200,
+   "pose": {
+    "torso": 20,
+    "head": 40,
+    "upperArmL": -160,
+    "forearmL": -25,
+    "upperArmR": -160,
+    "forearmR": -25
+   }
+  }
+ ]
+}
