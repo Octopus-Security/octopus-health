@@ -1,0 +1,80 @@
+{
+ "version": 2,
+ "title": "Butt Kicks",
+ "view": "side",
+ "grounded": false,
+ "highlight": [
+  "kneeL",
+  "kneeR"
+ ],
+ "frames": [
+  {
+   "duration": 220,
+   "label": "Left heel kicks up to the glute",
+   "hold": 0,
+   "pose": {
+    "torso": 174,
+    "head": 176,
+    "thighL": 12,
+    "shinL": -140,
+    "footL": -10,
+    "thighR": -4,
+    "shinR": -4,
+    "footR": 45,
+    "upperArmL": -40,
+    "forearmL": 50,
+    "upperArmR": 40,
+    "forearmR": 130,
+    "root": {
+     "x": 50,
+     "y": 46
+    }
+   }
+  },
+  {
+   "duration": 160,
+   "label": "Hop",
+   "air": true,
+   "hold": 0,
+   "pose": {
+    "root": {
+     "x": 50,
+     "y": 40
+    }
+   }
+  },
+  {
+   "duration": 220,
+   "label": "Right heel kicks up",
+   "hold": 0,
+   "pose": {
+    "thighL": -4,
+    "shinL": -4,
+    "footL": 45,
+    "thighR": 12,
+    "shinR": -140,
+    "footR": -10,
+    "upperArmL": 40,
+    "forearmL": 130,
+    "upperArmR": -40,
+    "forearmR": 50,
+    "root": {
+     "x": 50,
+     "y": 46
+    }
+   }
+  },
+  {
+   "duration": 160,
+   "label": "Hop",
+   "air": true,
+   "hold": 0,
+   "pose": {
+    "root": {
+     "x": 50,
+     "y": 40
+    }
+   }
+  }
+ ]
+}

@@ -21,7 +21,8 @@ const VARIANTS = [
   ['walking-lunge-db', 'walking-lunge', 'dumbbell', 'Dumbbell Walking Lunge'],
   ['goblet-squat-plate', 'goblet-squat', null, 'Plate Goblet Squat'],
   ['upright-row-barbell', 'upright-row', 'barbell', 'Barbell Upright Row'],
-  ['incline-press-barbell', 'incline-press', 'barbell', 'Barbell Incline Bench Press'],
+  ['incline-press-barbell', 'incline-press', 'barbell', 'Barbell Incline Bench Press', { labels: ['Bar at the upper chest, full stretch', 'Press up to lockout'] }],
+  ['incline-press-smith', 'incline-press', null, 'Smith Machine Incline Press', { labels: ['Bar at the upper chest, full stretch', 'Press up to lockout'] }],
   ['step-up-db', 'step-up', 'dumbbell', 'Dumbbell Step-up', { arms: 'down' }],
   ['step-up-barbell', 'step-up', 'barbell', 'Barbell Step-up', { arms: 'back' }],   // bar on the upper back: elbows down and behind
   ['bulgarian-split-squat-bare', 'bulgarian-split-squat', null, 'Bulgarian Split Squat'],
@@ -64,6 +65,7 @@ for (const [key, base, hold, title, patch] of VARIANTS) {
       : { upperArmL: 0, forearmL: 0, upperArmR: 0, forearmR: 0 };
     o.frames = o.frames.map((f) => ({ ...f, pose: { ...f.pose, ...A } }));
   }
+  if (patch && patch.labels) o.frames = o.frames.map((f, i) => (patch.labels[i] ? { ...f, label: patch.labels[i] } : f));
   if (patch && patch.ball) {
     if (o.props) o.props = o.props.map((p) => (p.type === 'roller' ? { ...p, type: 'ball' } : p));
     if (o.frames) o.frames = o.frames.map((f) => (f.label ? { ...f, label: f.label.replace(/Roller/g, 'Ball').replace(/roller/g, 'ball') } : f));

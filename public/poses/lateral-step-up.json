@@ -1,0 +1,103 @@
+{
+ "version": 2,
+ "title": "Lateral Step-up",
+ "view": "front",
+ "grounded": false,
+ "props": [
+  {
+   "type": "box",
+   "x": 58,
+   "y": 72,
+   "w": 34,
+   "h": 20
+  }
+ ],
+ "highlight": [
+  "kneeL",
+  "hipL"
+ ],
+ "frames": [
+  {
+   "duration": 700,
+   "label": "Stand beside the box",
+   "anchor": {
+    "joint": "ankleR",
+    "x": 38,
+    "y": 90
+   },
+   "hold": 250,
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "thighL": 4,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": -4,
+    "shinR": 0,
+    "footR": -90,
+    "upperArmL": 10,
+    "forearmL": -5,
+    "upperArmR": -10,
+    "forearmR": 5
+   }
+  },
+  {
+   "duration": 700,
+   "label": "Plant the near foot on the box",
+   "anchor": {
+    "joint": "ankleR",
+    "x": 38,
+    "y": 90
+   },
+   "pose": {
+    "torso": 178,
+    "head": 178,
+    "thighL": 70,
+    "shinL": -12,
+    "footL": 90,
+    "thighR": -6,
+    "shinR": -2,
+    "footR": -90
+   }
+  },
+  {
+   "duration": 800,
+   "label": "Press up until the leg is straight",
+   "anchor": {
+    "joint": "ankleL",
+    "x": 74,
+    "y": 70
+   },
+   "hold": 250,
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "thighL": 0,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": -12,
+    "shinR": -3,
+    "footR": -90
+   }
+  },
+  {
+   "duration": 900,
+   "label": "Lower back down with control",
+   "anchor": {
+    "joint": "ankleL",
+    "x": 74,
+    "y": 70
+   },
+   "pose": {
+    "torso": 178,
+    "head": 178,
+    "thighL": 45,
+    "shinL": -5,
+    "footL": 90,
+    "thighR": -5,
+    "shinR": -2,
+    "footR": -90
+   }
+  }
+ ]
+}

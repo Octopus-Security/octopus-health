@@ -12,7 +12,7 @@
    "label": "Crouch, arms swing back",
    "anchor": {
     "joint": "ankleL",
-    "x": 24,
+    "x": 20,
     "y": 90
    },
    "pose": {
@@ -31,12 +31,12 @@
    }
   },
   {
-   "duration": 300,
+   "duration": 280,
    "label": "Drive out: arms swing forward",
    "hold": 0,
    "anchor": {
     "joint": "toeL",
-    "x": 32,
+    "x": 28,
     "y": 90.3
    },
    "pose": {
@@ -55,26 +55,50 @@
    }
   },
   {
-   "duration": 450,
-   "label": "Fly, knees coming up to land",
+   "duration": 380,
+   "label": "Flight: body fully extended",
+   "air": true,
+   "hold": 100,
+   "pose": {
+    "torso": 130,
+    "head": 135,
+    "thighL": -50,
+    "shinL": -50,
+    "footL": 40,
+    "thighR": -50,
+    "shinR": -50,
+    "footR": 40,
+    "upperArmL": 150,
+    "forearmL": 160,
+    "upperArmR": 150,
+    "forearmR": 160,
+    "root": {
+     "x": 36,
+     "y": 34
+    }
+   }
+  },
+  {
+   "duration": 380,
+   "label": "Flight: knees swing forward to land",
    "air": true,
    "hold": 0,
    "pose": {
-    "torso": 140,
-    "head": 150,
-    "thighL": 65,
+    "torso": 150,
+    "head": 155,
+    "thighL": 75,
     "shinL": -5,
     "footL": 75,
-    "thighR": 65,
+    "thighR": 75,
     "shinR": -5,
     "footR": 75,
-    "upperArmL": 50,
-    "forearmL": 60,
-    "upperArmR": 50,
-    "forearmR": 60,
+    "upperArmL": 80,
+    "forearmL": 90,
+    "upperArmR": 80,
+    "forearmR": 90,
     "root": {
-     "x": 50,
-     "y": 46
+     "x": 52,
+     "y": 38
     }
    }
   },
@@ -129,7 +153,7 @@
    "label": "Walk back and reset",
    "anchor": {
     "joint": "ankleL",
-    "x": 24,
+    "x": 20,
     "y": 90
    },
    "pose": {}

@@ -1,0 +1,94 @@
+{
+ "version": 2,
+ "title": "Backpedal",
+ "view": "side",
+ "grounded": false,
+ "highlight": [
+  "hipL",
+  "kneeL",
+  "hipR",
+  "kneeR"
+ ],
+ "frames": [
+  {
+   "duration": 260,
+   "label": "Low and balanced, left foot reaches back",
+   "hold": 0,
+   "pose": {
+    "torso": 164,
+    "head": 170,
+    "thighL": -24,
+    "shinL": -34,
+    "footL": 48,
+    "thighR": 38,
+    "shinR": 8,
+    "footR": 80,
+    "upperArmL": -50,
+    "forearmL": 40,
+    "upperArmR": 50,
+    "forearmR": 130,
+    "root": {
+     "x": 50,
+     "y": 51
+    }
+   }
+  },
+  {
+   "duration": 200,
+   "label": "Feet pass under the hips",
+   "air": true,
+   "hold": 0,
+   "pose": {
+    "thighL": 5,
+    "shinL": -20,
+    "footL": 70,
+    "thighR": 5,
+    "shinR": -20,
+    "footR": 70,
+    "root": {
+     "x": 50,
+     "y": 47
+    }
+   }
+  },
+  {
+   "duration": 260,
+   "label": "Right foot reaches back",
+   "hold": 0,
+   "pose": {
+    "thighL": 38,
+    "shinL": 8,
+    "footL": 80,
+    "thighR": -24,
+    "shinR": -34,
+    "footR": 48,
+    "upperArmL": 50,
+    "forearmL": 130,
+    "upperArmR": -50,
+    "forearmR": 40,
+    "root": {
+     "x": 50,
+     "y": 51
+    }
+   }
+  },
+  {
+   "duration": 200,
+   "label": "Feet pass under the hips",
+   "air": true,
+   "hold": 0,
+   "pose": {
+    "thighL": 5,
+    "shinL": -20,
+    "footL": 70,
+    "thighR": 5,
+    "shinR": -20,
+    "footR": 70,
+    "root": {
+     "x": 50,
+     "y": 47
+    }
+   }
+  }
+ ]
+}

@@ -26,7 +26,7 @@
  "frames": [
   {
    "duration": 900,
-   "label": "Dumbbells at the chest, full stretch",
+   "label": "Bar at the upper chest, full stretch",
    "anchor": {
     "joint": "ankleL",
     "x": 76,
@@ -49,7 +49,7 @@
   },
   {
    "duration": 1000,
-   "label": "Press up and slightly together",
+   "label": "Press up to lockout",
    "anchor": {
     "joint": "ankleL",
     "x": 76,

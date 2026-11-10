@@ -2,9 +2,10 @@
  "version": 2,
  "title": "Side-Lying Shoulder Internal Rotation",
  "view": "front",
+ "hold": "dumbbellL",
  "highlight": [
-  "shoulderR",
-  "elbowR"
+  "shoulderL",
+  "elbowL"
  ],
  "frames": [
   {
@@ -15,9 +16,9 @@
     "torso": -90,
     "head": -90,
     "upperArmL": 90,
-    "forearmL": 90,
+    "forearmL": 180,
     "upperArmR": 90,
-    "forearmR": 180,
+    "forearmR": 90,
     "thighL": 80,
     "shinL": -100,
     "footL": -100,
@@ -25,9 +26,9 @@
     "shinR": -100,
     "footR": -100,
     "depth": {
-     "forearmR": 1,
-     "upperArmL": 0.35,
-     "forearmL": 0.35
+     "forearmL": 1,
+     "upperArmR": 0.35,
+     "forearmR": 0.35
     },
     "root": {
      "x": 52,
@@ -40,9 +41,9 @@
    "label": "Rotate the forearm in toward the stomach",
    "hold": 500,
    "pose": {
-    "forearmR": 100,
+    "forearmL": 100,
     "depth": {
-     "forearmR": 0.3
+     "forearmL": 0.3
     }
    }
   }

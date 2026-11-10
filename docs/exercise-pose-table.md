@@ -426,11 +426,11 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | library | Incline Dumbbell Fly | Incline Dumbbell Fly | strength | chest-fly | rule |
 | library | Cable Crossover | Cable Crossover | strength | chest-fly | rule |
 | library | Barbell Incline Bench Press | Barbell Incline Bench Press | strength | incline-press-barbell | rule |
-| library | Barbell Decline Bench Press | Barbell Decline Bench Press | strength | bench-press | rule |
+| library | Barbell Decline Bench Press | Barbell Decline Bench Press | strength | decline-press-barbell | rule |
 | library | Barbell Close-Grip Bench Press | Barbell Close-Grip Bench Press | strength | bench-press | rule |
 | library | Barbell Wide-Grip Bench Press | Barbell Wide-Grip Bench Press | strength | bench-press | rule |
 | library | Smith Machine Bench Press | Smith Machine Bench Press | strength | chest-press | rule |
-| library | Smith Machine Incline Bench Press | Smith Machine Incline Bench Press | strength | chest-press | rule |
+| library | Smith Machine Incline Bench Press | Smith Machine Incline Bench Press | strength | incline-press-smith | rule |
 | library | Smith Machine Decline Bench Press | Smith Machine Decline Bench Press | strength | chest-press | rule |
 | library | Standing Cable Chest Press | Standing Cable Chest Press | strength | chest-press | rule |
 | library | Knee Push-up | Knee Push-up | strength | push-up | rule |
@@ -516,7 +516,7 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | library | Jumping Lunge | Jumping Lunge | conditioning | split-jump | rule |
 | library | Dumbbell Step-Up | Dumbbell Step-Up | strength | step-up-db | rule |
 | library | Barbell Step-Up | Barbell Step-Up | strength | step-up-barbell | rule |
-| library | Lateral Step-Up | Lateral Step-Up | strength | step-up | rule |
+| library | Lateral Step-Up | Lateral Step-Up | strength | lateral-step-up | rule |
 | library | Step-Up | Step-Up | strength | step-up | rule |
 | library | Single-Leg Glute Bridge | Single-Leg Glute Bridge | strength | glute-bridge | rule |
 | library | Leg Press (45-Degree) | Leg Press (45-Degree) | strength | leg-press | rule |
@@ -539,7 +539,7 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | library | Barbell Push Jerk | Barbell Push Jerk | strength | overhead-press | rule |
 | library | Standing Broad Jump | Standing Broad Jump | conditioning | broad-jump | rule |
 | library | Tuck Jump | Tuck Jump | conditioning | tuck-jump | rule |
-| library | Vertical Jump | Vertical Jump | conditioning | jump-squat | rule |
+| library | Vertical Jump | Vertical Jump | conditioning | vertical-jump | rule |
 | library | Alternating Split-Squat Jump | Alternating Split-Squat Jump | conditioning | split-jump | rule |
 | library | Depth Jump | Depth Jump | conditioning | depth-jump | rule |
 | library | Lateral Hop | Lateral Hop | conditioning | lateral-hop | rule |
@@ -547,10 +547,10 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | library | Jump Burpee | Jump Burpee | conditioning | burpee | rule |
 | library | Spider Crawl | Spider Crawl | conditioning | bear-crawl | rule |
 | library | Pike Walk | Pike Walk | conditioning | downward-dog | rule |
-| library | Lateral Shuffle | Lateral Shuffle | conditioning | run | rule |
-| library | Backpedal | Backpedal | conditioning | run | rule |
-| library | A-Skip | A-Skip | conditioning | run | rule |
-| library | Butt Kicks | Butt Kicks | conditioning | run | rule |
+| library | Lateral Shuffle | Lateral Shuffle | conditioning | lateral-shuffle | rule |
+| library | Backpedal | Backpedal | conditioning | backpedal | rule |
+| library | A-Skip | A-Skip | conditioning | a-skip | rule |
+| library | Butt Kicks | Butt Kicks | conditioning | butt-kicks | rule |
 | library | Zigzag Run | Zigzag Run | conditioning | run | rule |
 | library | Stair Run | Stair Run | cardio | run | rule |
 | library | Run (Outdoor) | Run (Outdoor) | cardio | run | rule |

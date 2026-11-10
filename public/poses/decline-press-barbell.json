@@ -1,0 +1,62 @@
+{
+ "version": 2,
+ "title": "Barbell Decline Bench Press",
+ "view": "side",
+ "hold": "barbell",
+ "grounded": false,
+ "anchor": {
+  "joint": "ankleL",
+  "x": 71,
+  "y": 77
+ },
+ "props": [
+  {
+   "type": "bar",
+   "x1": 14,
+   "y1": 81,
+   "x2": 72,
+   "y2": 66
+  },
+  {
+   "type": "bar",
+   "x1": 75,
+   "y1": 70,
+   "x2": 75,
+   "y2": 84
+  }
+ ],
+ "highlight": [
+  "shoulderL",
+  "elbowL"
+ ],
+ "frames": [
+  {
+   "duration": 1300,
+   "label": "Lockout over the lower chest",
+   "pose": {
+    "torso": -75,
+    "head": -73,
+    "upperArmL": 180,
+    "forearmL": 180,
+    "upperArmR": 180,
+    "forearmR": 180,
+    "thighL": 100,
+    "shinL": -20,
+    "footL": 90,
+    "thighR": 100,
+    "shinR": -20,
+    "footR": 90
+   }
+  },
+  {
+   "duration": 800,
+   "label": "Bar to the lower chest",
+   "pose": {
+    "upperArmL": 100,
+    "forearmL": 180,
+    "upperArmR": 100,
+    "forearmR": 180
+   }
+  }
+ ]
+}
