@@ -1,0 +1,12 @@
+{
+ "version": 2,
+ "title": "Scapular Pull-up",
+ "view": "side",
+ "grounded": false,
+ "props": [{"type":"bar","x1":36,"y1":-3,"x2":84,"y2":-3}],
+ "highlight": ["shoulderL","spine"],
+ "frames": [
+  {"duration":1400,"label":"Passive hang, shoulders up by the ears","pins":["handR"],"anchor":{"joint":"handL","x":60,"y":-3},"pose":{"torso":180,"head":180,"upperArmL":180,"forearmL":180,"thighL":5,"shinL":-85,"footL":0,"upperArmR":180,"forearmR":180,"thighR":5,"shinR":-85,"footR":0,"shrug":4}},
+  {"duration":1100,"label":"Pull the shoulders down, arms still straight","hold":400,"pins":["handR"],"anchor":{"joint":"handL","x":60,"y":-3},"pose":{"torso":180,"head":180,"upperArmL":180,"forearmL":180,"thighL":22,"shinL":-70,"footL":0,"upperArmR":180,"forearmR":180,"thighR":22,"shinR":-70,"footR":0,"shrug":0}}
+ ]
+}

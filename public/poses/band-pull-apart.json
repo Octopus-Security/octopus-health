@@ -1,0 +1,10 @@
+{
+ "version": 2,
+ "title": "Band Pull-Apart",
+ "view": "front",
+ "highlight": ["shoulderL","shoulderR"],
+ "frames": [
+  {"duration":1100,"label":"Arms forward, hands together","hold":300,"pose":{"torso":180,"head":180,"upperArmL":22,"forearmL":-8,"upperArmR":-22,"forearmR":8,"thighL":5,"shinL":0,"footL":90,"thighR":-5,"shinR":0,"footR":-90,"depth":{"upperArmL":0.55,"forearmL":0.55,"upperArmR":0.55,"forearmR":0.55},"root":{"x":50,"y":50}}},
+  {"duration":1000,"label":"Pull the band apart to a T","hold":500,"pose":{"torso":180,"head":180,"upperArmL":90,"forearmL":90,"upperArmR":-90,"forearmR":-90,"thighL":5,"shinL":0,"footL":90,"thighR":-5,"shinR":0,"footR":-90,"depth":{"upperArmL":1,"forearmL":1,"upperArmR":1,"forearmR":1}}}
+ ]
+}

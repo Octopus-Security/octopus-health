@@ -166,12 +166,13 @@ test('poses: each new exercise maps to a pose that exists, or deliberately to no
     if (k === null) { none.push(n); continue; }
     assert.ok(fs.existsSync(path.join(POSES, k + '.json')), `${n} -> ${k}`);
   }
-  assert.ok(none.length >= 20, 'most of the new set has no figure yet; step 5 authors them');
+  assert.ok(none.length >= 3, 'the foot drills the stick figure cannot show stay on a null rule');
   // the three that MUST NOT fall through to a looser rule
-  assert.strictEqual(PM.match('Lacrosse Ball Upper Trap Wall Roll'), null, 'not the neck stretch');
-  assert.strictEqual(PM.match('Band Wrist Curl'), null, 'not the wrist circle');
-  assert.strictEqual(PM.match('Spanish Squat'), null, 'not a free squat');
-  assert.strictEqual(PM.keyFor('Band Wrist Curl', 'strength'), 'squat', 'null falls to the category figure, like Tuck L-sit Hold');
+  // each of these used to be a null rule (no figure); they now have their own, and must still not fall to a looser rule
+  assert.strictEqual(PM.match('Lacrosse Ball Upper Trap Wall Roll'), 'wall-ball-roll', 'not the neck stretch');
+  assert.strictEqual(PM.match('Band Wrist Curl'), 'wrist-curl', 'not the wrist circle');
+  assert.strictEqual(PM.match('Spanish Squat'), 'spanish-squat', 'not a free squat');
+  assert.strictEqual(PM.match('Toe Yoga'), null, 'a toe drill the stick figure cannot show stays on a null rule');
   assert.ok(!PM.keys().includes(null) && !PM.keys().includes('null'));
 });
 

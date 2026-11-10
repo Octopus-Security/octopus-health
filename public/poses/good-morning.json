@@ -1,0 +1,11 @@
+{
+ "version": 2,
+ "title": "Barbell Good Morning",
+ "view": "side",
+ "hold": "barbell",
+ "highlight": ["hipL","spine"],
+ "frames": [
+  {"duration":1100,"label":"Stand tall, bar on the upper back","anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":180,"head":180,"upperArmL":-60,"forearmL":90,"thighL":0,"shinL":0,"footL":90,"upperArmR":-60,"forearmR":90,"thighR":0,"shinR":0,"footR":90}},
+  {"duration":1100,"label":"Hips back, back flat, knees soft","hold":350,"anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":110,"head":130,"upperArmL":-130,"forearmL":20,"thighL":10,"shinL":-12,"footL":80,"upperArmR":-130,"forearmR":20,"thighR":10,"shinR":-12,"footR":80}}
+ ]
+}

@@ -1,0 +1,10 @@
+{
+ "version": 2,
+ "title": "Behind-the-Back Chest Opener",
+ "view": "side",
+ "highlight": ["shoulderL","shoulderR"],
+ "frames": [
+  {"duration":1500,"label":"Hands clasped low, behind the back","hold":300,"anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":180,"head":180,"upperArmL":-12,"forearmL":-12,"thighL":0,"shinL":0,"footL":90,"upperArmR":-12,"forearmR":-12,"thighR":0,"shinR":0,"footR":90}},
+  {"duration":1500,"label":"Straight arms lift, chest opens, eyes level","hold":700,"pose":{"torso":184,"head":186,"upperArmL":-52,"forearmL":-52,"thighL":0,"shinL":0,"footL":90,"upperArmR":-52,"forearmR":-52,"thighR":0,"shinR":0,"footR":90}}
+ ]
+}

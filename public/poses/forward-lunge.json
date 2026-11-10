@@ -1,0 +1,11 @@
+{
+ "version": 2,
+ "title": "Forward Lunge",
+ "view": "side",
+ "highlight": ["kneeL","hipL"],
+ "frames": [
+  {"duration":700,"label":"Stand, feet together","hold":300,"anchor":{"joint":"toeR","x":35,"y":91},"pose":{"torso":180,"head":180,"upperArmL":0,"forearmL":0,"thighL":0,"shinL":0,"footL":90,"upperArmR":0,"forearmR":0,"thighR":0,"shinR":0,"footR":90}},
+  {"duration":500,"label":"Step forward","hold":0,"anchor":{"joint":"toeR","x":35,"y":91},"pose":{"torso":180,"head":180,"upperArmL":0,"forearmL":0,"thighL":40,"shinL":15,"footL":90,"upperArmR":0,"forearmR":0,"thighR":0,"shinR":0,"footR":90}},
+  {"duration":700,"label":"Lower: front shin vertical, back knee near the floor","hold":500,"anchor":{"joint":"toeR","x":35,"y":91},"pose":{"torso":180,"head":180,"upperArmL":0,"forearmL":0,"thighL":84.4,"shinL":5.7,"footL":90,"upperArmR":0,"forearmR":0,"thighR":-5,"shinR":-97,"footR":40}}
+ ]
+}

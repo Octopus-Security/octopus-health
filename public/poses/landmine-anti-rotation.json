@@ -1,0 +1,10 @@
+{
+ "version": 2,
+ "title": "Landmine Anti-Rotation",
+ "view": "side",
+ "highlight": ["spine","shoulderL"],
+ "frames": [
+  {"duration":1000,"label":"Bar at the chest, feet planted","hold":300,"anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":180,"head":180,"upperArmL":35,"forearmL":140,"thighL":5,"shinL":-5,"footL":85,"upperArmR":35,"forearmR":140,"thighR":5,"shinR":-5,"footR":85}},
+  {"duration":1000,"label":"Press out, brace, do not twist","hold":600,"anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":180,"head":180,"upperArmL":80,"forearmL":85,"thighL":5,"shinL":-5,"footL":85,"upperArmR":80,"forearmR":85,"thighR":5,"shinR":-5,"footR":85}}
+ ]
+}

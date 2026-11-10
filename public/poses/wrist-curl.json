@@ -1,0 +1,11 @@
+{
+ "version": 2,
+ "title": "Wrist Curl",
+ "view": "side",
+ "props": [{"type":"box","x":16,"y":70,"w":34,"h":22}],
+ "highlight": ["elbowL","hand"],
+ "frames": [
+  {"duration":900,"label":"Forearm on the thigh, hand past the knee","hold":300,"anchor":{"joint":"ankleL","x":60,"y":90},"pose":{"torso":135,"head":150,"upperArmL":0,"forearmL":92,"thighL":90,"shinL":0,"footL":90,"upperArmR":0,"forearmR":92,"thighR":90,"shinR":0,"footR":90}},
+  {"duration":900,"label":"Curl the hand up, forearm stays down","hold":300,"anchor":{"joint":"ankleL","x":60,"y":90},"pose":{"torso":135,"head":150,"upperArmL":0,"forearmL":66,"thighL":90,"shinL":0,"footL":90,"upperArmR":0,"forearmR":66,"thighR":90,"shinR":0,"footR":90}}
+ ]
+}

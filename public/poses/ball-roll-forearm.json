@@ -1,0 +1,11 @@
+{
+ "version": 2,
+ "title": "Forearm Ball Roll",
+ "view": "side",
+ "props": [{"type":"box","x":38,"y":42,"w":58,"h":50},{"type":"ball","x":60,"y":38.5,"r":3}],
+ "highlight": ["elbowL","hand"],
+ "frames": [
+  {"duration":1600,"label":"Forearm on the ball, hand toward you","hold":300,"anchor":{"joint":"ankleL","x":35,"y":90},"pose":{"torso":150,"head":158,"upperArmL":0,"forearmL":90,"thighL":0,"shinL":0,"footL":90,"upperArmR":0,"forearmR":90,"thighR":0,"shinR":0,"footR":90}},
+  {"duration":1600,"label":"Lean forward: the ball rolls toward the elbow","hold":300,"anchor":{"joint":"ankleL","x":35,"y":90},"pose":{"torso":128,"head":140,"upperArmL":60,"forearmL":92,"thighL":0,"shinL":0,"footL":90,"upperArmR":60,"forearmR":92,"thighR":0,"shinR":0,"footR":90}}
+ ]
+}

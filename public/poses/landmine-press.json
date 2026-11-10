@@ -1,0 +1,10 @@
+{
+ "version": 2,
+ "title": "Landmine Press",
+ "view": "side",
+ "highlight": ["shoulderL","elbowL"],
+ "frames": [
+  {"duration":900,"label":"Bar end at the shoulder, knees soft","hold":300,"anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":180,"head":180,"upperArmL":30,"forearmL":160,"thighL":10,"shinL":-10,"footL":80,"upperArmR":0,"forearmR":0,"thighR":10,"shinR":-10,"footR":80}},
+  {"duration":900,"label":"Press up and forward, legs straighten","hold":450,"anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":180,"head":180,"upperArmL":150,"forearmL":155,"thighL":0,"shinL":0,"footL":90,"upperArmR":0,"forearmR":0,"thighR":0,"shinR":0,"footR":90}}
+ ]
+}

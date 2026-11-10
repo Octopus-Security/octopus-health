@@ -1,0 +1,10 @@
+{
+ "version": 2,
+ "title": "Quadruped Wrist Rocks",
+ "view": "side",
+ "highlight": ["hand","elbowL"],
+ "frames": [
+  {"duration":1400,"label":"All fours, shoulders over the wrists","hold":300,"anchor":{"joint":"kneeL","x":30,"y":89.5},"pose":{"torso":104,"head":150,"upperArmL":0,"forearmL":0,"thighL":0,"shinL":-90,"footL":-72,"upperArmR":0,"forearmR":0,"thighR":0,"shinR":-90,"footR":-72}},
+  {"duration":1400,"label":"Rock forward past the wrists, palms stay down","hold":500,"anchor":{"joint":"kneeL","x":30,"y":89.5},"pose":{"torso":104,"head":150,"upperArmL":-12,"forearmL":-12,"thighL":-18,"shinL":-90,"footL":-72,"upperArmR":-12,"forearmR":-12,"thighR":-18,"shinR":-90,"footR":-72}}
+ ]
+}

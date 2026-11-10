@@ -1,0 +1,10 @@
+{
+ "version": 2,
+ "title": "Single-Leg Romanian Deadlift",
+ "view": "side",
+ "highlight": ["hipL","spine"],
+ "frames": [
+  {"duration":1000,"label":"Stand on one leg","hold":300,"anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":180,"head":180,"upperArmL":0,"forearmL":0,"thighL":0,"shinL":0,"footL":90,"upperArmR":0,"forearmR":0,"thighR":0,"shinR":0,"footR":90}},
+  {"duration":1300,"label":"Hinge: back leg and torso make one line","hold":400,"anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":100,"head":115,"upperArmL":5,"forearmL":5,"thighL":12,"shinL":-3,"footL":90,"upperArmR":5,"forearmR":5,"thighR":-80,"shinR":-80,"footR":10}}
+ ]
+}

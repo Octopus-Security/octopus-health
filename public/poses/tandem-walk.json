@@ -1,0 +1,12 @@
+{
+ "version": 2,
+ "title": "Heel-to-Toe Walk",
+ "view": "side",
+ "highlight": ["ankleL","ankleR"],
+ "frames": [
+  {"duration":600,"label":"Left heel placed in front of the right toes","hold":250,"pose":{"torso":180,"head":180,"upperArmL":20,"forearmL":25,"thighL":8,"shinL":8,"footL":100,"upperArmR":20,"forearmR":25,"thighR":-8,"shinR":-8,"footR":85,"root":{"x":50,"y":50.4}}},
+  {"duration":450,"label":"Right foot swings through, close to the line","hold":0,"pose":{"torso":180,"head":180,"upperArmL":20,"forearmL":25,"thighL":0,"shinL":0,"footL":90,"upperArmR":20,"forearmR":25,"thighR":12,"shinR":-12,"footR":80,"root":{"x":50,"y":50}}},
+  {"duration":600,"label":"Right heel placed in front of the left toes","hold":250,"pose":{"torso":180,"head":180,"upperArmL":20,"forearmL":25,"thighL":-8,"shinL":-8,"footL":85,"upperArmR":20,"forearmR":25,"thighR":8,"shinR":8,"footR":100,"root":{"x":50,"y":50.4}}},
+  {"duration":450,"label":"Left foot swings through, close to the line","hold":0,"pose":{"torso":180,"head":180,"upperArmL":20,"forearmL":25,"thighL":12,"shinL":-12,"footL":80,"upperArmR":20,"forearmR":25,"thighR":0,"shinR":0,"footR":90,"root":{"x":50,"y":50}}}
+ ]
+}

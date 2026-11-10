@@ -1,0 +1,11 @@
+{
+ "version": 2,
+ "title": "Barbell Front Squat",
+ "view": "side",
+ "hold": "barbell",
+ "highlight": ["kneeL","hipL"],
+ "frames": [
+  {"duration":1100,"label":"Stand, bar racked on the shoulders","anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":180,"head":180,"upperArmL":95,"forearmL":180,"thighL":0,"shinL":0,"footL":90,"upperArmR":95,"forearmR":180,"thighR":0,"shinR":0,"footR":90}},
+  {"duration":900,"label":"Sit down, torso stays tall","hold":350,"anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":152,"head":160,"upperArmL":67,"forearmL":152,"thighL":85,"shinL":-30,"footL":90,"upperArmR":67,"forearmR":152,"thighR":85,"shinR":-30,"footR":90}}
+ ]
+}

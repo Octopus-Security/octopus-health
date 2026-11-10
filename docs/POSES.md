@@ -208,9 +208,20 @@ hip-bump and turkish-get-up (it edits the JSON in place, so always run the pair 
 
 Partner techniques (chokes, passes, sweeps) share the generic `guard` / `grappling-base`
 figures; the elbow and knee variants share `elbow-strike` / `knee-strike` apart from the
-upward elbow; Decline Dumbbell Press uses the flat bench; Rear Delt Fly uses the front-view
-fly; Concentration Curl uses the standing curl; Seated Spine Rotation is shown side-on as
-one elbow forward and one back. Everything else has a figure of its own.
+upward elbow; Decline Dumbbell Press uses the flat bench; Rear Delt Fly is drawn from the front with the
+torso foreshortened (a flat side view cannot show the arms sweeping wide); Arnold Press does not show the
+palms turning; Concentration Curl uses the standing curl; Seated Spine Rotation is shown side-on as
+one elbow forward and one back; the wrist curls move the forearm because the figure has no hand segment;
+the foot drills (Toe Yoga, Short Foot, Banded Ankle Eversion) have no figure because it has no toes or arch.
+Everything else has a figure of its own.
+
+## Same movement, different implement: `scripts/pose-variants.cjs`
+
+A barbell bench press and a dumbbell bench press are one movement but two figures, because the implement
+(`hold`) lives in the file and `test/exercise-guards.test.js` checks it against the exercise's equipment.
+The variants are GENERATED from a base pose by `node scripts/pose-variants.cjs` (a table of base, hold, title),
+so the movement cannot drift between them. Edit the base pose, run the script, commit both. `--check` fails if
+a variant file is stale. The hand-authored poses (and the specs behind them) are in `scripts/pose-specs/`.
 
 ## Checking your work
 

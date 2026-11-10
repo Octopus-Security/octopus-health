@@ -1,0 +1,11 @@
+{
+ "version": 2,
+ "title": "Spanish Squat",
+ "view": "side",
+ "props": [{"type":"bar","x1":48,"y1":70,"x2":98,"y2":70}],
+ "highlight": ["kneeL","hipL"],
+ "frames": [
+  {"duration":1100,"label":"Stand tall, band behind the knees","anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":180,"head":180,"upperArmL":50,"forearmL":50,"thighL":0,"shinL":0,"footL":90,"upperArmR":50,"forearmR":50,"thighR":0,"shinR":0,"footR":90}},
+  {"duration":1100,"label":"Sit back, shins stay vertical","hold":400,"anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":162,"head":172,"upperArmL":37,"forearmL":37,"thighL":85,"shinL":0,"footL":90,"upperArmR":37,"forearmR":37,"thighR":85,"shinR":0,"footR":90}}
+ ]
+}

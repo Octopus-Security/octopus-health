@@ -21,6 +21,11 @@ test('the committed pose table is current (run: node scripts/pose-table.mjs)', a
   assert.equal(fs.readFileSync(TABLE_PATH, 'utf8'), buildTable(), 'docs/exercise-pose-table.md is stale: run node scripts/pose-table.mjs and commit the diff');
 });
 
+test('generated pose variants are current (run: node scripts/pose-variants.cjs)', () => {
+  const r = require('child_process').spawnSync(process.execPath, [path.join(__dirname, '..', 'scripts', 'pose-variants.cjs'), '--check'], { encoding: 'utf8' });
+  assert.equal(r.status, 0, r.stderr || r.stdout);
+});
+
 test('the inventory covers the whole library and every mobility item', () => {
   assert.equal(rows.filter(r => r.source === 'library').length, INV.db.SEED_EXERCISES.length);
   assert.ok(rows.filter(r => r.source === 'mobility').length > 100);
@@ -32,13 +37,15 @@ test('a non-martial exercise on the category fallback must be on the allowlist',
 });
 
 // Rules from the audit: the implement the figure carries must match the exercise's equipment.
-const HOLD_EQ = { dumbbell: ['dumbbell'], dumbbellL: ['dumbbell'], barbell: ['barbell'], kettlebell: ['kettlebell'], kettlebellL: ['kettlebell'], ball: ['ball', 'sandbag'] };
+// `ball` is also how the ab wheel is drawn, hence 'roller'. The exercise NAME counts as evidence as well as the
+// equipment field ("Medicine Ball Slam" has equipment "none" but plainly holds a ball); a name never excuses the wrong implement.
+const HOLD_EQ = { dumbbell: ['dumbbell'], dumbbellL: ['dumbbell'], barbell: ['barbell'], kettlebell: ['kettlebell'], kettlebellL: ['kettlebell'], plate: ['plate'], ball: ['ball', 'sandbag', 'roller'] };
 test('the implement a figure holds matches the exercise equipment', () => {
   const bad = [];
   for (const r of rows.filter(x => x.source === 'library' && x.pose)) {
     const p = INV.loadPose(r.pose);
     const holds = new Set([p.hold, ...p.frames.map(f => f.hold)].filter(h => typeof h === 'string'));
-    const eq = (r.equipment || '').toLowerCase();
+    const eq = ((r.equipment || '') + ' ' + r.name).toLowerCase();
     for (const h of holds) if (!(HOLD_EQ[h] || []).some(x => eq.includes(x))) bad.push(`mismatch:${r.name}`);
     if (!holds.size && /^(dumbbell|barbell|kettlebell)$/.test(eq)) bad.push(`missing:${r.name}`);
   }

@@ -1,0 +1,10 @@
+{
+ "version": 2,
+ "title": "Lateral Lunge",
+ "view": "front",
+ "highlight": ["kneeL","hipL"],
+ "frames": [
+  {"duration":800,"label":"Stand tall","hold":300,"pose":{"torso":180,"head":180,"upperArmL":20,"forearmL":60,"upperArmR":-20,"forearmR":-60,"thighL":2,"shinL":2,"footL":90,"thighR":-2,"shinR":-2,"footR":-90,"root":{"x":50,"y":50}}},
+  {"duration":900,"label":"Step out and sit into the side leg, other leg straight","hold":500,"pose":{"torso":180,"head":180,"upperArmL":50,"forearmL":80,"upperArmR":-50,"forearmR":-80,"thighL":45,"shinL":0,"footL":90,"thighR":-30,"shinR":-30,"footR":-90,"root":{"x":56,"y":55.4}}}
+ ]
+}

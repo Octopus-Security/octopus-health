@@ -1,0 +1,12 @@
+{
+ "version": 2,
+ "title": "Single-Leg Reach",
+ "view": "side",
+ "highlight": ["ankleL","kneeL"],
+ "frames": [
+  {"duration":900,"label":"Stand on one leg, knee soft","hold":300,"anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":180,"head":180,"upperArmL":35,"forearmL":40,"thighL":0,"shinL":-8,"footL":82,"upperArmR":35,"forearmR":40,"thighR":0,"shinR":-8,"footR":82}},
+  {"duration":1100,"label":"Reach the free foot forward and tap","hold":400,"anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":180,"head":180,"upperArmL":35,"forearmL":40,"thighL":0,"shinL":-8,"footL":82,"upperArmR":35,"forearmR":40,"thighR":28.8,"shinR":26.4,"footR":90}},
+  {"duration":700,"label":"Back to centre","hold":200,"anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":180,"head":180,"upperArmL":35,"forearmL":40,"thighL":0,"shinL":-8,"footL":82,"upperArmR":35,"forearmR":40,"thighR":0,"shinR":-8,"footR":82}},
+  {"duration":1100,"label":"Reach the free foot behind and tap","hold":400,"anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":180,"head":180,"upperArmL":35,"forearmL":40,"thighL":0,"shinL":-8,"footL":82,"upperArmR":35,"forearmR":40,"thighR":-32.3,"shinR":-34.6,"footR":60}}
+ ]
+}

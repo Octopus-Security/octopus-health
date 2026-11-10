@@ -1,0 +1,11 @@
+{
+ "version": 2,
+ "title": "Wall Ball Roll",
+ "view": "side",
+ "props": [{"type":"wall","x":38},{"type":"ball","x":43,"y":36,"r":4}],
+ "highlight": ["spine","shoulderL"],
+ "frames": [
+  {"duration":1200,"label":"Lean back on the ball, knees soft","hold":300,"anchor":{"joint":"ankleL","x":62,"y":90},"pose":{"torso":190,"head":190,"upperArmL":0,"forearmL":0,"thighL":10,"shinL":10,"footL":100,"upperArmR":0,"forearmR":0,"thighR":10,"shinR":10,"footR":100}},
+  {"duration":1200,"label":"Bend the knees, the ball rolls up the back","hold":400,"anchor":{"joint":"ankleL","x":62,"y":90},"pose":{"torso":190,"head":190,"upperArmL":0,"forearmL":0,"thighL":40,"shinL":12,"footL":104,"upperArmR":0,"forearmR":0,"thighR":40,"shinR":12,"footR":104}}
+ ]
+}

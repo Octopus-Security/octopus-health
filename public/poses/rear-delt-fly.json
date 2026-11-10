@@ -1,0 +1,11 @@
+{
+ "version": 2,
+ "title": "Rear Delt Fly",
+ "view": "front",
+ "hold": "dumbbell",
+ "highlight": ["shoulderL","shoulderR"],
+ "frames": [
+  {"duration":1200,"label":"Hinged over, arms hang under the chest","hold":300,"pose":{"torso":180,"head":180,"upperArmL":8,"forearmL":4,"upperArmR":-8,"forearmR":-4,"thighL":12,"shinL":0,"footL":90,"thighR":-12,"shinR":0,"footR":-90,"depth":{"torso":0.35},"root":{"x":50,"y":52}}},
+  {"duration":1000,"label":"Sweep the arms out wide, squeeze the shoulder blades","hold":400,"pose":{"torso":180,"head":180,"upperArmL":88,"forearmL":80,"upperArmR":-88,"forearmR":-80,"thighL":12,"shinL":0,"footL":90,"thighR":-12,"shinR":0,"footR":-90}}
+ ]
+}

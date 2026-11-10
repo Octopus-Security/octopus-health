@@ -1,0 +1,10 @@
+{
+ "version": 2,
+ "title": "Lying Relaxation",
+ "view": "side",
+ "static": true,
+ "highlight": ["spine"],
+ "frames": [
+  {"label":"Lie flat, arms by the sides, breathe slowly","pose":{"torso":-90,"head":-88,"upperArmL":90,"forearmL":90,"thighL":90,"shinL":90,"footL":180,"upperArmR":90,"forearmR":90,"thighR":90,"shinR":90,"footR":180,"root":{"x":52,"y":87}}}
+ ]
+}

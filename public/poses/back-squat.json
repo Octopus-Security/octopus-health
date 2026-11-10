@@ -1,0 +1,11 @@
+{
+ "version": 2,
+ "title": "Barbell Back Squat",
+ "view": "side",
+ "hold": "barbell",
+ "highlight": ["kneeL","hipL"],
+ "frames": [
+  {"duration":1100,"label":"Stand, bar on the upper back","anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":180,"head":180,"upperArmL":-60,"forearmL":90,"thighL":0,"shinL":0,"footL":90,"upperArmR":-60,"forearmR":90,"thighR":0,"shinR":0,"footR":90}},
+  {"duration":900,"label":"Sit back and down, chest up","hold":350,"anchor":{"joint":"ankleL","x":50,"y":90},"pose":{"torso":140,"head":152,"upperArmL":-100,"forearmL":50,"thighL":85,"shinL":-30,"footL":90,"upperArmR":-100,"forearmR":50,"thighR":85,"shinR":-30,"footR":90}}
+ ]
+}
