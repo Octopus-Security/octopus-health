@@ -19,6 +19,13 @@ const FALLBACK = [
   { key: "mobility:lh-shoulders", finding: "#1, #15", reason: "skin strokes and breathing; no figure drawn on purpose, the null rule stops a neck-circle figure" },
   { key: "mobility:lh-neck-move", finding: "#1, #15", reason: "skin strokes and breathing; no figure drawn on purpose, the null rule stops a neck-circle figure" },
   { key: "mobility:lh-breath-end", finding: "#1, #15", reason: "skin strokes and breathing; no figure drawn on purpose, the null rule stops a neck-circle figure" },
+  { key: "library:Dumbbell Upright Row", finding: "catalogue-expansion", reason: "needs a pose: no upright-row figure; the bent-over row figure would be a different lift" },
+  { key: "library:Barbell Upright Row", finding: "catalogue-expansion", reason: "needs a pose: no upright-row figure; the bent-over row figure would be a different lift" },
+  { key: "library:Resistance Band Shoulder Adduction", finding: "catalogue-expansion", reason: "needs a pose: no figure for a band pulled down from overhead to the side" },
+  { key: "library:Cable Glute Kickback", finding: "catalogue-expansion", reason: "needs a pose: the kickback figure is the triceps one" },
+  { key: "library:Seated Hip Abduction (Machine)", finding: "catalogue-expansion", reason: "needs a pose: no seated machine figure for the hips" },
+  { key: "library:Seated Hip Adduction (Machine)", finding: "catalogue-expansion", reason: "needs a pose: no seated machine figure for the hips" },
+  { key: "library:Barbell Hang Clean", finding: "catalogue-expansion", reason: "needs a pose: no clean figure" },
 ];
 
 const IMPLEMENT = [
