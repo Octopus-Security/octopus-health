@@ -99,7 +99,7 @@ test('recovery exercises that need gear declare it: foam roller, bands, bar, bal
   assert.strictEqual(foam.length, 7, 'the seven foam-roller exercises');
   for (const e of foam) need(e.name, 'foam-roller');
   for (const n of ['Banded Ankle Dorsiflexion', 'Terminal Knee Extension (TKE)', 'Overhead Banded Shoulder Stretch', 'Band Pull-Apart']) need(n, 'resistance-bands');
-  for (const n of ['Lat Stretch on Pull-up Bar', 'Lumbar Decompression Hang']) need(n, 'bar');
+  for (const n of ['Lat Stretch on Pull-up Bar', 'Relaxed Dead Hang']) need(n, 'bar');
   need('Spiky Ball Foot Roll', 'massage-ball-spiky');
   need('Peanut Ball Upper Back Release', 'massage-ball-peanut');
   need('Lacrosse Ball Glute Release', 'massage-ball-lacrosse');
@@ -145,7 +145,7 @@ test('substitution table: every foam-roller exercise falls back, and every subst
   assert.deepStrictEqual(E.fitExercises([{ exerciseName: 'Overhead Banded Shoulder Stretch' }], []).substitutions.map(s => s.to), ['Cross-Body Shoulder Stretch']);
   assert.deepStrictEqual(E.fitExercises([{ exerciseName: 'Lat Stretch on Pull-up Bar' }], []).substitutions.map(s => s.to), ['Overhead Triceps Stretch']);
   // no sensible substitute: reported as left out, not hidden
-  for (const n of ['Terminal Knee Extension (TKE)', 'Lumbar Decompression Hang', 'Spiky Ball Foot Roll']) {
+  for (const n of ['Terminal Knee Extension (TKE)', 'Relaxed Dead Hang', 'Spiky Ball Foot Roll']) {
     const f = E.fitExercises([{ exerciseName: n }], []);
     assert.strictEqual(f.exercises.length, 0, n); assert.strictEqual(f.omitted.length, 1, n);
   }

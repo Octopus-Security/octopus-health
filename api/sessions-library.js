@@ -17,11 +17,13 @@ const { poseKeyOrNull } = require('./sessions-store');
 let MMA = { moves: [] };
 try { MMA = require('../lib/mma-moves.json'); } catch { /* snapshot not generated: no mma moves, nothing else breaks */ }
 
+const { excludedFromPlans } = require('../lib/martial-scope');
+
 const csv = (v) => (Array.isArray(v) ? v : []);
 
 /** Exercise rows (ExerciseDefinition-like, from the owner's own library) -> library entries. */
 function fromExercises(rows) {
-  return csv(rows).map(e => {
+  return csv(rows).filter(e => !excludedFromPlans(e)).map(e => {
     const n = M.normalize(e.primaryMuscles), s = M.normalize(e.secondaryMuscles);
     return {
       type: 'exercise', ref: 'exercise:' + (e.id != null ? e.id : e.name), name: e.name, category: e.category,
@@ -54,7 +56,7 @@ function fromRoutines(routines) {
 
 /** mma snapshot (scripts/snapshot-mma.mjs) -> library entries. They carry no muscle data. */
 function fromMma(catalogue) {
-  return csv((catalogue || MMA).moves).map(m => ({
+  return csv((catalogue || MMA).moves).filter(m => !excludedFromPlans(m)).map(m => ({
     type: 'mma', ref: 'mma:' + m.id, name: m.title, category: m.discipline,
     poseKey: poseKeyOrNull(m.poseKey),
     cues: csv(m.keyPoints).slice(0, 5), instructions: csv(m.steps).map((s, i) => `${i + 1}. ${s}`).join('\n'),
@@ -83,6 +85,7 @@ function suggest(library, tailoring) {
 
   const suggested = [], check = [], unavailable = [];
   for (const it of csv(library)) {
+    if (excludedFromPlans(it)) continue;   // partner submissions are never suggested
     const miss = gearKnown ? E.unmet(it.requires, have) : [];
     if (miss.length) { unavailable.push({ ref: it.ref, name: it.name, why: 'needs ' + miss.join(', ') }); continue; }
 

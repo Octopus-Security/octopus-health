@@ -1,4 +1,5 @@
 'use strict';
+const { excludedFromPlans } = require('../lib/martial-scope');
 
 /**
  * body-map.js - the clickable body diagram and the JSON behind it.
@@ -41,7 +42,7 @@ module.exports = (app, { requireLogin, getDatabase }) => {
 
     const { ExerciseDefinition, sequelize } = getDatabase(req.user.username);
     await sequelize.sync();
-    const rows = await ExerciseDefinition.findAll({ order: [['name', 'ASC']] });
+    const rows = (await ExerciseDefinition.findAll({ order: [['name', 'ASC']] })).filter(e => !excludedFromPlans(e));
     const found = M.exercisesFor(kind, id, rows);
     const def = kind === 'muscle' ? M.MUSCLES[id] : M.JOINTS[id];
     res.json({

@@ -111,29 +111,15 @@ const IMPLEMENT = [
 ];
 
 const ALIAS = [
-  { key: "bench", finding: "#7", reason: "alias target \"Bench Press\" is not a seed exercise name" },
-  { key: "flatbench", finding: "#7", reason: "alias target \"Bench Press\" is not a seed exercise name" },
-  { key: "bp", finding: "#7", reason: "alias target \"Bench Press\" is not a seed exercise name" },
-  { key: "ohp", finding: "#7", reason: "alias target \"Overhead Press\" is not a seed exercise name" },
-  { key: "dl", finding: "#7", reason: "alias target \"Deadlift\" is not a seed exercise name" },
-  { key: "dead", finding: "#7", reason: "alias target \"Deadlift\" is not a seed exercise name" },
-  { key: "rdl", finding: "#7", reason: "alias target \"Romanian Deadlift\" is not a seed exercise name" },
-  { key: "bs", finding: "#7", reason: "alias target \"Bulgarian Split Squat\" is not a seed exercise name" },
-  { key: "bike", finding: "#7", reason: "alias target \"Stationary Bike\" is not a seed exercise name" },
-  { key: "cycling", finding: "#7", reason: "alias target \"Stationary Bike\" is not a seed exercise name" },
 ];
 
 const CLAIMS = [
   { key: "library:name|Hip Flexor / Psoas Release", finding: "#20", reason: "\"release\" in a name or cue (soft-tissue wording); reword or confirm it is a plain action verb" },
-  { key: "library:cue|EZ-Bar Curl", finding: "#20", reason: "\"reduces\" in copy; reword without a claim" },
   { key: "library:cue|Teep (Front Push Kick)", finding: "#20", reason: "\"release\" in a name or cue (soft-tissue wording); reword or confirm it is a plain action verb" },
   { key: "library:cue|Double Collar Tie (Plum)", finding: "#20", reason: "\"Prevent\" in copy; reword without a claim" },
-  { key: "library:name|Lumbar Decompression Hang", finding: "#5", reason: "treatment claim in an exercise name" },
   { key: "library:name|Peanut Ball Upper Back Release", finding: "#20", reason: "\"release\" in a name or cue (soft-tissue wording); reword or confirm it is a plain action verb" },
   { key: "library:name|Lacrosse Ball Glute Release", finding: "#20", reason: "\"release\" in a name or cue (soft-tissue wording); reword or confirm it is a plain action verb" },
   { key: "library:name|Lacrosse Ball Chest and Shoulder Release", finding: "#20", reason: "\"release\" in a name or cue (soft-tissue wording); reword or confirm it is a plain action verb" },
-  { key: "library:cue|Lymph Drainage: Side-of-Neck Strokes", finding: "#20", reason: "\"release\" in a name or cue (soft-tissue wording); reword or confirm it is a plain action verb" },
-  { key: "routine:name|injury-prevention", finding: "#5", reason: "routine display name promises prevention" },
   { key: "mobility:name|ball-upper-back", finding: "#20", reason: "\"release\" in a name or cue (soft-tissue wording); reword or confirm it is a plain action verb" },
   { key: "mobility:name|ball-glute", finding: "#20", reason: "\"release\" in a name or cue (soft-tissue wording); reword or confirm it is a plain action verb" },
   { key: "mobility:name|ball-chest", finding: "#20", reason: "\"release\" in a name or cue (soft-tissue wording); reword or confirm it is a plain action verb" },
@@ -143,7 +129,6 @@ const CLAIMS = [
 
 // Muscle tags the Body Map cannot place (they resolve to no muscle and no joint in lib/muscles.js).
 const MUSCLE_TAGS = [
-  { key: "full_body", finding: "#16", reason: "\"full_body\" is aliased to nothing, so burpee, get-up, rowing and martial combos never show on the Body Map" },
   { key: "balance", finding: "#16", reason: "a quality, not a body region; deliberately nothing to click" },
   { key: "cardio", finding: "#16", reason: "a quality, not a body region; deliberately nothing to click" },
 ];
