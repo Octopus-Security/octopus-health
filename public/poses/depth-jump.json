@@ -20,7 +20,7 @@
   {
    "duration": 700,
    "label": "Ready stance on the box: soft knees, chest up, arms back",
-   "hold": 300,
+   "hold": 100,
    "anchor": {
     "joint": "ankleL",
     "x": 24,
@@ -90,9 +90,9 @@
    }
   },
   {
-   "duration": 170,
+   "duration": 150,
    "label": "Contact on the balls of the feet",
-   "hold": 30,
+   "hold": 0,
    "anchor": {
     "joint": "toeL",
     "x": 58,
@@ -107,39 +107,41 @@
     "thighR": 40,
     "shinR": -25,
     "footR": 50,
-    "upperArmL": -55,
-    "forearmL": -35,
-    "upperArmR": -55,
-    "forearmR": -35
-   }
+    "upperArmL": -45,
+    "forearmL": -25,
+    "upperArmR": -45,
+    "forearmR": -25
+   },
+   "ease": "linear"
   },
   {
-   "duration": 220,
-   "label": "Heels down: absorb into a quarter squat",
-   "hold": 60,
+   "duration": 150,
+   "label": "Heels down, shallow dip: arms already driving up",
+   "hold": 0,
    "anchor": {
     "joint": "ankleL",
     "x": 54,
     "y": 90
    },
    "pose": {
-    "torso": 150,
-    "head": 158,
-    "thighL": 60,
-    "shinL": -30,
-    "footL": 90,
-    "thighR": 60,
-    "shinR": -30,
-    "footR": 90,
-    "upperArmL": -50,
-    "forearmL": -35,
-    "upperArmR": -50,
-    "forearmR": -35
-   }
+    "torso": 158,
+    "head": 164,
+    "thighL": 45,
+    "shinL": -25,
+    "footL": 85,
+    "thighR": 45,
+    "shinR": -25,
+    "footR": 85,
+    "upperArmL": 40,
+    "forearmL": 55,
+    "upperArmR": 40,
+    "forearmR": 55
+   },
+   "ease": "ease-in"
   },
   {
    "duration": 330,
-   "label": "Rebound straight up, arms swing through",
+   "label": "Takeoff: extend and reach",
    "hold": 0,
    "air": true,
    "pose": {
