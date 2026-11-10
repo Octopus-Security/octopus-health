@@ -1,0 +1,54 @@
+{
+ "version": 2,
+ "title": "Standing Hamstring Active Lift",
+ "view": "side",
+ "anchor": {
+  "joint": "ankleR",
+  "x": 38,
+  "y": 90
+ },
+ "highlight": [
+  "hipL",
+  "kneeL"
+ ],
+ "frames": [
+  {
+   "duration": 2400,
+   "label": "Stand tall, arms forward for balance",
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "upperArmL": 35,
+    "forearmL": 38,
+    "upperArmR": 35,
+    "forearmR": 38,
+    "thighL": 0,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": 0,
+    "shinR": 0,
+    "footR": 90
+   }
+  },
+  {
+   "duration": 2400,
+   "label": "Lift the straight leg slowly, no swing",
+   "hold": 1200,
+   "pose": {
+    "thighL": 72,
+    "shinL": 72,
+    "footL": 165
+   }
+  },
+  {
+   "duration": 600,
+   "label": "Lower with control",
+   "hold": 0,
+   "pose": {
+    "thighL": 36,
+    "shinL": 36,
+    "footL": 128
+   }
+  }
+ ]
+}

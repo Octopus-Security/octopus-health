@@ -1,0 +1,52 @@
+{
+ "version": 2,
+ "title": "Side Leg Raise Hold",
+ "view": "front",
+ "anchor": {
+  "joint": "ankleR",
+  "x": 42,
+  "y": 90
+ },
+ "highlight": [
+  "hipL"
+ ],
+ "frames": [
+  {
+   "duration": 2200,
+   "label": "Stand tall, hand on a wall for balance",
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "upperArmL": 25,
+    "forearmL": 25,
+    "upperArmR": -25,
+    "forearmR": -25,
+    "thighL": 0,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": 0,
+    "shinR": 0,
+    "footR": -90
+   }
+  },
+  {
+   "duration": 2200,
+   "label": "Lift the leg out to the side and hold",
+   "hold": 1500,
+   "pose": {
+    "thighL": 42,
+    "shinL": 42,
+    "footL": 90
+   }
+  },
+  {
+   "duration": 600,
+   "label": "Lower",
+   "hold": 0,
+   "pose": {
+    "thighL": 21,
+    "shinL": 21
+   }
+  }
+ ]
+}

@@ -1,0 +1,108 @@
+{
+ "version": 2,
+ "title": "Wall-Supported Roundhouse Slow Kick",
+ "view": "side",
+ "anchor": {
+  "joint": "ankleR",
+  "x": 44,
+  "y": 88.5
+ },
+ "props": [
+  {
+   "type": "wall",
+   "x": 92
+  }
+ ],
+ "highlight": [
+  "hipL",
+  "kneeL"
+ ],
+ "frames": [
+  {
+   "duration": 1400,
+   "label": "Stand with one hand on the wall",
+   "pose": {
+    "torso": 172,
+    "head": 172,
+    "upperArmL": 30,
+    "forearmL": 160,
+    "upperArmR": 80,
+    "forearmR": 85,
+    "thighL": 12,
+    "shinL": -4,
+    "footL": 90,
+    "thighR": -22,
+    "shinR": -20,
+    "footR": 70
+   }
+  },
+  {
+   "duration": 1600,
+   "label": "Chamber the knee",
+   "hold": 400,
+   "pose": {
+    "torso": 184,
+    "head": 180,
+    "upperArmL": 30,
+    "forearmL": 160,
+    "upperArmR": 80,
+    "forearmR": 85,
+    "thighL": 96,
+    "shinL": -30,
+    "footL": 60,
+    "thighR": -12,
+    "shinR": -12,
+    "footR": 78
+   }
+  },
+  {
+   "duration": 1800,
+   "label": "Turn the hip over and extend slowly",
+   "hold": 1000,
+   "pose": {
+    "torso": 200,
+    "head": 192,
+    "thighL": 110,
+    "shinL": 108,
+    "footL": 198,
+    "thighR": -6,
+    "shinR": -6,
+    "footR": 84
+   }
+  },
+  {
+   "duration": 1400,
+   "label": "Back to the chamber",
+   "hold": 0,
+   "pose": {
+    "torso": 184,
+    "head": 180,
+    "thighL": 96,
+    "shinL": -30,
+    "footL": 60,
+    "thighR": -12,
+    "shinR": -12,
+    "footR": 78
+   }
+  },
+  {
+   "duration": 1400,
+   "label": "Set down",
+   "hold": 300,
+   "pose": {
+    "torso": 172,
+    "head": 172,
+    "upperArmL": 30,
+    "forearmL": 160,
+    "upperArmR": 80,
+    "forearmR": 85,
+    "thighL": 12,
+    "shinL": -4,
+    "footL": 90,
+    "thighR": -22,
+    "shinR": -20,
+    "footR": 70
+   }
+  }
+ ]
+}
