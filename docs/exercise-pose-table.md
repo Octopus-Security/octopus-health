@@ -425,7 +425,7 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | library | Dumbbell Chest Fly | Dumbbell Chest Fly | strength | chest-fly | rule |
 | library | Incline Dumbbell Fly | Incline Dumbbell Fly | strength | chest-fly | rule |
 | library | Cable Crossover | Cable Crossover | strength | chest-fly | rule |
-| library | Barbell Incline Bench Press | Barbell Incline Bench Press | strength | bench-press | rule |
+| library | Barbell Incline Bench Press | Barbell Incline Bench Press | strength | incline-press-barbell | rule |
 | library | Barbell Decline Bench Press | Barbell Decline Bench Press | strength | bench-press | rule |
 | library | Barbell Close-Grip Bench Press | Barbell Close-Grip Bench Press | strength | bench-press | rule |
 | library | Barbell Wide-Grip Bench Press | Barbell Wide-Grip Bench Press | strength | bench-press | rule |
@@ -453,16 +453,16 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | library | Single-Arm Dumbbell Shoulder Press | Single-Arm Dumbbell Shoulder Press | strength | overhead-press-db | rule |
 | library | Barbell Seated Overhead Press | Barbell Seated Overhead Press | strength | overhead-press | rule |
 | library | Dumbbell Push Press | Dumbbell Push Press | strength | overhead-press-db | rule |
-| library | Dumbbell Upright Row | Dumbbell Upright Row | strength | squat | null rule -> category fallback |
-| library | Barbell Upright Row | Barbell Upright Row | strength | squat | null rule -> category fallback |
+| library | Dumbbell Upright Row | Dumbbell Upright Row | strength | upright-row | rule |
+| library | Barbell Upright Row | Barbell Upright Row | strength | upright-row-barbell | rule |
 | library | Dumbbell Lateral Raise (Seated) | Dumbbell Lateral Raise (Seated) | strength | lateral-raise | rule |
 | library | Single-Arm Dumbbell Lateral Raise | Single-Arm Dumbbell Lateral Raise | strength | lateral-raise | rule |
 | library | Single-Arm Cable Lateral Raise | Single-Arm Cable Lateral Raise | strength | lateral-raise-bare | rule |
 | library | Lateral Raise (Machine) | Lateral Raise (Machine) | strength | lateral-raise-bare | rule |
 | library | Lying Reverse Cable Fly | Lying Reverse Cable Fly | strength | chest-fly | rule |
-| library | Resistance Band Shoulder Adduction | Resistance Band Shoulder Adduction | recovery | stand-breathe | null rule -> category fallback |
-| library | Band Shoulder Internal Rotation | Band Shoulder Internal Rotation | recovery | side-lying-er | rule |
-| library | Dumbbell Shoulder Internal Rotation (Side-Lying) | Dumbbell Shoulder Internal Rotation (Side-Lying) | strength | side-lying-er | rule |
+| library | Resistance Band Shoulder Adduction | Resistance Band Shoulder Adduction | recovery | band-shoulder-adduction | rule |
+| library | Band Shoulder Internal Rotation | Band Shoulder Internal Rotation | recovery | shoulder-ir-band | rule |
+| library | Dumbbell Shoulder Internal Rotation (Side-Lying) | Dumbbell Shoulder Internal Rotation (Side-Lying) | strength | side-lying-ir | rule |
 | library | Cable Bent-Over Row | Cable Bent-Over Row | strength | seated-row | rule |
 | library | Chest-Supported Dumbbell Row | Chest-Supported Dumbbell Row | strength | bench-row | rule |
 | library | Chest-Supported Barbell Row | Chest-Supported Barbell Row | strength | bent-row | rule |
@@ -476,8 +476,8 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | library | Narrow-Grip Lat Pulldown | Narrow-Grip Lat Pulldown | strength | lat-pulldown | rule |
 | library | Reverse-Grip Lat Pulldown | Reverse-Grip Lat Pulldown | strength | lat-pulldown | rule |
 | library | Resistance Band Lat Pulldown | Resistance Band Lat Pulldown | strength | lat-pulldown | rule |
-| library | Back Extension (Bench) | Back Extension (Bench) | strength | cobra | rule |
-| library | Prone Back Extension | Prone Back Extension | strength | cobra | rule |
+| library | Back Extension (Bench) | Back Extension (Bench) | strength | back-extension | rule |
+| library | Prone Back Extension | Prone Back Extension | strength | prone-back-extension | rule |
 | library | Dumbbell Bicep Curl (Seated) | Dumbbell Bicep Curl (Seated) | strength | curl | rule |
 | library | Dumbbell Hammer Curl (Seated) | Dumbbell Hammer Curl (Seated) | strength | curl | rule |
 | library | Alternating Dumbbell Curl | Alternating Dumbbell Curl | strength | curl | rule |
@@ -487,7 +487,7 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | library | Preacher Curl | Preacher Curl | strength | curl-barbell | rule |
 | library | Biceps Curl (Machine) | Biceps Curl (Machine) | strength | curl-bare | rule |
 | library | Tricep Extension (Machine) | Tricep Extension (Machine) | strength | pushdown | rule |
-| library | EZ-Bar Skull Crusher | EZ-Bar Skull Crusher | strength | tricep-overhead-bare | rule |
+| library | EZ-Bar Skull Crusher | EZ-Bar Skull Crusher | strength | skull-crusher | rule |
 | library | Barbell Wrist Curl | Barbell Wrist Curl | strength | wrist-curl | rule |
 | library | Barbell Shrug | Barbell Shrug | strength | shrug-bare | rule |
 | library | Crunch | Crunch | strength | crunch | rule |
@@ -513,11 +513,11 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | library | Dumbbell Reverse Lunge | Dumbbell Reverse Lunge | strength | reverse-lunge | rule |
 | library | Barbell Reverse Lunge | Barbell Reverse Lunge | strength | reverse-lunge | rule |
 | library | Barbell Forward Lunge | Barbell Forward Lunge | strength | forward-lunge | rule |
-| library | Jumping Lunge | Jumping Lunge | conditioning | lunge | rule |
-| library | Dumbbell Step-Up | Dumbbell Step-Up | strength | lunge | rule |
-| library | Barbell Step-Up | Barbell Step-Up | strength | lunge | rule |
-| library | Lateral Step-Up | Lateral Step-Up | strength | lunge | rule |
-| library | Step-Up | Step-Up | strength | lunge | rule |
+| library | Jumping Lunge | Jumping Lunge | conditioning | split-jump | rule |
+| library | Dumbbell Step-Up | Dumbbell Step-Up | strength | step-up-db | rule |
+| library | Barbell Step-Up | Barbell Step-Up | strength | step-up-barbell | rule |
+| library | Lateral Step-Up | Lateral Step-Up | strength | step-up | rule |
+| library | Step-Up | Step-Up | strength | step-up | rule |
 | library | Single-Leg Glute Bridge | Single-Leg Glute Bridge | strength | glute-bridge | rule |
 | library | Leg Press (45-Degree) | Leg Press (45-Degree) | strength | leg-press | rule |
 | library | Single-Leg Press (Machine) | Single-Leg Press (Machine) | strength | leg-press | rule |
@@ -529,20 +529,20 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | library | Calf Raise (Step) | Calf Raise (Step) | strength | calf-raise | rule |
 | library | Single-Leg Calf Raise (Step) | Single-Leg Calf Raise (Step) | strength | calf-raise | rule |
 | library | Seated Calf Raise (Machine) | Seated Calf Raise (Machine) | strength | calf-raise | rule |
-| library | Cable Glute Kickback | Cable Glute Kickback | strength | squat | null rule -> category fallback |
-| library | Seated Hip Abduction (Machine) | Seated Hip Abduction (Machine) | strength | squat | null rule -> category fallback |
-| library | Seated Hip Adduction (Machine) | Seated Hip Adduction (Machine) | strength | squat | null rule -> category fallback |
+| library | Cable Glute Kickback | Cable Glute Kickback | strength | cable-glute-kickback | rule |
+| library | Seated Hip Abduction (Machine) | Seated Hip Abduction (Machine) | strength | hip-abduction-machine | rule |
+| library | Seated Hip Adduction (Machine) | Seated Hip Adduction (Machine) | strength | hip-adduction-machine | rule |
 | library | Resistance Band Side-Lying Hip Abduction | Resistance Band Side-Lying Hip Abduction | strength | clamshell | rule |
 | library | Chair Stand | Chair Stand | strength | squat | rule |
 | library | Dumbbell Suitcase Deadlift | Dumbbell Suitcase Deadlift | strength | rdl | rule |
-| library | Barbell Hang Clean | Barbell Hang Clean | strength | squat | null rule -> category fallback |
+| library | Barbell Hang Clean | Barbell Hang Clean | strength | hang-clean | rule |
 | library | Barbell Push Jerk | Barbell Push Jerk | strength | overhead-press | rule |
-| library | Standing Broad Jump | Standing Broad Jump | conditioning | jump-squat | rule |
-| library | Tuck Jump | Tuck Jump | conditioning | jump-squat | rule |
+| library | Standing Broad Jump | Standing Broad Jump | conditioning | broad-jump | rule |
+| library | Tuck Jump | Tuck Jump | conditioning | tuck-jump | rule |
 | library | Vertical Jump | Vertical Jump | conditioning | jump-squat | rule |
-| library | Alternating Split-Squat Jump | Alternating Split-Squat Jump | conditioning | jump-squat | rule |
-| library | Depth Jump | Depth Jump | conditioning | jump-squat | rule |
-| library | Lateral Hop | Lateral Hop | conditioning | jump-squat | rule |
+| library | Alternating Split-Squat Jump | Alternating Split-Squat Jump | conditioning | split-jump | rule |
+| library | Depth Jump | Depth Jump | conditioning | depth-jump | rule |
+| library | Lateral Hop | Lateral Hop | conditioning | lateral-hop | rule |
 | library | Jumping Jacks | Jumping Jacks | conditioning | jumping-jack | rule |
 | library | Jump Burpee | Jump Burpee | conditioning | burpee | rule |
 | library | Spider Crawl | Spider Crawl | conditioning | bear-crawl | rule |
@@ -554,9 +554,9 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | library | Zigzag Run | Zigzag Run | conditioning | run | rule |
 | library | Stair Run | Stair Run | cardio | run | rule |
 | library | Run (Outdoor) | Run (Outdoor) | cardio | run | rule |
-| library | Elliptical | Elliptical | cardio | run | rule |
+| library | Elliptical | Elliptical | cardio | elliptical | rule |
 | library | Stationary Bike | Stationary Bike | cardio | bike | rule |
-| library | Stair Stepper | Stair Stepper | cardio | run | rule |
+| library | Stair Stepper | Stair Stepper | cardio | stair-stepper | rule |
 | library | Cable Hockey Swing | Cable Hockey Swing | strength | wood-chop-cable | rule |
 | library | Cable Golf Swing | Cable Golf Swing | strength | wood-chop-cable | rule |
 | library | Cable Baseball Swing | Cable Baseball Swing | strength | wood-chop-cable | rule |

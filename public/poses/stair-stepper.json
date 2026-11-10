@@ -1,0 +1,91 @@
+{
+ "version": 2,
+ "title": "Stair Stepper",
+ "view": "side",
+ "grounded": false,
+ "props": [
+  {
+   "type": "bar",
+   "x1": 66,
+   "y1": 38,
+   "x2": 84,
+   "y2": 38
+  }
+ ],
+ "highlight": [
+  "hipL",
+  "kneeL",
+  "hipR",
+  "kneeR"
+ ],
+ "frames": [
+  {
+   "duration": 550,
+   "label": "Left foot steps up",
+   "hold": 0,
+   "pose": {
+    "torso": 172,
+    "head": 172,
+    "thighL": 55,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": 0,
+    "shinR": 0,
+    "footR": 90,
+    "upperArmL": 40,
+    "forearmL": 62,
+    "upperArmR": 40,
+    "forearmR": 62,
+    "root": {
+     "x": 48,
+     "y": 50
+    }
+   }
+  },
+  {
+   "duration": 450,
+   "label": "Pedals pass",
+   "hold": 0,
+   "pose": {
+    "thighL": 25,
+    "shinL": 5,
+    "thighR": 25,
+    "shinR": 5,
+    "root": {
+     "x": 48,
+     "y": 51
+    }
+   }
+  },
+  {
+   "duration": 550,
+   "label": "Right foot steps up",
+   "hold": 0,
+   "pose": {
+    "thighL": 0,
+    "shinL": 0,
+    "thighR": 55,
+    "shinR": 0,
+    "root": {
+     "x": 48,
+     "y": 50
+    }
+   }
+  },
+  {
+   "duration": 450,
+   "label": "Pedals pass",
+   "hold": 0,
+   "pose": {
+    "thighL": 25,
+    "shinL": 5,
+    "thighR": 25,
+    "shinR": 5,
+    "root": {
+     "x": 48,
+     "y": 51
+    }
+   }
+  }
+ ]
+}

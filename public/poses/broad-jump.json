@@ -1,0 +1,138 @@
+{
+ "version": 2,
+ "title": "Standing Broad Jump",
+ "view": "side",
+ "highlight": [
+  "hipL",
+  "kneeL"
+ ],
+ "frames": [
+  {
+   "duration": 600,
+   "label": "Crouch, arms swing back",
+   "anchor": {
+    "joint": "ankleL",
+    "x": 24,
+    "y": 90
+   },
+   "pose": {
+    "torso": 140,
+    "head": 150,
+    "thighL": 85,
+    "shinL": -30,
+    "footL": 90,
+    "thighR": 85,
+    "shinR": -30,
+    "footR": 90,
+    "upperArmL": -70,
+    "forearmL": -55,
+    "upperArmR": -70,
+    "forearmR": -55
+   }
+  },
+  {
+   "duration": 300,
+   "label": "Drive out: arms swing forward",
+   "hold": 0,
+   "anchor": {
+    "joint": "toeL",
+    "x": 32,
+    "y": 90.3
+   },
+   "pose": {
+    "torso": 128,
+    "head": 140,
+    "thighL": -8,
+    "shinL": -12,
+    "footL": 40,
+    "thighR": -8,
+    "shinR": -12,
+    "footR": 40,
+    "upperArmL": 105,
+    "forearmL": 120,
+    "upperArmR": 105,
+    "forearmR": 120
+   }
+  },
+  {
+   "duration": 450,
+   "label": "Fly, knees coming up to land",
+   "air": true,
+   "hold": 0,
+   "pose": {
+    "torso": 140,
+    "head": 150,
+    "thighL": 65,
+    "shinL": -5,
+    "footL": 75,
+    "thighR": 65,
+    "shinR": -5,
+    "footR": 75,
+    "upperArmL": 50,
+    "forearmL": 60,
+    "upperArmR": 50,
+    "forearmR": 60,
+    "root": {
+     "x": 50,
+     "y": 46
+    }
+   }
+  },
+  {
+   "duration": 450,
+   "label": "Land soft on bent knees",
+   "anchor": {
+    "joint": "ankleL",
+    "x": 62,
+    "y": 90
+   },
+   "pose": {
+    "torso": 140,
+    "head": 150,
+    "thighL": 85,
+    "shinL": -30,
+    "footL": 90,
+    "thighR": 85,
+    "shinR": -30,
+    "footR": 90,
+    "upperArmL": 55,
+    "forearmL": 65,
+    "upperArmR": 55,
+    "forearmR": 65
+   }
+  },
+  {
+   "duration": 700,
+   "label": "Stand tall",
+   "anchor": {
+    "joint": "ankleL",
+    "x": 62,
+    "y": 90
+   },
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "thighL": 0,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": 0,
+    "shinR": 0,
+    "footR": 90,
+    "upperArmL": 0,
+    "forearmL": 5,
+    "upperArmR": 0,
+    "forearmR": 5
+   }
+  },
+  {
+   "duration": 900,
+   "label": "Walk back and reset",
+   "anchor": {
+    "joint": "ankleL",
+    "x": 24,
+    "y": 90
+   },
+   "pose": {}
+  }
+ ]
+}

@@ -1,0 +1,139 @@
+{
+ "version": 2,
+ "title": "Barbell Hang Clean",
+ "view": "side",
+ "hold": "barbell",
+ "anchor": {
+  "joint": "ankleL",
+  "x": 48,
+  "y": 90
+ },
+ "highlight": [
+  "hipL",
+  "kneeL"
+ ],
+ "frames": [
+  {
+   "duration": 900,
+   "label": "Hang: bar at the knees, hips back",
+   "pose": {
+    "torso": 128,
+    "head": 145,
+    "thighL": 59,
+    "shinL": -9,
+    "footL": 90,
+    "thighR": 59,
+    "shinR": -9,
+    "footR": 90,
+    "upperArmL": -33,
+    "forearmL": 6,
+    "upperArmR": -33,
+    "forearmR": 6
+   }
+  },
+  {
+   "duration": 450,
+   "label": "Jump and shrug: hips and knees extend",
+   "hold": 0,
+   "pose": {
+    "torso": 178,
+    "head": 178,
+    "thighL": 2,
+    "shinL": -2,
+    "footL": 68,
+    "thighR": 2,
+    "shinR": -2,
+    "footR": 68,
+    "upperArmL": -6,
+    "forearmL": -3,
+    "upperArmR": -6,
+    "forearmR": -3,
+    "shrug": 3
+   }
+  },
+  {
+   "duration": 350,
+   "label": "Pull under: elbows high, bar close",
+   "hold": 0,
+   "pose": {
+    "torso": 176,
+    "head": 176,
+    "thighL": 20,
+    "shinL": -12,
+    "footL": 78,
+    "thighR": 20,
+    "shinR": -12,
+    "footR": 78,
+    "upperArmL": 88,
+    "forearmL": 150,
+    "upperArmR": 88,
+    "forearmR": 150,
+    "shrug": 1,
+    "depth": {
+     "upperArmL": 0.4,
+     "upperArmR": 0.4,
+     "forearmL": 0.8,
+     "forearmR": 0.8
+    }
+   }
+  },
+  {
+   "duration": 500,
+   "label": "Catch: bar on the shoulders, knees bend",
+   "pose": {
+    "torso": 170,
+    "head": 172,
+    "thighL": 70,
+    "shinL": -22,
+    "footL": 88,
+    "thighR": 70,
+    "shinR": -22,
+    "footR": 88,
+    "upperArmL": 80,
+    "forearmL": 244,
+    "upperArmR": 80,
+    "forearmR": 244,
+    "shrug": 0,
+    "depth": {
+     "upperArmL": 1,
+     "upperArmR": 1,
+     "forearmL": 1,
+     "forearmR": 1
+    }
+   }
+  },
+  {
+   "duration": 700,
+   "label": "Stand tall with the bar racked",
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "thighL": 0,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": 0,
+    "shinR": 0,
+    "footR": 90
+   }
+  },
+  {
+   "duration": 600,
+   "label": "Lower the bar back to the hang",
+   "hold": 0,
+   "pose": {
+    "torso": 172,
+    "head": 175,
+    "thighL": 25,
+    "shinL": -10,
+    "footL": 88,
+    "thighR": 25,
+    "shinR": -10,
+    "footR": 88,
+    "upperArmL": 20,
+    "forearmL": 130,
+    "upperArmR": 20,
+    "forearmR": 130
+   }
+  }
+ ]
+}

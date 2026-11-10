@@ -1,0 +1,172 @@
+{
+ "version": 2,
+ "title": "Depth Jump",
+ "view": "side",
+ "grounded": false,
+ "props": [
+  {
+   "type": "box",
+   "x": 6,
+   "y": 72,
+   "w": 30,
+   "h": 20
+  }
+ ],
+ "highlight": [
+  "hipL",
+  "kneeL"
+ ],
+ "frames": [
+  {
+   "duration": 600,
+   "label": "Stand on the box edge",
+   "anchor": {
+    "joint": "ankleL",
+    "x": 26,
+    "y": 70
+   },
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "upperArmL": 0,
+    "forearmL": 5,
+    "upperArmR": 0,
+    "forearmR": 5,
+    "thighL": 0,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": 0,
+    "shinR": 0,
+    "footR": 90
+   }
+  },
+  {
+   "duration": 300,
+   "label": "Step off, do not jump",
+   "air": true,
+   "hold": 0,
+   "pose": {
+    "torso": 178,
+    "head": 178,
+    "thighL": 10,
+    "shinL": -5,
+    "footL": 75,
+    "thighR": 10,
+    "shinR": -5,
+    "footR": 75,
+    "upperArmL": 20,
+    "forearmL": 30,
+    "upperArmR": 20,
+    "forearmR": 30,
+    "root": {
+     "x": 44,
+     "y": 40
+    }
+   }
+  },
+  {
+   "duration": 300,
+   "label": "Land and absorb",
+   "anchor": {
+    "joint": "ankleL",
+    "x": 54,
+    "y": 90
+   },
+   "hold": 0,
+   "pose": {
+    "torso": 140,
+    "head": 150,
+    "thighL": 85,
+    "shinL": -30,
+    "footL": 90,
+    "thighR": 85,
+    "shinR": -30,
+    "footR": 90,
+    "upperArmL": -45,
+    "forearmL": -25,
+    "upperArmR": -45,
+    "forearmR": -25
+   }
+  },
+  {
+   "duration": 350,
+   "label": "Rebound straight up",
+   "air": true,
+   "hold": 0,
+   "pose": {
+    "torso": 182,
+    "head": 182,
+    "thighL": 2,
+    "shinL": 0,
+    "footL": 30,
+    "thighR": 2,
+    "shinR": 0,
+    "footR": 30,
+    "upperArmL": 110,
+    "forearmL": 115,
+    "upperArmR": 110,
+    "forearmR": 115,
+    "root": {
+     "x": 54,
+     "y": 36
+    }
+   }
+  },
+  {
+   "duration": 450,
+   "label": "Land soft",
+   "anchor": {
+    "joint": "ankleL",
+    "x": 54,
+    "y": 90
+   },
+   "pose": {
+    "torso": 142,
+    "head": 152,
+    "thighL": 85,
+    "shinL": -30,
+    "footL": 90,
+    "thighR": 85,
+    "shinR": -30,
+    "footR": 90,
+    "upperArmL": 70,
+    "forearmL": 80,
+    "upperArmR": 70,
+    "forearmR": 80
+   }
+  },
+  {
+   "duration": 600,
+   "label": "Stand, then step back up",
+   "anchor": {
+    "joint": "ankleL",
+    "x": 54,
+    "y": 90
+   },
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "thighL": 0,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": 0,
+    "shinR": 0,
+    "footR": 90,
+    "upperArmL": 0,
+    "forearmL": 5,
+    "upperArmR": 0,
+    "forearmR": 5
+   }
+  },
+  {
+   "duration": 900,
+   "label": "Back onto the box",
+   "anchor": {
+    "joint": "ankleL",
+    "x": 26,
+    "y": 70
+   },
+   "pose": {}
+  }
+ ]
+}

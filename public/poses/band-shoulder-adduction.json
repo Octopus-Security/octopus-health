@@ -1,0 +1,48 @@
+{
+ "version": 2,
+ "title": "Band Shoulder Adduction",
+ "view": "front",
+ "props": [
+  {
+   "type": "wall",
+   "x": 92
+  }
+ ],
+ "highlight": [
+  "shoulderL"
+ ],
+ "frames": [
+  {
+   "duration": 1200,
+   "label": "Arm out to the side, band taut",
+   "hold": 400,
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "upperArmL": 145,
+    "forearmL": 150,
+    "upperArmR": -4,
+    "forearmR": -4,
+    "thighL": 5,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": -5,
+    "shinR": 0,
+    "footR": -90,
+    "root": {
+     "x": 50,
+     "y": 50
+    }
+   }
+  },
+  {
+   "duration": 1300,
+   "label": "Pull the arm down to the body, elbow straight",
+   "hold": 300,
+   "pose": {
+    "upperArmL": 18,
+    "forearmL": 20
+   }
+  }
+ ]
+}

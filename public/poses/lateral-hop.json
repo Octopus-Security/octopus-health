@@ -1,0 +1,83 @@
+{
+ "version": 2,
+ "title": "Lateral Hop",
+ "view": "front",
+ "props": [
+  {
+   "type": "box",
+   "x": 48,
+   "y": 87,
+   "w": 4,
+   "h": 5
+  }
+ ],
+ "highlight": [
+  "kneeL",
+  "ankleL"
+ ],
+ "frames": [
+  {
+   "duration": 500,
+   "label": "Balance on one foot, right of the line",
+   "anchor": {
+    "joint": "ankleL",
+    "x": 64,
+    "y": 90
+   },
+   "hold": 100,
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "upperArmL": 25,
+    "forearmL": 30,
+    "upperArmR": -25,
+    "forearmR": -30,
+    "thighL": 0,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": -8,
+    "shinR": 0,
+    "footR": -90,
+    "depth": {
+     "thighR": 0.55,
+     "shinR": 0.5
+    }
+   }
+  },
+  {
+   "duration": 380,
+   "label": "Hop across",
+   "air": true,
+   "hold": 0,
+   "pose": {
+    "root": {
+     "x": 50,
+     "y": 38
+    }
+   }
+  },
+  {
+   "duration": 500,
+   "label": "Stick the landing on the same foot",
+   "anchor": {
+    "joint": "ankleL",
+    "x": 36,
+    "y": 90
+   },
+   "hold": 100,
+   "pose": {}
+  },
+  {
+   "duration": 380,
+   "label": "Hop back",
+   "air": true,
+   "hold": 0,
+   "pose": {
+    "root": {
+     "x": 50,
+     "y": 38
+    }
+   }
+  }
+ ]
+}

@@ -255,8 +255,7 @@ test('every seeded exercise is matched by a name rule, not the category fallback
     // lymphatic drainage routine: skin strokes, deliberately no figure
     'Lymph Drainage: Diaphragmatic Breathing', 'Lymph Drainage: Collarbone Strokes', 'Lymph Drainage: Side-of-Neck Strokes',
     'Lymph Drainage: Ear and Jawline Strokes', 'Lymph Drainage: Shoulder Rolls', 'Lymph Drainage: Gentle Neck Tilts and Turns',
-    // expanded catalogue: no existing figure is honest for these (see the null rules in public/pose-map.js)
-    'Dumbbell Upright Row', 'Barbell Upright Row', 'Resistance Band Shoulder Adduction', 'Cable Glute Kickback', 'Seated Hip Abduction (Machine)', 'Seated Hip Adduction (Machine)', 'Barbell Hang Clean'];
+  ];
   assert.deepStrictEqual(ex.filter((e) => !PM.match(e.name)).map((e) => e.name).sort(), [...NEEDS_POSE].sort());
 });
 

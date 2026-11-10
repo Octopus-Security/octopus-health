@@ -20,6 +20,10 @@ const VARIANTS = [
   ['forward-lunge-db', 'forward-lunge', 'dumbbell', 'Dumbbell Forward Lunge'],
   ['walking-lunge-db', 'walking-lunge', 'dumbbell', 'Dumbbell Walking Lunge'],
   ['goblet-squat-plate', 'goblet-squat', null, 'Plate Goblet Squat'],
+  ['upright-row-barbell', 'upright-row', 'barbell', 'Barbell Upright Row'],
+  ['incline-press-barbell', 'incline-press', 'barbell', 'Barbell Incline Bench Press'],
+  ['step-up-db', 'step-up', 'dumbbell', 'Dumbbell Step-up', { arms: 'down' }],
+  ['step-up-barbell', 'step-up', 'barbell', 'Barbell Step-up', { arms: 'back' }],   // bar on the upper back: elbows down and behind
   ['bulgarian-split-squat-bare', 'bulgarian-split-squat', null, 'Bulgarian Split Squat'],
   ['curl-bare', 'curl', null, 'Curl (cable or band)'],
   ['curl-barbell', 'curl', 'barbell', 'Bar Curl'],
@@ -55,7 +59,9 @@ for (const [key, base, hold, title, patch] of VARIANTS) {
     if (k === 'view' && hold) o.hold = hold;
   }
   if (patch && patch.arms) {
-    const A = patch.arms === 'hug' ? { upperArmL: 35, forearmL: 115, upperArmR: 35, forearmR: 115 } : { upperArmL: 0, forearmL: 0, upperArmR: 0, forearmR: 0 };
+    const A = patch.arms === 'hug' ? { upperArmL: 35, forearmL: 115, upperArmR: 35, forearmR: 115 }
+      : patch.arms === 'back' ? { upperArmL: -75, forearmL: 88, upperArmR: -75, forearmR: 88 }
+      : { upperArmL: 0, forearmL: 0, upperArmR: 0, forearmR: 0 };
     o.frames = o.frames.map((f) => ({ ...f, pose: { ...f.pose, ...A } }));
   }
   if (patch && patch.ball) {

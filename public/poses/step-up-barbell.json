@@ -1,0 +1,115 @@
+{
+ "version": 2,
+ "title": "Barbell Step-up",
+ "view": "side",
+ "hold": "barbell",
+ "grounded": false,
+ "props": [
+  {
+   "type": "box",
+   "x": 54,
+   "y": 72,
+   "w": 30,
+   "h": 20
+  }
+ ],
+ "highlight": [
+  "kneeL",
+  "hipL"
+ ],
+ "frames": [
+  {
+   "duration": 700,
+   "label": "Stand facing the box",
+   "anchor": {
+    "joint": "ankleR",
+    "x": 36,
+    "y": 90
+   },
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "upperArmL": -75,
+    "forearmL": 88,
+    "upperArmR": -75,
+    "forearmR": 88,
+    "thighL": 0,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": 0,
+    "shinR": 0,
+    "footR": 90
+   }
+  },
+  {
+   "duration": 600,
+   "label": "Plant the whole foot on the box",
+   "anchor": {
+    "joint": "ankleL",
+    "x": 66,
+    "y": 70
+   },
+   "pose": {
+    "torso": 160,
+    "head": 162,
+    "thighL": 50,
+    "shinL": -30,
+    "footL": 80,
+    "thighR": -30,
+    "shinR": -35,
+    "footR": 60,
+    "upperArmL": -75,
+    "forearmL": 88,
+    "upperArmR": -75,
+    "forearmR": 88
+   }
+  },
+  {
+   "duration": 700,
+   "label": "Drive up to stand tall",
+   "anchor": {
+    "joint": "ankleL",
+    "x": 66,
+    "y": 70
+   },
+   "hold": 250,
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "thighL": 0,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": 25,
+    "shinR": -5,
+    "footR": 90,
+    "upperArmL": -75,
+    "forearmL": 88,
+    "upperArmR": -75,
+    "forearmR": 88
+   }
+  },
+  {
+   "duration": 900,
+   "label": "Lower back with control",
+   "anchor": {
+    "joint": "ankleL",
+    "x": 66,
+    "y": 70
+   },
+   "pose": {
+    "torso": 150,
+    "head": 158,
+    "thighL": 80,
+    "shinL": -40,
+    "footL": 80,
+    "thighR": -20,
+    "shinR": -22,
+    "footR": 70,
+    "upperArmL": -75,
+    "forearmL": 88,
+    "upperArmR": -75,
+    "forearmR": 88
+   }
+  }
+ ]
+}

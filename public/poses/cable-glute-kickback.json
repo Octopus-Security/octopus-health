@@ -1,0 +1,60 @@
+{
+ "version": 2,
+ "title": "Cable Glute Kickback",
+ "view": "side",
+ "anchor": {
+  "joint": "ankleR",
+  "x": 46,
+  "y": 90
+ },
+ "highlight": [
+  "hipL",
+  "spine"
+ ],
+ "props": [
+  {
+   "type": "box",
+   "x": 84,
+   "y": 8,
+   "w": 10,
+   "h": 84
+  },
+  {
+   "type": "bar",
+   "x1": 70,
+   "y1": 34,
+   "x2": 70,
+   "y2": 56
+  }
+ ],
+ "frames": [
+  {
+   "duration": 1000,
+   "label": "Hold the frame, working leg under the hip",
+   "pose": {
+    "torso": 172,
+    "head": 172,
+    "upperArmL": 62,
+    "forearmL": 70,
+    "upperArmR": 62,
+    "forearmR": 70,
+    "thighL": 2,
+    "shinL": 2,
+    "footL": 90,
+    "thighR": 0,
+    "shinR": 0,
+    "footR": 90
+   }
+  },
+  {
+   "duration": 900,
+   "label": "Kick back to a straight hip, torso still",
+   "hold": 350,
+   "pose": {
+    "thighL": -34,
+    "shinL": -36,
+    "footL": 40
+   }
+  }
+ ]
+}

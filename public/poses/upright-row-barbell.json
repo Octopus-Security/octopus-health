@@ -1,0 +1,52 @@
+{
+ "version": 2,
+ "title": "Barbell Upright Row",
+ "view": "side",
+ "hold": "barbell",
+ "anchor": {
+  "joint": "ankleL",
+  "x": 50,
+  "y": 90
+ },
+ "highlight": [
+  "shoulderL",
+  "elbowL"
+ ],
+ "frames": [
+  {
+   "duration": 1200,
+   "label": "Hang in front of the thighs",
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "upperArmL": 4,
+    "forearmL": 6,
+    "upperArmR": 4,
+    "forearmR": 6,
+    "thighL": 0,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": 0,
+    "shinR": 0,
+    "footR": 90
+   }
+  },
+  {
+   "duration": 1000,
+   "label": "Elbows lead up to chest height",
+   "pose": {
+    "upperArmL": 62,
+    "forearmL": 58,
+    "upperArmR": 62,
+    "forearmR": 58,
+    "shrug": 2,
+    "depth": {
+     "upperArmL": 0.4,
+     "upperArmR": 0.4,
+     "forearmL": 0.55,
+     "forearmR": 0.55
+    }
+   }
+  }
+ ]
+}

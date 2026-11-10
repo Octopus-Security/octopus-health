@@ -1,0 +1,88 @@
+{
+ "version": 2,
+ "title": "Elliptical",
+ "view": "side",
+ "grounded": false,
+ "highlight": [
+  "hipL",
+  "kneeL",
+  "hipR",
+  "kneeR"
+ ],
+ "frames": [
+  {
+   "duration": 450,
+   "label": "Left foot forward",
+   "hold": 0,
+   "pose": {
+    "torso": 176,
+    "head": 176,
+    "thighL": 35,
+    "shinL": 12,
+    "footL": 90,
+    "thighR": -15,
+    "shinR": -25,
+    "footR": 92,
+    "upperArmL": -18,
+    "forearmL": 30,
+    "upperArmR": 35,
+    "forearmR": 75,
+    "root": {
+     "x": 50,
+     "y": 50
+    }
+   }
+  },
+  {
+   "duration": 450,
+   "label": "Pedals pass",
+   "hold": 0,
+   "pose": {
+    "thighL": 15,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": 2,
+    "shinR": -12,
+    "footR": 90,
+    "upperArmL": 8,
+    "forearmL": 50,
+    "upperArmR": 12,
+    "forearmR": 55
+   }
+  },
+  {
+   "duration": 450,
+   "label": "Right foot forward",
+   "hold": 0,
+   "pose": {
+    "thighL": -15,
+    "shinL": -25,
+    "footL": 92,
+    "thighR": 35,
+    "shinR": 12,
+    "footR": 90,
+    "upperArmL": 35,
+    "forearmL": 75,
+    "upperArmR": -18,
+    "forearmR": 30
+   }
+  },
+  {
+   "duration": 450,
+   "label": "Pedals pass",
+   "hold": 0,
+   "pose": {
+    "thighL": 2,
+    "shinL": -12,
+    "footL": 90,
+    "thighR": 15,
+    "shinR": 0,
+    "footR": 90,
+    "upperArmL": 12,
+    "forearmL": 55,
+    "upperArmR": 8,
+    "forearmR": 50
+   }
+  }
+ ]
+}
