@@ -323,7 +323,7 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | library | Upper Trap Stretch | Upper Trap Stretch | recovery | neck-side-stretch | rule |
 | library | Levator Scapulae Stretch | Levator Scapulae Stretch | recovery | neck-side-stretch | rule |
 | library | Chin Tuck | Chin Tuck | recovery | chin-tuck | rule |
-| library | Lumbar Decompression Hang | Lumbar Decompression Hang | recovery | dead-hang | rule |
+| library | Relaxed Dead Hang | Relaxed Dead Hang | recovery | dead-hang | rule |
 | library | Scorpion Stretch | Scorpion Stretch | recovery | scorpion | rule |
 | library | Cobra Stretch | Cobra Stretch | recovery | cobra | rule |
 | library | Standing Side Bend Stretch | Standing Side Bend Stretch | recovery | side-bend | rule |
@@ -598,9 +598,9 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | mobility | gh-shrimp | Hip Escape (Shrimp) | recovery | shrimp | rule |
 | mobility | gh-cars | Quadruped Hip CARs | recovery | quadruped-hip-cars | rule |
 | mobility | lh-breath-start | Diaphragmatic breathing | recovery | stand-breathe | null rule -> category fallback |
-| mobility | lh-collar | Collarbone (supraclavicular) strokes | recovery | stand-breathe | null rule -> category fallback |
+| mobility | lh-collar | Collarbone-area strokes | recovery | stand-breathe | null rule -> category fallback |
 | mobility | lh-side-neck | Side-of-neck strokes | recovery | stand-breathe | null rule -> category fallback |
-| mobility | lh-ear-jaw | In front of and behind the ears, and along the jaw | recovery | stand-breathe | null rule -> category fallback |
+| mobility | lh-ear-jaw | Around the ears and along the jaw | recovery | stand-breathe | null rule -> category fallback |
 | mobility | lh-shoulders | Slow shoulder rolls | recovery | stand-breathe | null rule -> category fallback |
 | mobility | lh-neck-move | Gentle neck tilts and turns | recovery | stand-breathe | null rule -> category fallback |
 | mobility | lh-breath-end | Diaphragmatic breathing to finish | recovery | stand-breathe | null rule -> category fallback |

@@ -435,16 +435,17 @@ test('inline: "30s" after NxM is not guessed, and a trailing colon is not part o
 
 test('matchExercise resolves shorthand aliases to the canonical library entry', () => {
   const lib = [
-    { id: 1, name: 'Bench Press' }, { id: 2, name: 'Overhead Press' }, { id: 3, name: 'Deadlift' },
-    { id: 4, name: 'Romanian Deadlift' }, { id: 5, name: 'Bulgarian Split Squat' },
-    { id: 6, name: 'Stationary Bike' }, { id: 7, name: 'Inverted Row' },
+    { id: 1, name: 'Barbell Bench Press' }, { id: 2, name: 'Barbell Overhead Press' }, { id: 3, name: 'Barbell Deadlift' },
+    { id: 4, name: 'Romanian Deadlift (RDL)' }, { id: 5, name: 'Dumbbell Bulgarian Split Squat' },
+    { id: 6, name: 'Assault Bike — Steady State' }, { id: 7, name: 'Inverted Row' }, { id: 8, name: 'Relaxed Dead Hang' },
   ];
-  assert.deepStrictEqual(matchExercise('bench', lib), { id: 1, name: 'Bench Press' });
-  assert.deepStrictEqual(matchExercise('OHP', lib), { id: 2, name: 'Overhead Press' });
-  assert.deepStrictEqual(matchExercise('DL', lib), { id: 3, name: 'Deadlift' });
-  assert.deepStrictEqual(matchExercise('RDL', lib), { id: 4, name: 'Romanian Deadlift' });
-  assert.deepStrictEqual(matchExercise('BSS', lib), { id: 5, name: 'Bulgarian Split Squat' });
-  assert.deepStrictEqual(matchExercise('bike', lib), { id: 6, name: 'Stationary Bike' });
+  assert.deepStrictEqual(matchExercise('bench', lib), { id: 1, name: 'Barbell Bench Press' });
+  assert.deepStrictEqual(matchExercise('OHP', lib), { id: 2, name: 'Barbell Overhead Press' });
+  assert.deepStrictEqual(matchExercise('DL', lib), { id: 3, name: 'Barbell Deadlift' });
+  assert.deepStrictEqual(matchExercise('RDL', lib), { id: 4, name: 'Romanian Deadlift (RDL)' });
+  assert.deepStrictEqual(matchExercise('BSS', lib), { id: 5, name: 'Dumbbell Bulgarian Split Squat' });
+  assert.deepStrictEqual(matchExercise('bike', lib), { id: 6, name: 'Assault Bike — Steady State' });
+  assert.deepStrictEqual(matchExercise('Lumbar Decompression Hang', lib), { id: 8, name: 'Relaxed Dead Hang' }); // renamed seed
   assert.strictEqual(matchExercise('row', lib), null); // still no substring grab
 });
 

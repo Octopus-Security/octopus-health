@@ -1,3 +1,4 @@
+const { excludedFromPlans } = require('./lib/martial-scope');
 const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs');
@@ -1411,7 +1412,8 @@ app.get('/library', requireLogin, async (req, res) => {
 app.get('/plan-maker', requireLogin, async (req, res) => {
     const { ExerciseDefinition, ExercisePlan, sequelize } = getDatabase(req.user.username);
     await sequelize.sync();
-    const all = await ExerciseDefinition.findAll({ order: [['category','ASC'],['name','ASC']] });
+    // partner submissions stay loggable but are never offered to build a plan from (lib/martial-scope.js)
+    const all = (await ExerciseDefinition.findAll({ order: [['category','ASC'],['name','ASC']] })).filter(e => !excludedFromPlans(e));
     const exercises = all.map(e => ({
         ...e.toJSON(),
         primaryMuscles:   JSON.parse(e.primaryMuscles   || '[]'),
