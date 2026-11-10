@@ -39,7 +39,7 @@ test('a non-martial exercise on the category fallback must be on the allowlist',
 // Rules from the audit: the implement the figure carries must match the exercise's equipment.
 // `ball` is also how the ab wheel is drawn, hence 'roller'. The exercise NAME counts as evidence as well as the
 // equipment field ("Medicine Ball Slam" has equipment "none" but plainly holds a ball); a name never excuses the wrong implement.
-const HOLD_EQ = { dumbbell: ['dumbbell'], dumbbellL: ['dumbbell'], barbell: ['barbell'], kettlebell: ['kettlebell'], kettlebellL: ['kettlebell'], ball: ['ball', 'sandbag', 'roller'] };
+const HOLD_EQ = { dumbbell: ['dumbbell'], dumbbellL: ['dumbbell'], barbell: ['barbell'], kettlebell: ['kettlebell'], kettlebellL: ['kettlebell'], plate: ['plate'], ball: ['ball', 'sandbag', 'roller'] };
 test('the implement a figure holds matches the exercise equipment', () => {
   const bad = [];
   for (const r of rows.filter(x => x.source === 'library' && x.pose)) {

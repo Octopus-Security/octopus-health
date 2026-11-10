@@ -577,6 +577,8 @@
         var at = hold === 'kettlebellL' ? jt.handL : mid;
         return circ({ x: at.x, y: at.y + 4 }, 4.2, c) + circ(at, 2, 'none', ' stroke="' + c + '" stroke-width="1.5"');
       }
+      case 'plate':      // weight plates, one per hand (pinch carries): a ring with a hub
+        return ['L', 'R'].map(function (sd) { var h = jt['hand' + sd]; return circ(h, 5.5, 'none', ' stroke="' + c + '" stroke-width="2"') + circ(h, 1.2, c); }).join('');
       case 'ball':       return circ(mid, 6, c, ' opacity="0.9"');
       default:           return '';
     }

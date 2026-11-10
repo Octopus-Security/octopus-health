@@ -41,9 +41,9 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | library | Dumbbell Lunge | Dumbbell Lunge | strength | forward-lunge-db | rule |
 | library | Dumbbell Walking Lunge | Dumbbell Walking Lunge | strength | walking-lunge-db | rule |
 | library | Goblet Squat | Goblet Squat | strength | goblet-squat | rule |
-| library | Farmer's Carry | Farmer's Carry | strength | walk | rule |
+| library | Farmer's Carry | Farmer's Carry | strength | farmers-carry | rule |
 | library | Dumbbell Shrug | Dumbbell Shrug | strength | shrug | rule |
-| library | Dumbbell Suitcase Carry | Dumbbell Suitcase Carry | strength | walk | rule |
+| library | Dumbbell Suitcase Carry | Dumbbell Suitcase Carry | strength | suitcase-carry | rule |
 | library | Lat Pulldown | Lat Pulldown | strength | lat-pulldown | rule |
 | library | Seated Cable Row | Seated Cable Row | strength | seated-row | rule |
 | library | Cable Chest Fly | Cable Chest Fly | strength | chest-fly | rule |
@@ -199,7 +199,7 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | library | Plate Glute Bridge | Plate Glute Bridge | strength | glute-bridge | rule |
 | library | Plate Calf Raise | Plate Calf Raise | strength | calf-raise | rule |
 | library | Plate Sit-up | Plate Sit-up | strength | crunch | rule |
-| library | Plate Pinch Carry | Plate Pinch Carry | strength | walk-bare | rule |
+| library | Plate Pinch Carry | Plate Pinch Carry | strength | plate-pinch-carry | rule |
 | library | Weighted Pull-up | Weighted Pull-up | strength | pull-up | rule |
 | library | Weighted Chin-up | Weighted Chin-up | strength | pull-up | rule |
 | library | Weighted Dip | Weighted Dip | strength | dip | rule |
@@ -213,7 +213,7 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | library | Landmine Push Press | Landmine Push Press | strength | landmine-press | rule |
 | library | Landmine Thruster | Landmine Thruster | strength | landmine-thruster | rule |
 | library | Landmine Split Jerk | Landmine Split Jerk | strength | split-jerk | rule |
-| library | Landmine Meadows Row | Landmine Meadows Row | strength | bent-row-bare | rule |
+| library | Landmine Meadows Row | Landmine Meadows Row | strength | landmine-row | rule |
 | library | Landmine Reverse Lunge | Landmine Reverse Lunge | strength | reverse-lunge | rule |
 | library | Landmine Lateral Lunge | Landmine Lateral Lunge | strength | lateral-lunge | rule |
 | library | Landmine Anti-Rotation | Landmine Anti-Rotation | strength | landmine-anti-rotation | rule |
@@ -307,7 +307,7 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | library | Battle Ropes | Battle Ropes | conditioning | battle-ropes | rule |
 | library | Jump Rope — Double Unders | Jump Rope — Double Unders | conditioning | jump-rope | rule |
 | library | Wall Walks | Wall Walks | conditioning | wall-walk | rule |
-| library | Sandbag Carry | Sandbag Carry | conditioning | walk-bare | rule |
+| library | Sandbag Carry | Sandbag Carry | conditioning | sandbag-carry | rule |
 | library | Wrist CARS | Wrist CARS | recovery | wrist-circle | rule |
 | library | Wrist Flexor Stretch | Wrist Flexor Stretch | recovery | wrist-flexor-stretch | rule |
 | library | Pronation/Supination Circles | Pronation/Supination Circles | recovery | wrist-circle | rule |
@@ -384,7 +384,7 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | library | Single-Leg Stand | Single-Leg Stand | recovery | single-leg-stand | rule |
 | library | Single-Leg Reach | Single-Leg Reach | recovery | single-leg-reach | rule |
 | library | Single-Leg RDL (Bodyweight) | Single-Leg RDL (Bodyweight) | strength | single-leg-rdl | rule |
-| library | Heel-to-Toe Walk | Heel-to-Toe Walk | recovery | walk-bare | rule |
+| library | Heel-to-Toe Walk | Heel-to-Toe Walk | recovery | tandem-walk | rule |
 | library | Jump Rope: Room Intervals | Jump Rope: Room Intervals | conditioning | jump-rope | rule |
 | library | Jump Rope: Boxer Skip | Jump Rope: Boxer Skip | conditioning | jump-rope | rule |
 | library | Box Breathing | Box Breathing | recovery | stand-breathe | rule |

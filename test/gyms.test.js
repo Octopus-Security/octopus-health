@@ -408,7 +408,7 @@ test('landmine work needs the landmine and a bar, and swaps to something real wi
 test('every landmine exercise has a pose chosen on purpose, and the plan names real exercises', () => {
   const PM = require('../public/pose-map.js');
   const { ex, tpl } = seedArrays();
-  const want = { 'Landmine Punch': 'jab-cross', 'Landmine Rotation': 'landmine-rotation', 'Landmine Anti-Rotation': 'landmine-anti-rotation', 'Landmine Rotational Press': 'landmine-press', 'Landmine Deadlift to Rotational Press': 'landmine-deadlift-press', 'Landmine Push Press': 'landmine-press', 'Landmine Thruster': 'landmine-thruster', 'Landmine Split Jerk': 'split-jerk', 'Landmine Meadows Row': 'bent-row-bare', 'Landmine Reverse Lunge': 'reverse-lunge', 'Landmine Lateral Lunge': 'lateral-lunge' };
+  const want = { 'Landmine Punch': 'jab-cross', 'Landmine Rotation': 'landmine-rotation', 'Landmine Anti-Rotation': 'landmine-anti-rotation', 'Landmine Rotational Press': 'landmine-press', 'Landmine Deadlift to Rotational Press': 'landmine-deadlift-press', 'Landmine Push Press': 'landmine-press', 'Landmine Thruster': 'landmine-thruster', 'Landmine Split Jerk': 'split-jerk', 'Landmine Meadows Row': 'landmine-row', 'Landmine Reverse Lunge': 'reverse-lunge', 'Landmine Lateral Lunge': 'lateral-lunge' };
   const seeded = ex.filter(e => e.name.startsWith('Landmine ')).map(e => e.name).sort();
   assert.deepStrictEqual(seeded, Object.keys(want).sort());
   for (const [n, k] of Object.entries(want)) assert.strictEqual(PM.keyFor(n), k, n);

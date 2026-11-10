@@ -77,7 +77,7 @@
     [/single-leg stand/i, 'single-leg-stand'],
     [/single-leg reach/i, 'single-leg-reach'],
     [/single-leg rdl/i, 'single-leg-rdl'],
-    [/heel-to-toe/i, 'walk-bare'],
+    [/heel-to-toe/i, 'tandem-walk'],
     [/progressive muscle/i, 'supine-relax'],
     [/wall biceps stretch/i, 'wall-biceps-stretch'],
     [/behind-the-back chest opener/i, 'chest-opener'],
@@ -256,7 +256,7 @@
     [/landmine rotation/i, 'landmine-rotation'],
     [/landmine thruster/i, 'landmine-thruster'],
     [/landmine split jerk/i, 'split-jerk'],
-    [/landmine meadows row/i, 'bent-row-bare'],
+    [/landmine meadows row/i, 'landmine-row'],
     [/landmine reverse lunge/i, 'reverse-lunge'],
     [/landmine lateral lunge/i, 'lateral-lunge'],
     [/hanging knee raise|captain'?s chair/i, 'hanging-leg-raise'],   // before the knee-strike rule below, which would take any "knee"
@@ -282,7 +282,10 @@
     [/assault bike|bike|cycling/i, 'bike'],
     [/rowing machine|erg/i, 'rower'],
     [/treadmill|sprint|\brun\b|basketball|high knees/i, 'run'],
-    [/plate pinch carry|sandbag carry/i, 'walk-bare'],
+    [/farmer/i, 'farmers-carry'],
+    [/suitcase carry/i, 'suitcase-carry'],
+    [/plate pinch carry/i, 'plate-pinch-carry'],
+    [/sandbag carry/i, 'sandbag-carry'],
     [/carry|walk \+|walking$/i, 'walk'],
 
     // ── strength: core ──

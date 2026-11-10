@@ -1,0 +1,10 @@
+{
+ "version": 2,
+ "title": "Landmine Meadows Row",
+ "view": "side",
+ "highlight": ["shoulderL","elbowL","spine"],
+ "frames": [
+  {"duration":1000,"label":"Staggered stance, hinged, arm long toward the bar end","hold":300,"anchor":{"joint":"ankleL","x":55,"y":90},"pose":{"torso":115,"head":125,"upperArmL":25,"forearmL":25,"thighL":20,"shinL":5,"footL":90,"upperArmR":30,"forearmR":35,"thighR":-12,"shinR":-14,"footR":76}},
+  {"duration":900,"label":"Row the bar end to the ribs, elbow close","hold":350,"anchor":{"joint":"ankleL","x":55,"y":90},"pose":{"torso":115,"head":125,"upperArmL":-65,"forearmL":-5,"thighL":20,"shinL":5,"footL":90,"upperArmR":30,"forearmR":35,"thighR":-12,"shinR":-14,"footR":76}}
+ ]
+}

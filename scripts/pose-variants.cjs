@@ -17,7 +17,6 @@ const VARIANTS = [
   ['bench-press-db', 'bench-press', 'dumbbell', 'Dumbbell Bench Press'],
   ['overhead-press-db', 'overhead-press', 'dumbbell', 'Dumbbell Overhead Press'],
   ['rdl-barbell', 'rdl', 'barbell', 'Barbell Romanian Deadlift'],
-  ['bent-row-bare', 'bent-row', null, 'Bent-Over Row'],
   ['forward-lunge-db', 'forward-lunge', 'dumbbell', 'Dumbbell Forward Lunge'],
   ['walking-lunge-db', 'walking-lunge', 'dumbbell', 'Dumbbell Walking Lunge'],
   ['goblet-squat-plate', 'goblet-squat', null, 'Plate Goblet Squat'],
@@ -28,7 +27,11 @@ const VARIANTS = [
   ['tricep-overhead-bare', 'tricep-overhead', null, 'Overhead Triceps Extension (cable)'],
   ['shrug-bare', 'shrug', null, 'Shrug Roll'],
   ['wood-chop-cable', 'wood-chop', null, 'Cable Wood Chop'],
-  ['walk-bare', 'walk', null, 'Walk'],
+  // carries: the walk's legs, but the arms hang still under the load instead of swinging
+  ['farmers-carry', 'walk', 'dumbbell', "Farmer's Carry", { arms: 'down' }],
+  ['suitcase-carry', 'walk', 'dumbbellL', 'Suitcase Carry (one side)', { arms: 'down' }],
+  ['plate-pinch-carry', 'walk', 'plate', 'Plate Pinch Carry', { arms: 'down' }],
+  ['sandbag-carry', 'walk', 'ball', 'Sandbag Carry (bear hug)', { arms: 'hug' }],
   // the same figures with a lacrosse ball instead of a foam roller
   ['ball-roll-calf', 'foam-roll-calf', null, 'Calf Ball Roll', { ball: true }],
   ['ball-roll-quad', 'foam-roll-prone', null, 'Quad Ball Roll (face down)', { ball: true }],
@@ -50,6 +53,10 @@ for (const [key, base, hold, title, patch] of VARIANTS) {
     if (k === 'hold') continue;
     o[k] = k === 'title' ? title : v;
     if (k === 'view' && hold) o.hold = hold;
+  }
+  if (patch && patch.arms) {
+    const A = patch.arms === 'hug' ? { upperArmL: 35, forearmL: 115, upperArmR: 35, forearmR: 115 } : { upperArmL: 0, forearmL: 0, upperArmR: 0, forearmR: 0 };
+    o.frames = o.frames.map((f) => ({ ...f, pose: { ...f.pose, ...A } }));
   }
   if (patch && patch.ball) {
     if (o.props) o.props = o.props.map((p) => (p.type === 'roller' ? { ...p, type: 'ball' } : p));
