@@ -39,7 +39,7 @@ document.querySelectorAll('.ao-done').forEach(function (b) {
       if (!j.ok) throw new Error('failed');
       b.setAttribute('aria-pressed', String(j.done));
       b.textContent = j.done ? '✓ Done (tap to undo)' : 'Mark done';
-    } catch (e) { alert('Could not save. Try again.'); }
+    } catch (e) { await oDialog.alert({ title: 'Not saved', body: 'Could not save. Check your connection and try again.' }); }
     b.disabled = false;
   });
 });

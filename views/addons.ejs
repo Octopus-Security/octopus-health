@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title><%= title %></title>
   <link rel="stylesheet" href="<%= asset('/theme.css') %>">
+  <%- include('partials/dialog') %>
   <style>
     .ao-card h3 { margin: 0 0 6px; overflow-wrap: anywhere; }
     .ao-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
@@ -92,7 +93,7 @@
   document.querySelectorAll('.ao-act').forEach(function (b) {
     b.addEventListener('click', async function () {
       var id = b.closest('.ao-card').dataset.addon, act = b.dataset.act;
-      if (act === 'stop' && !confirm('Stop this add-on? Its history stays, and you can start it again later.')) return;
+      if (act === 'stop' && !(await oDialog.confirm({ title: 'Stop this add-on?', body: 'Its history stays, and you can start it again later.', confirmLabel: 'Stop', danger: true }))) return;
       b.disabled = true; say('');
       try { await send('POST', '/addons/api/' + act, { addonId: id }); location.reload(); }
       catch (e) { say('Could not do that: ' + e.message); b.disabled = false; }
