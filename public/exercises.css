@@ -1,0 +1,55 @@
+/* Exercises section of the Logs area. Mobile first: 16px gutter (the .container), 44px tap
+   targets, wrapping names, and nothing that makes the page scroll sideways. */
+.ex-page { padding-top: 20px; padding-bottom: 40px; }
+.ex-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+.ex-head h2 { margin: 0; overflow-wrap: anywhere; }
+.ex-sub { color: #888; font-size: 0.85rem; margin: 0 0 16px; }
+.ex-empty { color: #666; text-align: center; padding: 40px 0; }
+.ex-find { display: block; font-size: 0.78rem; color: #777; margin-bottom: 4px; }
+#ex-filter, #pick-filter { width: 100%; box-sizing: border-box; min-height: 44px; font-size: 16px; margin-bottom: 12px; }
+.ex-list, .pick-list { list-style: none; margin: 0; padding: 0; }
+.ex-row { background: #0d0d0d; border: 1px solid #2a2a2a; border-radius: 10px; padding: 12px 14px; margin-bottom: 10px; }
+.ex-row[hidden] { display: none; }
+.ex-name { display: block; font-weight: 600; color: #e8e8e8; font-size: 1rem; text-decoration: none; overflow-wrap: anywhere; min-height: 28px; }
+.ex-name:hover { color: #2ecc71; }
+.ex-meta { color: #777; font-size: 0.8rem; margin-top: 2px; }
+.ex-similar { color: #c9a227; font-size: 0.78rem; margin-top: 4px; overflow-wrap: anywhere; }
+.ex-actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.ex-actions .mini, .sheet .btns button { min-height: 44px; }
+.mini { background: none; border: 1px solid #2a2a2a; color: #aaa; border-radius: 6px; cursor: pointer; font-size: 0.85rem; padding: 8px 14px; font-family: inherit; }
+.mini:hover { color: #e8e8e8; border-color: #444; }
+
+.sheet-bg { position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 50; }
+.sheet-bg:not([hidden]) { display: flex; align-items: flex-end; justify-content: center; }
+.sheet { background: #111; border: 1px solid #2a2a2a; border-radius: 14px 14px 0 0; width: 100%; max-width: 520px;
+         max-height: 92vh; max-height: 92dvh; overflow-y: auto; overscroll-behavior: contain;
+         padding: 18px 16px calc(18px + env(safe-area-inset-bottom)); box-sizing: border-box; }
+@media (min-width: 641px) { .sheet-bg:not([hidden]) { align-items: center; } .sheet { border-radius: 14px; } }
+.sheet h3 { margin: 0 0 12px; }
+.sheet label { display: block; font-size: 0.78rem; color: #777; margin-bottom: 4px; }
+.sheet .btns { margin-top: 12px; }
+.sheet .btns button { width: 100%; }
+.pick-list { border: 1px solid #222; border-radius: 8px; max-height: 40vh; overflow-y: auto; }
+.pick-list li { border-top: 1px solid #1a1a1a; }
+.pick-list li:first-child { border-top: none; }
+.pick-list button { all: unset; box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; display: flex; justify-content: space-between; gap: 8px; align-items: center; cursor: pointer; color: #ddd; overflow-wrap: anywhere; }
+.pick-list button:hover, .pick-list button:focus-visible { background: #142014; }
+.pick-list .cnt { color: #666; font-size: 0.75rem; flex-shrink: 0; }
+
+/* Detail page */
+.ex-card { background: #0d0d0d; border: 1px solid #2a2a2a; border-radius: 10px; padding: 14px; margin-bottom: 14px; }
+.ex-card h3 { margin: 0 0 10px; font-size: 1rem; color: #e8e8e8; }
+.ex-chart { position: relative; height: 260px; }
+.ex-chart canvas { max-width: 100%; }
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; }
+.table-wrap table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+.table-wrap th, .table-wrap td { text-align: left; padding: 8px 6px; border-top: 1px solid #1a1a1a; white-space: nowrap; }
+.table-wrap th { color: #777; font-weight: 600; font-size: 0.75rem; }
+.ex-pill { display: inline-block; padding: 4px 10px; border-radius: 14px; font-size: 0.8rem; border: 1px solid #2a2a2a; color: #aaa; }
+.ex-pill.ok { border-color: #1f4a2e; color: #2ecc71; }
+.ex-pill.warn { border-color: #7a4010; color: #e67e22; }
+.ex-tips { margin: 10px 0 0; padding-left: 20px; }
+.ex-tips li { margin-bottom: 10px; color: #bbb; font-size: 0.9rem; }
+.ex-tips strong { color: #e8e8e8; }
+.ex-fine { color: #666; font-size: 0.78rem; margin-top: 8px; }
+.ex-note { color: #999; font-size: 0.85rem; margin: 0 0 8px; }

@@ -111,13 +111,16 @@ const ASSET_STAMPS = new Map();
 
 // Files served from octopus-kit rather than public/ (the themed dialog). Resolved lazily so a
 // missing package degrades to an unstamped URL instead of failing at load.
+// Values are paths under node_modules. chart.js (the exercise page's graph) is served the same way:
+// it is already a dependency, so there is no second copy to keep in step in public/.
 const KIT_FILES = {
-  '/vendor/octopus-dialog.js': 'ui/dialog.js',
-  '/vendor/octopus-dialog.css': 'ui/dialog.css',
+  '/vendor/octopus-dialog.js': 'octopus-kit/ui/dialog.js',
+  '/vendor/octopus-dialog.css': 'octopus-kit/ui/dialog.css',
+  '/vendor/chart.umd.js': 'chart.js/dist/chart.umd.js',
 };
 function kitFile(urlPath) {
   const rel = KIT_FILES[urlPath];
-  return rel ? path.join(ROOT, 'node_modules', 'octopus-kit', rel) : null;
+  return rel ? path.join(ROOT, 'node_modules', rel) : null;
 }
 
 function asset(urlPath) {

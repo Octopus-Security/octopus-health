@@ -66,7 +66,7 @@
     <div class="container" style="padding-top:20px">
       <div class="page-head">
         <h2 style="margin:0">📒 Workout Logs</h2>
-        <a href="/workout" class="btn">＋ Log a workout</a>
+        <span class="head-actions"><a href="/logs/exercises" class="btn">📋 Exercises</a><a href="/workout" class="btn">＋ Log a workout</a></span>
       </div>
 
       <div class="filter-row">
@@ -123,7 +123,7 @@
             ${s.exercises.map(ex => `
               <div class="log-ex">
                 <div class="log-ex-head">
-                  <div class="log-ex-name">${esc(ex.name)}</div>
+                  <a class="log-ex-name" href="/logs/exercises/detail?name=${encodeURIComponent(ex.name)}" style="text-decoration:none">${esc(ex.name)}</a>
                   <button class="mini" onclick="renameEx(${s.id}, ${esc(JSON.stringify(ex.name))})">Rename</button>
                 </div>
                 ${ex.sets.map((st, i) => { const t = setText(st); return `

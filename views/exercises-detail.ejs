@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <%- include('partials/favicon') %>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="<%= asset('/theme.css') %>">
+    <%- include('partials/dialog') %>
+    <link rel="stylesheet" href="<%= asset('/exercises.css') %>">
+</head>
+<body>
+    <%- include('partials/nav') %>
+
+    <div class="container ex-page">
+      <% if (!d) { %>
+        <div class="ex-head"><h2>Exercise not found</h2><a href="/logs/exercises" class="btn">← Exercises</a></div>
+        <p class="ex-sub">Nothing is logged under "<%= name %>". It may have been renamed or merged.</p>
+      <% } else {
+           const pr = d.prs, pl = d.plateau;
+           const fmtSecs = function (s) { return s >= 60 ? (Math.round(s / 6) / 10) + ' min' : s + 's'; };
+      %>
+      <div class="ex-head">
+        <h2><%= d.name %></h2>
+        <a href="/logs/exercises" class="btn">← Exercises</a>
+      </div>
+      <p class="ex-sub"><%= d.totalSets %> set<%= d.totalSets === 1 ? '' : 's' %> logged across <%= d.sessions %> session<%= d.sessions === 1 ? '' : 's' %>. Weights are shown in lbs (kg sets are converted). Failed sets are left out of records.</p>
+
+      <% if (d.mode === 'none' || !d.sessions) { %>
+        <div class="ex-card"><p class="ex-note">No reps, weight or time on record for this exercise yet, so there is nothing to chart.</p></div>
+      <% } else { %>
+
+      <div class="ex-card">
+        <h3>Personal records</h3>
+        <div class="table-wrap"><table>
+          <% if (d.mode === 'weighted') { %>
+          <thead><tr><th>Record</th><th>Value</th><th>Date</th></tr></thead>
+          <tbody>
+            <% if (pr.heaviest) { %><tr><td>Heaviest set</td><td><%= pr.heaviest.weight %> lbs x <%= pr.heaviest.reps == null ? '?' : pr.heaviest.reps %></td><td><%= pr.heaviest.date %></td></tr><% } %>
+            <% if (pr.bestE1rm) { %><tr><td>Best estimated 1RM</td><td><%= pr.bestE1rm.value %> lbs <small>(<%= pr.bestE1rm.weight %> x <%= pr.bestE1rm.reps %>)</small></td><td><%= pr.bestE1rm.date %></td></tr><% } %>
+            <% if (pr.bestVolumeSet) { %><tr><td>Best volume, one set</td><td><%= pr.bestVolumeSet.volume %> lbs <small>(<%= pr.bestVolumeSet.weight %> x <%= pr.bestVolumeSet.reps %>)</small></td><td><%= pr.bestVolumeSet.date %></td></tr><% } %>
+            <% pr.repPRs.forEach(function (r) { if (r.weight != null) { %><tr><td><%= r.reps %>+ rep<%= r.reps === 1 ? '' : 's' %></td><td><%= r.weight %> lbs</td><td><%= r.date %></td></tr><% } }) %>
+          </tbody>
+          <% } else if (d.mode === 'reps') { %>
+          <thead><tr><th>Record</th><th>Value</th><th>Date</th></tr></thead>
+          <tbody><% if (pr.mostReps) { %><tr><td>Most reps, one set</td><td><%= pr.mostReps.reps %></td><td><%= pr.mostReps.date %></td></tr><% } %></tbody>
+          <% } else { %>
+          <thead><tr><th>Record</th><th>Value</th><th>Date</th></tr></thead>
+          <tbody><% if (pr.longest) { %><tr><td>Longest hold</td><td><%= fmtSecs(pr.longest.seconds) %></td><td><%= pr.longest.date %></td></tr><% } %></tbody>
+          <% } %>
+        </table></div>
+        <% if (d.mode === 'weighted') { %><p class="ex-fine">Estimated 1RM uses the <%= S.E1RM_FORMULA %> formula, on sets of 1 to <%= S.E1RM_MAX_REPS %> reps only: above that it over-reads. "5+ reps" means the heaviest weight lifted for at least 5 reps.</p><% } %>
+        <% if (d.storedRecord) { %><p class="ex-fine">Recorded by the logger: <%= d.storedRecord.weight != null ? d.storedRecord.weight + ' ' + d.storedRecord.weightUnit : (d.storedRecord.durationSecs != null ? fmtSecs(d.storedRecord.durationSecs) : d.storedRecord.reps + ' reps') %> on <%= d.storedRecord.date %>.</p><% } %>
+      </div>
+
+      <div class="ex-card">
+        <h3><%= d.mode === 'weighted' ? 'Strength over time' : (d.mode === 'reps' ? 'Best reps over time' : 'Best hold over time') %></h3>
+        <% if (d.series.length < 2) { %>
+          <p class="ex-note">The graph needs at least two sessions. Log this one again and it appears.</p>
+        <% } else { %>
+        <div class="ex-chart"><canvas id="ex-canvas" role="img" aria-label="Line graph of <%= d.name %> by session"></canvas></div>
+        <noscript><p class="ex-note">The graph needs JavaScript; the numbers are in the session table below.</p></noscript>
+        <% } %>
+        <details style="margin-top:10px"><summary class="ex-note" style="cursor:pointer;min-height:44px;display:flex;align-items:center">Session table</summary>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Date</th>
+              <% if (d.mode === 'weighted') { %><th>Top set</th><th>Est. 1RM</th><th>Volume</th>
+              <% } else if (d.mode === 'reps') { %><th>Best reps</th><th>Total reps</th>
+              <% } else { %><th>Best hold</th><% } %></tr></thead>
+            <tbody>
+              <% d.series.slice().reverse().forEach(function (p) { %>
+              <tr><td><%= p.date %></td>
+                <% if (d.mode === 'weighted') { %><td><%= p.topWeight %> x <%= p.topReps == null ? '?' : p.topReps %></td><td><%= p.e1rm == null ? '-' : p.e1rm %></td><td><%= p.volume %></td>
+                <% } else if (d.mode === 'reps') { %><td><%= p.topReps %></td><td><%= p.volume %></td>
+                <% } else { %><td><%= fmtSecs(p.topSeconds) %></td><% } %></tr>
+              <% }) %>
+            </tbody>
+          </table></div>
+        </details>
+      </div>
+
+      <div class="ex-card">
+        <h3>Plateau check</h3>
+        <% if (pl.status === 'not-enough-data') { %>
+          <p><span class="ex-pill">Too early to tell</span></p>
+          <p class="ex-note">A plateau needs at least <%= pl.need %> sessions to judge; there are <%= pl.have %>.</p>
+        <% } else if (pl.status === 'too-recent') { %>
+          <p><span class="ex-pill">Too early to tell</span></p>
+          <p class="ex-note">Your last <%= pl.rule.sessions %> sessions are only <%= pl.days %> day<%= pl.days === 1 ? '' : 's' %> apart. A stall is judged over at least <%= pl.rule.minDays %> days.</p>
+        <% } else if (pl.status === 'progressing') { %>
+          <p><span class="ex-pill ok">Still progressing</span></p>
+          <p class="ex-note">Your best in the last <%= pl.rule.sessions %> sessions (<%= pl.recentBest %>) beats everything before it (<%= pl.priorBest %>) by more than <%= Math.round(pl.rule.minGain * 100) %>%.</p>
+        <% } else { %>
+          <p><span class="ex-pill warn"><%= pl.status === 'declining' ? 'Slipping' : 'Plateau' %></span></p>
+          <p class="ex-note">No improvement of <%= Math.round(pl.rule.minGain * 100) %>% or more across your last <%= pl.rule.sessions %> sessions (<%= pl.days %> days). Best before: <%= pl.priorBest %><%= d.mode === 'weighted' ? ' lbs est. 1RM' : '' %>; best since: <%= pl.recentBest %>.</p>
+          <ol class="ex-tips">
+            <% d.tips.forEach(function (t) { %><li><strong><%= t.title %>.</strong> <%= t.text %></li><% }) %>
+          </ol>
+        <% } %>
+        <p class="ex-fine">Rule: stalled when the best of the last <%= pl.rule.sessions %> sessions is not at least <%= Math.round(pl.rule.minGain * 100) %>% above the best of all earlier sessions, over at least <%= pl.rule.minDays %> days. <%= d.disclaimer %></p>
+      </div>
+      <% } %>
+      <% } %>
+    </div>
+
+    <% if (d && d.series.length >= 2) { %>
+    <script type="application/json" id="ex-series"><%- JSON.stringify({ mode: d.mode, series: d.series }).replace(/</g, '\\u003c') %></script>
+    <script src="<%= asset('/vendor/chart.umd.js') %>"></script>
+    <script src="<%= asset('/js/exercises-detail.js') %>"></script>
+    <% } %>
+</body>
+</html>

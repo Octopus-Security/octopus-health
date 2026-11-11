@@ -247,3 +247,19 @@ year that is more than 12 months back is refused with a message saying what
 today is. A silently wrong date is the one mistake nobody catches until the
 history is already wrong, so the response also returns the date the session was
 actually filed under, for the caller to report back.
+
+## Bar weights in logged text
+
+`api/workout-parse.js` (the parser behind `POST /api/service/sessions/from-text`, so no model can skip it) reads a bar as a load:
+`50 + bar`, `bar + 50`, `bar+50`, and a bare `bar` (`5 x bar`, `bar x 5`) are plates plus the bar, or the bar alone. The bar's weight comes from,
+in order: the exercise header (`45lb bar`, `20kg bar`, `bar 20kg`, `EZ bar 25`), an earlier `Bar = 35 lbs` line, then the standard **45 lb** bar.
+The set's note records how the total was read (`50 + 45lb bar`, `just the 45lb bar`), so an assumed bar is visible on the set. A bar is never
+read as bodyweight. A line that mixes a named weight with the word bar (`10 x 25lb ez bar`) is left alone.
+
+## Exercises section (Logs area)
+
+`/logs/exercises` lists every exercise name in the account with set and session counts and the last date. **Rename** and **Merge into** are one
+operation (`api/exercise-manage.js`, `moveExercise`): every set under the old name moves to the new one, stored PRs follow, and an `ExerciseAlias`
+is recorded so later logs of the old spelling land on the new name. Without `confirm: true` it only previews. Nothing is deleted; repeating it moves 0.
+`/logs/exercises/detail?name=` shows records, a chart.js graph and the plateau check (`api/exercise-stats.js`): stalled = the best estimated 1RM
+(Epley, 1-12 reps) of the last 4 sessions is not at least 1% above every earlier session, over at least 14 days, with at least 5 sessions.
