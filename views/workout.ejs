@@ -815,7 +815,9 @@ async function confirmFinish() {
 
 async function discardSession() {
   if (!sessionId || !(await oDialog.confirm({ title: 'Discard workout?', body: 'Discard this workout?', confirmLabel: 'Discard', danger: true }))) return;
-  await fetch('/workout/api/session/' + sessionId, { method: 'DELETE' });
+  let r = null;
+  try { r = await fetch('/workout/api/session/' + sessionId, { method: 'DELETE' }); } catch (e) { /* network error */ }
+  if (!r || !r.ok) return oDialog.alert({ title: 'Not deleted', body: 'Could not delete. Check your connection and try again.' });
   clearSession(); stopRest();
   window.location.reload();
 }
@@ -966,7 +968,9 @@ function addCustomToBuilder() {
 async function loadTemplate(id) {
   if (sessionId) {
     if (!(await oDialog.confirm({ title: 'Replace active workout?', body: 'You have an active workout. Start a new one with this template?', confirmLabel: 'Start new', danger: true }))) return;
-    await fetch('/workout/api/session/' + sessionId, { method: 'DELETE' });
+    let d = null;
+    try { d = await fetch('/workout/api/session/' + sessionId, { method: 'DELETE' }); } catch (e) { /* network error */ }
+    if (!d || !d.ok) return oDialog.alert({ title: 'Not deleted', body: 'Could not close your active workout. Check your connection and try again.' });
     clearSession(); stopRest();
   }
   const r = await fetch('/workout/api/templates');
@@ -986,7 +990,9 @@ async function loadTemplate(id) {
 
 async function deleteTemplate(id) {
   if (!(await oDialog.confirm({ title: 'Delete template?', body: 'Delete this workout template?', confirmLabel: 'Delete', danger: true }))) return;
-  await fetch(`/workout/api/templates/${id}`, { method: 'DELETE' });
+  let r = null;
+  try { r = await fetch(`/workout/api/templates/${id}`, { method: 'DELETE' }); } catch (e) { /* network error */ }
+  if (!r || !r.ok) return oDialog.alert({ title: 'Not deleted', body: 'Could not delete. Check your connection and try again.' });
   const card = document.getElementById('tpl-' + id);
   if (card) card.remove();
 }

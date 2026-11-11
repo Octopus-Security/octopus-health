@@ -141,7 +141,9 @@
 
     async function deletePR(id) {
       if (!(await oDialog.confirm({ title: 'Delete PR?', body: 'Delete this PR?', confirmLabel: 'Delete', danger: true }))) return;
-      await fetch(`/api/workout/prs/${id}`, { method:'DELETE', credentials:'include' });
+      let r = null;
+      try { r = await fetch(`/api/workout/prs/${id}`, { method:'DELETE', credentials:'include' }); } catch (e) { /* network error */ }
+      if (!r || !r.ok) return oDialog.alert({ title: 'Not deleted', body: 'Could not delete. Check your connection and try again.' });
       loadPRs();
     }
 

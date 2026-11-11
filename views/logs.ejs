@@ -227,7 +227,7 @@
       async function delSet(sid, setId) {
         if (!(await oDialog.confirm({ title: 'Delete set?', body: 'Delete this set?', confirmLabel: 'Delete', danger: true }))) return;
         const r = await api('DELETE', '/logs/api/set/' + setId);
-        if (!r.ok) return showErr(r.error);
+        if (!r.ok) return oDialog.alert({ title: 'Not deleted', body: r.error || 'Could not delete. Check your connection and try again.' });
         closeSheet(); refresh(sid);
       }
 
@@ -308,7 +308,7 @@
       async function delSession(sid) {
         if (!(await oDialog.confirm({ title: 'Delete workout?', body: 'Delete this whole workout and its sets? This cannot be undone.', confirmLabel: 'Delete', danger: true }))) return;
         const r = await api('DELETE', '/logs/api/session/' + sid);
-        if (!r.ok) return showErr(r.error);
+        if (!r.ok) return oDialog.alert({ title: 'Not deleted', body: r.error || 'Could not delete. Check your connection and try again.' });
         closeSheet();
         SESSIONS = SESSIONS.filter(s => s.id !== sid);
         render();

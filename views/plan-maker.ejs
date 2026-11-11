@@ -374,10 +374,13 @@ async function deletePlan(id) {
   const token = localStorage.getItem('authToken');
   const headers = {};
   if (token) headers['Authorization'] = 'Bearer ' + token;
-  const r = await fetch('/api/workout/exercise-plans/' + id, { method:'DELETE', headers });
-  if (r.ok) {
+  let r = null;
+  try { r = await fetch('/api/workout/exercise-plans/' + id, { method:'DELETE', headers }); } catch (e) { /* network error */ }
+  if (r && r.ok) {
     SAVED_PLANS = SAVED_PLANS.filter(p => p.id !== id);
     renderSavedPlans();
+  } else {
+    await oDialog.alert({ title: 'Not deleted', body: 'Could not delete. Check your connection and try again.' });
   }
 }
 

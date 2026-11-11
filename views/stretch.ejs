@@ -375,7 +375,9 @@ async function saveRoutine() {
 
 async function deleteRoutine(id) {
   if (!(await oDialog.confirm({ title: 'Delete routine?', body: 'Delete this stretch routine?', confirmLabel: 'Delete', danger: true }))) return;
-  await fetch('/stretch/api/routines/' + id, { method: 'DELETE' });
+  let r = null;
+  try { r = await fetch('/stretch/api/routines/' + id, { method: 'DELETE' }); } catch (e) { /* network error */ }
+  if (!r || !r.ok) return oDialog.alert({ title: 'Not deleted', body: 'Could not delete. Check your connection and try again.' });
   const card = document.getElementById('routine-' + id);
   if (card) card.remove();
 }
