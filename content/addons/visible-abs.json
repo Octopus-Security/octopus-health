@@ -1,0 +1,50 @@
+{
+  "id": "visible-abs",
+  "title": "Visible abs",
+  "goalKind": "body_comp",
+  "summary": "Three core sessions a week on training days, moving from anti-extension and anti-rotation basics to harder variations.",
+  "honesty": "Visible abs depend mostly on body fat, which is set by diet and overall activity. Core training builds the muscle underneath, but it does not remove fat from one area. Use the nutrition targets alongside this add-on.",
+  "nutritionLink": true,
+  "deload": "follow",
+  "weeks": [
+    {
+      "from": 1, "to": 2, "focus": "Bracing basics: anti-extension and anti-rotation",
+      "tracks": [ { "id": "core", "sessionsPerWeek": 3, "placement": "training", "sessions": [[
+        { "exercise": "Dead Bug", "sets": 3, "reps": 8 },
+        { "exercise": "Plank", "sets": 3, "duration": 30 },
+        { "exercise": "Side Plank", "sets": 2, "duration": 20 },
+        { "exercise": "Hollow Body Hold", "sets": 3, "duration": 15 }
+      ]] } ]
+    },
+    {
+      "from": 3, "to": 4, "focus": "Longer holds and leg raises",
+      "tracks": [ { "id": "core", "sessionsPerWeek": 3, "placement": "training", "sessions": [[
+        { "exercise": "Dead Bug", "sets": 3, "reps": 10 },
+        { "exercise": "Plank", "sets": 3, "duration": 45 },
+        { "exercise": "Side Plank", "sets": 3, "duration": 30 },
+        { "exercise": "Hollow Body Hold", "sets": 3, "duration": 20 },
+        { "exercise": "Lying Leg Raise", "sets": 3, "reps": 8 }
+      ]] } ]
+    },
+    {
+      "from": 5, "to": 8, "focus": "Harder variations: hanging work, shoulder taps, hollow rocks",
+      "tracks": [ { "id": "core", "sessionsPerWeek": 3, "placement": "training", "sessions": [[
+        { "exercise": "Hanging Knee Raise", "sets": 3, "reps": 8 },
+        { "exercise": "Ab Roller Knee Tuck", "sets": 3, "reps": 8 },
+        { "exercise": "Plank Shoulder Taps", "sets": 3, "reps": 16 },
+        { "exercise": "Side Plank", "sets": 3, "duration": 40 },
+        { "exercise": "Hollow Body Rock", "sets": 3, "reps": 12 }
+      ]] } ]
+    },
+    {
+      "from": 9, "to": null, "focus": "Ongoing: the hardest variations; add a rep or a few seconds when all sets are clean",
+      "tracks": [ { "id": "core", "sessionsPerWeek": 3, "placement": "training", "sessions": [[
+        { "exercise": "Ab Roller Rollout", "sets": 3, "reps": 8 },
+        { "exercise": "Hanging Leg Raise", "sets": 3, "reps": 8 },
+        { "exercise": "V-Up", "sets": 3, "reps": 10 },
+        { "exercise": "Hollow Body Rock", "sets": 3, "reps": 15 },
+        { "exercise": "Plank", "sets": 3, "duration": 60 }
+      ]] } ]
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "id": "head-height-kick",
+  "title": "Head-height kick",
+  "goalKind": "mobility",
+  "summary": "Build the hip range and hip strength a roundhouse to head height needs, over eight weeks and then ongoing.",
+  "honesty": "Progress is gradual, over months, not weeks. Warm up before any high kick. Range comes from both flexibility and hip strength, so this add-on trains both. Stop at a mild stretch; it should never hurt.",
+  "deload": "follow",
+  "_todo": "A parallel PR adds new kick drills. When it lands, add them to the strength sessions below (exact SEED_EXERCISES names) and the catalogue test will check them.",
+  "weeks": [
+    {
+      "from": 1, "to": 2, "focus": "Easy range work and basic hip strength",
+      "tracks": [
+        { "id": "strength", "sessionsPerWeek": 2, "placement": "training", "sessions": [[
+          { "exercise": "Cossack Squat", "sets": 2, "reps": 6 },
+          { "exercise": "Single-Leg Stand", "sets": 2, "duration": 30 },
+          { "exercise": "Resistance Band Side-Lying Hip Abduction", "sets": 2, "reps": 12 },
+          { "exercise": "Kick Chamber Hold", "sets": 2, "reps": 5 }
+        ]] },
+        { "id": "mobility", "sessionsPerWeek": 4, "placement": "any", "sessions": [
+          [ { "routine": "kick-range" } ]
+        ] }
+      ]
+    },
+    {
+      "from": 3, "to": 4, "focus": "Longer sessions, a third set of strength work",
+      "tracks": [
+        { "id": "strength", "sessionsPerWeek": 2, "placement": "training", "sessions": [[
+          { "exercise": "Cossack Squat", "sets": 3, "reps": 6 },
+          { "exercise": "Single-Leg Stand", "sets": 3, "duration": 30 },
+          { "exercise": "Resistance Band Side-Lying Hip Abduction", "sets": 3, "reps": 12 },
+          { "exercise": "Kick Chamber Hold", "sets": 3, "reps": 5 },
+          { "exercise": "Teep (Front Push Kick)", "sets": 3, "reps": 5, "note": "Slow and controlled, technique first." }
+        ]] },
+        { "id": "mobility", "sessionsPerWeek": 4, "placement": "any", "sessions": [
+          [ { "routine": "kick-range" }, { "routine": "hips-hamstrings-ball" } ],
+          [ { "routine": "kick-range" }, { "routine": "hips-20" } ]
+        ] }
+      ]
+    },
+    {
+      "from": 5, "to": 8, "focus": "Full hip sessions and kick technique at a controlled height",
+      "tracks": [
+        { "id": "strength", "sessionsPerWeek": 2, "placement": "training", "sessions": [[
+          { "exercise": "Cossack Squat", "sets": 3, "reps": 8 },
+          { "exercise": "Single-Leg Stand", "sets": 3, "duration": 40 },
+          { "exercise": "Resistance Band Side-Lying Hip Abduction", "sets": 3, "reps": 15 },
+          { "exercise": "Kick Chamber Hold", "sets": 3, "reps": 6 },
+          { "exercise": "Teep (Front Push Kick)", "sets": 3, "reps": 6 },
+          { "exercise": "Roundhouse Kick — Body", "sets": 3, "reps": 5, "note": "Controlled, at the height you can hold good form." }
+        ]] },
+        { "id": "mobility", "sessionsPerWeek": 4, "placement": "any", "sessions": [
+          [ { "routine": "kick-range" }, { "routine": "hips-20" } ],
+          [ { "routine": "kick-range" }, { "routine": "hips-hamstrings-ball" } ]
+        ] }
+      ]
+    },
+    {
+      "from": 9, "to": null, "focus": "Ongoing: keep the range and raise the kick height a little at a time",
+      "tracks": [
+        { "id": "strength", "sessionsPerWeek": 2, "placement": "training", "sessions": [[
+          { "exercise": "Cossack Squat", "sets": 3, "reps": 8 },
+          { "exercise": "Single-Leg Stand", "sets": 3, "duration": 45 },
+          { "exercise": "Resistance Band Side-Lying Hip Abduction", "sets": 3, "reps": 15 },
+          { "exercise": "Kick Chamber Hold", "sets": 3, "reps": 6 },
+          { "exercise": "Roundhouse Kick — Body", "sets": 3, "reps": 5 },
+          { "exercise": "Roundhouse Kick — Head", "sets": 3, "reps": 5, "note": "Only as high as you can control. Warm up first." }
+        ]] },
+        { "id": "mobility", "sessionsPerWeek": 4, "placement": "any", "sessions": [
+          [ { "routine": "kick-range" }, { "routine": "hips-20" } ],
+          [ { "routine": "kick-range" }, { "routine": "hips-hamstrings-ball" } ]
+        ] }
+      ]
+    }
+  ]
+}

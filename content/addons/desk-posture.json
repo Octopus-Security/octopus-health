@@ -1,0 +1,33 @@
+{
+  "id": "desk-posture",
+  "title": "Desk posture",
+  "goalKind": "habit",
+  "summary": "A short daily break from sitting, five to ten minutes: a desk reset, then upper back, hip flexor and neck movement.",
+  "honesty": "This is general movement for people who sit a lot. It makes no claims about pain or injury. If you have pain, numbness or tingling, see a qualified professional.",
+  "deload": "keep",
+  "weeks": [
+    {
+      "from": 1, "to": 2, "focus": "Just the five-minute desk reset, every day",
+      "tracks": [ { "id": "daily", "sessionsPerWeek": 7, "placement": "daily", "sessions": [
+        [ { "routine": "desk-reset" } ]
+      ] } ]
+    },
+    {
+      "from": 3, "to": 4, "focus": "Add an upper-back move and a hip flexor hold",
+      "tracks": [ { "id": "daily", "sessionsPerWeek": 7, "placement": "daily", "sessions": [[
+        { "routine": "desk-reset" },
+        { "exercise": "Thoracic Open Book", "sets": 2, "duration": 30 },
+        { "exercise": "Half-Kneeling Hip Flexor Stretch", "sets": 2, "duration": 30 }
+      ]] } ]
+    },
+    {
+      "from": 5, "to": null, "focus": "Ongoing: the reset plus upper back, hips and neck",
+      "tracks": [ { "id": "daily", "sessionsPerWeek": 7, "placement": "daily", "sessions": [[
+        { "routine": "desk-reset" },
+        { "exercise": "Thoracic Open Book", "sets": 2, "duration": 30 },
+        { "exercise": "Half-Kneeling Hip Flexor Stretch", "sets": 2, "duration": 30 },
+        { "exercise": "Neck Rotation Turns", "sets": 1, "reps": 8 }
+      ]] } ]
+    }
+  ]
+}

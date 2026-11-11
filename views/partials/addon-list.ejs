@@ -1,0 +1,47 @@
+<%# Add-on sessions for one ET date. Needs: entries (array), date (YYYY-MM-DD), canMark (bool). %>
+<% entries.forEach(function (e) { %>
+<div class="ao-entry" data-addon="<%= e.addonId %>" data-date="<%= date %>">
+  <div class="ao-head">
+    <strong><%= e.title %></strong>
+    <span class="fx-chip"><%= e.phase.label %></span>
+    <% if (e.deloaded) { %><span class="fx-chip">deload</span><% } %>
+  </div>
+  <ul class="ao-items">
+    <% e.items.forEach(function (i) { %>
+    <li><%= i.name %><% if (i.detail) { %> <span class="fx-meta"><%= i.detail %></span><% } %><% if (i.note) { %> <span class="fx-meta">- <%= i.note %></span><% } %><% if (i.substitutedFor) { %> <span class="fx-meta">(swapped for <%= i.substitutedFor %>)</span><% } %></li>
+    <% }) %>
+    <% if (!e.items.length) { %><li class="fx-meta">Covered by today's plan already.</li><% } %>
+  </ul>
+  <% (e.notes || []).forEach(function (n) { %><p class="fx-meta"><%= n %></p><% }) %>
+  <% (e.merged || []).forEach(function (m) { %><p class="fx-meta">Merged with the plan: <%= m %> is already in today's plan, so it is not repeated.</p><% }) %>
+  <% if (canMark) { %>
+  <button type="button" class="btn ao-done" aria-pressed="<%= e.done ? 'true' : 'false' %>" style="min-height:var(--tap)"><%= e.done ? '✓ Done (tap to undo)' : 'Mark done' %></button>
+  <% } else { %><span class="fx-meta"><%= e.done ? '✓ Done' : 'Not done' %></span><% } %>
+</div>
+<% }) %>
+<% if (!locals.__aoScript) { locals.__aoScript = true; %>
+<style>
+  .ao-entry { padding: 10px 0; border-top: 1px solid #1a1a1a; }
+  .ao-entry:first-child { border-top: none; }
+  .ao-head { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; overflow-wrap: anywhere; }
+  .ao-items { list-style: none; margin: 6px 0; padding: 0; }
+  .ao-items li { padding: 3px 0; overflow-wrap: anywhere; }
+</style>
+<script>
+document.querySelectorAll('.ao-done').forEach(function (b) {
+  b.addEventListener('click', async function () {
+    var box = b.closest('.ao-entry'), want = b.getAttribute('aria-pressed') !== 'true';
+    b.disabled = true;
+    try {
+      var r = await fetch('/addons/api/done', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ addonId: box.dataset.addon, date: box.dataset.date, done: want }) });
+      var j = await r.json();
+      if (!j.ok) throw new Error('failed');
+      b.setAttribute('aria-pressed', String(j.done));
+      b.textContent = j.done ? '✓ Done (tap to undo)' : 'Mark done';
+    } catch (e) { alert('Could not save. Try again.'); }
+    b.disabled = false;
+  });
+});
+</script>
+<% } %>

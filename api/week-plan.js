@@ -60,8 +60,14 @@ function block(tree, st, have, s) {
   };
 }
 
+/** The day-level routines for the Nth (0-based) training day: A and C carry injury-prevention. */
+function routinesForTrainingDay(ti) {
+  return ti % DAY_SLOTS.length === 0 || ti % DAY_SLOTS.length === 2 ? ['injury-prevention'] : [];
+}
+
 /**
- * @param ctx {tree, st, have, focus, benchmarks, lastByItem, date, benchmarkDay}
+ * @param ctx {tree, st, have, focus, benchmarks, lastByItem, date, benchmarkDay, addonStates?, addonHave?}
+ * addonStates are the active GoalAddon rows (api/addons.js); each day then carries an `addons` list.
  */
 function buildPlan(ctx) {
   const { tree, st, have, focus = 'balanced', benchmarks, lastByItem, date, benchmarkDay } = ctx;
@@ -90,11 +96,15 @@ function buildPlan(ctx) {
   let ti = 0;
   for (const d of week.days) {
     if (d.kind !== 'train') continue;
-    if (ti % DAY_SLOTS.length === 0 || ti % DAY_SLOTS.length === 2) d.routines = ['injury-prevention'];
+    const r = routinesForTrainingDay(ti);
+    if (r.length) d.routines = r;
     ti++;
   }
+  // Goal add-ons (api/addons.js): a separate `addons` section per day, never mixed into `blocks`.
+  const att = require('./addons').attachToPlanDays(week.days, ctx.addonStates, { deload: false, have: ctx.addonHave || null });
+  week.days = att.days;
   return {
-    ...week, focus,
+    ...week, focus, addonsSummary: att.summary,
     routines: ROUTINES,
     note: 'Three training days plus benchmark day. Warm up the wrists first. Stop sets 1-2 reps short of failure; the standards are coaching conventions, not tests. Rest days between training days.',
   };
@@ -108,6 +118,7 @@ function buildPlan(ctx) {
  */
 const DELOAD_LABEL = 'Deload week: about half the usual sets at an easy effort, no benchmark tests. Your normal plan is unchanged.';
 function deloadWeek(plan) {
+  const A = require('./addons');
   const days = (plan.days || []).map(d => ({
     ...d,
     blocks: (d.blocks || []).map(b => {
@@ -115,9 +126,10 @@ function deloadWeek(plan) {
       return { ...b, sets, instruction: `${sets} easy ${sets === 1 ? 'set' : 'sets'}, well short of failure (usual: ${b.sets})`, deloaded: true };
     }),
     benchmarks: [],
+    addons: (d.addons || []).map(A.applyDeload),
     ...(d.kind === 'benchmarks' ? { kind: 'rest' } : {}),
   }));
   return { ...plan, days, benchmarksDue: [], deload: true, deloadLabel: DELOAD_LABEL };
 }
 
-module.exports = { buildPlan, frontier, deloadWeek, DELOAD_LABEL, ROUTINES, DAY_SLOTS };
+module.exports = { buildPlan, routinesForTrainingDay, frontier, deloadWeek, DELOAD_LABEL, ROUTINES, DAY_SLOTS };

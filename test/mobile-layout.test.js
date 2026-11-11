@@ -65,7 +65,7 @@ test('nav: accessible menu button, no-JS checkbox fallback, grouped links, logou
 test('nav renders every link and marks the active one', async () => {
   const ejs = require('ejs');
   const html = await ejs.renderFile(path.join(root, 'views', 'partials', 'nav.ejs'), { activeTab: 'stretch', user: { username: 'x' } });
-  assert.strictEqual((html.match(/<a href="\/[a-z-]*"/g) || []).length, 19 + 1 + 1); // 19 links (Today added 2026-10-26, Gyms 2026-10-27, Coaching 2026-10-27, Week and Limits 2026-11) + title + logout
+  assert.strictEqual((html.match(/<a href="\/[a-z-]*"/g) || []).length, 20 + 1 + 1); // 20 links (Add-ons 2026-11-10, Today added 2026-10-26, Gyms 2026-10-27, Coaching 2026-10-27, Week and Limits 2026-11) + title + logout
   assert.match(html, /<a href="\/stretch" class="active" aria-current="page">Stretch<\/a>/);
   assert.match(html, /class="nav-current"[^>]*>Stretch</);
   assert.doesNotMatch(html, /href="\/sessions"/, 'Sessions is offered to admins only (phase 1)');
@@ -74,7 +74,7 @@ test('nav renders every link and marks the active one', async () => {
 test('nav offers Sessions to an admin: one more link, and it is marked current on /sessions', async () => {
   const ejs = require('ejs');
   const html = await ejs.renderFile(path.join(root, 'views', 'partials', 'nav.ejs'), { activeTab: 'sessions', user: { username: 'x', role: 'admin' } });
-  assert.strictEqual((html.match(/<a href="\/[a-z-]*"/g) || []).length, 20 + 1 + 1);
+  assert.strictEqual((html.match(/<a href="\/[a-z-]*"/g) || []).length, 21 + 1 + 1);
   assert.match(html, /<a href="\/sessions" class="active" aria-current="page">Sessions<\/a>/);
 });
 

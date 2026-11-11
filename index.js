@@ -60,6 +60,7 @@ function getActiveTab(requestPath) {
     if (requestPath.startsWith('/gyms')) return 'gyms';
     if (requestPath.startsWith('/sessions')) return 'sessions';
     if (requestPath === '/week') return 'week';
+    if (requestPath.startsWith('/addons')) return 'addons';
     if (requestPath.startsWith('/constraints')) return 'constraints';
     if (requestPath.startsWith('/plan-maker')) return 'plan-maker';
     if (requestPath.startsWith('/exercises') || requestPath.startsWith('/library') || requestPath.startsWith('/exercise') || requestPath.startsWith('/workout')) return 'exercises';
@@ -358,6 +359,7 @@ require('./api/web-fitness')(app, { requireLogin, getDatabase });
 require('./api/web-gyms')(app, { requireLogin, getDatabase });
 require('./api/web-nutrition')(app, { requireLogin, getDatabase });
 require('./api/web-week')(app, { requireLogin, getDatabase });
+require('./api/web-addons')(app, { requireLogin, getDatabase });
 require('./api/web-constraints')(app, { requireLogin, getDatabase });
 require('./api/web-coaching')(app, { requireLogin, getDatabase });
 // Shareable sessions, authoring side (admin only in phase 1; SESSIONS.md).

@@ -1683,6 +1683,17 @@ const createDatabase = (username, storage) => {
         value: { type: DataTypes.TEXT },
     }, { tableName: 'UserSettings', timestamps: false });
 
+    // Goal add-ons (api/addons.js): a bundle layered on the weekly program. One row per run of an
+    // add-on; a finished one is kept (status 'done') so a restart is a new row. A new table, so
+    // sync() creates it and nothing existing is altered. startDate is an ET YYYY-MM-DD string.
+    const GoalAddon = sequelize.define('GoalAddon', {
+        addonId:   { type: DataTypes.STRING,  allowNull: false },  // content/addons/<id>.json
+        status:    { type: DataTypes.STRING,  allowNull: false, defaultValue: 'active' }, // active | paused | done
+        startDate: { type: DataTypes.STRING,  allowNull: false },
+        goalId:    { type: DataTypes.INTEGER, allowNull: true },   // the Goal this started or linked to
+        reminder:  { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+    }, { tableName: 'GoalAddons' });
+
     // Daily nutrition targets (api/nutrition-targets.js). One row (id 1) per account file,
     // so no owner column. A new table: sync() creates it, nothing existing is altered.
     const NutritionTarget = sequelize.define('NutritionTarget', {
@@ -1954,6 +1965,8 @@ const createDatabase = (username, storage) => {
     // health uses plain sequelize.sync() (no alter), so new nullable columns must
     // be added by hand. ADD COLUMN is safe in SQLite; we swallow "duplicate column".
     async function migrate() {
+        // New tables: create-if-missing only (never alters or drops anything).
+        try { await GoalAddon.sync(); } catch (e) { console.error('migrate: GoalAddons failed:', e.message); }
         const adds = [
             ['Goals', 'title',        'VARCHAR(255)'],
             ['Goals', 'exerciseName', 'VARCHAR(255)'],
@@ -2033,6 +2046,7 @@ const createDatabase = (username, storage) => {
         Benchmark,
         BenchmarkSeed,
         UserSetting,
+        GoalAddon,
         NutritionTarget,
         Gym,
         GymEquipment,
