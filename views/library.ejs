@@ -467,7 +467,7 @@ document.getElementById('add-form').addEventListener('submit', async e => {
       e.target.reset();
       filterExercises();
     } else {
-      oDialog.toast('Error: ' + data.error, { kind: 'danger' });
+      await oDialog.alert({ title: 'Not saved', body: 'Error: ' + data.error });
     }
   } catch(err) {
     window.location.reload();

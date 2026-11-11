@@ -369,7 +369,7 @@ async function saveRoutine() {
     body: JSON.stringify({ name, type, notes, items: routineItems }),
   });
   const result = await response.json();
-  if (!result.success) return oDialog.toast(result.message || 'Could not save routine.', { kind: 'danger' });
+  if (!result.success) return oDialog.alert({ title: 'Not saved', body: result.message || 'Could not save routine.' });
   window.location.reload();
 }
 

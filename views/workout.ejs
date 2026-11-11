@@ -736,7 +736,7 @@ async function updateSetField(ei, si, field, val) {
     const j = await r.json().catch(() => ({}));
     if (!r.ok || j.ok === false) throw new Error(j.error || 'HTTP ' + r.status);
   } catch (e) {
-    oDialog.toast('That change was not saved (' + e.message + '). Check your connection and enter it again.', { kind: 'danger', timeout: 8000 });
+    await oDialog.alert({ title: 'Not saved', body: 'That change was not saved (' + e.message + '). Check your connection and enter it again.' });
   }
 }
 
@@ -750,7 +750,7 @@ async function saveFail(ei, si, body) {
     if (!r.ok || j.ok === false) throw new Error(j.error || 'HTTP ' + r.status);
     set.failed = !!j.set.failed; set.failPoint = j.set.failPoint || null;
   } catch (e) {
-    oDialog.toast('That was not saved (' + e.message + ').', { kind: 'danger', timeout: 8000 });
+    await oDialog.alert({ title: 'Not saved', body: 'That was not saved (' + e.message + ').' });
   }
   renderExercises();
 }

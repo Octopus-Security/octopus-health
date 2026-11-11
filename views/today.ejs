@@ -167,7 +167,7 @@ document.querySelectorAll('#mob-card .mob-done').forEach(function (b) {
       if (!j.success) throw new Error('failed');
       b.setAttribute('aria-pressed', String(j.done));
       b.textContent = j.done ? '✓ Done today (tap to undo)' : 'Mark done';
-    } catch (e) { oDialog.toast('Could not save. Try again.', { kind: 'danger' }); }
+    } catch (e) { await oDialog.alert({ title: 'Not saved', body: 'Could not save. Try again.' }); }
     b.disabled = false;
   });
 });
@@ -196,7 +196,7 @@ if (startBtn) startBtn.addEventListener('click', async function () {
     location.href = '/workout';
   } catch (e) {
     startBtn.disabled = false; startBtn.textContent = 'Start logging this workout';
-    oDialog.toast('Could not start the workout. Check your connection and try again.', { kind: 'danger' });
+    await oDialog.alert({ title: 'Not saved', body: 'Could not start the workout. Check your connection and try again.' });
   }
 });
 </script>
