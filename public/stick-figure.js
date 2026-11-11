@@ -796,7 +796,7 @@
   var cache = {};
   Player.load = function (container, key, opts, cb) {
     // 'mma/bjj-armbar' keeps its slash: a %2F in a URL path is refused by some proxies.
-    cache[key] = cache[key] || fetch('/poses/' + String(key).split('/').map(encodeURIComponent).join('/') + '.json').then(function (r) {
+    cache[key] = cache[key] || fetch('/poses/' + String(key).split('/').map(encodeURIComponent).join('/') + '.json' + (typeof window !== 'undefined' && window.POSE_VERSION ? '?v=' + encodeURIComponent(window.POSE_VERSION) : '')).then(function (r) {
       if (!r.ok) throw new Error('pose ' + key + ': HTTP ' + r.status);
       return r.json();
     });

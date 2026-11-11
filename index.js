@@ -111,6 +111,14 @@ app.get('/api/build', (_req, res) => res.json({
 }));
 
 // Static files
+// Pose files: ~280 small JSON files the library fetches one per card. With the default static headers
+// (max-age=0) every one is a revalidation round trip on every visit. A request carrying ?v=<build> (the
+// pages pass it, see stick-figure.js) names an immutable copy, because the build stamp moves whenever
+// anything under public/ does; a bare request gets a short cache so other callers still see edits soon.
+app.use('/poses', (req, res, next) => {
+    res.set('Cache-Control', req.query.v ? 'public, max-age=31536000, immutable' : 'public, max-age=300');
+    next();
+});
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ── Dedicated public host for shared sessions (OFF by default) ───────────────
@@ -1379,15 +1387,14 @@ app.delete('/workout/api/templates/:id', requireLogin, async (req, res) => {
 // ── Exercise Library ──────────────────────────────────────────────────────────
 
 app.get('/exercises', requireLogin, async (req, res) => {
-    const { ExerciseDefinition, sequelize } = getDatabase(req.user.username);
-    await sequelize.sync();
+    const { ExerciseDefinition } = getDatabase(req.user.username);
     const all = await ExerciseDefinition.findAll({ order: [['category','ASC'],['name','ASC']] });
     const exercises = all.map(e => ({
         ...e.toJSON(),
         primaryMuscles:   JSON.parse(e.primaryMuscles   || '[]'),
         secondaryMuscles: JSON.parse(e.secondaryMuscles || '[]'),
     }));
-    res.render('library', { title: 'Exercises', user: req.user, exercises });
+    res.render('library', { title: 'Exercises', user: req.user, exercises, poseVersion: BUILD });
 });
 
 require('./api/body-map')(app, { requireLogin, getDatabase });
@@ -1396,15 +1403,14 @@ require('./api/daily-stretches')(app, { requireLogin, getDatabase });
 require('./api/mobility')(app, { requireLogin, getDatabase });
 
 app.get('/library', requireLogin, async (req, res) => {
-    const { ExerciseDefinition, sequelize } = getDatabase(req.user.username);
-    await sequelize.sync();
+    const { ExerciseDefinition } = getDatabase(req.user.username);
     const all = await ExerciseDefinition.findAll({ order: [['category','ASC'],['name','ASC']] });
     const exercises = all.map(e => ({
         ...e.toJSON(),
         primaryMuscles:   JSON.parse(e.primaryMuscles   || '[]'),
         secondaryMuscles: JSON.parse(e.secondaryMuscles || '[]'),
     }));
-    res.render('library', { title: 'Exercise Library', user: req.user, exercises });
+    res.render('library', { title: 'Exercise Library', user: req.user, exercises, poseVersion: BUILD });
 });
 
 // ── Exercise Plan Maker ───────────────────────────────────────────────────────

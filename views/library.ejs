@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title><%= title %></title>
   <link rel="stylesheet" href="<%= asset('/theme.css') %>">
+  <script>window.POSE_VERSION = <%- JSON.stringify(poseVersion || '') %>;</script>
   <script src="<%= asset('/stick-figure.js') %>" defer></script>
   <script src="<%= asset('/pose-map.js') %>"></script>
   <style>
@@ -170,7 +171,7 @@
   </div>
 
   <div class="filter-bar">
-    <input type="text" id="search-input" placeholder="Search exercises..." oninput="filterExercises()">
+    <input type="text" id="search-input" placeholder="Search exercises..." oninput="filterSoon()">
     <select id="equip-filter" onchange="filterExercises()">
       <option value="">All Equipment</option>
       <option value="barbell">Barbell</option>
@@ -301,6 +302,7 @@ let _sfPlayers = {};
 function destroyFigures() {
   Object.keys(_sfPlayers).forEach(function (k) { try { _sfPlayers[k].destroy(); } catch (e) { /* gone with its card */ } });
   _sfPlayers = {};
+  if (_figObs) { _figObs.disconnect(); _figObs = null; }
 }
 let activeCat = '';
 
@@ -313,8 +315,15 @@ document.querySelectorAll('.cat-tab').forEach(btn => {
   });
 });
 
+// Search is over a lowercase name computed once per exercise (not per keystroke per card), and typing is
+// debounced so a phone keyboard does not rebuild the grid on every letter.
+let _filterTimer = null;
+function filterSoon() { clearTimeout(_filterTimer); _filterTimer = setTimeout(filterExercises, 120); }
+ALL_EXERCISES.forEach(function (e) { e._lname = String(e.name || '').toLowerCase(); });
+
 function filterExercises() {
-  const q      = document.getElementById('search-input').value.toLowerCase();
+  clearTimeout(_filterTimer);
+  const q      = document.getElementById('search-input').value.toLowerCase().trim();
   const equip  = document.getElementById('equip-filter').value;
   const muscle = document.getElementById('muscle-filter').value;
 
@@ -322,7 +331,7 @@ function filterExercises() {
   if (activeCat) list = list.filter(e => e.category === activeCat);
   if (equip)     list = list.filter(e => e.equipment === equip);
   if (muscle)    list = list.filter(e => e.primaryMuscles.includes(muscle) || e.secondaryMuscles.includes(muscle));
-  if (q)         list = list.filter(e => e.name.toLowerCase().includes(q));
+  if (q)         list = list.filter(e => (e._lname || (e._lname = String(e.name).toLowerCase())).includes(q));
 
   renderGrid(list);
 }
@@ -332,13 +341,37 @@ const CAT_ICON = {
   bjj:'🥋', muay_thai:'🦵', recovery:'🧘', default:'💪'
 };
 
+// Cards are built a screenful at a time (CHUNK), the next batch when the end of the grid nears the viewport,
+// and a figure is only fetched and drawn once its card is near the viewport. The library has ~550 cards;
+// building and animating all of them up front is what made the page unusable for seconds on a phone.
+const CHUNK = 36;
+let _list = [], _shown = 0, _more = null, _figObs = null;
+function nearViewport(cb) {
+  if (typeof IntersectionObserver === 'undefined') return null;
+  return new IntersectionObserver(function (es, obs) {
+    es.forEach(function (en) { if (en.isIntersecting) { obs.unobserve(en.target); cb(en.target); } });
+  }, { rootMargin: '400px 0px' });
+}
+
 function renderGrid(list) {
+  _list = list; _shown = 0;
   document.getElementById('count-label').textContent = `${list.length} exercise${list.length !== 1 ? 's' : ''}`;
   // One standing safety line for the page, shown only while recovery content is on screen.
   document.getElementById('rec-note').hidden = !list.some(e => e.category === 'recovery');
   const grid = document.getElementById('lib-grid');
   destroyFigures();
-  grid.innerHTML = list.map(e => {
+  grid.innerHTML = '';
+  if (_more) { _more.disconnect(); _more = null; }
+  appendChunk();
+}
+
+function appendChunk() {
+  const grid = document.getElementById('lib-grid');
+  const old = document.getElementById('lib-more');
+  if (old) old.remove();
+  const batch = _list.slice(_shown, _shown + CHUNK);
+  _shown += batch.length;
+  grid.insertAdjacentHTML('beforeend', batch.map(e => {
     const catClass   = 'tag-' + (e.category || 'strength');
     const equipLabel = (e.equipment || '').replace(/_/g,' ');
     const icon       = CAT_ICON[e.category] || CAT_ICON.default;
@@ -387,8 +420,13 @@ function renderGrid(list) {
     ${hasInstr ? `<div class="ex-instructions-wrap" id="instr-wrap-${e.id}"><div class="ex-instructions">${escHtml(e.instructions)}</div></div><button class="btn-details" onclick="toggleInstructions(${e.id})" id="expand-${e.id}">▼ show instructions</button>` : ''}
   </div>
 </div>`;
-  }).join('');
-  setTimeout(initStickFigures, 60);
+  }).join(''));
+  initStickFigures();
+  if (_shown < _list.length) {
+    grid.insertAdjacentHTML('beforeend', '<div id="lib-more" style="grid-column:1/-1;text-align:center;color:#555;font-size:0.8rem;padding:12px"><button class="btn" onclick="appendChunk()">Show more (' + (_list.length - _shown) + ')</button></div>');
+    _more = nearViewport(function () { appendChunk(); });
+    if (_more) _more.observe(document.getElementById('lib-more'));
+  }
 }
 
 function toggleInstructions(id) {
@@ -435,30 +473,39 @@ document.getElementById('add-form').addEventListener('submit', async e => {
   }
 });
 
-function initStickFigures(tries) {
+// Mount a figure when its card comes near the viewport (all at once where IntersectionObserver is missing).
+function initStickFigures() {
+  const els = Array.prototype.filter.call(document.querySelectorAll('.ex-media[data-pose]'), function (el) {
+    const c = document.getElementById('sf-' + el.dataset.exid);
+    return c && !c.dataset.sf;
+  });
+  if (!els.length) return;
+  _figObs = _figObs || nearViewport(mountFigure);
+  els.forEach(function (el) { if (_figObs) _figObs.observe(el); else mountFigure(el); });
+}
+
+function mountFigure(el, tries) {
   // stick-figure.js is deferred: on a slow connection it can arrive after this runs. Wait for it
-  // (up to ~10 s) rather than leaving every card blank.
+  // (up to ~10 s) rather than leaving the card blank.
+  var exId = el.dataset.exid;
+  var container = document.getElementById('sf-' + exId);
+  if (!container || container.dataset.sf === '1') return;   // gone, or already drawn (or loading) on THIS render
   if (typeof StickFigurePlayer === 'undefined') {
-    if ((tries || 0) < 100) setTimeout(function () { initStickFigures((tries || 0) + 1); }, 100);
-    else document.querySelectorAll('.ex-media[data-pose] .sf-container').forEach(function (c) { c.innerHTML = '<span class="ex-nodiagram">No diagram yet</span>'; });
+    if ((tries || 0) < 100) setTimeout(function () { mountFigure(el, (tries || 0) + 1); }, 100);
+    else container.innerHTML = '<span class="ex-nodiagram">No diagram yet</span>';
     return;
   }
-  document.querySelectorAll('.ex-media[data-pose]').forEach(function (el) {
-    var exId = el.dataset.exid;
-    var container = document.getElementById('sf-' + exId);
-    if (!container || container.dataset.sf) return;   // already drawn (or loading) on THIS render
-    container.dataset.sf = '1';
-    // One card at a time, caught per card: a bad pose shows "No diagram yet" there and touches no other.
-    try {
-      StickFigurePlayer.mount(container, el.dataset.pose, { autoplay: true }, function (err, p) {
-        if (!err && p) {
-          if (container.isConnected) _sfPlayers[exId] = p; else p.destroy();   // the grid was replaced while loading
-        }
-      });
-    } catch (err) {
-      container.innerHTML = '<span class="ex-nodiagram">No diagram yet</span>';
-    }
-  });
+  container.dataset.sf = '1';
+  // One card at a time, caught per card: a bad pose shows "No diagram yet" there and touches no other.
+  try {
+    StickFigurePlayer.mount(container, el.dataset.pose, { autoplay: true }, function (err, p) {
+      if (!err && p) {
+        if (container.isConnected) _sfPlayers[exId] = p; else p.destroy();   // the grid was replaced while loading
+      }
+    });
+  } catch (err) {
+    container.innerHTML = '<span class="ex-nodiagram">No diagram yet</span>';
+  }
 }
 
 // Deep link from the body map: /library?ex=<id> narrows to that exercise and opens its instructions.
