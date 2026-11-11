@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title><%= title %></title>
   <link rel="stylesheet" href="<%= asset('/theme.css') %>">
+  <%- include('partials/dialog') %>
   <script>window.POSE_VERSION = <%- JSON.stringify(poseVersion || '') %>;</script>
   <script src="<%= asset('/stick-figure.js') %>" defer></script>
   <script src="<%= asset('/pose-map.js') %>"></script>
@@ -466,7 +467,7 @@ document.getElementById('add-form').addEventListener('submit', async e => {
       e.target.reset();
       filterExercises();
     } else {
-      alert('Error: ' + data.error);
+      oDialog.toast('Error: ' + data.error, { kind: 'danger' });
     }
   } catch(err) {
     window.location.reload();

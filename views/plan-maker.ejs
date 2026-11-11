@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title><%= title %></title>
   <link rel="stylesheet" href="<%= asset('/theme.css') %>">
+  <%- include('partials/dialog') %>
   <style>
     .pm-layout { display:grid; grid-template-columns:1fr 420px; gap:20px; align-items:start; }
     @media (max-width:900px) { .pm-layout { grid-template-columns:1fr; } }
@@ -369,7 +370,7 @@ async function savePlan() {
 }
 
 async function deletePlan(id) {
-  if (!confirm('Delete this plan?')) return;
+  if (!(await oDialog.confirm({ title: 'Delete plan?', body: 'Delete this plan?', confirmLabel: 'Delete', danger: true }))) return;
   const token = localStorage.getItem('authToken');
   const headers = {};
   if (token) headers['Authorization'] = 'Bearer ' + token;

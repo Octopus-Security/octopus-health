@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title><%= title %></title>
   <link rel="stylesheet" href="<%= asset('/theme.css') %>">
+  <%- include('partials/dialog') %>
   <link rel="stylesheet" href="<%= asset('/stretch-demo.css') %>">
   <script src="<%= asset('/stick-figure.js') %>" defer></script>
   <script src="<%= asset('/pose-map.js') %>"></script>
@@ -166,7 +167,7 @@ document.querySelectorAll('#mob-card .mob-done').forEach(function (b) {
       if (!j.success) throw new Error('failed');
       b.setAttribute('aria-pressed', String(j.done));
       b.textContent = j.done ? '✓ Done today (tap to undo)' : 'Mark done';
-    } catch (e) { alert('Could not save. Try again.'); }
+    } catch (e) { oDialog.toast('Could not save. Try again.', { kind: 'danger' }); }
     b.disabled = false;
   });
 });
@@ -177,7 +178,7 @@ const startBtn = document.getElementById('today-start');
 if (startBtn) startBtn.addEventListener('click', async function () {
   // One live session at a time: a second would be orphaned, never finished.
   if (localStorage.getItem('activeSessionId')) {
-    if (confirm('You already have a workout in progress. Open it?')) location.href = '/workout';
+    if (await oDialog.confirm({ title: 'Workout in progress', body: 'You already have a workout in progress. Open it?', confirmLabel: 'Open it' })) location.href = '/workout';
     return;
   }
   startBtn.disabled = true; startBtn.textContent = 'Starting…';
@@ -195,7 +196,7 @@ if (startBtn) startBtn.addEventListener('click', async function () {
     location.href = '/workout';
   } catch (e) {
     startBtn.disabled = false; startBtn.textContent = 'Start logging this workout';
-    alert('Could not start the workout. Check your connection and try again.');
+    oDialog.toast('Could not start the workout. Check your connection and try again.', { kind: 'danger' });
   }
 });
 </script>

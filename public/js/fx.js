@@ -31,7 +31,7 @@
   });
   document.addEventListener('click', async function (e) {
     var b = e.target.closest('[data-act]'); if (!b) return;
-    if (b.dataset.confirm && !window.confirm(b.dataset.confirm)) return;
+    if (b.dataset.confirm && !(await oDialog.confirm({ title: 'Are you sure?', body: b.dataset.confirm, confirmLabel: 'Yes, continue', danger: true }))) return;
     var body = null; if (b.dataset.body) { try { body = JSON.parse(b.dataset.body); } catch (x) { body = null; } }
     try { await send(b.dataset.url, b.dataset.method || 'POST', body); location.reload(); }
     catch (err) { show(b, err.message, false); }

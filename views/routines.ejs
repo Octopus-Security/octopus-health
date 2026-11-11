@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title><%= title %></title>
     <link rel="stylesheet" href="<%= asset('/theme.css') %>">
+    <%- include('partials/dialog') %>
 </head>
 <body>
     <%- include('partials/nav') %>
@@ -63,7 +64,7 @@
                     <h2 style="margin:0;"><%= r.name %></h2>
                 </div>
                 <div style="display:flex; gap:8px;">
-                    <form method="POST" action="/routines/delete/<%= r.id %>" onsubmit="return confirm('Delete this routine?')">
+                    <form method="POST" action="/routines/delete/<%= r.id %>" onsubmit="return oConfirmForm(event, 'Delete this routine?', 'Delete')">
                         <button class="delete-btn">Delete Routine</button>
                     </form>
                 </div>

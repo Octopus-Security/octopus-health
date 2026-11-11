@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title><%= title %></title>
   <link rel="stylesheet" href="<%= asset('/theme.css') %>">
+  <%- include('partials/dialog') %>
   <link rel="stylesheet" href="<%= asset('/stretch-demo.css') %>">
   <script src="<%= asset('/stick-figure.js') %>" defer></script>
   <script src="<%= asset('/pose-map.js') %>"></script>
@@ -735,7 +736,7 @@ async function updateSetField(ei, si, field, val) {
     const j = await r.json().catch(() => ({}));
     if (!r.ok || j.ok === false) throw new Error(j.error || 'HTTP ' + r.status);
   } catch (e) {
-    alert('That change was not saved (' + e.message + '). Check your connection and enter it again.');
+    oDialog.toast('That change was not saved (' + e.message + '). Check your connection and enter it again.', { kind: 'danger', timeout: 8000 });
   }
 }
 
@@ -749,7 +750,7 @@ async function saveFail(ei, si, body) {
     if (!r.ok || j.ok === false) throw new Error(j.error || 'HTTP ' + r.status);
     set.failed = !!j.set.failed; set.failPoint = j.set.failPoint || null;
   } catch (e) {
-    alert('That was not saved (' + e.message + ').');
+    oDialog.toast('That was not saved (' + e.message + ').', { kind: 'danger', timeout: 8000 });
   }
   renderExercises();
 }
@@ -813,7 +814,7 @@ async function confirmFinish() {
 }
 
 async function discardSession() {
-  if (!sessionId || !confirm('Discard this workout?')) return;
+  if (!sessionId || !(await oDialog.confirm({ title: 'Discard workout?', body: 'Discard this workout?', confirmLabel: 'Discard', danger: true }))) return;
   await fetch('/workout/api/session/' + sessionId, { method: 'DELETE' });
   clearSession(); stopRest();
   window.location.reload();
@@ -895,8 +896,8 @@ function removeTplEx(i) {
 async function saveTemplate() {
   const name = document.getElementById('builder-name').value.trim();
   const type = document.getElementById('builder-type').value;
-  if (!name) { alert('Please enter a template name.'); return; }
-  if (!templateExercises.length) { alert('Add at least one exercise.'); return; }
+  if (!name) { oDialog.toast('Please enter a template name.', { kind: 'danger' }); return; }
+  if (!templateExercises.length) { oDialog.toast('Add at least one exercise.', { kind: 'danger' }); return; }
   const r = await fetch('/workout/api/templates', {
     method: 'POST', headers: {'Content-Type':'application/json'},
     body: JSON.stringify({ name, type, exercises: templateExercises }),
@@ -964,7 +965,7 @@ function addCustomToBuilder() {
 // ── Load Template ──────────────────────────────────────────────────────────
 async function loadTemplate(id) {
   if (sessionId) {
-    if (!confirm('You have an active workout. Start a new one with this template?')) return;
+    if (!(await oDialog.confirm({ title: 'Replace active workout?', body: 'You have an active workout. Start a new one with this template?', confirmLabel: 'Start new', danger: true }))) return;
     await fetch('/workout/api/session/' + sessionId, { method: 'DELETE' });
     clearSession(); stopRest();
   }
@@ -984,7 +985,7 @@ async function loadTemplate(id) {
 }
 
 async function deleteTemplate(id) {
-  if (!confirm('Delete this workout template?')) return;
+  if (!(await oDialog.confirm({ title: 'Delete template?', body: 'Delete this workout template?', confirmLabel: 'Delete', danger: true }))) return;
   await fetch(`/workout/api/templates/${id}`, { method: 'DELETE' });
   const card = document.getElementById('tpl-' + id);
   if (card) card.remove();

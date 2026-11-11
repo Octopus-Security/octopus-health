@@ -3,7 +3,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
-const { BUILD, STARTED_AT, asset } = require('./build');
+const { BUILD, STARTED_AT, asset, kitFile, KIT_FILES } = require('./build');
 const ET = require('./lib/et');
 const { displayName } = require('./api/template-names');
 const { Op } = require('sequelize');
@@ -120,6 +120,13 @@ app.use('/poses', (req, res, next) => {
     res.set('Cache-Control', req.query.v ? 'public, max-age=31536000, immutable' : 'public, max-age=300');
     next();
 });
+// Themed dialog (octopus-kit ui/dialog.js + dialog.css), served at stamped URLs from the package.
+for (const urlPath of Object.keys(KIT_FILES)) {
+    app.get(urlPath, (req, res) => {
+        res.set('Cache-Control', req.query.v ? 'public, max-age=31536000, immutable' : 'public, max-age=300');
+        res.sendFile(kitFile(urlPath), (err) => { if (err && !res.headersSent) res.status(404).end(); });
+    });
+}
 // Every view references public/ files through asset(), which appends ?v=<content hash>, so a stamped
 // request names immutable bytes and may be cached for a year; a bare request keeps the default.
 app.use(express.static(path.join(__dirname, 'public'), {

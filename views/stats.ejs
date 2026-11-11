@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title><%= title %></title>
   <link rel="stylesheet" href="<%= asset('/theme.css') %>">
+  <%- include('partials/dialog') %>
   <style>
     .stats-grid { display:grid; grid-template-columns:340px 1fr; gap:20px; align-items:start; }
     @media(max-width:900px){ .stats-grid { grid-template-columns:1fr; } }
@@ -139,7 +140,7 @@
     }
 
     async function deletePR(id) {
-      if (!confirm('Delete this PR?')) return;
+      if (!(await oDialog.confirm({ title: 'Delete PR?', body: 'Delete this PR?', confirmLabel: 'Delete', danger: true }))) return;
       await fetch(`/api/workout/prs/${id}`, { method:'DELETE', credentials:'include' });
       loadPRs();
     }
@@ -162,7 +163,7 @@
         date:     document.getElementById('prDate').value,
         notes:    document.getElementById('prNotes').value.trim() || null,
       };
-      if (!body.exerciseName || !body.date) return alert('Exercise name and date required');
+      if (!body.exerciseName || !body.date) return oDialog.toast('Exercise name and date required', { kind: 'danger' });
       await fetch('/api/workout/prs', { method:'POST', credentials:'include', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
       toggleAddPR();
       loadPRs();
