@@ -11,7 +11,6 @@ router.use(requireUser);
 router.get('/exercises', async (req, res) => {
     try {
         const { ExerciseDefinition, sequelize } = getDatabase(req.user.username);
-        await sequelize.sync();
         const { category, equipment, muscle, q } = req.query;
         const all = await ExerciseDefinition.findAll({ order: [['name', 'ASC']] });
         let exercises = all.map(e => ({
@@ -32,7 +31,6 @@ router.get('/exercises', async (req, res) => {
 router.post('/exercises', async (req, res) => {
     try {
         const { ExerciseDefinition, sequelize } = getDatabase(req.user.username);
-        await sequelize.sync();
         const { name, category, equipment, primaryMuscles, secondaryMuscles, instructions, videoUrl } = req.body;
         if (!name || !category || !equipment) return res.status(400).json({ success: false, error: 'name, category, equipment required' });
         const ex = await ExerciseDefinition.create({
@@ -52,7 +50,6 @@ router.post('/exercises', async (req, res) => {
 router.get('/sessions', async (req, res) => {
     try {
         const { WorkoutSession, WorkoutSet, sequelize } = getDatabase(req.user.username);
-        await sequelize.sync();
         const { limit = 20, offset = 0 } = req.query;
         const sessions = await WorkoutSession.findAll({
             order: [['date', 'DESC'], ['startedAt', 'DESC']],
@@ -72,7 +69,6 @@ router.get('/sessions', async (req, res) => {
 router.post('/sessions', async (req, res) => {
     try {
         const { WorkoutSession, sequelize } = getDatabase(req.user.username);
-        await sequelize.sync();
         const { date, type, title, notes } = req.body;
         if (!date || !type) return res.status(400).json({ success: false, error: 'date and type required' });
         const session = await WorkoutSession.create({ date, type, title, notes, startedAt: new Date(), status: 'active' });
@@ -85,7 +81,6 @@ router.post('/sessions', async (req, res) => {
 router.get('/sessions/:id', async (req, res) => {
     try {
         const { WorkoutSession, WorkoutSet, sequelize } = getDatabase(req.user.username);
-        await sequelize.sync();
         const session = await WorkoutSession.findByPk(req.params.id);
         if (!session) return res.status(404).json({ success: false, error: 'Session not found' });
         const sets = await WorkoutSet.findAll({ where: { sessionId: session.id }, order: [['exerciseOrder','ASC'],['setNumber','ASC']] });
@@ -98,7 +93,6 @@ router.get('/sessions/:id', async (req, res) => {
 router.put('/sessions/:id', async (req, res) => {
     try {
         const { WorkoutSession, sequelize } = getDatabase(req.user.username);
-        await sequelize.sync();
         const session = await WorkoutSession.findByPk(req.params.id);
         if (!session) return res.status(404).json({ success: false, error: 'Session not found' });
         const fields = ['type','title','notes','effort','duration','status','finishedAt'];
@@ -114,7 +108,6 @@ router.put('/sessions/:id', async (req, res) => {
 router.delete('/sessions/:id', async (req, res) => {
     try {
         const { WorkoutSession, WorkoutSet, sequelize } = getDatabase(req.user.username);
-        await sequelize.sync();
         await WorkoutSet.destroy({ where: { sessionId: req.params.id } });
         await WorkoutSession.destroy({ where: { id: req.params.id } });
         res.json({ success: true });
@@ -128,7 +121,6 @@ router.delete('/sessions/:id', async (req, res) => {
 router.post('/sessions/:id/sets', async (req, res) => {
     try {
         const { WorkoutSet, WorkoutSession, PersonalRecord, sequelize } = getDatabase(req.user.username);
-        await sequelize.sync();
         const { exerciseName, exerciseId, exerciseOrder, setNumber, reps, weight, weightUnit, duration, distance, distanceUnit, rpe, notes } = req.body;
         if (!exerciseName) return res.status(400).json({ success: false, error: 'exerciseName required' });
         const set = await WorkoutSet.create({
@@ -157,7 +149,6 @@ router.post('/sessions/:id/sets', async (req, res) => {
 router.put('/sets/:id', async (req, res) => {
     try {
         const { WorkoutSet, sequelize } = getDatabase(req.user.username);
-        await sequelize.sync();
         const set = await WorkoutSet.findByPk(req.params.id);
         if (!set) return res.status(404).json({ success: false, error: 'Set not found' });
         const fields = ['reps','weight','weightUnit','duration','distance','distanceUnit','rpe','notes'];
@@ -172,7 +163,6 @@ router.put('/sets/:id', async (req, res) => {
 router.delete('/sets/:id', async (req, res) => {
     try {
         const { WorkoutSet, sequelize } = getDatabase(req.user.username);
-        await sequelize.sync();
         await WorkoutSet.destroy({ where: { id: req.params.id } });
         res.json({ success: true });
     } catch (err) {
@@ -185,7 +175,6 @@ router.delete('/sets/:id', async (req, res) => {
 router.get('/plans', async (req, res) => {
     try {
         const { TrainingPlan, TrainingPlanAssignment, sequelize } = getDatabase(req.user.username);
-        await sequelize.sync();
         const plans = await TrainingPlan.findAll({ order: [['sport','ASC'],['name','ASC']] });
         const active = await TrainingPlanAssignment.findOne({ where: { status: 'active' }, order: [['createdAt','DESC']] });
         res.json({ success: true, data: plans, activeAssignment: active });
@@ -197,7 +186,6 @@ router.get('/plans', async (req, res) => {
 router.post('/plans/assign', async (req, res) => {
     try {
         const { TrainingPlanAssignment, sequelize } = getDatabase(req.user.username);
-        await sequelize.sync();
         const { planId, startDate } = req.body;
         if (!planId || !startDate) return res.status(400).json({ success: false, error: 'planId and startDate required' });
         await TrainingPlanAssignment.update({ status: 'paused' }, { where: { status: 'active' } });
@@ -214,7 +202,6 @@ router.post('/plans/assign', async (req, res) => {
 router.post('/plans/start', async (req, res) => {
     try {
         const { TrainingPlan, TrainingPlanAssignment, sequelize } = getDatabase(req.user.username);
-        await sequelize.sync();
         const { sport = 'bjj', compDate } = req.body;
         if (!compDate) return res.status(400).json({ success: false, error: 'compDate required (YYYY-MM-DD)' });
         const { weeksUntil, selectPlan, alignedStartDate } = require('../plan-select');
@@ -237,7 +224,6 @@ router.post('/plans/start', async (req, res) => {
 router.get('/plans/today', async (req, res) => {
     try {
         const { TrainingPlan, TrainingPlanAssignment, sequelize } = getDatabase(req.user.username);
-        await sequelize.sync();
         const assignment = await TrainingPlanAssignment.findOne({ where: { status: 'active' } });
         if (!assignment) return res.json({ success: true, data: null });
         const plan = await TrainingPlan.findByPk(assignment.planId);
@@ -264,7 +250,6 @@ router.get('/plans/today', async (req, res) => {
 router.get('/exercise-plans', async (req, res) => {
     try {
         const { ExercisePlan, sequelize } = getDatabase(req.user.username);
-        await sequelize.sync();
         const plans = await ExercisePlan.findAll({ order: [['updatedAt', 'DESC']] });
         res.json({ success: true, data: plans.map(p => ({ ...p.toJSON(), items: JSON.parse(p.items || '[]') })) });
     } catch (err) {
@@ -275,7 +260,6 @@ router.get('/exercise-plans', async (req, res) => {
 router.post('/exercise-plans', async (req, res) => {
     try {
         const { ExercisePlan, sequelize } = getDatabase(req.user.username);
-        await sequelize.sync();
         const { name, type, description, items } = req.body;
         if (!name) return res.status(400).json({ success: false, error: 'name required' });
         const plan = await ExercisePlan.create({
@@ -293,7 +277,6 @@ router.post('/exercise-plans', async (req, res) => {
 router.delete('/exercise-plans/:id', async (req, res) => {
     try {
         const { ExercisePlan, sequelize } = getDatabase(req.user.username);
-        await sequelize.sync();
         const plan = await ExercisePlan.findByPk(req.params.id);
         if (!plan) return res.status(404).json({ success: false, error: 'Not found' });
         await plan.destroy();
@@ -309,7 +292,6 @@ router.delete('/exercise-plans/:id', async (req, res) => {
 router.get('/exercise-history', async (req, res) => {
     try {
         const { WorkoutSet, WorkoutSession, sequelize } = getDatabase(req.user.username);
-        await sequelize.sync();
         const { exercise, limit = 200 } = req.query;
         if (!exercise) return res.status(400).json({ success: false, error: 'exercise required' });
 
@@ -362,7 +344,6 @@ router.get('/exercise-history', async (req, res) => {
 router.get('/prs', async (req, res) => {
     try {
         const { PersonalRecord, sequelize } = getDatabase(req.user.username);
-        await sequelize.sync();
         const all = await PersonalRecord.findAll({ order: [['date', 'DESC']] });
         res.json({ success: true, data: bestPerExercise(all.map(pr => pr.toJSON())) });
     } catch (err) {
@@ -374,7 +355,6 @@ router.get('/prs', async (req, res) => {
 router.post('/prs', async (req, res) => {
     try {
         const { PersonalRecord, sequelize } = getDatabase(req.user.username);
-        await sequelize.sync();
         const { exerciseName, weight, weightUnit, reps, durationSecs, date, notes } = req.body;
         if (!exerciseName || !date) return res.status(400).json({ success: false, error: 'exerciseName and date required' });
         const pr = await PersonalRecord.create({ exerciseName, weight, weightUnit: weightUnit || 'lbs', reps, durationSecs, date, notes });
@@ -388,7 +368,6 @@ router.post('/prs', async (req, res) => {
 router.delete('/prs/:id', async (req, res) => {
     try {
         const { PersonalRecord, sequelize } = getDatabase(req.user.username);
-        await sequelize.sync();
         await PersonalRecord.destroy({ where: { id: req.params.id } });
         res.json({ success: true });
     } catch (err) {
@@ -406,7 +385,6 @@ router.delete('/prs/:id', async (req, res) => {
 router.post('/prs/rebuild', async (req, res) => {
     try {
         const db = getDatabase(req.user.username);
-        await db.sequelize.sync();
         const { scanned, created } = await rebuildPRs(db);
         res.json({
             success: true,
@@ -422,7 +400,6 @@ router.post('/prs/rebuild', async (req, res) => {
 router.get('/exercise-names', async (req, res) => {
     try {
         const { WorkoutSet, sequelize } = getDatabase(req.user.username);
-        await sequelize.sync();
         const { Op } = require('sequelize');
         const { q } = req.query;
         const where = q ? { exerciseName: { [Op.like]: `%${q}%` } } : {};

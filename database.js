@@ -1,5 +1,6 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const path = require('path');
+const fs = require('fs');
 const crypto = require('crypto');
 
 // ── Seed data ────────────────────────────────────────────────────────────────
@@ -1318,14 +1319,115 @@ const SEED_CONTENT_VERSION = crypto.createHash('sha1')
   .update(JSON.stringify(SEED_RENAMES))
   .digest('hex').slice(0, 12);
 
+// ── SQLite connection pragmas ─────────────────────────────────────────────────
+// Sequelize's sqlite dialect overrides getConnection() and never fires the afterConnect hook, and it
+// opens a SEPARATE connection per transaction, so the pragmas are applied by wrapping getConnection:
+// once per raw connection, awaited by every caller (a second caller sharing the connection waits on
+// the same promise). WAL needs the db's DIRECTORY to be writable (-wal/-shm sit beside it); the
+// compose mounts the whole data directory as the health_data volume, so it is. HEALTH_SQLITE_WAL=0
+// turns WAL off if a deployment ever bind-mounts a single file.
+const PRAGMAS = () => (process.env.HEALTH_SQLITE_WAL === '0'
+    ? 'PRAGMA busy_timeout=5000; PRAGMA synchronous=NORMAL;'
+    : 'PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000; PRAGMA synchronous=NORMAL;');
+function applyPragmas(sequelize) {
+    const cm = sequelize.connectionManager;
+    const orig = cm.getConnection.bind(cm);
+    cm.getConnection = async (options) => {
+        const conn = await orig(options);
+        if (!conn.__octoPragmas) {
+            conn.__octoPragmas = new Promise((resolve) => {
+                conn.exec(PRAGMAS(), (err) => {
+                    if (err) console.error('sqlite pragmas failed:', err.message);
+                    resolve();   // a pragma failure must not take the request down
+                });
+            });
+        }
+        await conn.__octoPragmas;
+        return conn;
+    };
+}
+
 // ── Per-user database factory ─────────────────────────────────────────────────
+// getDatabase(username) used to build a new Sequelize instance and ~30 define() calls on EVERY call
+// (~70 call sites, none ever closed): ~18 ms each against 0.3 ms for the query. It now returns one
+// handle per database FILE, kept in an LRU. The key is the storage path (data dir + username), so
+// one account's handle can never serve another's, and tests that point DATA_DIR elsewhere get fresh
+// handles. Evicted handles are closed after a grace period rather than at once, so a request that
+// is still using one is not cut off.
+const DB_CACHE_MAX = Number(process.env.HEALTH_DB_CACHE_MAX) || 200;
+const closeDelayMs = () => (process.env.HEALTH_DB_CLOSE_DELAY_MS !== undefined ? Number(process.env.HEALTH_DB_CLOSE_DELAY_MS) : 2 * 60 * 1000);
+const _dbCache = new Map();   // storage path -> handle (insertion order = recency)
+const _closing = new Set();
+
+function closeLater(handle) {
+    if (handle.__closing) return;
+    handle.__closing = true;
+    _closing.add(handle);
+    const t = setTimeout(() => {
+        _closing.delete(handle);
+        Promise.resolve(handle.sequelize.close()).catch(() => {});
+    }, closeDelayMs());
+    if (t.unref) t.unref();
+    handle.__closeTimer = t;
+}
 
 const getDatabase = (username) => {
+    const storage = path.join(require('./lib/dataDir')(), `${username}_health.sqlite`);
+    let handle = _dbCache.get(storage);
+    // A database file that vanished after we created it (restore, test cleanup) makes the handle stale.
+    if (handle && handle.__ensured && !fs.existsSync(storage)) {
+        _dbCache.delete(storage);
+        closeLater(handle);
+        handle = null;
+    }
+    if (handle) {
+        _dbCache.delete(storage);   // refresh recency
+        _dbCache.set(storage, handle);
+        return handle;
+    }
+    handle = createDatabase(username, storage);
+    // ensure(): create tables and apply additive migrations/indexes — once per handle, shared by every
+    // concurrent caller; a failure is not remembered, so the next request retries. This is all the
+    // service and /api routes ever did per request (sync + migrate), so it changes nothing for them.
+    // ensureSeeded(): the same plus seedData(), which is what the web pages' requireLogin always did.
+    // Seeding is kept OFF the service path on purpose: it changes which exercise names quick-log matches.
+    handle.ensure = () => {
+        if (!handle.__ensureP) {
+            handle.__ensureP = (async () => {
+                await handle.sequelize.sync();
+                await handle.migrate();
+                handle.__ensured = true;
+            })().catch((e) => { handle.__ensureP = null; throw e; });
+        }
+        return handle.__ensureP;
+    };
+    handle.ensureSeeded = () => {
+        if (!handle.__seedP) {
+            handle.__seedP = handle.ensure().then(() => handle.seedData())
+                .catch((e) => { handle.__seedP = null; throw e; });
+        }
+        return handle.__seedP;
+    };
+    _dbCache.set(storage, handle);
+    while (_dbCache.size > DB_CACHE_MAX) {
+        const oldestKey = _dbCache.keys().next().value;
+        const old = _dbCache.get(oldestKey);
+        _dbCache.delete(oldestKey);
+        closeLater(old);
+    }
+    return handle;
+};
+getDatabase._cache = _dbCache;
+getDatabase._closing = _closing;
+getDatabase.DB_CACHE_MAX = DB_CACHE_MAX;
+
+const createDatabase = (username, storage) => {
     const sequelize = new Sequelize({
         dialect: 'sqlite',
-        storage: path.join(require('./lib/dataDir')(), `${username}_health.sqlite`),
+        storage,
         logging: false
     });
+    applyPragmas(sequelize);
 
     // ── Existing models ────────────────────────────────────────────────────────
 
@@ -1872,6 +1974,24 @@ const getDatabase = (username) => {
                 if (!/duplicate column|already exists/i.test(e.message || '')) {
                     console.error(`migrate: ${table}.${col} failed:`, e.message);
                 }
+            }
+        }
+        // Indexes (idempotent). sync() never adds an index to a table that already exists, so these
+        // are created here; reads filter and join on exactly these columns.
+        const indexes = [
+            ['WorkoutSets',     'sessionId'],
+            ['WorkoutSets',     'exerciseName'],
+            ['WorkoutSessions', 'date'],
+            ['WorkoutSessions', 'status'],
+            ['Exercises',       'date'],
+            ['Meals',           'date'],
+            ['WeightEntries',   'date'],
+        ];
+        for (const [table, col] of indexes) {
+            try {
+                await sequelize.query(`CREATE INDEX IF NOT EXISTS "idx_${table}_${col}" ON "${table}" ("${col}")`);
+            } catch (e) {
+                console.error(`migrate: index ${table}.${col} failed:`, e.message);
             }
         }
         // Backfill: a goal completed before `status` existed is 'done'. Only rows still at

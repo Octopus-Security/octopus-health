@@ -60,7 +60,6 @@ function mount(app, { requireLogin, getDatabase }) {
 
   app.get('/sessions/api/library', ...guard, api(async (req) => {
     const db = getDatabase(me(req));
-    await db.sequelize.sync();
     const rows = await db.ExerciseDefinition.findAll({ order: [['name', 'ASC']] });
     const library = [...L.fromExercises(rows.map(r => r.toJSON())), ...L.fromRoutines(mobility.ROUTINES), ...L.fromMma()];
     // The client only needs enough to show and snapshot an item; muscle data stays server-side for suggest().
@@ -74,7 +73,6 @@ function mount(app, { requireLogin, getDatabase }) {
 
   app.post('/sessions/api/suggest', ...guard, sameOriginJson, api(async (req) => {
     const db = getDatabase(me(req));
-    await db.sequelize.sync();
     const rows = await db.ExerciseDefinition.findAll();
     const library = [...L.fromExercises(rows.map(r => r.toJSON())), ...L.fromRoutines(mobility.ROUTINES), ...L.fromMma()];
     return { suggestions: L.suggest(library, S.cleanTailoring((req.body || {}).tailoring)) };
