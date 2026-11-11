@@ -165,6 +165,7 @@
     { "match": "^banded ankle eversion$", "requires": ["resistance-bands"], "tool": "Use a light band" },
     { "match": "^spanish squat$", "requires": ["resistance-bands"], "tool": "Use a band around a sturdy upright", "substitutes": [ { "name": "Tempo Bodyweight Squat", "requires": [] } ] },
     { "match": "^(scapular pull-up|towel hang|flexed-arm hang)$", "requires": ["bar"] },
+    { "match": "^jefferson curl \\(elevated\\)$", "requires": ["plyo-box|step|weight-bench"], "optional": ["dumbbell|kettlebell"], "tool": "Light dumbbell or kettlebell, only when it is comfortable", "substitutes": [ { "name": "Jefferson Curl", "requires": [] } ] },
     { "match": "^shoulder dislocates$", "optional": ["resistance-bands"], "tool": "Use a band held wide", "without": "No band? Use a broom handle or a towel held wide." },
     { "match": "^overhead banded shoulder stretch$", "requires": ["resistance-bands"], "tool": "Use a band on a high anchor", "substitutes": [ { "name": "Cross-Body Shoulder Stretch", "requires": [] } ] },
     { "match": "^terminal knee extension", "requires": ["resistance-bands"], "tool": "Use a band" },

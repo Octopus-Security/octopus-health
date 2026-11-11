@@ -275,6 +275,7 @@ test('rules route the names that used to collide', () => {
     'Hanging Leg Raise': 'hanging-leg-raise',
     'Hanging Knee Raise': 'hanging-knee-raise',   // the knee-strike rule would otherwise take any "knee"; not the straight-leg raise
     'Jefferson Curl': 'forward-fold',
+    'Jefferson Curl (Elevated)': 'jefferson-curl-elevated',   // on a box, hands below the box top; the floor version is unchanged
     'Couch Stretch': 'couch-stretch',            // not the generic hip-flexor figure
     'Lizard Stretch': 'lizard',
     "World's Greatest Stretch": 'worlds-greatest',
