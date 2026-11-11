@@ -33,13 +33,12 @@ function mount(app, { requireLogin, getDatabase }) {
     next();
   }
   const api = fn => async (req, res) => {
-    try { const db = dbFor(req); await db.sequelize.sync(); res.json(await fn(req, db)); }
+    try { const db = dbFor(req); res.json(await fn(req, db)); }
     catch (e) { res.status(e.status || 500).json({ ok: false, error: e.status ? e.message : 'Something went wrong' }); if (!e.status) console.error(e); }
   };
 
   app.get('/gyms', requireLogin, async (req, res) => {
     const db = dbFor(req);
-    await db.sequelize.sync();
     const gyms = await G.listGyms(db);
     const groups = {};
     for (const it of E.ITEMS) (groups[it.group] = groups[it.group] || []).push(it);

@@ -117,10 +117,9 @@ router.use(requireToken, (req, res, next) => {
  */
 async function getDB(req) {
   const db = getDatabase(req.serviceUser || serviceUser(req));
-  // Create any missing tables — only if sequelize is available (safe no-op if tables exist)
-  if (db.sequelize) await db.sequelize.sync().catch(() => {});
-  // Additive column migrations (health uses plain sync(), so new columns need ALTER).
-  if (db.migrate) await db.migrate().catch(() => {});
+  // Tables, additive migrations and indexes: once per handle (database.js ensure()), not per request.
+  // A failure is logged and the request carries on, as it did when these were `.catch(() => {})`.
+  if (db.ensure) await db.ensure().catch((e) => console.error('service ensure failed:', e.message));
   return db;
 }
 

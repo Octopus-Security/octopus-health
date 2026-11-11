@@ -273,7 +273,7 @@ test('rules route the names that used to collide', () => {
     'Pike Push-up': 'pike-push-up',
     'Side Plank': 'side-plank',
     'Hanging Leg Raise': 'hanging-leg-raise',
-    'Hanging Knee Raise': 'hanging-leg-raise',   // the knee-strike rule would otherwise take any "knee"
+    'Hanging Knee Raise': 'hanging-knee-raise',   // the knee-strike rule would otherwise take any "knee"; not the straight-leg raise
     'Jefferson Curl': 'forward-fold',
     'Jefferson Curl (Elevated)': 'jefferson-curl-elevated',   // on a box, hands below the box top; the floor version is unchanged
     'Couch Stretch': 'couch-stretch',            // not the generic hip-flexor figure
@@ -422,4 +422,77 @@ test('a foot that passes through a box between two key poses is rejected; the fi
     const errs2 = SF.validate(JSON.parse(fs.readFileSync(path.join(POSES, k + '.json'), 'utf8')));
     assert.deepStrictEqual(errs2.filter((e) => /box/.test(e)), [], k);
   }
+});
+
+// ── Hanging raises and resistance bands (2026-11-10) ─────────────────────────────────────────
+// "Hanging Knee Raise" and "Hanging Leg Raise" were one pose file, so they drew the same figure, and that figure's
+// dead hang had the thigh forward and the shin kicked back (thigh 20 / shin -20).
+const kneeAt = (pose) => pose.thighL - pose.shinL;          // knee flexion, degrees (0 = locked straight)
+const lastPose = (key) => { const f = SF.resolveFrames(load(key)); return f[f.length - 1].pose; };
+const firstPose = (key) => SF.resolveFrames(load(key))[0].pose;
+
+test('hanging knee raise and hanging leg raise are two different movements', () => {
+  assert.notStrictEqual(PM.keyFor('Hanging Knee Raise'), PM.keyFor('Hanging Leg Raise'));
+  for (const n of ['Ab Strap Knee Raise', 'Ab Strap Oblique Knee Raise']) assert.strictEqual(PM.keyFor(n), 'hanging-knee-raise', n);
+  assert.strictEqual(PM.keyFor('Ab Strap Leg Raise'), 'hanging-leg-raise');
+  const knee = lastPose('hanging-knee-raise'), leg = lastPose('hanging-leg-raise');
+  assert.ok(kneeAt(knee) >= 90, 'knee raise: knees bent 90 or more at the top, got ' + kneeAt(knee));
+  assert.ok(Math.abs(kneeAt(leg)) <= 5, 'leg raise: knees stay locked at the top, got ' + kneeAt(leg));
+  assert.ok(kneeAt(knee) - kneeAt(leg) >= 60, 'the two top frames must not collapse into one pose');
+  assert.ok(knee.thighL >= 90 && leg.thighL >= 90, 'thighs horizontal or higher at the top (90 = horizontal, 180 = straight up)');
+  assert.ok(Math.abs(knee.shinL) <= 30, 'knee raise: the shin hangs roughly vertical');
+  assert.ok(leg.shinL >= 90, 'leg raise: the whole leg is raised to horizontal or above');
+});
+
+test('every hanging raise starts from a dead hang with straight legs', () => {
+  for (const k of ['hanging-knee-raise', 'hanging-leg-raise', 'dead-hang']) {
+    const p = firstPose(k);
+    assert.ok(Math.abs(kneeAt(p)) <= 5, k + ': a dead hang has straight legs, knee flexion ' + kneeAt(p));
+    assert.ok(Math.abs(p.thighL) <= 5, k + ': thigh hangs straight down');
+    assert.strictEqual(p.upperArmL, 180, k + ': arms straight overhead');
+  }
+});
+
+test('a band prop is drawn from its anchor to the joint, and follows the joint', () => {
+  const data = { version: 2, title: 'Band test', view: 'front', props: [{ type: 'band', from: { x: 90, y: 30 }, to: 'handL', rest: 10 }],
+    frames: [{ duration: 800, pose: { torso: 180, head: 180, upperArmL: 90, forearmL: 90, upperArmR: -90, forearmR: -90, thighL: 5, shinL: 0, footL: 90, thighR: -5, shinR: 0, footR: -90, root: { x: 50, y: 50 } } },
+      { duration: 800, pose: { upperArmL: 20, forearmL: 20 } }] };
+  assert.deepStrictEqual(SF.validate(data), []);
+  const band = (t) => (SF.svgFor(data, 0, t).match(/<(?:line|path)[^>]*stroke="#e8a33d"[^>]*>/g) || []);
+  const a = band(0), b = band(1);
+  assert.strictEqual(a.length, 1, 'one band line at the start');
+  assert.strictEqual(b.length, 1);
+  assert.notStrictEqual(a[0], b[0], 'the band is recomputed when the hand moves');
+  const endOf = (s) => s.match(/x2="([\d.-]+)" y2="([\d.-]+)"/);
+  const hand0 = SF.solve(SF.resolveFrames(data)[0].pose, 'front').handL;
+  assert.ok(Math.abs(+endOf(a[0])[1] - hand0.x) < 0.1 && Math.abs(+endOf(a[0])[2] - hand0.y) < 0.1, 'the band ends on the hand');
+  const w = (s) => +s.match(/stroke-width="([\d.]+)"/)[1];
+  assert.ok(w(a[0]) < 2.8, 'a stretched band is drawn thinner than a slack one');
+  assert.match(SF.svgFor(data, 0, 0), /<circle[^>]*cx="90.0" cy="30.0"/, 'the anchor is drawn');
+});
+
+test('a band must name a real joint and a real anchor', () => {
+  const mk = (band) => ({ version: 2, title: 'x', view: 'front', props: [band], static: true,
+    frames: [{ pose: { torso: 180, head: 180, upperArmL: 0, forearmL: 0, upperArmR: 0, forearmR: 0, thighL: 5, shinL: 0, footL: 90, thighR: -5, shinR: 0, footR: -90, root: { x: 50, y: 50 } } }] });
+  assert.ok(SF.validate(mk({ type: 'band', from: { x: 5, y: 5 }, to: 'wristL' })).some((e) => /"to"/.test(e)));
+  assert.ok(SF.validate(mk({ type: 'band', from: 'handL', to: 'handL' })).some((e) => /itself/.test(e)));
+  assert.ok(SF.validate(mk({ type: 'band', to: 'handL' })).some((e) => /"from"/.test(e)));
+  assert.deepStrictEqual(SF.validate(mk({ type: 'band', from: 'handR', to: 'handL' })), []);
+});
+
+test('the band exercises show a band, and shoulder rotation keeps the upper arm pinned', () => {
+  for (const k of ['shoulder-ir-band', 'shoulder-er-band', 'band-shoulder-adduction', 'band-pull-apart', 'seated-row-band', 'face-pull-band',
+    'pushdown-band', 'lat-pulldown-band', 'curl-band', 'lateral-raise-band', 'leg-curl-band', 'clamshell-band', 'pull-up-band']) {
+    const d = load(k);
+    assert.ok((d.props || []).some((p) => p.type === 'band'), k + ' has a band prop');
+    assert.ok(SF.svgFor(d, 0, 0).includes('#e8a33d'), k + ' draws the band');
+  }
+  const ir = SF.resolveFrames(load('shoulder-ir-band'));
+  for (const f of ir) assert.ok(Math.abs(f.pose.upperArmL - 4) <= 1, 'the upper arm stays against the ribs');
+  const fore = ir.map((f) => f.pose.forearmL);
+  assert.ok(Math.max(...fore) > 80 && Math.min(...fore) < -80, 'forearm swings from out to across the belly');
+  assert.ok(ir.some((f) => (f.pose.depth || {}).forearmL <= 0.3), 'the forearm foreshortens as it comes toward the viewer');
+  for (const n of ['Resistance Band Row', 'Resistance Band Face Pull', 'Resistance Band Lat Pulldown', 'Resistance Band Bicep Curl', 'Resistance Band Leg Curl', 'Band-Assisted Pull-up'])
+    assert.match(PM.keyFor(n), /-band$/, n);
+  assert.strictEqual(PM.keyFor('Seated Cable Row'), 'seated-row');
 });

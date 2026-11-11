@@ -34,6 +34,7 @@ function escapeHtml(s) {
 function createAppGate({ authUrl, slug, upgradeUrl = '', appName = 'this app', fetchImpl, now = Date.now } = {}) {
   const doFetch = fetchImpl || ((...a) => fetch(...a));
   const cache = new Map();           // username → { allowed, at }
+  const inflight = new Map();        // username → Promise<boolean>
 
   async function allowed(req) {
     const key = req.user && req.user.username;
@@ -45,20 +46,29 @@ function createAppGate({ authUrl, slug, upgradeUrl = '', appName = 'this app', f
     if (req.get('cookie')) headers.Cookie = req.get('cookie');
     if (req.get('authorization')) headers.Authorization = req.get('authorization');
 
+    // Concurrent checks for one user (a page firing several API calls at once) share one request.
+    let p = key && inflight.get(key);
+    if (!p) {
+      p = (async () => {
+        // A hung auth must not hang every request behind it: 5s, then it fails the way any error does.
+        const res = await doFetch(`${authUrl}/api/auth/apps/${encodeURIComponent(slug)}/allowed`, { headers, signal: AbortSignal.timeout(5000) });
+        if (res.status === 404) {
+          console.warn(`[access] "${slug}" is not an app octopus-auth knows — the gate is doing nothing. Check hub-apps.json.`);
+          return true;
+        }
+        if (!res.ok) throw new Error(`auth answered ${res.status}`);
+        const body = await res.json();
+        const ok = body.allowed !== false;
+        if (key) {
+          if (cache.size >= MAX_CACHE) cache.clear();
+          cache.set(key, { allowed: ok, at: now() });
+        }
+        return ok;
+      })();
+      if (key) { inflight.set(key, p); p.then(() => inflight.delete(key), () => inflight.delete(key)); }
+    }
     try {
-      const res = await doFetch(`${authUrl}/api/auth/apps/${encodeURIComponent(slug)}/allowed`, { headers });
-      if (res.status === 404) {
-        console.warn(`[access] "${slug}" is not an app octopus-auth knows — the gate is doing nothing. Check hub-apps.json.`);
-        return true;
-      }
-      if (!res.ok) throw new Error(`auth answered ${res.status}`);
-      const body = await res.json();
-      const ok = body.allowed !== false;
-      if (key) {
-        if (cache.size >= MAX_CACHE) cache.clear();
-        cache.set(key, { allowed: ok, at: now() });
-      }
-      return ok;
+      return await p;
     } catch (err) {
       console.warn(`[access] could not check "${slug}" access (${err.message}) — ${hit ? 'using the last answer' : 'allowing'}`);
       return hit ? hit.allowed : true;

@@ -144,12 +144,12 @@
     var u = $('sx-url'); u.select();
     (navigator.clipboard ? navigator.clipboard.writeText(u.value) : Promise.reject()).then(function () { say('Link copied.'); }, function () { try { document.execCommand('copy'); say('Link copied.'); } catch (e) { say('Select the link and copy it.', true); } });
   });
-  $('sx-rotate').addEventListener('click', function () {
-    if (!confirm('Make a new link? Anyone with the old one loses access.')) return;
+  $('sx-rotate').addEventListener('click', async function () {
+    if (!(await oDialog.confirm({ title: 'Make a new link?', body: 'Anyone with the old one loses access.', confirmLabel: 'Make new link', danger: true }))) return;
     api('POST', '/sessions/api/' + S.id + '/rotate-link').then(function (j) { S = j.session; paintShare(); say('New link made. The old one no longer works.'); }).catch(function (e) { say(e.message, true); });
   });
-  $('sx-delete').addEventListener('click', function () {
-    if (!confirm('Delete this session for good? Its link stops working.')) return;
+  $('sx-delete').addEventListener('click', async function () {
+    if (!(await oDialog.confirm({ title: 'Delete this session?', body: 'Its link stops working.', confirmLabel: 'Delete', danger: true }))) return;
     api('DELETE', '/sessions/api/' + S.id).then(function () { location.href = '/sessions'; }).catch(function (e) { say(e.message, true); });
   });
 })();

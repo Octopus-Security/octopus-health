@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title><%= title %></title>
     <link rel="stylesheet" href="<%= asset('/theme.css') %>">
+    <%- include('partials/dialog') %>
     <style>
       .log-card { background:#0d0d0d; border:1px solid #2a2a2a; border-radius:10px; margin-bottom:14px; overflow:hidden; }
       .log-head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; padding:12px 14px; background:#141414; border-bottom:1px solid #1e1e1e; }
@@ -224,9 +225,9 @@
         closeSheet(); refresh(sid);
       }
       async function delSet(sid, setId) {
-        if (!confirm('Delete this set?')) return;
+        if (!(await oDialog.confirm({ title: 'Delete set?', body: 'Delete this set?', confirmLabel: 'Delete', danger: true }))) return;
         const r = await api('DELETE', '/logs/api/set/' + setId);
-        if (!r.ok) return showErr(r.error);
+        if (!r.ok) return oDialog.alert({ title: 'Not deleted', body: r.error || 'Could not delete. Check your connection and try again.' });
         closeSheet(); refresh(sid);
       }
 
@@ -305,9 +306,9 @@
         closeSheet(); refresh(sid);
       }
       async function delSession(sid) {
-        if (!confirm('Delete this whole workout and its sets? This cannot be undone.')) return;
+        if (!(await oDialog.confirm({ title: 'Delete workout?', body: 'Delete this whole workout and its sets? This cannot be undone.', confirmLabel: 'Delete', danger: true }))) return;
         const r = await api('DELETE', '/logs/api/session/' + sid);
-        if (!r.ok) return showErr(r.error);
+        if (!r.ok) return oDialog.alert({ title: 'Not deleted', body: r.error || 'Could not delete. Check your connection and try again.' });
         closeSheet();
         SESSIONS = SESSIONS.filter(s => s.id !== sid);
         render();

@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title><%= title %></title>
     <link rel="stylesheet" href="<%= asset('/theme.css') %>">
+    <%- include('partials/dialog') %>
     <style>
         .slot-row { display: grid; grid-template-columns: 2fr 1fr auto; gap: .5rem; margin-bottom: .4rem; align-items: start; }
         .slot-row input { width: 100%; }
@@ -78,7 +79,7 @@
                             or threw the last one out.
                         </p>
                         <form method="POST" action="/meal-preps/<%= p.id %>/delete"
-                              onsubmit="return confirm('Discard this batch? Meals already logged from it are not affected.')">
+                              onsubmit="return oConfirmForm(event, 'Discard this batch? Meals already logged from it are not affected.', 'Discard')">
                             <button type="submit" class="btn-danger">Discard batch</button>
                         </form>
                     </div>
@@ -144,7 +145,7 @@
                             <button type="submit">Save changes</button>
                         </form>
                         <form method="POST" action="/meal-templates/<%= t.id %>/delete" style="margin-top:.6rem;"
-                              onsubmit="return confirm('Delete <%= t.name %>? Meals already logged from it are not affected.')">
+                              onsubmit="return oConfirmForm(event, <%- JSON.stringify('Delete ' + t.name + '? Meals already logged from it are not affected.').replace(/</g,'\\u003c').replace(/"/g,'&quot;') %>, 'Delete')">
                             <button type="submit" class="btn-danger">Delete saved meal</button>
                         </form>
                     </div>

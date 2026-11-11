@@ -305,7 +305,6 @@ function mount(app, { requireLogin, getDatabase }) {
   const handler = (fn) => async (req, res) => {
     try {
       const db = getDatabase(req.user.username);
-      await db.sequelize.sync();
       res.json({ success: true, ...(await fn(db, req.user.username, req.body || {}, req)) });
     } catch (e) {
       const status = e.status || 500;

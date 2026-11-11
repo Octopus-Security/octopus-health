@@ -109,11 +109,22 @@ const STARTED_AT = new Date().toISOString();
  */
 const ASSET_STAMPS = new Map();
 
+// Files served from octopus-kit rather than public/ (the themed dialog). Resolved lazily so a
+// missing package degrades to an unstamped URL instead of failing at load.
+const KIT_FILES = {
+  '/vendor/octopus-dialog.js': 'ui/dialog.js',
+  '/vendor/octopus-dialog.css': 'ui/dialog.css',
+};
+function kitFile(urlPath) {
+  const rel = KIT_FILES[urlPath];
+  return rel ? path.join(ROOT, 'node_modules', 'octopus-kit', rel) : null;
+}
+
 function asset(urlPath) {
   if (!ASSET_STAMPS.has(urlPath)) {
     let stamp = null;
     try {
-      const file = path.join(ROOT, 'public', urlPath.replace(/^\/+/, '').split('?')[0]);
+      const file = kitFile(urlPath) || path.join(ROOT, 'public', urlPath.replace(/^\/+/, '').split('?')[0]);
       stamp = crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex').slice(0, 8);
     } catch { /* not on disk — serve it unstamped rather than failing the render */ }
     ASSET_STAMPS.set(urlPath, stamp ? `${urlPath}?v=${stamp}` : urlPath);
@@ -121,4 +132,4 @@ function asset(urlPath) {
   return ASSET_STAMPS.get(urlPath);
 }
 
-module.exports = { BUILD, STARTED_AT, sourceFiles, asset };
+module.exports = { BUILD, STARTED_AT, sourceFiles, asset, kitFile, KIT_FILES };

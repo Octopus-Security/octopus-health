@@ -142,11 +142,11 @@
     });
   }
 
-  $('ds-load').addEventListener('click', function () {
+  $('ds-load').addEventListener('click', async function () {
     var id = Number($('ds-preset').value); if (!id) return;
     var mode = document.querySelector('input[name="ds-mode"]:checked').value;
     var name = $('ds-preset').selectedOptions[0].textContent.replace(/ - \d+ stretches.*$/, '');
-    if (mode === 'replace' && !window.confirm('Replace your daily stretches with "' + name + '"? Your current list will be lost.')) return;
+    if (mode === 'replace' && !(await oDialog.confirm({ title: 'Replace daily stretches?', body: 'Replace your daily stretches with "' + name + '"? Your current list will be lost.', confirmLabel: 'Replace', danger: true }))) return;
     guard(DS.preset(id, mode).then(function () { msg(mode === 'replace' ? 'Loaded ' + name + '.' : 'Added the stretches from ' + name + ' that were not already there.'); }));
   });
   $('ds-search').addEventListener('input', renderLibrary);

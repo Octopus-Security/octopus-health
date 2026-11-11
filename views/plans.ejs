@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title><%= title %></title>
   <link rel="stylesheet" href="<%= asset('/theme.css') %>">
+  <%- include('partials/dialog') %>
   <style>
     .plans-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
     @media(max-width:800px){ .plans-grid { grid-template-columns:1fr; } }

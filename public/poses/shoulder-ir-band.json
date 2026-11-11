@@ -2,20 +2,29 @@
  "version": 2,
  "title": "Band Shoulder Internal Rotation",
  "view": "front",
+ "props": [
+  {
+   "type": "band",
+   "from": {
+    "x": 94,
+    "y": 35
+   },
+   "to": "handL",
+   "rest": 14
+  }
+ ],
  "highlight": [
   "shoulderL",
   "elbowL"
  ],
  "frames": [
   {
-   "duration": 1100,
-   "label": "Forearm out, elbow on the ribs",
-   "hold": 300,
+   "duration": 900,
+   "label": "Forearm out, elbow pinned to the ribs",
    "pose": {
     "torso": 180,
     "head": 180,
     "upperArmL": 4,
-    "forearmL": 92,
     "upperArmR": -4,
     "forearmR": -4,
     "thighL": 5,
@@ -24,19 +33,49 @@
     "thighR": -5,
     "shinR": 0,
     "footR": -90,
+    "forearmL": 92,
+    "depth": {
+     "forearmL": 1
+    },
     "root": {
      "x": 50,
      "y": 50
     }
-   }
+   },
+   "hold": 300
   },
   {
-   "duration": 1100,
-   "label": "Rotate in across the belly, elbow stays put",
-   "hold": 400,
+   "duration": 500,
+   "label": "Forearm swinging through, toward you",
    "pose": {
-    "forearmL": -88
-   }
+    "forearmL": 0,
+    "depth": {
+     "forearmL": 0.25
+    }
+   },
+   "hold": 0
+  },
+  {
+   "duration": 900,
+   "label": "Rotate in across the belly, elbow stays put",
+   "pose": {
+    "forearmL": -88,
+    "depth": {
+     "forearmL": 1
+    }
+   },
+   "hold": 400
+  },
+  {
+   "duration": 500,
+   "label": "Forearm swinging back out",
+   "pose": {
+    "forearmL": 0,
+    "depth": {
+     "forearmL": 0.25
+    }
+   },
+   "hold": 0
   }
  ]
 }

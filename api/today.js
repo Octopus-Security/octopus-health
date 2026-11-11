@@ -84,7 +84,6 @@ function planFromTemplate(t, defsByName) {
 function mount(app, { requireLogin, getDatabase }) {
   app.get('/today', requireLogin, async (req, res) => {
     const db = getDatabase(req.user.username);
-    await db.sequelize.sync();
     const day = dayKeyET();
     const rows = await db.WorkoutTemplate.findAll({ attributes: ['name'] });
     const slug = resolveSlug(rows.map(r => r.name), String(req.query.slug || ''), day);

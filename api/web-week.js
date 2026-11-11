@@ -40,7 +40,6 @@ function dayRow(day, plan, todayKey) {
 function mount(app, { requireLogin, getDatabase }) {
   app.get('/week', requireLogin, async (req, res) => {
     const db = getDatabase(req.user.username);
-    await db.sequelize.sync();
     const gyms = await G.listGyms(db);
     const days = [];
     for (const d of ORDER) {
