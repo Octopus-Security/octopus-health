@@ -365,6 +365,8 @@ require('./api/web-sessions')(app, { requireLogin, getDatabase });
 // Correcting the log in place: edit/delete a set, retitle or redate a session,
 // add a set, rename an exercise, and known-name suggestions (api/web-log-edit.js).
 require('./api/web-log-edit')(app, { requireLogin, getDatabase });
+// Exercises section of the Logs area: list, rename/merge, per-exercise PRs, graph, plateau tips.
+require('./api/web-exercises')(app, { requireLogin, getDatabase });
 
 app.get('/tools', requireLogin, (req, res) => {
     res.render('tools', { title: 'Tools', user: req.user });

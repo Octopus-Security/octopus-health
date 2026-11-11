@@ -373,6 +373,20 @@ function parseSegment(segment, bar = { weight: 45, unit: 'lbs' }) {
 const BAR_ONLY_RE = /^(?:just\s+)?(?:the\s+)?(?:empty\s+)?bars?$/i;
 
 const BAR_SPEC_RE = new RegExp(`(\\d+(?:\\.\\d+)?)\\s*(${WEIGHT_UNIT_RE})\\s*(?:olympic\\s+)?bar\\b`, 'i');
+// Bar-first declaration in a header: "bar 20kg", "bar: 45lb", "EZ bar 25" (a bare
+// number after a NAMED bar is pounds; after plain "bar" a unit is required, so
+// "pull-up bar 3 sets" never declares a 3 lb bar).
+const BAR_SPEC2_RE = new RegExp(`\\b(?:(?:olympic|ez|trap|hex|safety)\\s+)?bar\\s*[:=]?\\s*(\\d+(?:\\.\\d+)?)\\s*(${WEIGHT_UNIT_RE})?(?![\\w.]|\\s*x\\b)`, 'i');
+function matchBarSpec(h) {
+  const a = h.match(BAR_SPEC_RE);
+  if (a) return { m: a, weight: parseFloat(a[1]), unit: WEIGHT_UNIT[a[2].toLowerCase()] || 'lbs' };
+  const b = h.match(BAR_SPEC2_RE);
+  if (!b) return null;
+  const named = /\b(?:olympic|ez|trap|hex|safety)\s+bar/i.test(b[0]);
+  if (!b[2] && !named) return null;
+  return { m: b, weight: parseFloat(b[1]), unit: b[2] ? (WEIGHT_UNIT[b[2].toLowerCase()] || 'lbs') : 'lbs' };
+}
+function stripBarSpec(line) { const b = matchBarSpec(line); return b ? line.replace(b.m[0], ' ') : line; }
 const PLUS_BAR_RE = /(\d+(?:\.\d+)?)\s*(?:lbs?|kgs?)?\s*\+\s*(?:the\s+)?bar\b/i;
 
 /**
@@ -389,15 +403,39 @@ function expandBarWords(line, bar) {
   };
 }
 
-/** Rewrite "50+bar x 10" as "95lbs x 10", returning the note it came from. */
+// "bar + 50" is the same fact as "50 + bar", said bar-first. The owner writes
+// BOTH: 2026-11-11 "10 x bar + 50" was read as ten reps of 50 lb (the bar
+// silently dropped), and "5 x bar" as five reps with NO weight, i.e. bodyweight.
+// Wrong numbers, stored with no sign anything was off.
+const BAR_PLUS_RE = /\bbar\s*\+\s*(\d+(?:\.\d+)?)\s*(?:lbs?|kgs?)?(?![\w.])/i;
+
+/** Rewrite "50+bar x 10" / "bar + 50 x 10" as "95lbs x 10", returning the note it came from. */
 function expandPlusBar(line, bar) {
-  const m = line.match(PLUS_BAR_RE);
+  const m = line.match(PLUS_BAR_RE) || line.match(BAR_PLUS_RE);
   if (!m) return { line, note: null };
   const plates = parseFloat(m[1]);
   const total = Math.round((plates + bar.weight) * 100) / 100;
   return {
     line: line.replace(m[0], `${total}${bar.unit}`),
     note: `${plates} + ${bar.weight}${bar.unit === 'kg' ? 'kg' : 'lb'} bar`,
+  };
+}
+
+/**
+ * A SET LINE whose load is the bare word "bar": "5 x bar", "bar x 5". Only when
+ * the line names no weight of its own (no unit, no "+"), so "10 x 25lb ez bar"
+ * and "50 + bar" are untouched. The load is the bar, never bodyweight.
+ */
+function expandBareBar(line, bar) {
+  const s = String(line);
+  if (new RegExp(`\\d\\s*(?:${WEIGHT_UNIT_RE})\\b`, 'i').test(s) || /\+/.test(s)) return { line: s, note: null };
+  const m = s.match(/(^|[\s(x×])(?:the\s+)?bar(?=\s|$|[,.)x×])/i);
+  if (!m) return { line: s, note: null };
+  const stripped = s.replace(/\b(?:x|×|bar|the|reps?|sets?|each|side|per)\b/gi, ' ');
+  if (/[a-z]{2,}/i.test(stripped)) return { line: s, note: null };      // other words: not a bare set line
+  return {
+    line: s.replace(/\bbar\b/i, `${bar.weight}${bar.unit}`).replace(/\s+/g, ' ').trim(),
+    note: `just the ${bar.weight}${bar.unit === 'kg' ? 'kg' : 'lb'} bar`,
   };
 }
 
@@ -447,12 +485,11 @@ function isSetOnly(line) {
 function parseHeaderBlock(header, setLines, declaredBar = { weight: 45, unit: 'lbs' }) {
   let h = header.replace(/:\s*$/, '').trim();
   if (TOOL_ECHO_RE.test(h)) return null;
-  const bm = h.match(BAR_SPEC_RE);
+  const bm = matchBarSpec(h);
   // A bar named in the HEADER wins over one declared earlier in the message,
   // which wins over the 45 lb assumption.
-  const bar = bm ? { weight: parseFloat(bm[1]), unit: WEIGHT_UNIT[bm[2].toLowerCase()] || 'lbs' }
-                 : declaredBar;
-  if (bm) h = h.replace(bm[0], ' ').replace(/\s+/g, ' ').trim();
+  const bar = bm ? { weight: bm.weight, unit: bm.unit } : declaredBar;
+  if (bm) h = h.replace(bm.m[0], ' ').replace(/\s+/g, ' ').trim();
 
   // The header may carry its own first set ("bicep curls 10 20lbs").
   const own = parseClause(h, bar);
@@ -470,7 +507,9 @@ function parseHeaderBlock(header, setLines, declaredBar = { weight: 45, unit: 'l
   const bad = [];
   for (const raw of setLines) {
     const words_ = expandBarWords(raw.replace(/×/g, 'x'), bar);
-    const { line, note } = expandPlusBar(words_.line, bar);
+    const plus = expandPlusBar(words_.line, bar);
+    const bare = plus.note ? { line: plus.line, note: null } : expandBareBar(plus.line, bar);
+    const line = bare.line, note = plus.note || bare.note;
     // The phrasings the inline grammar already reads ("12 reps 40lb", "10 reps
     // at 50") were unread as set lines, because only parseClause normalised.
     const got = parseSets(normalisePhrasing(line.toLowerCase()), { oneSet: true });
@@ -516,11 +555,11 @@ function parseWorkout(text) {
       // pure set spec and was swallowed as a second, repless 45 lb set of the
       // exercise before it — while the declaration itself never ran.
       if (BAR_DECL_RE.test(t)) break;
-      const probe = expandPlusBar(expandBarWords(t, bar).line, bar).line;
+      const probe = expandBareBar(expandPlusBar(expandBarWords(t, bar).line, bar).line, bar).line;
       if (!isSetOnly(probe)) break;
       next.push(t); j++;
     }
-    const looksHeader = /:\s*$/.test(line) || (next.length > 0 && hasNameWord(line.replace(BAR_SPEC_RE, ' ')));
+    const looksHeader = /:\s*$/.test(line) || (next.length > 0 && hasNameWord(stripBarSpec(line)));
     if (looksHeader && (next.length || /:\s*$/.test(line))) {
       const r = parseHeaderBlock(line, next, bar);
       if (r && r.exercise) {
@@ -611,4 +650,4 @@ function buildPreview(parsed, library) {
   });
 }
 
-module.exports = { parseWorkout, expandPlusBar, expandBarWords, buildPreview, parseSets, parseClause, matchExercise, EXERCISE_ALIASES, normKey, splitSegments, pickLoad };
+module.exports = { parseWorkout, expandPlusBar, expandBareBar, expandBarWords, buildPreview, parseSets, parseClause, matchExercise, EXERCISE_ALIASES, normKey, splitSegments, pickLoad };
