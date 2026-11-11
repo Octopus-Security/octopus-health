@@ -40,6 +40,7 @@ for (const method of ['get', 'post', 'put', 'patch', 'delete', 'use']) {
 app.set('trust proxy', 1);
 const port = process.env.PORT || 3000;
 const getDatabase = require('./database');
+const { createVerifyCache } = require('./lib/verify-cache');
 const { parseWorkout, buildPreview } = require('./api/workout-parse');
 const { detectPR } = require('./api/pr-detect');
 const goalsApi = require('./api/goals');
@@ -119,7 +120,14 @@ app.use('/poses', (req, res, next) => {
     res.set('Cache-Control', req.query.v ? 'public, max-age=31536000, immutable' : 'public, max-age=300');
     next();
 });
-app.use(express.static(path.join(__dirname, 'public')));
+// Every view references public/ files through asset(), which appends ?v=<content hash>, so a stamped
+// request names immutable bytes and may be cached for a year; a bare request keeps the default.
+app.use(express.static(path.join(__dirname, 'public'), {
+    setHeaders: (res) => {
+        const q = res.req && res.req.query;
+        if (q && q.v) res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    },
+}));
 
 // ── Dedicated public host for shared sessions (OFF by default) ───────────────
 // With PUBLIC_HOST unset (the default) nothing here does anything and /s lives on the app host.
@@ -162,8 +170,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // and expose the user as req.user — no local session.
 const SSO_COOKIE     = 'octopus_sso';
 const AUTH_LOGIN_URL = (process.env.AUTH_PUBLIC_URL || 'https://auth.octopustechnology.net') + '/login';
-const _verifyCache = new Map();   // token -> { user, exp }
-const _seededUsers = new Set();   // usernames whose DB has been ensured this run
 
 function parseCookies(req) {
     const out = {};
@@ -176,29 +182,17 @@ function parseCookies(req) {
     return out;
 }
 
-async function verifyToken(token) {
-    const cached = _verifyCache.get(token);
-    if (cached && cached.exp > Date.now()) return cached.user;
-    try {
-        const r = await axios.post(`${AUTH_URL}/api/auth/verify`, {}, {
-            headers: { Authorization: `Bearer ${token}` }, timeout: 5000,
-        });
-        if (r.data && r.data.valid && r.data.user) {
-            _verifyCache.set(token, { user: r.data.user, exp: Date.now() + 5 * 60 * 1000 });
-            return r.data.user;
-        }
-    } catch { /* invalid or auth unreachable → treat as unauthenticated */ }
-    return null;
-}
+const verifyToken = createVerifyCache({
+    call: async (token) => (await axios.post(`${AUTH_URL}/api/auth/verify`, {}, {
+        headers: { Authorization: `Bearer ${token}` }, timeout: 5000,
+    })).data,
+});
 
-// Lazily create + seed a user's DB the first time we see them this run.
+// Lazily create + seed a user's DB the first time we see them this run. The "once" lives on the
+// cached handle itself (database.js ensure()), so every path — web pages, the /api router and the
+// service routes — shares one answer, and a handle that was evicted or replaced re-ensures.
 async function ensureUserDb(username) {
-    if (_seededUsers.has(username)) return;
-    const { sequelize, seedData, migrate } = getDatabase(username);
-    await sequelize.sync();
-    await migrate();
-    await seedData();
-    _seededUsers.add(username);
+    await getDatabase(username).ensureSeeded();
 }
 
 app.use(async (req, res, next) => {
@@ -276,7 +270,6 @@ app.post('/api/auth/login', async (req, res) => {
 // Dashboard
 app.get('/', requireLogin, async (req, res) => {
     const { WeightEntry, Exercise, Meal, Goal, Competition, TrainingSession, WorkoutSession, WorkoutSet, sequelize } = getDatabase(req.user.username);
-    await sequelize.sync();
 
     try {
         const todayStr = ET.todayET();
@@ -294,18 +287,26 @@ app.get('/', requireLogin, async (req, res) => {
             where: { date: todayStr, status: 'finished' },
             order: [['startedAt', 'ASC']],
         });
-        const todayWorkoutSessions = await Promise.all(rawSessions.map(async s => {
-            const sets = await WorkoutSet.findAll({
-                where: { sessionId: s.id },
+        // One query for every session's sets (was one per session).
+        const allSets = rawSessions.length
+            ? await WorkoutSet.findAll({
+                where: { sessionId: { [Op.in]: rawSessions.map(s => s.id) } },
                 order: [['exerciseOrder', 'ASC'], ['setNumber', 'ASC']],
-            });
+            })
+            : [];
+        const setsBySession = new Map();
+        for (const set of allSets) {
+            if (!setsBySession.has(set.sessionId)) setsBySession.set(set.sessionId, []);
+            setsBySession.get(set.sessionId).push(set);
+        }
+        const todayWorkoutSessions = rawSessions.map(s => {
             const byExercise = {};
-            for (const set of sets) {
+            for (const set of setsBySession.get(s.id) || []) {
                 if (!byExercise[set.exerciseOrder]) byExercise[set.exerciseOrder] = { name: set.exerciseName, sets: [] };
                 byExercise[set.exerciseOrder].sets.push(set);
             }
             return { ...s.toJSON(), exercises: Object.values(byExercise) };
-        }));
+        });
 
         // Upcoming competition widget
         const nextComp = await Competition.findOne({
@@ -790,7 +791,6 @@ function mapRoutineForClient(routine) {
 
 app.get('/stretch', requireLogin, async (req, res) => {
     const { Routine, ExerciseDefinition, sequelize } = getDatabase(req.user.username);
-    await sequelize.sync();
 
     const all = await Routine.findAll({ order: [['type', 'ASC'], ['name', 'ASC']] });
     const routines = all.map(mapRoutineForClient);
@@ -817,14 +817,12 @@ app.get('/stretch', requireLogin, async (req, res) => {
 
 app.get('/stretch/api/routines', requireLogin, async (req, res) => {
     const { Routine, sequelize } = getDatabase(req.user.username);
-    await sequelize.sync();
     const routines = await Routine.findAll({ order: [['type', 'ASC'], ['name', 'ASC']] });
     res.json({ success: true, data: routines.map(mapRoutineForClient) });
 });
 
 app.post('/stretch/api/routines', requireLogin, async (req, res) => {
     const { Routine, sequelize } = getDatabase(req.user.username);
-    await sequelize.sync();
 
     const { name, type, notes, items } = req.body;
     if (!name || !type || !Array.isArray(items)) {
@@ -853,7 +851,6 @@ app.get('/routines', requireLogin, async (req, res) => {
 
 app.post('/routines', requireLogin, async (req, res) => {
     const { Routine, sequelize } = getDatabase(req.user.username);
-    await sequelize.sync();
     const { name, type, notes } = req.body;
     await Routine.create({ name: name.trim(), type, notes: notes?.trim() || null, items: '[]' });
     res.redirect('/routines?success=1');
@@ -952,7 +949,6 @@ const SESSION_TYPES = {
 
 app.get('/planner', requireLogin, async (req, res) => {
     const { ScheduleProfile, TrainingSession, Competition, sequelize } = getDatabase(req.user.username);
-    await sequelize.sync();
 
     const schedule = await ScheduleProfile.findOne();
     const scheduleData = schedule ? {
@@ -996,7 +992,6 @@ app.get('/planner', requireLogin, async (req, res) => {
 
 app.post('/planner/schedule', requireLogin, async (req, res) => {
     const { ScheduleProfile, sequelize } = getDatabase(req.user.username);
-    await sequelize.sync();
 
     const workDays    = [].concat(req.body.workDays    || []).map(Number);
     const bjjDays     = [].concat(req.body.bjjDays     || []).map(Number);
@@ -1020,7 +1015,6 @@ app.post('/planner/schedule', requireLogin, async (req, res) => {
 
 app.post('/planner/session', requireLogin, async (req, res) => {
     const { TrainingSession, sequelize } = getDatabase(req.user.username);
-    await sequelize.sync();
 
     const { date, type, title, plannedDuration, notes, competitionId } = req.body;
     await TrainingSession.create({
@@ -1064,7 +1058,6 @@ const SPORT_LABELS = { muay_thai: '🥊 Muay Thai', bjj: '🥋 BJJ', other: '�
 
 app.get('/competitions', requireLogin, async (req, res) => {
     const { Competition, sequelize } = getDatabase(req.user.username);
-    await sequelize.sync();
 
     const all = await Competition.findAll({ order: [['date', 'ASC']] });
     const todayStr = ET.todayET();
@@ -1091,7 +1084,6 @@ app.get('/competitions', requireLogin, async (req, res) => {
 
 app.post('/competitions', requireLogin, async (req, res) => {
     const { Competition, sequelize } = getDatabase(req.user.username);
-    await sequelize.sync();
 
     const { name, sport, date, location, weightClass, registrationDeadline, notes } = req.body;
     await Competition.create({
@@ -1115,7 +1107,6 @@ app.post('/competitions/delete/:id', requireLogin, async (req, res) => {
 
 app.get('/accountability', requireLogin, async (req, res) => {
     const { TrainingSession, sequelize } = getDatabase(req.user.username);
-    await sequelize.sync();
 
     const todayStr = ET.todayET();
 
@@ -1190,7 +1181,6 @@ function withKitMeta(t) {
 
 app.get('/workout', requireLogin, async (req, res) => {
     const { WorkoutSession, WorkoutSet, TrainingPlan, TrainingPlanAssignment, WorkoutTemplate, sequelize } = getDatabase(req.user.username);
-    await sequelize.sync();
     const recent = await WorkoutSession.findAll({ order: [['date','DESC'],['startedAt','DESC']], limit: 10 });
     const recentWithCounts = await Promise.all(recent.map(async s => {
         const sets = await WorkoutSet.findAll({ where: { sessionId: s.id } });
@@ -1224,7 +1214,6 @@ app.get('/workout', requireLogin, async (req, res) => {
 // Workout Logs — full session history, sets grouped by exercise, with a type filter.
 app.get('/logs', requireLogin, async (req, res) => {
     const { WorkoutSession, WorkoutSet, sequelize } = getDatabase(req.user.username);
-    await sequelize.sync();
     const { type } = req.query;
     const where = {};
     if (type && type !== 'all') where.type = type;
@@ -1245,7 +1234,6 @@ app.get('/logs', requireLogin, async (req, res) => {
 // Workout AJAX endpoints (session-protected, used by workout.ejs)
 app.post('/workout/api/session', requireLogin, async (req, res) => {
     const { WorkoutSession, sequelize } = getDatabase(req.user.username);
-    await sequelize.sync();
     const { type, title, date } = req.body;
     // ET is the only clock: toISOString() is UTC, so a workout started after 8pm ET was dated tomorrow.
     const todayET = ET.todayET();
@@ -1282,7 +1270,6 @@ app.get('/workout/api/session/:id', requireLogin, async (req, res) => {
 
 app.post('/workout/api/session/:id/set', requireLogin, async (req, res) => {
     const { WorkoutSet, sequelize } = getDatabase(req.user.username);
-    await sequelize.sync();
     const { exerciseName, exerciseId, exerciseOrder, setNumber, reps, weight, weightUnit, duration, rpe, notes } = req.body;
     const set = await WorkoutSet.create({
         sessionId: req.params.id, exerciseName, exerciseId: exerciseId || null,
@@ -1310,7 +1297,6 @@ app.post('/workout/api/quick-log', requireLogin, async (req, res) => {
         const { text, commit, date, type, title } = req.body || {};
         const parsed = parseWorkout(text);
         const { ExerciseDefinition, WorkoutSession, WorkoutSet, PersonalRecord, sequelize } = getDatabase(req.user.username);
-        await sequelize.sync();
 
         // Match each parsed name to the library (canonical name + id), inventing nothing.
         const library = (await ExerciseDefinition.findAll({ attributes: ['id', 'name'] }))
@@ -1364,14 +1350,12 @@ app.get('/workout/api/exercises', requireLogin, async (req, res) => {
 // Workout templates API
 app.get('/workout/api/templates', requireLogin, async (req, res) => {
     const { WorkoutTemplate, sequelize } = getDatabase(req.user.username);
-    await sequelize.sync();
     const templates = await WorkoutTemplate.findAll({ order: [['name','ASC']] });
     res.json({ success: true, data: templates.map(withKitMeta) });
 });
 
 app.post('/workout/api/templates', requireLogin, async (req, res) => {
     const { WorkoutTemplate, sequelize } = getDatabase(req.user.username);
-    await sequelize.sync();
     const { name, type, description, exercises } = req.body;
     if (!name || !Array.isArray(exercises)) return res.status(400).json({ success: false, message: 'name and exercises required' });
     const t = await WorkoutTemplate.create({ name: name.trim(), type: type || 'strength', description: description?.trim() || null, exercises: JSON.stringify(exercises) });
@@ -1417,7 +1401,6 @@ app.get('/library', requireLogin, async (req, res) => {
 
 app.get('/plan-maker', requireLogin, async (req, res) => {
     const { ExerciseDefinition, ExercisePlan, sequelize } = getDatabase(req.user.username);
-    await sequelize.sync();
     // partner submissions stay loggable but are never offered to build a plan from (lib/martial-scope.js)
     const all = (await ExerciseDefinition.findAll({ order: [['category','ASC'],['name','ASC']] })).filter(e => !excludedFromPlans(e));
     const exercises = all.map(e => ({
@@ -1440,7 +1423,6 @@ app.get('/timers', requireLogin, (req, res) => {
 
 app.get('/plans', requireLogin, async (req, res) => {
     const { TrainingPlan, TrainingPlanAssignment, sequelize } = getDatabase(req.user.username);
-    await sequelize.sync();
     const plans = await TrainingPlan.findAll({ order: [['sport','ASC'],['name','ASC']] });
     const assignment = await TrainingPlanAssignment.findOne({ where: { status: 'active' } });
     let activePlan = null;
@@ -1465,7 +1447,6 @@ app.get('/plans', requireLogin, async (req, res) => {
 
 app.post('/plans/assign', requireLogin, async (req, res) => {
     const { TrainingPlanAssignment, sequelize } = getDatabase(req.user.username);
-    await sequelize.sync();
     const { planId, startDate } = req.body;
     await TrainingPlanAssignment.update({ status: 'paused' }, { where: { status: 'active' } });
     await TrainingPlanAssignment.create({ planId, startDate: startDate || ET.todayET(), status: 'active' });

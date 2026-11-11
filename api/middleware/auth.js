@@ -56,8 +56,19 @@ if (/^(1|true|yes)$/i.test(process.env.AUTH_REMOTE_VERIFY || '') && !authenticat
  * carry no cookie, and fall through to the token gate unchanged.
  */
 const appAccessGate = require('../../appGate');
+const getDatabase = require('../../database');
 const requireUser = (req, res, next) => {
-  const gated = (err) => (err ? next(err) : appAccessGate(req, res, next));
+  // After the access gate, make sure THIS account's tables exist (once per handle). Bearer callers
+  // (mobile, bots) never pass through index.js's requireLogin, so without this a first-ever call
+  // would hit missing tables now that the routes no longer sync().
+  const ensured = (err) => {
+    if (err) return next(err);
+    if (!req.user || !req.user.username) return next();
+    getDatabase(req.user.username).ensure()
+      .catch((e) => console.error('ensureUserDb failed:', e.message))
+      .then(() => next());
+  };
+  const gated = (err) => (err ? next(err) : appAccessGate(req, res, ensured));
   return (req.user && req.user.username) ? gated() : authenticateToken(req, res, gated);
 };
 

@@ -3,6 +3,8 @@ FROM node:22-alpine
 # Patch Alpine OS packages before anything else
 RUN apk upgrade --no-cache
 
+ENV NODE_ENV=production
+
 # Set working directory
 WORKDIR /usr/src/app
 

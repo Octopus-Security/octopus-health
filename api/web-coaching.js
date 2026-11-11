@@ -18,14 +18,14 @@ function mount(app, { requireLogin, getDatabase }) {
 
   app.get('/coaching/api/status', requireLogin, async (req, res) => {
     try {
-      const db = dbFor(req); await db.sequelize.sync(); await db.migrate();
+      const db = dbFor(req);
       res.json({ ok: true, ...(await C.status(db)) });
     } catch (e) { console.error(e); res.status(500).json({ ok: false, error: 'Something went wrong' }); }
   });
 
   app.get('/coaching', requireLogin, async (req, res) => {
     try {
-      const db = dbFor(req); await db.sequelize.sync(); await db.migrate();
+      const db = dbFor(req);
       const s = await C.status(db);
       res.render('coaching', { title: 'Coaching', user: req.user, activeTab: 'coaching', ...s });
     } catch (e) { console.error(e); res.status(500).send('Something went wrong'); }

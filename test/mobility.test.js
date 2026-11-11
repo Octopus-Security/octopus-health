@@ -67,10 +67,10 @@ before(async () => {
   if (skip) return;
   const app = express();
   app.use(express.json());
-  const requireLogin = (req, res, next) => {
+  const requireLogin = async (req, res, next) => {
     const u = req.get('x-test-user');
     if (!u) return res.status(401).end();
-    used.add(u); req.user = { username: u }; next();
+    used.add(u); req.user = { username: u }; await getDatabase(u).ensureSeeded(); next();   // as index.js requireLogin does
   };
   mob(app, { requireLogin, getDatabase });
   await new Promise(r => { server = app.listen(0, r); });

@@ -249,7 +249,7 @@ before(async () => {
   const app = express();
   app.use(express.json());
   app.use((req, res, next) => { const u = req.get('x-test-user'); if (!u) return res.status(401).end(); used.add(u); req.user = { username: u }; next(); });
-  const requireLogin = (req, res, next) => next();
+  const requireLogin = async (req, res, next) => { await getDatabase(req.user.username).ensureSeeded(); next(); };
   mob(app, { requireLogin, getDatabase });
   app.get('/gyms-probe', async (req, res) => { const db = getDatabase(req.user.username); await db.sequelize.sync(); res.json(await G.listGyms(db)); });
   await new Promise(r => { server = app.listen(0, r); });

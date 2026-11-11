@@ -157,6 +157,7 @@ before(async () => {
     const u = req.get('x-test-user');
     if (!u) return res.status(302).set('Location', '/login').end();
     req.user = { username: u }; res.locals.user = req.user; res.locals.activeTab = 'gyms';
+    await getDatabase(u).ensureSeeded();
     next();
   };
   require('../api/web-gyms')(app, { requireLogin, getDatabase });

@@ -49,7 +49,6 @@ async function knownNames(db, q) {
 module.exports = function mountLogEdit(app, { requireLogin, getDatabase }) {
   const dbFor = async req => {
     const db = getDatabase(req.user.username);
-    await db.sequelize.sync();
     return db;
   };
   const send = (res, r) => res.status(r.ok ? 200 : (r.status || 400)).json(r);

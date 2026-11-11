@@ -41,7 +41,6 @@ module.exports = (app, { requireLogin, getDatabase }) => {
     }
 
     const { ExerciseDefinition, sequelize } = getDatabase(req.user.username);
-    await sequelize.sync();
     const rows = (await ExerciseDefinition.findAll({ order: [['name', 'ASC']] })).filter(e => !excludedFromPlans(e));
     const found = M.exercisesFor(kind, id, rows);
     const def = kind === 'muscle' ? M.MUSCLES[id] : M.JOINTS[id];
