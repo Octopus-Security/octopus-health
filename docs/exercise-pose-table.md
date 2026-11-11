@@ -168,11 +168,11 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | library | Push-up Board Narrow | Push-up Board Narrow | strength | push-up | rule |
 | library | Ab Roller Rollout | Ab Roller Rollout | strength | rollout | rule |
 | library | Ab Roller Knee Tuck | Ab Roller Knee Tuck | strength | rollout | rule |
-| library | Resistance Band Row | Resistance Band Row | strength | seated-row | rule |
-| library | Resistance Band Bicep Curl | Resistance Band Bicep Curl | strength | curl-bare | rule |
-| library | Resistance Band Tricep Extension | Resistance Band Tricep Extension | strength | pushdown | rule |
-| library | Resistance Band Lateral Raise | Resistance Band Lateral Raise | strength | lateral-raise-bare | rule |
-| library | Resistance Band Face Pull | Resistance Band Face Pull | strength | face-pull | rule |
+| library | Resistance Band Row | Resistance Band Row | strength | seated-row-band | rule |
+| library | Resistance Band Bicep Curl | Resistance Band Bicep Curl | strength | curl-band | rule |
+| library | Resistance Band Tricep Extension | Resistance Band Tricep Extension | strength | pushdown-band | rule |
+| library | Resistance Band Lateral Raise | Resistance Band Lateral Raise | strength | lateral-raise-band | rule |
+| library | Resistance Band Face Pull | Resistance Band Face Pull | strength | face-pull-band | rule |
 | library | Bodyweight Squat | Bodyweight Squat | strength | squat | rule |
 | library | Bodyweight Bulgarian Split Squat | Bodyweight Bulgarian Split Squat | strength | bulgarian-split-squat-bare | rule |
 | library | Reverse Lunge | Reverse Lunge | strength | reverse-lunge | rule |
@@ -183,8 +183,8 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | library | V-Up | V-Up | strength | v-up | rule |
 | library | Lying Leg Raise | Lying Leg Raise | strength | lying-leg-raise | rule |
 | library | Dead Bug | Dead Bug | strength | dead-bug | rule |
-| library | Band-Assisted Pull-up | Band-Assisted Pull-up | strength | pull-up | rule |
-| library | Hanging Knee Raise | Hanging Knee Raise | strength | hanging-leg-raise | rule |
+| library | Band-Assisted Pull-up | Band-Assisted Pull-up | strength | pull-up-band | rule |
+| library | Hanging Knee Raise | Hanging Knee Raise | strength | hanging-knee-raise | rule |
 | library | Dead Hang | Dead Hang | strength | dead-hang | rule |
 | library | Tuck L-sit Hold | Tuck L-sit Hold | strength | tuck-l-sit | rule |
 | library | Parallette Push-up | Parallette Push-up | strength | push-up | rule |
@@ -203,9 +203,9 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | library | Weighted Pull-up | Weighted Pull-up | strength | pull-up | rule |
 | library | Weighted Chin-up | Weighted Chin-up | strength | pull-up | rule |
 | library | Weighted Dip | Weighted Dip | strength | dip | rule |
-| library | Ab Strap Knee Raise | Ab Strap Knee Raise | strength | hanging-leg-raise | rule |
+| library | Ab Strap Knee Raise | Ab Strap Knee Raise | strength | hanging-knee-raise | rule |
 | library | Ab Strap Leg Raise | Ab Strap Leg Raise | strength | hanging-leg-raise | rule |
-| library | Ab Strap Oblique Knee Raise | Ab Strap Oblique Knee Raise | strength | hanging-leg-raise | rule |
+| library | Ab Strap Oblique Knee Raise | Ab Strap Oblique Knee Raise | strength | hanging-knee-raise | rule |
 | library | Landmine Rotation | Landmine Rotation | strength | landmine-rotation | rule |
 | library | Landmine Rotational Press | Landmine Rotational Press | strength | landmine-press | rule |
 | library | Landmine Punch | Landmine Punch | strength | jab-cross | rule |
@@ -475,7 +475,7 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | library | Wide-Grip Lat Pulldown | Wide-Grip Lat Pulldown | strength | lat-pulldown | rule |
 | library | Narrow-Grip Lat Pulldown | Narrow-Grip Lat Pulldown | strength | lat-pulldown | rule |
 | library | Reverse-Grip Lat Pulldown | Reverse-Grip Lat Pulldown | strength | lat-pulldown | rule |
-| library | Resistance Band Lat Pulldown | Resistance Band Lat Pulldown | strength | lat-pulldown | rule |
+| library | Resistance Band Lat Pulldown | Resistance Band Lat Pulldown | strength | lat-pulldown-band | rule |
 | library | Back Extension (Bench) | Back Extension (Bench) | strength | back-extension | rule |
 | library | Prone Back Extension | Prone Back Extension | strength | prone-back-extension | rule |
 | library | Dumbbell Bicep Curl (Seated) | Dumbbell Bicep Curl (Seated) | strength | curl | rule |
@@ -524,7 +524,7 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | library | Seated Leg Curl (Machine) | Seated Leg Curl (Machine) | strength | curl-bare | rule |
 | library | Lying Leg Curl (Machine) | Lying Leg Curl (Machine) | strength | curl-bare | rule |
 | library | Standing Leg Curl | Standing Leg Curl | strength | leg-curl | rule |
-| library | Resistance Band Leg Curl | Resistance Band Leg Curl | strength | leg-curl | rule |
+| library | Resistance Band Leg Curl | Resistance Band Leg Curl | strength | leg-curl-band | rule |
 | library | Single-Leg Extension (Machine) | Single-Leg Extension (Machine) | strength | leg-extension | rule |
 | library | Calf Raise (Step) | Calf Raise (Step) | strength | calf-raise | rule |
 | library | Single-Leg Calf Raise (Step) | Single-Leg Calf Raise (Step) | strength | calf-raise | rule |
@@ -532,7 +532,7 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | library | Cable Glute Kickback | Cable Glute Kickback | strength | cable-glute-kickback | rule |
 | library | Seated Hip Abduction (Machine) | Seated Hip Abduction (Machine) | strength | hip-abduction-machine | rule |
 | library | Seated Hip Adduction (Machine) | Seated Hip Adduction (Machine) | strength | hip-adduction-machine | rule |
-| library | Resistance Band Side-Lying Hip Abduction | Resistance Band Side-Lying Hip Abduction | strength | clamshell | rule |
+| library | Resistance Band Side-Lying Hip Abduction | Resistance Band Side-Lying Hip Abduction | strength | clamshell-band | rule |
 | library | Chair Stand | Chair Stand | strength | squat | rule |
 | library | Dumbbell Suitcase Deadlift | Dumbbell Suitcase Deadlift | strength | rdl | rule |
 | library | Barbell Hang Clean | Barbell Hang Clean | strength | hang-clean | rule |
@@ -583,7 +583,7 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | mobility | tib-raise | Tibialis raises | recovery | tibialis-raise | rule |
 | mobility | band-er | Band external rotations | recovery | shoulder-er-band | rule |
 | mobility | band-er/alt | Side-lying external rotation | recovery | side-lying-er | rule |
-| mobility | face-pull | Face pulls | recovery | face-pull | rule |
+| mobility | face-pull | Face pulls | recovery | face-pull-band | rule |
 | mobility | sl-bridge | Single-leg bridge or hamstring walkouts | recovery | glute-bridge | rule |
 | mobility | finger-wrist | Band finger extensions + wrist curls | recovery | wrist-curl | rule |
 | mobility | finger-wrist/alt | Finger spreads + wrist curls | recovery | wrist-flexor-stretch | rule |

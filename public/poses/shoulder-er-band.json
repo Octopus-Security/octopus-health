@@ -2,9 +2,80 @@
  "version": 2,
  "title": "Band Shoulder External Rotation",
  "view": "front",
- "highlight": ["shoulderL","elbowL"],
+ "props": [
+  {
+   "type": "band",
+   "from": {
+    "x": 6,
+    "y": 35
+   },
+   "to": "handL",
+   "rest": 14
+  }
+ ],
+ "highlight": [
+  "shoulderL",
+  "elbowL"
+ ],
  "frames": [
-  {"duration":1100,"label":"Forearm across the belly","hold":300,"pose":{"torso":180,"head":180,"upperArmL":4,"forearmL":-88,"upperArmR":-4,"forearmR":-4,"thighL":5,"shinL":0,"footL":90,"thighR":-5,"shinR":0,"footR":-90,"root":{"x":50,"y":50}}},
-  {"duration":1100,"label":"Rotate out, elbow stays on the ribs","hold":400,"pose":{"torso":180,"head":180,"upperArmL":4,"forearmL":92,"upperArmR":-4,"forearmR":-4,"thighL":5,"shinL":0,"footL":90,"thighR":-5,"shinR":0,"footR":-90}}
+  {
+   "duration": 900,
+   "label": "Forearm across the belly, elbow pinned",
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "upperArmL": 4,
+    "upperArmR": -4,
+    "forearmR": -4,
+    "thighL": 5,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": -5,
+    "shinR": 0,
+    "footR": -90,
+    "forearmL": -88,
+    "depth": {
+     "forearmL": 1
+    },
+    "root": {
+     "x": 50,
+     "y": 50
+    }
+   },
+   "hold": 300
+  },
+  {
+   "duration": 500,
+   "label": "Forearm swinging through, toward you",
+   "pose": {
+    "forearmL": 0,
+    "depth": {
+     "forearmL": 0.25
+    }
+   },
+   "hold": 0
+  },
+  {
+   "duration": 900,
+   "label": "Rotate out, elbow stays on the ribs",
+   "pose": {
+    "forearmL": 92,
+    "depth": {
+     "forearmL": 1
+    }
+   },
+   "hold": 400
+  },
+  {
+   "duration": 500,
+   "label": "Forearm swinging back in",
+   "pose": {
+    "forearmL": 0,
+    "depth": {
+     "forearmL": 0.25
+    }
+   },
+   "hold": 0
+  }
  ]
 }

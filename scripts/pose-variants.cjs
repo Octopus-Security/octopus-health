@@ -28,6 +28,17 @@ const VARIANTS = [
   ['bulgarian-split-squat-bare', 'bulgarian-split-squat', null, 'Bulgarian Split Squat'],
   ['curl-bare', 'curl', null, 'Curl (cable or band)'],
   ['curl-barbell', 'curl', 'barbell', 'Bar Curl'],
+  // resistance-band versions: the same movement with a band prop (stick-figure.js `band`), anchored where the band is
+  // actually fixed. A `from` that is a joint name means the band is stood on / looped round that joint, not tied to a wall.
+  ['seated-row-band', 'seated-row', null, 'Resistance Band Row', { band: { from: { x: 97, y: 62 }, to: 'handL', rest: 22 } }],
+  ['face-pull-band', 'face-pull', null, 'Resistance Band Face Pull', { band: { from: { x: 97, y: 11 }, to: 'handL', rest: 22 } }],
+  ['pushdown-band', 'pushdown', null, 'Resistance Band Triceps Pushdown', { band: { from: { x: 70, y: -14 }, to: 'handL', rest: 30 } }],
+  ['lat-pulldown-band', 'lat-pulldown', null, 'Resistance Band Lat Pulldown', { band: { from: { x: 44, y: -14 }, to: 'handL', rest: 26 } }],
+  ['curl-band', 'curl-bare', null, 'Resistance Band Curl (stand on the band)', { band: { from: 'ankleL', to: 'handL', rest: 38 } }],
+  ['lateral-raise-band', 'lateral-raise-bare', null, 'Resistance Band Lateral Raise (stand on the band)', { band: { from: 'ankleL', to: 'handL', rest: 36 } }],
+  ['leg-curl-band', 'leg-curl', null, 'Resistance Band Leg Curl', { band: { from: { x: 3, y: 90 }, to: 'ankleL', rest: 18 } }],
+  ['clamshell-band', 'clamshell', null, 'Banded Clamshell (band round the knees)', { band: { from: 'kneeR', to: 'kneeL', rest: 8 } }],
+  ['pull-up-band', 'pull-up', null, 'Band-Assisted Pull-up', { band: { from: { x: 50, y: -3 }, to: 'ankleL', rest: 34 } }],
   ['lateral-raise-bare', 'lateral-raise', null, 'Lateral Raise (cable or band)'],
   ['tricep-overhead-bare', 'tricep-overhead', null, 'Overhead Triceps Extension (cable)'],
   ['shrug-bare', 'shrug', null, 'Shrug Roll'],
@@ -65,6 +76,7 @@ for (const [key, base, hold, title, patch] of VARIANTS) {
       : { upperArmL: 0, forearmL: 0, upperArmR: 0, forearmR: 0 };
     o.frames = o.frames.map((f) => ({ ...f, pose: { ...f.pose, ...A } }));
   }
+  if (patch && patch.band) o.props = [...(o.props || []), { type: 'band', ...patch.band }];
   if (patch && patch.labels) o.frames = o.frames.map((f, i) => (patch.labels[i] ? { ...f, label: patch.labels[i] } : f));
   if (patch && patch.ball) {
     if (o.props) o.props = o.props.map((p) => (p.type === 'roller' ? { ...p, type: 'ball' } : p));
