@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title><%= title %></title>
     <link rel="stylesheet" href="<%= asset('/theme.css') %>">
+    <%- include('partials/dialog') %>
 </head>
 <body>
     <%- include('partials/nav') %>
@@ -96,7 +97,7 @@
                     <% }) %>
                 </div>
 
-                <form method="POST" action="/competitions/delete/<%= c.id %>" style="margin-top:12px" onsubmit="return confirm('Delete this competition?')">
+                <form method="POST" action="/competitions/delete/<%= c.id %>" style="margin-top:12px" onsubmit="return oConfirmForm(event, 'Delete this competition?', 'Delete')">
                     <button class="delete-btn">Delete</button>
                 </form>
             </div>
@@ -121,7 +122,7 @@
                     <% if (c.location) { %><span class="comp-loc">📍 <%= c.location %></span><% } %>
                 </div>
                 <% if (c.result) { %><div class="comp-result">Result: <%= c.result %></div><% } %>
-                <form method="POST" action="/competitions/delete/<%= c.id %>" style="margin-top:12px" onsubmit="return confirm('Delete this competition?')">
+                <form method="POST" action="/competitions/delete/<%= c.id %>" style="margin-top:12px" onsubmit="return oConfirmForm(event, 'Delete this competition?', 'Delete')">
                     <button class="delete-btn">Delete</button>
                 </form>
             </div>

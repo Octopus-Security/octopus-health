@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title><%= title %></title>
   <link rel="stylesheet" href="<%= asset('/theme.css') %>">
+  <%- include('partials/dialog') %>
   <style>
     .timer-tabs { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:24px; }
     .timer-tab  { padding:8px 18px; border-radius:8px; border:1px solid #2a2a2a; background:#0d0d0d; color:#888; font-size:0.85rem; cursor:pointer; transition:all 0.15s; }
@@ -718,7 +719,7 @@ function cbStart() {
     return;
   }
   const pool = cbGetPool();
-  if (!pool.length) { alert('Enable at least one strike type.'); return; }
+  if (!pool.length) { oDialog.toast('Enable at least one strike type.', { kind: 'danger' }); return; }
   cbState = {
     pool,
     rounds:     parseInt(document.getElementById('cb-rounds').value) || 5,

@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title><%= title %></title>
   <link rel="stylesheet" href="<%= asset('/theme.css') %>">
+  <%- include('partials/dialog') %>
   <link rel="stylesheet" href="<%= asset('/daily-stretches.css') %>">
   <link rel="stylesheet" href="<%= asset('/stretch-demo.css') %>">
   <script src="<%= asset('/stick-figure.js') %>" defer></script>
@@ -333,15 +334,15 @@ function addCustomCard() {
   renderRoutineItems();
 }
 
-function editCard(index) {
+async function editCard(index) {
   const item = routineItems[index];
-  const sets = prompt('Sets', item.sets || 1);
+  const sets = await oDialog.prompt({ title: 'Sets', label: 'Sets', value: item.sets || 1, inputType: 'number', inputMode: 'numeric' });
   if (sets === null) return;
-  const reps = prompt('Reps (leave blank for timed drills)', item.reps || '');
+  const reps = await oDialog.prompt({ title: 'Reps', label: 'Reps (leave blank for timed drills)', value: item.reps || '', inputType: 'number', inputMode: 'numeric' });
   if (reps === null) return;
-  const duration = prompt('Duration in seconds (leave blank for rep-based drills)', item.duration || '');
+  const duration = await oDialog.prompt({ title: 'Duration', label: 'Duration in seconds (leave blank for rep-based drills)', value: item.duration || '', inputType: 'number', inputMode: 'numeric' });
   if (duration === null) return;
-  const notes = prompt('Notes / cue', item.notes || '');
+  const notes = await oDialog.prompt({ title: 'Notes', label: 'Notes / cue', value: item.notes || '' });
   if (notes === null) return;
   item.sets = parseInt(sets) || 1;
   item.reps = reps ? parseInt(reps) || null : null;
@@ -359,8 +360,8 @@ async function saveRoutine() {
   const name = document.getElementById('routine-name').value.trim();
   const type = document.getElementById('routine-type').value;
   const notes = document.getElementById('routine-notes').value.trim();
-  if (!name) return alert('Name the routine first.');
-  if (!routineItems.length) return alert('Add at least one card.');
+  if (!name) return oDialog.toast('Name the routine first.', { kind: 'danger' });
+  if (!routineItems.length) return oDialog.toast('Add at least one card.', { kind: 'danger' });
 
   const response = await fetch('/stretch/api/routines', {
     method: 'POST',
@@ -368,13 +369,15 @@ async function saveRoutine() {
     body: JSON.stringify({ name, type, notes, items: routineItems }),
   });
   const result = await response.json();
-  if (!result.success) return alert(result.message || 'Could not save routine.');
+  if (!result.success) return oDialog.alert({ title: 'Not saved', body: result.message || 'Could not save routine.' });
   window.location.reload();
 }
 
 async function deleteRoutine(id) {
-  if (!confirm('Delete this stretch routine?')) return;
-  await fetch('/stretch/api/routines/' + id, { method: 'DELETE' });
+  if (!(await oDialog.confirm({ title: 'Delete routine?', body: 'Delete this stretch routine?', confirmLabel: 'Delete', danger: true }))) return;
+  let r = null;
+  try { r = await fetch('/stretch/api/routines/' + id, { method: 'DELETE' }); } catch (e) { /* network error */ }
+  if (!r || !r.ok) return oDialog.alert({ title: 'Not deleted', body: 'Could not delete. Check your connection and try again.' });
   const card = document.getElementById('routine-' + id);
   if (card) card.remove();
 }

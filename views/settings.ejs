@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title><%= title %></title>
     <link rel="stylesheet" href="<%= asset('/theme.css') %>">
+    <%- include('partials/dialog') %>
 </head>
 <body>
     <%- include('partials/nav') %>
@@ -43,7 +44,7 @@
         <div class="card danger-zone">
             <h3>⚠️ Danger Zone</h3>
             <p style="margin-bottom: 15px; color: #666;">This action cannot be undone. All your health data will be permanently deleted.</p>
-            <form method="POST" action="/settings/delete-account" onsubmit="return confirm('Are you sure you want to delete your account? This cannot be undone!');">
+            <form method="POST" action="/settings/delete-account" onsubmit="return oConfirmForm(event, 'Are you sure you want to delete your account? This cannot be undone!', 'Delete account')">
                 <div class="form-group">
                     <label>Enter your password to confirm</label>
                     <input type="password" name="password" required>
