@@ -421,7 +421,8 @@ test('every landmine exercise has a pose chosen on purpose, and the plan names r
 
 test('ab strap raises show the hanging pose, not the knee strike', () => {
   const PM = require('../public/pose-map.js');
-  for (const n of ['Ab Strap Knee Raise', 'Ab Strap Leg Raise', 'Ab Strap Oblique Knee Raise']) assert.strictEqual(PM.keyFor(n), 'hanging-leg-raise', n);
+  for (const n of ['Ab Strap Knee Raise', 'Ab Strap Oblique Knee Raise']) assert.strictEqual(PM.keyFor(n), 'hanging-knee-raise', n);
+  assert.strictEqual(PM.keyFor('Ab Strap Leg Raise'), 'hanging-leg-raise');
 });
 
 test('the new rules: a gym without the kit loses or swaps the right things', () => {

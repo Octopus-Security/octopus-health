@@ -3,10 +3,42 @@
  "title": "Dead Hang",
  "static": true,
  "view": "side",
- "props": [{ "type": "bar", "x1": 36, "y1": -3, "x2": 84, "y2": -3 }],
+ "props": [
+  {
+   "type": "bar",
+   "x1": 36,
+   "y1": -14,
+   "x2": 84,
+   "y2": -14
+  }
+ ],
  "grounded": false,
- "highlight": ["hand", "shoulderL"],
+ "highlight": [
+  "hand",
+  "shoulderL"
+ ],
  "frames": [
-  {"label":"Hang","anchor":{"joint":"handL","x":60,"y":-3},"pose":{"torso":180,"head":180,"upperArmL":180,"forearmL":180,"upperArmR":180,"forearmR":180,"thighL":5,"shinL":-85,"footL":0,"thighR":5,"shinR":-85,"footR":0}}
+  {
+   "label": "Hang, legs straight",
+   "anchor": {
+    "joint": "handL",
+    "x": 60,
+    "y": -14
+   },
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "upperArmL": 180,
+    "forearmL": 180,
+    "upperArmR": 180,
+    "forearmR": 180,
+    "thighL": 0,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": 0,
+    "shinR": 0,
+    "footR": 90
+   }
+  }
  ]
 }

@@ -1,0 +1,67 @@
+{
+ "version": 2,
+ "title": "Banded Clamshell (band round the knees)",
+ "view": "front",
+ "highlight": [
+  "hipR",
+  "kneeR"
+ ],
+ "frames": [
+  {
+   "duration": 1100,
+   "label": "Knees stacked, heels together",
+   "hold": 300,
+   "pose": {
+    "torso": -90,
+    "head": -90,
+    "upperArmL": 90,
+    "forearmL": 90,
+    "upperArmR": 90,
+    "forearmR": 90,
+    "thighL": 80,
+    "shinL": -100,
+    "footL": -100,
+    "thighR": 80,
+    "shinR": -100,
+    "footR": -100,
+    "depth": {
+     "upperArmL": 0.35,
+     "forearmL": 0.35,
+     "upperArmR": 0.35,
+     "forearmR": 0.35
+    },
+    "root": {
+     "x": 52,
+     "y": 82
+    }
+   }
+  },
+  {
+   "duration": 1100,
+   "label": "Top knee opens, feet stay together",
+   "hold": 400,
+   "pose": {
+    "torso": -90,
+    "head": -90,
+    "upperArmL": 90,
+    "forearmL": 90,
+    "upperArmR": 90,
+    "forearmR": 90,
+    "thighL": 80,
+    "shinL": -100,
+    "footL": -100,
+    "thighR": 125,
+    "shinR": -53,
+    "footR": -53
+   }
+  }
+ ],
+ "props": [
+  {
+   "type": "band",
+   "from": "kneeR",
+   "to": "kneeL",
+   "rest": 8
+  }
+ ]
+}

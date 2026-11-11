@@ -96,7 +96,7 @@
   var JOINTS = ['hip', 'neck', 'head', 'shoulderL', 'shoulderR', 'elbowL', 'elbowR', 'handL', 'handR',
     'hipL', 'hipR', 'kneeL', 'kneeR', 'ankleL', 'ankleR', 'toeL', 'toeR'];
 
-  var PAL = { near: '#d4cfc8', far: '#4a4a62', ctr: '#8a8296', hl: '#e74c3c', prop: '#5f5f75', floor: '#34343f', headFill: '#1e1e28' };
+  var PAL = { near: '#d4cfc8', far: '#4a4a62', ctr: '#8a8296', hl: '#e74c3c', prop: '#5f5f75', band: '#e8a33d', floor: '#34343f', headFill: '#1e1e28' };
 
   // ── maths ────────────────────────────────────────────────────────────────
   function rad(a) { return a * Math.PI / 180; }
@@ -466,6 +466,14 @@
       if (!isStatic && !(fr.duration >= 150 && fr.duration <= 10000)) errs.push('frame ' + i + ': duration must be 150–10000 ms');
     });
     if (data.anchor && JOINTS.indexOf(data.anchor.joint) < 0) errs.push('anchor joint "' + data.anchor.joint + '" unknown');
+    (data.props || []).forEach(function (pr, i) {
+      if (!pr || pr.type !== 'band') return;
+      var okEnd = function (e) { return typeof e === 'string' ? JOINTS.indexOf(e) >= 0 : !!e && isFinite(e.x) && isFinite(e.y); };
+      if (typeof pr.to !== 'string' || JOINTS.indexOf(pr.to) < 0) errs.push('prop ' + i + ': a band needs "to": a joint (' + JOINTS.join(', ') + ')');
+      if (!okEnd(pr.from)) errs.push('prop ' + i + ': a band needs "from": an anchor {x,y} or another joint');
+      else if (pr.from === pr.to) errs.push('prop ' + i + ': a band cannot run from a joint to itself');
+      if (pr.rest !== undefined && !(pr.rest > 0)) errs.push('prop ' + i + ': band rest must be a positive length');
+    });
     if (errs.length) return errs;
 
     var frames = resolveFrames(data);
@@ -568,8 +576,31 @@
       case 'ball':   return '<circle cx="' + p.x + '" cy="' + p.y + '" r="' + p.r + '" fill="' + c + '" opacity="0.7"/>';
       case 'roller': return '<circle cx="' + p.x + '" cy="' + p.y + '" r="' + p.r + '" fill="none" stroke="' + c + '" stroke-width="2"/>';
       case 'wall':   return '<line x1="' + p.x + '" y1="-10" x2="' + p.x + '" y2="' + (FLOOR_Y + 1.5) + '" stroke="' + c + '" stroke-width="2.5"/>';
+      case 'band':   // only the fixed end (a door, rack or post) is scenery; the band itself follows the body: bandHTML
+        return p.from && typeof p.from === 'object'
+          ? '<circle cx="' + f(p.from.x) + '" cy="' + f(p.from.y) + '" r="2.6" fill="none" stroke="' + c + '" stroke-width="1.6"/>' +
+            '<circle cx="' + f(p.from.x) + '" cy="' + f(p.from.y) + '" r="0.9" fill="' + c + '"/>'
+          : '';
       default:       return '';
     }
+  }
+
+  // A resistance band: a line from a fixed anchor point (or from another joint, for a band held between the
+  // hands or looped round the knees) to a joint, recomputed from the solved skeleton on every frame so it
+  // follows the body. {type:'band', from:{x,y} | joint, to: joint, rest: length at which it is slack}.
+  // Beyond `rest` it draws thinner (stretched rubber); inside it sags in a shallow curve instead of a ruler line.
+  function bandEnd(e, jt) { return typeof e === 'string' ? jt[e] : e; }
+  function bandHTML(p, jt, pal) {
+    var a = bandEnd(p.from, jt), b = bandEnd(p.to, jt);
+    if (!a || !b) return '';
+    var d = Math.hypot(b.x - a.x, b.y - a.y), rest = p.rest > 0 ? p.rest : 14, col = pal.band || pal.prop;
+    if (d < 0.5) return '';
+    var w = d >= rest ? Math.max(1, 2.8 * rest / d) : 2.8;
+    if (d >= rest * 0.92) return line(a, b, col, f(w));
+    var sag = Math.min(8, (rest - d) * 0.6), nx = -(b.y - a.y) / d, ny = (b.x - a.x) / d;   // perpendicular, bowed downward
+    if (ny < 0) { nx = -nx; ny = -ny; }
+    return '<path d="M' + f(a.x) + ' ' + f(a.y) + ' Q' + f((a.x + b.x) / 2 + nx * sag) + ' ' + f((a.y + b.y) / 2 + ny * sag) + ' ' + f(b.x) + ' ' + f(b.y) +
+      '" fill="none" stroke="' + col + '" stroke-width="2.8" stroke-linecap="round"/>';
   }
 
   // Equipment in the hands is drawn from the hand positions, so it travels with them.
@@ -649,6 +680,7 @@
         (want('legL') ? leg('L', 1) : '') + (want('head') ? headHTML + circ(step(jt.head, fa, 3.6), 1.4, headCol) : '') +
         (want('armL') ? arm('L', 1) : '');
     }
+    if (!only) (opts.props || []).forEach(function (p) { if (p.type === 'band') out += bandHTML(p, jt, pal); });
     out += (only ? '' : holdHTML(opts.hold, jt, pal, view)) + '</g>';
     return opts.faceRight === false ? '<g transform="translate(100 0) scale(-1 1)">' + out + '</g>' : out;
   }
@@ -660,7 +692,7 @@
       palette: over.palette || PAL, faceRight: over.faceRight !== false };
   }
 
-  var PARTNER_PAL = { near: '#5090c8', far: '#1f4672', ctr: '#2c6098', hl: '#e74c3c', prop: '#5f5f75', floor: '#34343f', headFill: '#14202e' };
+  var PARTNER_PAL = { near: '#5090c8', far: '#1f4672', ctr: '#2c6098', hl: '#e74c3c', prop: '#5f5f75', band: '#e8a33d', floor: '#34343f', headFill: '#14202e' };
 
   // The viewBox for an animation. One figure uses the standard box. With a partner it is the
   // combined bounding box of BOTH figures over the whole loop (padded, floor included), fixed for

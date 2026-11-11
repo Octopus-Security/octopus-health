@@ -6,6 +6,15 @@
   {
    "type": "wall",
    "x": 92
+  },
+  {
+   "type": "band",
+   "from": {
+    "x": 90,
+    "y": -8
+   },
+   "to": "handL",
+   "rest": 18
   }
  ],
  "highlight": [

@@ -20,6 +20,17 @@
   'use strict';
 
   var RULES = [
+    // Resistance-band versions first: each is its base movement plus a drawn band (stick-figure.js), so they must win
+    // over the cable / bare rules further down that share the movement.
+    [/band .*(lat )?pulldown/i, 'lat-pulldown-band'],
+    [/band .*face pull/i, 'face-pull-band'],
+    [/band .*(tricep|triceps) .*(extension|pushdown)|band pushdown/i, 'pushdown-band'],
+    [/band .*(bicep|biceps) curl/i, 'curl-band'],
+    [/band .*lateral raise/i, 'lateral-raise-band'],
+    [/band .*leg curl/i, 'leg-curl-band'],
+    [/band(ed)? .*row/i, 'seated-row-band'],
+    [/band-assisted pull-?up/i, 'pull-up-band'],
+    [/band .*side-lying hip abduction|banded clamshell/i, 'clamshell-band'],
     // Mobility drills that reuse the closest existing figure.
     [/hip airplane/i, 'hip-circle'],
     [/fire hydrant/i, 'quadruped-hip-cars'],
@@ -307,6 +318,7 @@
     [/teep|push kick/i, 'teep'],
     [/kick check/i, 'kick-check'],
     [/roundhouse|switch kick|low kick|kick work|shin conditioning/i, 'roundhouse'],
+    [/ab strap.*knee raise/i, 'hanging-knee-raise'],   // knee raise and leg raise are two movements: bent knees vs locked legs
     [/ab strap/i, 'hanging-leg-raise'],
     [/landmine punch/i, 'jab-cross'],
     [/landmine deadlift to rotational/i, 'landmine-deadlift-press'],
@@ -318,7 +330,7 @@
     [/landmine meadows row/i, 'landmine-row'],
     [/landmine reverse lunge/i, 'reverse-lunge'],
     [/landmine lateral lunge/i, 'lateral-lunge'],
-    [/hanging knee raise|captain'?s chair/i, 'hanging-leg-raise'],   // before the knee-strike rule below, which would take any "knee"
+    [/hanging knee raise|captain'?s chair/i, 'hanging-knee-raise'],   // before the knee-strike rule below, which would take any "knee"
     [/knee|clinch|plum|dteh chiang/i, 'knee-strike'],
     [/elbow|sok /i, 'elbow-strike'],
     [/uppercut/i, 'uppercut'],
@@ -348,7 +360,8 @@
     [/carry|walk \+|walking$/i, 'walk'],
 
     // ── strength: core ──
-    [/hanging leg raise|knee raise/i, 'hanging-leg-raise'],
+    [/hanging leg raise/i, 'hanging-leg-raise'],
+    [/knee raise/i, 'hanging-knee-raise'],
     [/lying leg raise|leg raise/i, 'lying-leg-raise'],
     [/hollow/i, 'hollow-body'],
     [/v-?up/i, 'v-up'],

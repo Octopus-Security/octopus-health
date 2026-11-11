@@ -1,0 +1,69 @@
+{
+ "version": 2,
+ "title": "Hanging Knee Raise",
+ "view": "side",
+ "props": [
+  {
+   "type": "bar",
+   "x1": 26,
+   "y1": -14,
+   "x2": 58,
+   "y2": -14
+  }
+ ],
+ "grounded": false,
+ "highlight": [
+  "hipL",
+  "spine"
+ ],
+ "frames": [
+  {
+   "duration": 1100,
+   "label": "Dead hang, legs straight",
+   "anchor": {
+    "joint": "handL",
+    "x": 42,
+    "y": -14
+   },
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "upperArmL": 180,
+    "forearmL": 180,
+    "upperArmR": 180,
+    "forearmR": 180,
+    "thighL": 0,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": 0,
+    "shinR": 0,
+    "footR": 90,
+    "arch": 0
+   }
+  },
+  {
+   "duration": 1500,
+   "label": "Knees to hips, pelvis tucked, shins hanging",
+   "anchor": {
+    "joint": "handL",
+    "x": 42,
+    "y": -14
+   },
+   "pose": {
+    "torso": 190,
+    "head": 184,
+    "upperArmL": 180,
+    "forearmL": 180,
+    "upperArmR": 180,
+    "forearmR": 180,
+    "thighL": 110,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": 110,
+    "shinR": 0,
+    "footR": 90,
+    "arch": 0
+   }
+  }
+ ]
+}

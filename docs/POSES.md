@@ -145,6 +145,12 @@ sides are `upperArmL: 90, upperArmR: -90`, and feet point outwards with
 
 - `hold`: `dumbbell`, `dumbbellL` (near hand only, for single-arm work), `barbell`, `kettlebell`, `kettlebellL` (near hand only), `ball`. These are drawn at the
   hands and move with them.
+- **`band`** is a resistance band: `{"type":"band","from":{"x":94,"y":35},"to":"handL","rest":14}`. `from` is a fixed
+  anchor point (a door, rack or post; drawn as a small ring) or another joint (`"ankleL"` for a band stood on,
+  `"handR"` for a band held between both hands, `"kneeR"` for one looped round the knees); `to` is the joint it pulls.
+  It is recomputed from the skeleton every frame, so it follows the movement: thinner beyond `rest` (stretched), a
+  shallow sag inside it (slack). Colour is `palette.band`. A band needs a place to be fixed: if the exercise has none, use a
+  joint-to-joint band rather than inventing an anchor.
 - `props` are fixed scenery: `bar {x1,y1,x2,y2}`, `box {x,y,w,h}` (a bench, a
   seat, a plyo box), `ball {x,y,r}`, `roller {x,y,r}`, `wall {x}`.
 
