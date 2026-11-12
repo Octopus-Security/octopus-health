@@ -38,6 +38,11 @@ for (const method of ['get', 'post', 'put', 'patch', 'delete', 'use']) {
 
 // Trust proxy for correct IP detection behind Cloudflare/NGINX
 app.set('trust proxy', 1);
+// Security headers on every answer (HIPAA map: octopus-vault/compliance/HIPAA.md). Public pages keep
+// their own Cache-Control; authenticated answers get no-store below.
+const safeguards = require('./lib/safeguards');
+app.disable('x-powered-by');
+app.use(safeguards.secureHeaders());
 const port = process.env.PORT || 3000;
 const getDatabase = require('./database');
 const { createVerifyCache } = require('./lib/verify-cache');
@@ -220,10 +225,24 @@ app.use(async (req, res, next) => {
         const user = await verifyToken(token);
         if (user) req.user = { username: user.username, role: user.role, token };
     }
+    // A signed-in answer holds personal data: not cached by a shared proxy or the browser's back button.
+    // Public pages and static files set their own Cache-Control later or earlier and win.
+    if (req.user && !res.getHeader('Cache-Control')) res.set('Cache-Control', 'no-store');
     res.locals.user = req.user || null;
     res.locals.activeTab = getActiveTab(req.path);
     next();
 });
+
+// Automatic logoff (164.312(a)(2)(iii)) for the people who handle OTHER people's data: trainers and
+// admins. A plain account is the owner of its own data and keeps the long session. IDLE_MINUTES
+// (default 30) and IDLE_SECRET are optional; without a secret a restart signs everyone out.
+app.use(safeguards.idleTimeout({
+    idleMs: Math.max(1, Number(process.env.IDLE_MINUTES) || 30) * 60 * 1000,
+    secret: process.env.IDLE_SECRET,
+    userOf: (req) => (req.user && (req.user.role === 'trainer' || req.user.role === 'admin') ? req.user.username : null),
+    onExpire: (req, res) => (req.method === 'GET' && !req.originalUrl.startsWith('/api/')
+        ? res.redirect('/logout') : res.status(401).json({ error: 'Session timed out.' })),
+}));
 
 // Shared sessions, public side: BEFORE the login and app-access gates, needs no account.
 // Handlers never read req.user. Authoring is in api/web-sessions.js, behind login.
@@ -361,7 +380,7 @@ app.get('/', requireLogin, async (req, res) => {
             todayWorkoutSessions,
         });
     } catch (error) {
-        console.error(error);
+        console.error('[health] dashboard failed:', safeguards.safeError(error));
         res.status(500).send('Error loading dashboard');
     }
 });
@@ -1495,7 +1514,8 @@ app.get('/stats', requireLogin, (req, res) => {
 // and JSON to fetch(), because an HTML error body breaks the caller's r.json()
 // and produces the same silent nothing as the hang it is replacing.
 app.use((err, req, res, next) => {
-    console.error(`[health] ${req.method} ${req.originalUrl} failed:`, err);
+    // Name, code and frames only: a database error quotes the value it choked on.
+    console.error(`[health] ${req.method} ${req.path} failed:`, safeguards.safeError(err));
     if (res.headersSent) return next(err);
     const wantsJson = req.originalUrl.startsWith('/api/') ||
                       (req.get('accept') || '').includes('application/json');

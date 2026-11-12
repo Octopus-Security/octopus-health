@@ -16,6 +16,9 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
+      # Automatic logoff for trainer/admin accounts (HIPAA map). Empty: 30 minutes, restart signs them out.
+      - IDLE_MINUTES=${IDLE_MINUTES:-}
+      - IDLE_SECRET=${IDLE_SECRET:-}
       - SESSION_SECRET=${SESSION_SECRET:-change-me-in-production}
       # Legacy HS256 secret — RETIRED. Empty on purpose; never give this a
       # default again, and never a working one.
