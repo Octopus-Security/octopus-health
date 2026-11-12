@@ -74,7 +74,7 @@ test('Home defaults: massage ball set and jump rope, no garage claim; foam rolle
 });
 
 // Add-on gear is not in the seeded Home: an account ticks it on /gyms when it owns it.
-const KIT_EXTRA_GEAR = { 'kit:dip-belt': ['dip-belt', 'weight-plates'], 'kit:ab-straps': ['ab-straps'], 'kit:landmine-power': ['landmine', 'barbell'] };
+const KIT_EXTRA_GEAR = { 'kit:dip-belt': ['dip-belt', 'weight-plates'], 'kit:ab-straps': ['ab-straps'], 'kit:landmine-power': ['landmine', 'barbell'], 'kit:spartan-dumbbell-300': ['dumbbell'] };
 
 test('Home, plus any add-on gear a plan names, fits every kit plan (those with buy links, and the variety plans) without dropping or swapping anything', () => {
   const { tpl } = seedSrc();

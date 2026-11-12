@@ -5,7 +5,7 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 
 "how": `rule` = a name rule matched; `category fallback` = no rule, the category figure is shown; `null rule -> category fallback` = a rule says "no figure yet" but the category figure is still shown; `none (martial: no figure)` = the card says "No diagram yet".
 
-556 library exercises, 182 mobility items.
+563 library exercises, 182 mobility items.
 
 | source | id | name | category | figure | how |
 |---|---|---|---|---|---|
@@ -565,6 +565,13 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | library | Strap Calf Stretch (Seated) | Strap Calf Stretch (Seated) | recovery | calf-stretch | rule |
 | library | Shoulder Rolls | Shoulder Rolls | recovery | shrug-bare | rule |
 | library | Wrist Deviation | Wrist Deviation | recovery | wrist-circle | rule |
+| library | Dumbbell Front Squat (Racked) | Dumbbell Front Squat (Racked) | strength | goblet-squat | rule |
+| library | Alternating Dumbbell Floor Press | Alternating Dumbbell Floor Press | strength | bench-press-db | rule |
+| library | Dumbbell Renegade Row | Dumbbell Renegade Row | strength | renegade-row | rule |
+| library | Dumbbell Jumping Lunge | Dumbbell Jumping Lunge | conditioning | split-jump | rule |
+| library | Dumbbell Staggered Row | Dumbbell Staggered Row | strength | bench-row | rule |
+| library | Dumbbell Goblet Jump Squat | Dumbbell Goblet Jump Squat | conditioning | jump-squat | rule |
+| library | Dumbbell Swing | Dumbbell Swing | conditioning | db-swing | rule |
 | mobility | hip-flexor-glute | Half-kneeling hip-flexor stretch with glute squeeze | recovery | couch-stretch | rule |
 | mobility | calf-wall-straight | Calf wall stretch, straight knee | recovery | calf-stretch | rule |
 | mobility | calf-wall-bent | Calf wall stretch, bent knee (soleus) | recovery | calf-stretch | rule |
