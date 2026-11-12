@@ -206,8 +206,8 @@ async function renameExercise(db, sessionId, from, to, opts = {}) {
   // already has (or an iso/single-arm variant into its bilateral twin or back),
   // or that edits a session that is not today's, is not a spelling fix: it
   // rewrites history. It needs an explicit `confirm: true` (the approval card).
+  const fromKey = canonicalKey(from), toKey = canonicalKey(name);
   if (!opts.confirm) {
-    const fromKey = canonicalKey(from), toKey = canonicalKey(name);
     const reasons = [];
     if (variantsDiffer(from, name)) reasons.push(`"${from}" and "${name}" are different exercises (iso / single-arm variants are not interchangeable)`);
     if (toKey !== fromKey) {
@@ -215,7 +215,7 @@ async function renameExercise(db, sessionId, from, to, opts = {}) {
       const other = all.map(r => r.exerciseName).find(n => canonicalKey(n) === toKey);
       if (other) reasons.push(`"${other}" is already an exercise in the log; this would merge "${from}" into it`);
     }
-    if (s.date !== etToday()) reasons.push(`session ${s.id} is dated ${s.date}, not today`);
+    if (toKey !== fromKey && s.date !== etToday()) reasons.push(`session ${s.id} is dated ${s.date}, not today`);
     if (reasons.length) {
       return { ok: false, status: 409, needsConfirmation: true, sessionId: s.id, sessionDate: s.date,
         from: String(from).trim(), to: name, sets: hit.length,
