@@ -697,7 +697,7 @@ router.patch('/sessions/:id', requireToken, editRoute((db, req) => LogEdit.editS
 router.delete('/sessions/:id', requireToken, editRoute((db, req) => LogEdit.deleteSession(db, req.params.id)));
 router.post('/sessions/:id/sets', requireToken, editRoute((db, req) => LogEdit.addSet(db, req.params.id, req.body || {})));
 router.post('/sessions/:id/rename', requireToken,
-  editRoute((db, req) => LogEdit.renameExercise(db, req.params.id, (req.body || {}).from, (req.body || {}).to)));
+  editRoute((db, req) => LogEdit.renameExercise(db, req.params.id, (req.body || {}).from, (req.body || {}).to, { confirm: (req.body || {}).confirm === true })));
 router.patch('/sets/:id', requireToken, editRoute((db, req) => LogEdit.editSet(db, req.params.id, req.body || {})));
 router.delete('/sets/:id', requireToken, editRoute((db, req) => LogEdit.deleteSet(db, req.params.id)));
 

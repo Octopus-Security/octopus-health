@@ -115,6 +115,23 @@ function qualifies(a, b) {
   return ` ${long} `.includes(` ${short} `);
 }
 
+/**
+ * Unilateral / iso-lateral markers. `Iso Leg Press` is a different MACHINE from
+ * `Leg Press`; `Single-arm Row` a different lift from `Row`. 2026-11-12: Neith
+ * renamed 2 sets of Iso Leg Press to Leg Press, which erased a real record.
+ * Names whose variant signature differs are DISTINCT canonical exercises:
+ * never candidates for each other, never aliased, never merged.
+ */
+const VARIANTS = [
+  ['iso', /\b(iso|isolateral|iso lateral|isolat?eral)\b/],
+  ['single', /\b(single|one|1) (arm|leg|hand)\b|\bunilateral\b/],
+];
+function variantSig(name) {
+  const n = normalise(name);
+  return VARIANTS.filter(([, re]) => re.test(n)).map(([t]) => t).join(',');
+}
+const variantsDiffer = (a, b) => variantSig(a) !== variantSig(b);
+
 /** A typo, not a different exercise. Strict: `Leg Press` and `Leg Curl` are not this. */
 function looksLikeTypo(a, b) {
   if (a.length < 6 || b.length < 6) return false;   // short names differ for real
@@ -141,6 +158,7 @@ function resolveExerciseName(input, knownNames = []) {
 
   const base = baseKey(asked);
   const candidates = knownNames.filter(k => {
+    if (variantsDiffer(k, asked)) return false;         // iso / single-arm: a different exercise
     const kk = canonicalKey(k);
     if (baseKey(k) === base) return true;               // same movement, different kit
     if (qualifies(kk, key)) return true;                // one qualifies the other
@@ -201,5 +219,5 @@ function questionText(questions) {
 module.exports = {
   normalise, canonicalKey, baseKey, editDistance, qualifies,
   resolveExerciseName, resolveExerciseNames, questionText,
-  EQUIPMENT,
+  EQUIPMENT, variantSig, variantsDiffer,
 };

@@ -195,7 +195,7 @@ test('from-text: an ambiguous name is asked ONCE — the answer is remembered', 
   // The answer is a RENAME, which is also what records the alias.
   const { renameExercise } = require('../api/log-edit');
   const db = getDatabase(user); await db.sequelize.sync();
-  const r = await renameExercise(db, first.body.sessionId, 'Bench Press', 'Barbell Bench Press');
+  const r = await renameExercise(db, first.body.sessionId, 'Bench Press', 'Barbell Bench Press', { confirm: true });
   assert.strictEqual(r.renamed, 1, JSON.stringify(r));
 
   // A later day, no names passed: the answer applies, and nothing is asked.
@@ -251,4 +251,39 @@ test('from-text dryRun parses and writes nothing — not even an alias', { skip 
   const db = getDatabase(user); await db.sequelize.sync();
   assert.strictEqual(await db.WorkoutSet.count(), 0);
   assert.strictEqual(await db.ExerciseAlias.count(), 0);
+});
+
+// ── 2026-11-12: Iso Leg Press renamed to Leg Press ────────────────────────────
+test('Iso Leg Press and Leg Press are distinct names, never a question', () => {
+  const { resolveExerciseName, variantsDiffer } = require('../api/exercise-names');
+  assert.ok(variantsDiffer('Iso Leg Press', 'Leg Press'));
+  assert.ok(variantsDiffer('Single-arm Row', 'Row'));
+  assert.strictEqual(resolveExerciseName('Leg Press', ['Iso Leg Press']).status, 'new');
+  assert.strictEqual(resolveExerciseName('Iso-lateral Leg Press', ['Leg Press']).status, 'new');
+  assert.strictEqual(resolveExerciseName('iso leg press', ['Iso Leg Press']).status, 'known');
+});
+
+test('a service rename of Iso Leg Press into Leg Press needs confirmation and changes nothing', { skip }, async () => {
+  const user = userFor('isoleg');
+  const r = await log(user, [{ exerciseName: 'Iso Leg Press', sets: [{ reps: 10, weight: 90 }, { reps: 10, weight: 90 }] }]);
+  const db = getDatabase(user); await db.sequelize.sync();
+  const sid = r.body.sessionId;
+  const bad = await svc(user, 'POST', `/sessions/${sid}/rename`, { from: 'Iso Leg Press', to: 'Leg Press' });
+  assert.strictEqual(bad.status, 409, JSON.stringify(bad.body));
+  assert.ok(bad.body.needsConfirmation);
+  assert.strictEqual(await db.WorkoutSet.count({ where: { exerciseName: 'Iso Leg Press' } }), 2);
+  assert.strictEqual(await db.WorkoutSet.count({ where: { exerciseName: 'Leg Press' } }), 0);
+  // confirmed: applies, but no alias iso -> bilateral is ever remembered
+  const ok = await svc(user, 'POST', `/sessions/${sid}/rename`, { from: 'Iso Leg Press', to: 'Leg Press', confirm: true });
+  assert.strictEqual(ok.status, 200, JSON.stringify(ok.body));
+  assert.strictEqual(await db.ExerciseAlias.count({ where: { key: 'iso leg press' } }), 0);
+});
+
+test('logging Leg Press 225x10 beside an existing Iso Leg Press is saved as typed', { skip }, async () => {
+  const user = userFor('isoleg2');
+  await log(user, [{ exerciseName: 'Iso Leg Press', sets: [{ reps: 10, weight: 90 }] }]);
+  const r = await svc(user, 'POST', '/sessions/from-text', { text: 'Leg Press: 225 x 10', date: '2026-11-12' });
+  assert.ok(r.body.sessionId, JSON.stringify(r.body));
+  assert.ok(!r.body.namingAsk || !r.body.namingAsk.length, JSON.stringify(r.body));
+  assert.strictEqual(r.body.logged[0].exerciseName, 'Leg Press');
 });
