@@ -1,0 +1,77 @@
+{
+ "version": 2,
+ "title": "Dumbbell Z Twist",
+ "view": "side",
+ "hold": "dumbbell",
+ "anchor": {
+  "joint": "ankleL",
+  "x": 84,
+  "y": 90
+ },
+ "props": [
+  {
+   "type": "box",
+   "x": 24,
+   "y": 78,
+   "w": 62,
+   "h": 14
+  }
+ ],
+ "highlight": [
+  "shoulderL"
+ ],
+ "frames": [
+  {
+   "duration": 1800,
+   "label": "Dumbbells over the hips, arms long",
+   "hold": 400,
+   "pose": {
+    "torso": -90,
+    "head": -88,
+    "thighL": 90,
+    "shinL": -30,
+    "footL": 90,
+    "thighR": 90,
+    "shinR": -30,
+    "footR": 90,
+    "upperArmL": 125,
+    "forearmL": 130,
+    "upperArmR": 125,
+    "forearmR": 130
+   }
+  },
+  {
+   "duration": 1800,
+   "label": "Pass over the chest",
+   "hold": 0,
+   "pose": {
+    "upperArmL": 180,
+    "forearmL": 185,
+    "upperArmR": 180,
+    "forearmR": 185
+   }
+  },
+  {
+   "duration": 2200,
+   "label": "Arc toward the head, stop before it strains",
+   "hold": 600,
+   "pose": {
+    "upperArmL": 245,
+    "forearmL": 250,
+    "upperArmR": 245,
+    "forearmR": 250
+   }
+  },
+  {
+   "duration": 2200,
+   "label": "Back over the chest",
+   "hold": 0,
+   "pose": {
+    "upperArmL": 180,
+    "forearmL": 185,
+    "upperArmR": 180,
+    "forearmR": 185
+   }
+  }
+ ]
+}

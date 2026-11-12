@@ -1,0 +1,58 @@
+{
+ "version": 2,
+ "title": "Z Press",
+ "view": "side",
+ "hold": "barbell",
+ "highlight": [
+  "shoulderL",
+  "elbowL"
+ ],
+ "frames": [
+  {
+   "duration": 1500,
+   "label": "Sit tall, legs out, bar at the collarbones",
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "upperArmL": 20,
+    "forearmL": 175,
+    "upperArmR": 20,
+    "forearmR": 175,
+    "thighL": 90,
+    "shinL": 90,
+    "footL": 180,
+    "thighR": 90,
+    "shinR": 90,
+    "footR": 180,
+    "root": {
+     "x": 35,
+     "y": 87
+    }
+   }
+  },
+  {
+   "duration": 700,
+   "label": "Head back slightly as the bar passes",
+   "hold": 0,
+   "pose": {
+    "head": 170,
+    "upperArmL": 85,
+    "forearmL": 178,
+    "upperArmR": 85,
+    "forearmR": 178
+   }
+  },
+  {
+   "duration": 900,
+   "label": "Lock out overhead, head through",
+   "hold": 400,
+   "pose": {
+    "head": 180,
+    "upperArmL": 178,
+    "forearmL": 180,
+    "upperArmR": 178,
+    "forearmR": 180
+   }
+  }
+ ]
+}

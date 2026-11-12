@@ -1,0 +1,104 @@
+{
+ "version": 2,
+ "title": "Teep Balance Hold",
+ "view": "side",
+ "anchor": {
+  "joint": "ankleR",
+  "x": 36,
+  "y": 88.5
+ },
+ "highlight": [
+  "ankleR",
+  "hipL"
+ ],
+ "frames": [
+  {
+   "duration": 1400,
+   "label": "Guard",
+   "pose": {
+    "torso": 172,
+    "head": 172,
+    "upperArmL": 30,
+    "forearmL": 160,
+    "upperArmR": 20,
+    "forearmR": 165,
+    "thighL": 12,
+    "shinL": -4,
+    "footL": 90,
+    "thighR": -22,
+    "shinR": -20,
+    "footR": 70
+   }
+  },
+  {
+   "duration": 1400,
+   "label": "Chamber the knee",
+   "hold": 400,
+   "pose": {
+    "torso": 178,
+    "head": 176,
+    "upperArmL": 30,
+    "forearmL": 160,
+    "upperArmR": 20,
+    "forearmR": 165,
+    "thighL": 86,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": -12,
+    "shinR": -12,
+    "footR": 78
+   }
+  },
+  {
+   "duration": 1200,
+   "label": "Push the foot out, stay tall, hold",
+   "hold": 2200,
+   "pose": {
+    "torso": 188,
+    "head": 182,
+    "upperArmL": 35,
+    "forearmL": 165,
+    "thighL": 88,
+    "shinL": 88,
+    "footL": 178,
+    "thighR": -6,
+    "shinR": -6,
+    "footR": 84
+   }
+  },
+  {
+   "duration": 1200,
+   "label": "Bring the knee back",
+   "hold": 0,
+   "pose": {
+    "torso": 178,
+    "head": 176,
+    "thighL": 86,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": -12,
+    "shinR": -12,
+    "footR": 78
+   }
+  },
+  {
+   "duration": 1400,
+   "label": "Set down",
+   "hold": 300,
+   "pose": {
+    "torso": 172,
+    "head": 172,
+    "upperArmL": 30,
+    "forearmL": 160,
+    "upperArmR": 20,
+    "forearmR": 165,
+    "thighL": 12,
+    "shinL": -4,
+    "footL": 90,
+    "thighR": -22,
+    "shinR": -20,
+    "footR": 70
+   }
+  }
+ ]
+}

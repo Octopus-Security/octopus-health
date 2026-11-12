@@ -1,0 +1,58 @@
+{
+ "version": 2,
+ "title": "Standing-Leg Balance with Knee Raise",
+ "view": "side",
+ "anchor": {
+  "joint": "toeR",
+  "x": 52,
+  "y": 90.5
+ },
+ "highlight": [
+  "ankleR",
+  "hipL"
+ ],
+ "frames": [
+  {
+   "duration": 1800,
+   "label": "Stand tall, hands on hips",
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "upperArmL": 20,
+    "forearmL": 130,
+    "upperArmR": 20,
+    "forearmR": 130,
+    "thighL": 0,
+    "shinL": 0,
+    "footL": 90,
+    "thighR": 0,
+    "shinR": 0,
+    "footR": 90
+   }
+  },
+  {
+   "duration": 2000,
+   "label": "Knee up to hip height, heel lifts, pivot on the ball of the foot",
+   "hold": 1600,
+   "pose": {
+    "thighL": 90,
+    "shinL": 0,
+    "footL": 90,
+    "footR": 62,
+    "torso": 182
+   }
+  },
+  {
+   "duration": 600,
+   "label": "Lower",
+   "hold": 0,
+   "pose": {
+    "thighL": 45,
+    "shinL": 0,
+    "footL": 90,
+    "footR": 76,
+    "torso": 181
+   }
+  }
+ ]
+}

@@ -1,0 +1,112 @@
+{
+ "version": 2,
+ "title": "Kick Chamber to Extension",
+ "view": "side",
+ "anchor": {
+  "joint": "ankleR",
+  "x": 36,
+  "y": 88.5
+ },
+ "highlight": [
+  "hipL",
+  "kneeL"
+ ],
+ "frames": [
+  {
+   "duration": 1400,
+   "label": "Guard",
+   "pose": {
+    "torso": 172,
+    "head": 172,
+    "upperArmL": 30,
+    "forearmL": 160,
+    "upperArmR": 20,
+    "forearmR": 165,
+    "thighL": 12,
+    "shinL": -4,
+    "footL": 90,
+    "thighR": -22,
+    "shinR": -20,
+    "footR": 70
+   }
+  },
+  {
+   "duration": 1600,
+   "label": "Chamber: knee high, shin tucked",
+   "hold": 500,
+   "pose": {
+    "torso": 186,
+    "head": 180,
+    "upperArmL": 30,
+    "forearmL": 160,
+    "upperArmR": 20,
+    "forearmR": 165,
+    "thighL": 96,
+    "shinL": -30,
+    "footL": 60,
+    "thighR": -12,
+    "shinR": -12,
+    "footR": 78
+   }
+  },
+  {
+   "duration": 1800,
+   "label": "Extend slowly and hold at your own height",
+   "hold": 1200,
+   "highlight": [
+    "hipL",
+    "kneeL"
+   ],
+   "pose": {
+    "torso": 212,
+    "head": 198,
+    "upperArmL": 60,
+    "forearmL": 200,
+    "thighL": 118,
+    "shinL": 118,
+    "footL": 208,
+    "thighR": -6,
+    "shinR": -6,
+    "footR": 84
+   }
+  },
+  {
+   "duration": 1400,
+   "label": "Bring it back to the chamber",
+   "hold": 0,
+   "pose": {
+    "torso": 186,
+    "head": 180,
+    "upperArmL": 30,
+    "forearmL": 160,
+    "upperArmR": 20,
+    "forearmR": 165,
+    "thighL": 96,
+    "shinL": -30,
+    "footL": 60,
+    "thighR": -12,
+    "shinR": -12,
+    "footR": 78
+   }
+  },
+  {
+   "duration": 1400,
+   "label": "Set down",
+   "hold": 300,
+   "pose": {
+    "torso": 172,
+    "head": 172,
+    "upperArmL": 30,
+    "forearmL": 160,
+    "upperArmR": 20,
+    "forearmR": 165,
+    "thighL": 12,
+    "shinL": -4,
+    "footL": 90,
+    "thighR": -22,
+    "shinR": -20,
+    "footR": 70
+   }
+  }
+ ]
+}

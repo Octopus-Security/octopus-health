@@ -1,0 +1,49 @@
+{
+ "version": 2,
+ "title": "Side-Lying Hip Abduction",
+ "view": "front",
+ "highlight": [
+  "hipR"
+ ],
+ "frames": [
+  {
+   "duration": 1800,
+   "label": "On your side, legs stacked and straight",
+   "hold": 300,
+   "pose": {
+    "torso": 90,
+    "head": 90,
+    "upperArmL": 90,
+    "forearmL": 90,
+    "upperArmR": 90,
+    "forearmR": 90,
+    "depth": {
+     "upperArmL": 0.35,
+     "forearmL": 0.35,
+     "upperArmR": 0.35,
+     "forearmR": 0.35
+    },
+    "thighL": -90,
+    "shinL": -90,
+    "footL": -90,
+    "thighR": -90,
+    "shinR": -90,
+    "footR": -90,
+    "root": {
+     "x": 50,
+     "y": 84
+    }
+   }
+  },
+  {
+   "duration": 1800,
+   "label": "Lift the top leg, toes forward, then lower",
+   "hold": 800,
+   "pose": {
+    "thighR": -125,
+    "shinR": -125,
+    "footR": -125
+   }
+  }
+ ]
+}

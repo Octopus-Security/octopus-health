@@ -1,0 +1,34 @@
+{
+ "version": 2,
+ "title": "Half Front Split Hold",
+ "view": "side",
+ "static": true,
+ "highlight": [
+  "kneeL",
+  "hipL"
+ ],
+ "frames": [
+  {
+   "label": "Back knee down, front leg straight, hips back, fold forward",
+   "anchor": {
+    "joint": "kneeR",
+    "x": 38,
+    "y": 89
+   },
+   "pose": {
+    "torso": 128,
+    "head": 118,
+    "upperArmL": 10,
+    "forearmL": 12,
+    "upperArmR": 10,
+    "forearmR": 12,
+    "thighL": 59,
+    "shinL": 59,
+    "footL": 178,
+    "thighR": 0,
+    "shinR": -90,
+    "footR": -74
+   }
+  }
+ ]
+}

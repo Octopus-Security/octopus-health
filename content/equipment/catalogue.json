@@ -105,6 +105,7 @@
     { "match": "push-up board",          "requires": ["push-up-board"], "substitutes": [ { "name": "Wide Push-up", "requires": [] } ] },
     { "match": "jump rope",              "requires": ["jump-rope"] },
     { "match": "bench press",            "requires": ["barbell|dumbbell", "weight-bench"] },
+    { "match": "z twist",                "requires": ["dumbbell", "weight-bench"] },
     { "match": "barbell back squat",     "requires": ["barbell"],    "substitutes": [ { "name": "Bodyweight Squat", "requires": [] } ] },
     { "match": "romanian deadlift",      "requires": ["barbell|dumbbell"] },
     { "match": "skull crusher", "requires": ["barbell|dumbbell", "weight-bench"], "substitutes": [ { "name": "Diamond Push-up", "requires": [] } ] },

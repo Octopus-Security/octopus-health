@@ -5,7 +5,7 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 
 "how": `rule` = a name rule matched; `category fallback` = no rule, the category figure is shown; `null rule -> category fallback` = a rule says "no figure yet" but the category figure is still shown; `none (martial: no figure)` = the card says "No diagram yet".
 
-563 library exercises, 182 mobility items.
+575 library exercises, 182 mobility items.
 
 | source | id | name | category | figure | how |
 |---|---|---|---|---|---|
@@ -408,6 +408,18 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | library | Half-Kneeling Side Bend | Half-Kneeling Side Bend | recovery | kneeling-hip-flexor | rule |
 | library | Crab Reach | Crab Reach | recovery | crab-reach | rule |
 | library | Kick Chamber Hold | Kick Chamber Hold | recovery | kick-check | rule |
+| library | Standing Hamstring Active Lift | Standing Hamstring Active Lift | recovery | hamstring-active-lift | rule |
+| library | Side Leg Raise Hold | Side Leg Raise Hold | recovery | side-leg-raise-hold | rule |
+| library | Kick Chamber to Extension | Kick Chamber to Extension | recovery | chamber-extend | rule |
+| library | Wall-Supported Roundhouse Slow Kick | Wall-Supported Roundhouse Slow Kick | recovery | wall-roundhouse-slow | rule |
+| library | Standing-Leg Balance with Knee Raise | Standing-Leg Balance with Knee Raise | recovery | balance-knee-raise | rule |
+| library | Teep Balance Hold | Teep Balance Hold | recovery | teep-balance-hold | rule |
+| library | Adductor Contract-Relax Stretch | Adductor Contract-Relax Stretch | recovery | adductor-contract-relax | rule |
+| library | Half Front Split Hold | Half Front Split Hold | recovery | half-split | rule |
+| library | Side-Lying Hip Abduction | Side-Lying Hip Abduction | recovery | side-lying-abduction | rule |
+| library | Barbell Z Press | Barbell Z Press | strength | z-press | rule |
+| library | Dumbbell Z Press | Dumbbell Z Press | strength | z-press-db | rule |
+| library | Dumbbell Z Twist (Bench) | Dumbbell Z Twist (Bench) | strength | z-twist-bench | rule |
 | library | Quadruped Thoracic Rotation | Quadruped Thoracic Rotation | recovery | thread-needle | rule |
 | library | Elbows-on-Bench Thoracic Extension | Elbows-on-Bench Thoracic Extension | recovery | thoracic-extension | rule |
 | library | Reverse Tabletop | Reverse Tabletop | recovery | reverse-tabletop | rule |

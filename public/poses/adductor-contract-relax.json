@@ -1,0 +1,93 @@
+{
+ "version": 2,
+ "title": "Adductor Contract-Relax Stretch",
+ "view": "front",
+ "highlight": [
+  "hipL",
+  "hipR"
+ ],
+ "anchor": {
+  "joint": "hip",
+  "x": 50,
+  "y": 83.1
+ },
+ "frames": [
+  {
+   "duration": 2200,
+   "label": "Legs wide, sit tall, first stretch",
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "upperArmL": 40,
+    "forearmL": 10,
+    "upperArmR": -40,
+    "forearmR": -10,
+    "thighL": 80,
+    "shinL": 80,
+    "footL": 180,
+    "thighR": -80,
+    "shinR": -80,
+    "footR": 180,
+    "depth": {
+     "torso": 0.85,
+     "upperArmL": 0.6,
+     "upperArmR": 0.6,
+     "forearmL": 0.6,
+     "forearmR": 0.6
+    }
+   }
+  },
+  {
+   "duration": 1600,
+   "label": "Contract: press the heels gently into the floor",
+   "hold": 1800,
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "upperArmL": 12,
+    "forearmL": -8,
+    "upperArmR": -12,
+    "forearmR": 8,
+    "thighL": 80,
+    "shinL": 80,
+    "footL": 180,
+    "thighR": -80,
+    "shinR": -80,
+    "footR": 180,
+    "depth": {
+     "torso": 0.7,
+     "upperArmL": 0.55,
+     "upperArmR": 0.55,
+     "forearmL": 0.5,
+     "forearmR": 0.5
+    }
+   }
+  },
+  {
+   "duration": 2400,
+   "label": "Relax, breathe out, fold a little further",
+   "hold": 1500,
+   "pose": {
+    "torso": 180,
+    "head": 180,
+    "upperArmL": 12,
+    "forearmL": -8,
+    "upperArmR": -12,
+    "forearmR": 8,
+    "thighL": 80,
+    "shinL": 80,
+    "footL": 180,
+    "thighR": -80,
+    "shinR": -80,
+    "footR": 180,
+    "depth": {
+     "torso": 0.5,
+     "upperArmL": 0.55,
+     "upperArmR": 0.55,
+     "forearmL": 0.5,
+     "forearmR": 0.5
+    }
+   }
+  }
+ ]
+}
