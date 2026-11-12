@@ -6,9 +6,8 @@ Each claim is marked **verified** (checked in code or by a test or run, with the
 
 ## Phase 1 (this PR)
 
-- Authoring at `/sessions` (list) and `/sessions/:id` (editor), behind login, **admin only**: any
-  other account gets 404 on every authoring route. Admin is `req.user.role === 'admin'`, the value
-  octopus-auth returns on verify. The nav link is shown to admins only. *Verified 2026-11-07 (tests).*
+- Authoring at `/sessions` (list) and `/sessions/:id` (editor), behind login, **trainer or admin** (changed 2026-11-11, see PLANS.md; it was admin only): any
+  other account gets 404 on every authoring route. The nav link is shown to trainers and admins. *Verified (tests).*
 - Public reading at `GET /s` (storefront), `GET /s/sitemap.xml`, `GET /s/:slugOrToken`. Mounted
   before the login and app-access gates, and the handlers never read `req.user`. *Verified
   (test with no cookie; headless Chromium).*

@@ -148,7 +148,7 @@ if (PUBLIC_HOST) {
     app.use((req, res, next) => {
         if (req.hostname.toLowerCase() !== PUBLIC_HOST) return next();
         if (req.path === '/') return res.redirect(302, '/s');
-        if (req.path === '/s' || req.path.startsWith('/s/') || req.path === '/health' || req.path === '/api/build') return next();
+        if (req.path === '/s' || req.path.startsWith('/s/') || req.path.startsWith('/p/') || req.path === '/health' || req.path === '/api/build') return next();
         return res.status(404).type('text/plain').send('Not found');
     });
 }
@@ -196,6 +196,16 @@ const verifyToken = createVerifyCache({
     })).data,
 });
 
+// Authoring (sessions, plans) re-checks the role through this SHORTER cache so a revoked trainer
+// loses access in ~30 s instead of 5 minutes (api/trainer-guard.js).
+const verifyTokenFresh = createVerifyCache({
+    call: async (token) => (await axios.post(`${AUTH_URL}/api/auth/verify`, {}, {
+        headers: { Authorization: `Bearer ${token}` }, timeout: 5000,
+    })).data,
+    ttl: Number(process.env.ROLE_CACHE_MS) || 30 * 1000,
+    negTtl: 5 * 1000,
+});
+
 // Lazily create + seed a user's DB the first time we see them this run. The "once" lives on the
 // cached handle itself (database.js ensure()), so every path — web pages, the /api router and the
 // service routes — shares one answer, and a handle that was evicted or replaced re-ensures.
@@ -217,6 +227,7 @@ app.use(async (req, res, next) => {
 // Shared sessions, public side: BEFORE the login and app-access gates, needs no account.
 // Handlers never read req.user. Authoring is in api/web-sessions.js, behind login.
 require('./api/public-sessions')(app, { publicHost: PUBLIC_HOST });
+require('./api/public-plans')(app, { publicHost: PUBLIC_HOST });
 
 // Mount API routes (before session-based routes)
 const apiRouter = require('./api');
@@ -362,8 +373,9 @@ require('./api/web-week')(app, { requireLogin, getDatabase });
 require('./api/web-addons')(app, { requireLogin, getDatabase });
 require('./api/web-constraints')(app, { requireLogin, getDatabase });
 require('./api/web-coaching')(app, { requireLogin, getDatabase });
-// Shareable sessions, authoring side (admin only in phase 1; SESSIONS.md).
-require('./api/web-sessions')(app, { requireLogin, getDatabase });
+// Shareable sessions and plans, authoring side (trainer or admin; SESSIONS.md, PLANS.md).
+require('./api/web-sessions')(app, { requireLogin, getDatabase, verifyFresh: verifyTokenFresh });
+require('./api/web-plans')(app, { requireLogin, verifyFresh: verifyTokenFresh });
 // Correcting the log in place: edit/delete a set, retitle or redate a session,
 // add a set, rename an exercise, and known-name suggestions (api/web-log-edit.js).
 require('./api/web-log-edit')(app, { requireLogin, getDatabase });

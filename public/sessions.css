@@ -26,3 +26,6 @@
 .sx-linkbox { display: flex; flex-direction: column; gap: 8px; }
 .sx-group { margin: 12px 0 4px; color: #bbb; font-weight: 600; }
 @media (min-width: 700px) { .sx-linkbox { flex-direction: row; flex-wrap: wrap; align-items: center; } .sx-linkbox input { flex: 1 1 280px; margin-top: 0; } }
+.px-week { border: 1px solid #2a2a2a; border-radius: 8px; padding: 12px; margin-bottom: 12px; }
+.px-week .sx-head input { flex: 1 1 160px; min-width: 0; margin-top: 0; }
+.sx-item select { display: block; width: 100%; font-size: 16px; min-height: var(--tap); margin-top: 6px; }

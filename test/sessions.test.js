@@ -53,7 +53,7 @@ async function startApp(authBase, extraEnv = {}) {
   const port = await freePort();
   const base = `http://127.0.0.1:${port}`;
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'sess-'));
-  const env = { ...process.env, PORT: String(port), DATA_DIR: tmp, AUTH_SERVICE_URL: authBase, AUTH_PUBLIC_URL: 'https://auth.example.test', AUTH_REMOTE_VERIFY: '', ...extraEnv };
+  const env = { ...process.env, PORT: String(port), DATA_DIR: tmp, AUTH_SERVICE_URL: authBase, AUTH_PUBLIC_URL: 'https://auth.example.test', AUTH_REMOTE_VERIFY: '', ROLE_CACHE_MS: '150', ...extraEnv };
   const child = spawn(process.execPath, ['index.js'], { cwd: root, stdio: ['ignore', 'pipe', 'pipe'], env });
   let out = ''; child.stdout.on('data', d => { out += d; }); child.stderr.on('data', d => { out += d; });
   const until = Date.now() + 60000;
@@ -288,6 +288,8 @@ test('the tracker is not reachable on a dedicated public host when PUBLIC_HOST i
     assert.strictEqual((await viaPublic('/')).status, 302);
     assert.strictEqual((await viaPublic('/')).headers.get('location'), '/s');
     assert.strictEqual((await viaPublic('/s')).status, 200);
+    assert.strictEqual((await viaPublic('/p/sitemap.xml')).status, 200, 'plan pages are public too');
+    assert.strictEqual((await viaPublic('/trainer-plans')).status, 404);
     assert.strictEqual((await viaPublic('/settings')).status, 404);
     assert.strictEqual((await viaPublic('/sessions')).status, 404);
     assert.strictEqual((await viaPublic('/api/health/anything')).status, 404);
