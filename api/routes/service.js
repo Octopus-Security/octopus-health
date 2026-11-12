@@ -15,7 +15,7 @@ const { partition } = require('../dedupe-sets');
 const { detectPR, rebuildPRs } = require('../pr-detect');
 const { macrosForTemplate, describe, provenance } = require('../meal-template');
 const { isFinished, mealFor } = require('../meal-prep');
-const { resolveExerciseNames, questionText, canonicalKey } = require('../exercise-names');
+const { resolveExerciseNames, questionText, canonicalKey, variantsDiffer } = require('../exercise-names');
 const { parseWorkout } = require('../workout-parse');
 const { resolveSessionTitle, titleQuestionText, seedSessionTitles } = require('../session-titles');
 
@@ -531,7 +531,11 @@ router.post('/sessions', requireToken, logSession);
 async function aliasMap(db) {
   if (!db.ExerciseAlias) return new Map();
   const rows = await db.ExerciseAlias.findAll().catch(() => []);
-  return new Map(rows.map(r => [r.key, r.name]));
+  // An alias saved before 2026-11-12 may map an iso / single-arm name onto its
+  // bilateral twin ("iso leg press" -> "Leg Press"). Those are different
+  // exercises, so such a row is ignored rather than trusted: it must never
+  // rewrite a new log, and the user should not have to find and delete it.
+  return new Map(rows.filter(r => !variantsDiffer(r.key, r.name)).map(r => [r.key, r.name]));
 }
 
 /** Record "when I say `asked` I mean `name`" — one row per key, last answer wins. */
@@ -540,6 +544,7 @@ async function rememberAlias(db, asked, name) {
   // A same-name answer ("Leg Raises" → "Leg Raises") is kept too: it means
   // "a new exercise, not one of those", and without it the question returns.
   if (!key || !name || !db.ExerciseAlias) return;
+  if (variantsDiffer(asked, name)) return;   // never alias iso / single-arm <-> bilateral
   const [row, created] = await db.ExerciseAlias.findOrCreate({ where: { key }, defaults: { name } });
   if (!created && row.name !== name) { row.name = name; await row.save(); }
 }
