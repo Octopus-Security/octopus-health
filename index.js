@@ -1377,7 +1377,7 @@ app.post('/workout/api/quick-log', requireLogin, async (req, res) => {
         }
         res.json({ success: true, committed: true, sessionId: session.id, logged: preview, unparsed: parsed.unparsed, prs });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('[health] request failed:', safeguards.safeError(err)); res.status(500).json({ success: false, error: 'Something went wrong' });
     }
 });
 
@@ -1520,7 +1520,7 @@ app.use((err, req, res, next) => {
     const wantsJson = req.originalUrl.startsWith('/api/') ||
                       (req.get('accept') || '').includes('application/json');
     if (wantsJson) {
-        return res.status(500).json({ error: err.message || 'internal error' });
+        return res.status(500).json({ error: 'Something went wrong' });   // generic on purpose: the real error is in the log
     }
     res.status(500).send(
         '<h1>Something went wrong</h1>' +
