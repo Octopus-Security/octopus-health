@@ -250,6 +250,25 @@ function resolveExerciseNames(names, known = [], stats = []) {
   return { resolved, questions, allKnown: questions.length === 0 };
 }
 
+/**
+ * Is this "name" a line of conversation rather than an exercise? (2026-11-12.)
+ *
+ * On 2026-10-29 a reply to a naming question - "yes but it was with dumbbells" - reached the
+ * rename route as the NEW name and became an exercise with one set. Health is the service that
+ * owns the data, so health refuses to CREATE such a name (the model upstream can decline to be
+ * careful; this cannot be argued with). A name the account already uses is never refused.
+ *
+ * @returns {string|null} why it is not an exercise name, or null if it could be one
+ */
+function conversationalReason(nameIn) {
+  const name = String(nameIn == null ? '' : nameIn).trim();
+  if (!name) return null;
+  if (/\?\s*$/.test(name)) return 'it is a question';
+  if (/^(yes|no|yeah|yep|yup|nope|nah|ok|okay|sure|but|it was|i did|i do|i didn't|that was|that's|thats)(?=[\s,.!;:]|$)/i.test(name)) return 'it starts like a reply, not a name';
+  if (name.split(/\s+/).length > 8) return 'it is too long to be an exercise name';
+  return null;
+}
+
 /** One line per ambiguity, so several can be asked in a single reply. */
 function questionText(questions) {
   if (!questions.length) return null;
@@ -263,6 +282,6 @@ function questionText(questions) {
 
 module.exports = {
   normalise, canonicalKey, baseKey, editDistance, qualifies,
-  resolveExerciseName, resolveExerciseNames, questionText,
+  resolveExerciseName, resolveExerciseNames, questionText, conversationalReason,
   EQUIPMENT, variantSig, variantsDiffer, groupKey, movementKey, dominantSpelling,
 };

@@ -11,8 +11,8 @@
  * name lands on the new one (service.js applies ExerciseAlias to every log).
  *
  * Health is a database per user: `db` is the caller's own file, so nothing here
- * filters by owner and an unfiltered query is correct. Additive only - no column,
- * no table, no row is ever deleted; sets keep their ids.
+ * filters by owner and an unfiltered query is correct. Rename and merge are additive (sets keep
+ * their ids); only deleteExercise removes rows, and only the caller's own sets of one exact name.
  *
  * Safe to repeat: after a move `from` has no sets, so the second call moves 0 and
  * says so. Two-step: without `confirm: true` it writes NOTHING and returns a preview
@@ -20,7 +20,7 @@
  */
 
 const { QueryTypes } = require('sequelize');
-const { canonicalKey, groupKey, movementKey, dominantSpelling, variantSig } = require('./exercise-names');
+const { canonicalKey, groupKey, movementKey, dominantSpelling, variantSig, variantsDiffer } = require('./exercise-names');
 
 const bad = (error, status = 400) => ({ ok: false, status, error });
 
@@ -209,6 +209,100 @@ async function moveExercise(db, fromIn, toIn, { confirm = false, exact = false }
 }
 
 /**
+ * Merge ONLY the listed names into `to` (the selective merge of a suggestion or spelling card:
+ * "these two are the same lift, that one is not"). Unlisted names are untouched. Two-step: without
+ * confirm: true nothing is written and the result lists exactly what would move.
+ *
+ * Every `from` must really belong with `to` (same spelling group or same movement) and must not cross
+ * iso / single-arm <-> plain; anything else refuses the WHOLE request before a single write. Moves
+ * are applied with moveExercise (exact), one name at a time.
+ */
+async function mergeSelected(db, fromIn, toIn, { confirm = false } = {}) {
+  const to = String(toIn == null ? '' : toIn).trim();
+  const from = [...new Set((Array.isArray(fromIn) ? fromIn : []).map(n => String(n == null ? '' : n).trim()).filter(Boolean))];
+  if (!to) return bad('to is required');
+  if (!from.length) return bad('choose at least one name to merge');
+  if (from.includes(to)) return bad('the name to keep cannot also be merged away');
+  const stats = await spellingStats(db);
+  const have = new Map(stats.map(r => [r.name, r]));
+  if (!have.has(to)) return bad(`no exercise named "${to}"`, 404);
+  for (const n of from) {
+    if (variantsDiffer(n, to)) return bad(`"${n}" and "${to}" are different exercises (iso / single-arm versions are never merged with the plain one)`);
+    const same = groupKey(n) === groupKey(to) || (movementKey(n).split('|')[0] && movementKey(n) === movementKey(to));
+    if (!same) return bad(`"${n}" does not look like "${to}" - merge different exercises one pair at a time`);
+  }
+  const present = from.filter(n => have.has(n));   // a name already merged away (repeat / second tab) is skipped
+  if (!present.length) return { ok: true, preview: !confirm, moved: 0, alreadyDone: true, to, from: [], names: [], sets: 0, sessions: 0 };
+  const sessions = new Set();
+  for (const n of present) (await db.WorkoutSet.findAll({ where: { exerciseName: n }, attributes: ['sessionId'] })).forEach(x => sessions.add(x.sessionId));
+  const names = present.map(n => ({ name: n, sets: have.get(n).sets }));
+  const plan = { to, from: present, names, sets: names.reduce((a, x) => a + x.sets, 0), sessions: sessions.size, targetSets: have.get(to).sets };
+  if (!confirm) return { ok: true, preview: true, moved: 0, alreadyDone: false, ...plan };
+  let moved = 0;
+  for (const n of present) { const r = await moveExercise(db, n, to, { confirm: true, exact: true }); if (!r.ok) return r; moved += r.moved; }
+  return { ok: true, preview: false, moved, alreadyDone: moved === 0, ...plan };
+}
+
+/**
+ * Delete every set logged under ONE exact exercise name (a junk row such as a chat reply that was
+ * logged as a name). A deliberate, user-initiated delete of the caller's own rows - what the Logs
+ * page's per-set delete already does, in bulk. Two-step like moveExercise: without `confirm: true`
+ * nothing is written and the result is the count and dates to show. More than DELETE_TYPE_OVER sets
+ * also need `typed` to equal the name (enforced here, not only in the dialog).
+ *
+ * A session left with no sets is deleted too (as log-edit.js deleteSession does); a session with
+ * other exercises stays and its remaining sets are renumbered. Remembered ExerciseAlias rows
+ * pointing at the name go with it, and so do stored PersonalRecord rows for the name (they would
+ * be records of sets that no longer exist). No table or column is touched. Repeat: deletes 0.
+ */
+const DELETE_TYPE_OVER = 20;
+async function deleteExercise(db, nameIn, { confirm = false, typed = null } = {}) {
+  const name = String(nameIn == null ? '' : nameIn);
+  if (!name.trim()) return bad('name is required');
+  const { WorkoutSet, WorkoutSession } = db;
+  const sets = await WorkoutSet.findAll({ where: { exerciseName: name } });
+  const sessionIds = [...new Set(sets.map(s => s.sessionId))];
+  const sessions = sessionIds.length ? await WorkoutSession.findAll({ where: { id: sessionIds } }) : [];
+  const dates = sessions.map(s => s.date).filter(Boolean).sort();
+  const aliasCount = db.ExerciseAlias ? await db.ExerciseAlias.count({ where: { name } }) : 0;
+  const plan = {
+    name, sets: sets.length, sessions: sessionIds.length, dates,
+    firstDate: dates[0] || null, lastDate: dates[dates.length - 1] || null,
+    requiresTyped: sets.length > DELETE_TYPE_OVER, aliases: aliasCount,
+  };
+  if (!sets.length && !aliasCount) return { ok: true, preview: false, deleted: 0, alreadyDone: true, ...plan, emptiedSessions: 0 };
+  let emptied = 0;
+  for (const id of sessionIds) {
+    const left = await WorkoutSet.count({ where: { sessionId: id, exerciseName: { [require('sequelize').Op.ne]: name } } });
+    if (!left) emptied++;
+  }
+  plan.emptiedSessions = emptied;
+  if (!confirm) return { ok: true, preview: true, deleted: 0, alreadyDone: false, ...plan };
+  if (plan.requiresTyped && typed !== name) return bad(`more than ${DELETE_TYPE_OVER} sets: type the exercise name exactly to confirm`, 400);
+
+  await db.sequelize.transaction(async (t) => {
+    for (const s of sets) await s.destroy({ transaction: t });
+    for (const id of sessionIds) {
+      const rest = await WorkoutSet.findAll({ where: { sessionId: id }, order: [['exerciseOrder', 'ASC'], ['setNumber', 'ASC'], ['id', 'ASC']], transaction: t });
+      if (!rest.length) {
+        const sess = sessions.find(x => x.id === id);
+        if (sess) await sess.destroy({ transaction: t });
+        continue;
+      }
+      // Keep "Set 1, Set 2" unbroken within each remaining exercise block.
+      const byBlock = new Map();
+      for (const r of rest) { const k = r.exerciseOrder; if (!byBlock.has(k)) byBlock.set(k, []); byBlock.get(k).push(r); }
+      for (const block of byBlock.values()) {
+        for (let i = 0; i < block.length; i++) if (block[i].setNumber !== i + 1) { block[i].setNumber = i + 1; await block[i].save({ transaction: t }); }
+      }
+    }
+    if (db.PersonalRecord) await db.PersonalRecord.destroy({ where: { exerciseName: name }, transaction: t });
+    if (db.ExerciseAlias) await db.ExerciseAlias.destroy({ where: { name }, transaction: t });
+  });
+  return { ok: true, preview: false, deleted: sets.length, alreadyDone: false, ...plan };
+}
+
+/**
  * Merge every spelling of ONE exercise into the chosen one. Two-step like moveExercise: without
  * confirm: true nothing is written and the result is the count to show. The names must all be
  * spellings of one exercise (same groupKey) - merging different exercises is moveExercise's job,
@@ -247,4 +341,4 @@ async function mergeGroup(db, namesIn, targetIn, { confirm = false } = {}) {
   return { ok: true, preview: false, moved, alreadyDone: moved === 0, ...plan };
 }
 
-module.exports = { listExercises, spellingStats, reviewExercises, dominantFor, setsFor, moveExercise, mergeGroup };
+module.exports = { listExercises, spellingStats, reviewExercises, dominantFor, setsFor, moveExercise, mergeGroup, mergeSelected, deleteExercise, DELETE_TYPE_OVER };

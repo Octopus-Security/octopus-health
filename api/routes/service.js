@@ -15,7 +15,7 @@ const { partition } = require('../dedupe-sets');
 const { detectPR, rebuildPRs } = require('../pr-detect');
 const { macrosForTemplate, describe, provenance } = require('../meal-template');
 const { isFinished, mealFor } = require('../meal-prep');
-const { resolveExerciseNames, questionText, canonicalKey, variantsDiffer, groupKey, dominantSpelling } = require('../exercise-names');
+const { resolveExerciseNames, questionText, conversationalReason, canonicalKey, variantsDiffer, groupKey, dominantSpelling } = require('../exercise-names');
 const { spellingStats } = require('../exercise-manage');
 const { parseWorkout } = require('../workout-parse');
 const { resolveSessionTitle, titleQuestionText, seedSessionTitles } = require('../session-titles');
@@ -345,6 +345,29 @@ async function logSession(req, res) {
       }
     }
 
+    // A line of conversation is not an exercise (2026-11-12). "yes but it was with dumbbells" became an
+    // exercise on 2026-10-29 because nothing here said no. Only a name the account does NOT already use is
+    // refused (a known or remembered name is always fine); the rest of the workout is still logged, and the
+    // refused line comes back as a question, so a chat reply never costs the day's training.
+    let heldBack = [];
+    if (sets.length) {
+      const knownNow = (await knownExerciseNames(await getDB(req))).map(k => canonicalKey(k));
+      for (let i = sets.length - 1; i >= 0; i--) {
+        const nm = sets[i].exerciseName;
+        const why = nm && !answered.has(nm) && !knownNow.includes(canonicalKey(nm)) ? conversationalReason(nm) : null;
+        if (why) { heldBack.unshift({ exerciseName: nm, reason: why }); sets.splice(i, 1); }
+      }
+    }
+    const heldText = heldBack.length
+      ? `${heldBack.map(h => `"${h.exerciseName}"`).join(', ')} ${heldBack.length === 1 ? 'was' : 'were'} NOT logged: ${heldBack.length === 1 ? 'it looks' : 'they look'} like a chat reply, not an exercise name. Ask which exercise was meant and log it under that name.`
+      : null;
+    if (heldBack.length && !sets.length) {
+      return res.json({
+        ok: true, sessionId: null, date: today, exerciseCount: 0, logged: [],
+        needsName: heldBack, question: heldText, message: `NOTHING WAS SAVED. ${heldText}`,
+      });
+    }
+
     // Hold back exercises that are already in the log, unless forced.
     //
     // Neith logs from a chat whose history contains previous days' logs, and it
@@ -532,6 +555,8 @@ async function logSession(req, res) {
       // asked about AFTER the fact. Advisory: the workout IS saved. A caller
       // that does not know this key ignores it and reports the log correctly.
       namingAsk,
+      needsName: heldBack.length ? heldBack : undefined,
+      heldBackMessage: heldText || undefined,
       namingQuestion: namingAsk
         ? questionText(namingAsk).replace(' Nothing has been saved yet.', '')
             .replace('\nAnswer each one. Nothing has been saved yet.', '')
