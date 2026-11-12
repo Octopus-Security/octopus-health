@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <%- include('partials/favicon') %>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="<%= asset('/theme.css') %>">
+  <%- include('partials/dialog') %>
+  <link rel="stylesheet" href="<%= asset('/body-map.css') %>">
+  <link rel="stylesheet" href="<%= asset('/volume.css') %>">
+</head>
+<body>
+<%- include('partials/nav') %>
+<%
+  const MUSCLES = {}; vocab.muscles.forEach(function (m) { MUSCLES[m.id] = m; });
+  function grouped(list) {
+    const out = [], seen = {};
+    list.forEach(function (s) {
+      if (!seen[s.id]) { seen[s.id] = { id: s.id, items: [] }; out.push(seen[s.id]); }
+      seen[s.id].items.push(s);
+    });
+    return out;
+  }
+  const views = [{ key: 'front', label: 'Front' }, { key: 'back', label: 'Back' }];
+%>
+<div class="container bm vol" id="vol-root" data-defaults="<%= JSON.stringify(defaults) %>">
+  <div class="bm-head">
+    <h2>Training volume</h2>
+    <p class="bm-lede">Hard sets per muscle from your logged sets, over a sliding window. Primary muscles count in full, secondary muscles at a fraction (default 0.5).
+      Bodyweight and timed sets count as sets but add no tonnage. <a href="/body">Body map</a> · <a href="/logs">Logs</a></p>
+  </div>
+
+  <form class="card vol-controls" id="vol-form" autocomplete="off">
+    <label>From <input type="date" name="from"></label>
+    <label>To <input type="date" name="to"></label>
+    <label>Window (days) <input type="number" name="length" min="1" max="366" value="<%= defaults.length %>" inputmode="numeric"></label>
+    <label>Step (days) <input type="number" name="step" min="1" max="366" value="<%= defaults.step %>" inputmode="numeric"></label>
+    <label>Min sets / week <input type="number" name="guidelineMin" min="0" step="0.5" value="<%= defaults.guideline.min %>" inputmode="decimal"></label>
+    <label>Max sets / week <input type="number" name="guidelineMax" min="0" step="0.5" value="<%= defaults.guideline.max %>" inputmode="decimal"></label>
+    <label>Secondary credit <input type="number" name="secondaryCredit" min="0" max="1" step="0.05" value="<%= defaults.secondaryCredit %>" inputmode="decimal"></label>
+    <label>Colour by
+      <select name="metric" id="vol-metric">
+        <option value="weeklySets">Weekly hard sets vs guideline</option>
+        <option value="tonnageLbs">Tonnage (lbs)</option>
+        <option value="hardSets">Hard sets in window</option>
+      </select>
+    </label>
+    <div class="vol-actions">
+      <button type="submit">Update</button>
+      <a class="btn" id="vol-csv" href="#" download>CSV</a>
+      <a class="btn" id="vol-json" href="#" download="muscle-volume.json">JSON</a>
+    </div>
+  </form>
+  <p class="bm-sub" id="vol-guide-note">Guideline: at least 10 weekly hard sets per muscle for growth (Schoenfeld, Ogborn &amp; Krieger 2017, J Sports Sci). The upper bound of 20 is a working assumption, not from that paper. Both are yours to change above.</p>
+
+  <section class="card vol-scrub" aria-label="Window scrubber">
+    <div class="vol-scrub-row">
+      <button type="button" id="vol-play" aria-pressed="false">Play</button>
+      <input type="range" id="vol-slider" min="0" max="0" value="0" aria-label="Window">
+    </div>
+    <p id="vol-label" class="vol-label" aria-live="polite">Loading...</p>
+  </section>
+
+  <section class="bm-figure card" aria-label="Heat map on the body">
+    <div class="bm-toggle" role="group" aria-label="Body view">
+      <% views.forEach(function (v, i) { %>
+        <button type="button" class="bm-view-btn" data-view="<%= v.key %>" aria-pressed="<%= i === 0 ? 'true' : 'false' %>"><%= v.label %></button>
+      <% }) %>
+    </div>
+    <% views.forEach(function (v, i) { const g = geometry[v.key]; %>
+      <svg class="bm-svg" data-view="<%= v.key %>" viewBox="<%= geometry.viewBox %>" role="group" aria-label="<%= v.label %> view heat map" <%= i === 0 ? '' : 'hidden' %>>
+        <% g.shapes.filter(function (s) { return s.id === '@head'; }).forEach(function (s) { %>
+          <polygon class="bm-head" points="<%= s.points %>" aria-hidden="true"/>
+        <% }) %>
+        <% grouped(g.shapes.filter(function (s) { return s.id !== '@head' && s.id !== '@knee'; })).forEach(function (grp) {
+             const m = MUSCLES[grp.id]; %>
+          <g class="vol-part" data-id="<%= grp.id %>" role="img" aria-label="<%= m.name %>"><title><%= m.name %></title>
+            <% grp.items.forEach(function (s) { %><polygon points="<%= s.points %>"/><% }) %>
+          </g>
+        <% }) %>
+      </svg>
+    <% }) %>
+    <p class="bm-sub vol-tip" id="vol-tip" aria-live="polite">Tap a muscle for its numbers.</p>
+    <div class="vol-legend" id="vol-legend" aria-hidden="true"></div>
+    <p class="bm-sub">Deeper muscles that the figure cannot draw (rotator cuff, hip flexors, ...) are in the grid below.</p>
+  </section>
+
+  <section class="card" aria-label="Muscle by window grid">
+    <h3>Muscle by window</h3>
+    <div class="o-table-wrap vol-grid-wrap"><table class="vol-grid" id="vol-grid"><caption class="bm-sub">One column per window, oldest first. The highlighted column is the one on the figure.</caption></table></div>
+  </section>
+</div>
+<script src="<%= asset('/js/volume.js') %>"></script>
+</body>
+</html>
