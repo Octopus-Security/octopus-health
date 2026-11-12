@@ -132,6 +132,32 @@ function variantSig(name) {
 }
 const variantsDiffer = (a, b) => variantSig(a) !== variantSig(b);
 
+/**
+ * The identity of an exercise for COUNTING: spelling-insensitive (case,
+ * punctuation, plurals) but variant-sensitive (iso / single-arm are their own
+ * exercises). Two names with the same groupKey are one exercise; PRs, stats and
+ * the log's spelling are all decided per groupKey.
+ */
+const groupKey = name => `${canonicalKey(name)}|${variantSig(name)}`;
+
+/** The equipment-stripped movement, still variant-sensitive. Used for SUGGESTIONS only, never to merge. */
+const movementKey = name => `${baseKey(name)}|${variantSig(name)}`;
+
+/**
+ * The dominant spelling among names that are one exercise: most sets, ties to
+ * the most recent, then to the name that sorts first (so it never flips).
+ *
+ * @param {string[]} names
+ * @param {Array<{name:string, sets:number, last?:string|null}>} stats  usage; names absent from it count 0
+ */
+function dominantSpelling(names, stats = []) {
+  const use = new Map(stats.map(r => [r.name, r]));
+  const sets = n => (use.get(n) ? Number(use.get(n).sets) || 0 : 0);
+  const last = n => (use.get(n) && use.get(n).last) || '';
+  return [...names].sort((a, b) =>
+    (sets(b) - sets(a)) || String(last(b)).localeCompare(String(last(a))) || a.localeCompare(b))[0] || null;
+}
+
 /** A typo, not a different exercise. Strict: `Leg Press` and `Leg Curl` are not this. */
 function looksLikeTypo(a, b) {
   if (a.length < 6 || b.length < 6) return false;   // short names differ for real
@@ -148,13 +174,19 @@ function looksLikeTypo(a, b) {
  *   ambiguous  — it resembles something already logged. Ask; do not write.
  *   new        — nothing like it exists. Log it as sent.
  */
-function resolveExerciseName(input, knownNames = []) {
+function resolveExerciseName(input, knownNames = [], stats = []) {
   const asked = String(input == null ? '' : input).trim();
   const key = canonicalKey(asked);
   if (!key) return { asked, status: 'new', name: asked, candidates: [] };
 
-  const exact = knownNames.find(k => canonicalKey(k) === key);
-  if (exact) return { asked, status: 'known', name: exact, candidates: [] };
+  // A spelling variant (case, punctuation, plural) of something already logged
+  // is that exercise: it is logged under the DOMINANT existing spelling and
+  // never asked about (2026-11-12: "Single arm row" was asked against "Single
+  // Arm Row" / "Single-Arm Row"). Where several spellings already exist, the
+  // one with the most sets wins, so history converges instead of forking again.
+  const gk = groupKey(asked);
+  const same = knownNames.filter(k => groupKey(k) === gk);
+  if (same.length) return { asked, status: 'known', name: dominantSpelling(same, stats), candidates: [] };
 
   const base = baseKey(asked);
   const candidates = knownNames.filter(k => {
@@ -164,6 +196,15 @@ function resolveExerciseName(input, knownNames = []) {
     if (qualifies(kk, key)) return true;                // one qualifies the other
     return looksLikeTypo(kk, key);
   });
+
+  // Several spellings of ONE candidate exercise are one candidate: offer the dominant.
+  const byGroup = new Map();
+  for (const c of candidates) {
+    const g = groupKey(c);
+    byGroup.set(g, [...(byGroup.get(g) || []), c]);
+  }
+  candidates.length = 0;
+  for (const names of byGroup.values()) candidates.push(dominantSpelling(names, stats));
 
   if (candidates.length) {
     // Sorted so the question reads the same way twice, which matters when the
@@ -185,19 +226,23 @@ function resolveExerciseName(input, knownNames = []) {
  * @param {string[]} known   names this account already uses
  * @returns {{resolved:Map<string,string>, questions:Array, allKnown:boolean}}
  */
-function resolveExerciseNames(names, known = []) {
+function resolveExerciseNames(names, known = [], stats = []) {
   const resolved = new Map();
   const questions = [];
   const seen = new Set();
+  const firstNew = new Map();
 
   for (const raw of names) {
-    const key = canonicalKey(raw);
-    if (seen.has(key)) continue;    // one question per name, not per set
-    seen.add(key);
-
-    const r = resolveExerciseName(raw, known);
+    const key = groupKey(raw);
+    const r = resolveExerciseName(raw, known, stats);
     if (r.status === 'ambiguous') {
+      if (seen.has(key)) continue;    // one question per name, not per set
+      seen.add(key);
       questions.push({ exerciseName: r.asked, candidates: r.candidates });
+    } else if (r.status === 'new') {
+      // Two spellings of one NEW exercise in the same message: the first one typed wins.
+      if (!firstNew.has(key)) firstNew.set(key, r.name);
+      resolved.set(raw, firstNew.get(key));
     } else {
       resolved.set(raw, r.name);
     }
@@ -219,5 +264,5 @@ function questionText(questions) {
 module.exports = {
   normalise, canonicalKey, baseKey, editDistance, qualifies,
   resolveExerciseName, resolveExerciseNames, questionText,
-  EQUIPMENT, variantSig, variantsDiffer,
+  EQUIPMENT, variantSig, variantsDiffer, groupKey, movementKey, dominantSpelling,
 };

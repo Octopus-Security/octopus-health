@@ -1,4 +1,5 @@
 'use strict';
+const { groupKey, dominantSpelling } = require('./exercise-names');
 
 /**
  * pr-detect.js — "is this set a personal record", in one place.
@@ -29,7 +30,10 @@ async function detectPR({ PersonalRecord }, set, date) {
   const { exerciseName, reps, weight, weightUnit, duration, distance, distanceUnit } = set;
   if (!exerciseName) return null;
 
-  const existing = await PersonalRecord.findAll({ where: { exerciseName } });
+  // Records are held per EXERCISE, not per spelling: a 205 lb "Pull-up" must not be beaten
+  // again as a "new" PR by the same weight logged as "Pull ups".
+  const gk = groupKey(exerciseName);
+  const existing = (await PersonalRecord.findAll()).filter(pr => groupKey(pr.exerciseName) === gk);
 
   // Timed only when there is nothing else to judge it by. A set with a duration
   // AND reps is rep work that happened to be timed, and belongs in the reps
@@ -122,7 +126,7 @@ async function rebuildPRs({ PersonalRecord, WorkoutSet, WorkoutSession }) {
  * second and third still ran after the first had already replaced the entry —
  * so a reps-only row could overwrite the heavier record it had just lost to.
  */
-function bestPerExercise(prs) {
+function bestPerExercise(prs, stats = []) {
   const rank = pr => (pr.weight != null ? 3 : pr.durationSecs != null ? 2 : 1);
 
   const beats = (a, b) => {
@@ -136,12 +140,18 @@ function bestPerExercise(prs) {
   };
 
   const best = new Map();
+  const names = new Map();
   for (const pr of prs) {
     if (pr.weight == null && pr.durationSecs == null && pr.reps == null) continue;
-    const cur = best.get(pr.exerciseName);
-    if (!cur || beats(pr, cur)) best.set(pr.exerciseName, pr);
+    const k = groupKey(pr.exerciseName);
+    names.set(k, [...(names.get(k) || []), pr.exerciseName]);
+    const cur = best.get(k);
+    if (!cur || beats(pr, cur)) best.set(k, pr);
   }
-  return [...best.values()].sort((a, b) => a.exerciseName.localeCompare(b.exerciseName));
+  // Shown under the dominant spelling when the caller knows usage (`stats`), else under the winner's own.
+  return [...best.entries()]
+    .map(([k, pr]) => (stats.length ? { ...(pr.toJSON ? pr.toJSON() : pr), exerciseName: dominantSpelling(names.get(k), stats) } : pr))
+    .sort((a, b) => a.exerciseName.localeCompare(b.exerciseName));
 }
 
 module.exports = { detectPR, rebuildPRs, bestPerExercise };

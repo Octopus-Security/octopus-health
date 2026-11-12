@@ -24,6 +24,7 @@
         <h2><%= d.name %></h2>
         <a href="/logs/exercises" class="btn">← Exercises</a>
       </div>
+      <% if (d.spellings && d.spellings.length > 1) { %><p class="ex-sub">Counts every spelling together: <%= d.spellings.join(', ') %>. <a href="/logs/exercises">Review &amp; consolidate</a> to merge them.</p><% } %>
       <p class="ex-sub"><%= d.totalSets %> set<%= d.totalSets === 1 ? '' : 's' %> logged across <%= d.sessions %> session<%= d.sessions === 1 ? '' : 's' %>. Weights are shown in lbs (kg sets are converted). Failed sets are left out of records.</p>
 
       <% if (d.mode === 'none' || !d.sessions) { %>

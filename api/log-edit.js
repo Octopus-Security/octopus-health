@@ -1,6 +1,7 @@
 'use strict';
 
 const { canonicalKey, variantsDiffer } = require('./exercise-names');
+const { dominantFor } = require('./exercise-manage');
 
 const etToday = () => new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
 
@@ -193,7 +194,7 @@ async function addSet(db, sessionId, body = {}) {
 
 /** Rename every set of one exercise within a session — "that was Hanging Leg Raise". */
 async function renameExercise(db, sessionId, from, to, opts = {}) {
-  const name = String(to || '').trim();
+  let name = String(to || '').trim();
   if (!name) return bad('new name cannot be empty');
   const s = await db.WorkoutSession.findByPk(sessionId);
   if (!s) return notFound('session');
@@ -206,7 +207,19 @@ async function renameExercise(db, sessionId, from, to, opts = {}) {
   // already has (or an iso/single-arm variant into its bilateral twin or back),
   // or that edits a session that is not today's, is not a spelling fix: it
   // rewrites history. It needs an explicit `confirm: true` (the approval card).
+  // A rename must not FORK a spelling (2026-11-12: "Hanging Leg Raise" -> "Hanging Leg Raises" and
+  // "Pull-up" -> "Pull ups" added two spellings to a log that already had them). If `to` is another
+  // spelling of an exercise the log already holds, the existing DOMINANT spelling is used instead of
+  // the literal text. Only `opts.exact` (the UI's "make this THE spelling") imposes a spelling.
+  let spelledAs = null;
+  if (!opts.exact) {
+    const dom = await dominantFor(db, name);
+    if (dom && dom !== name) { spelledAs = name; name = dom; }
+  }
   const fromKey = canonicalKey(from), toKey = canonicalKey(name);
+  if (spelledAs && hit.every(x => x.exerciseName === name)) {   // already the dominant spelling: nothing to do
+    return { ok: true, renamed: 0, from: String(from).trim(), to: name, remembered: false, ...(spelledAs ? { spelledAs } : {}) };
+  }
   if (!opts.confirm) {
     const reasons = [];
     if (variantsDiffer(from, name)) reasons.push(`"${from}" and "${name}" are different exercises (iso / single-arm variants are not interchangeable)`);
@@ -238,7 +251,7 @@ async function renameExercise(db, sessionId, from, to, opts = {}) {
       if (!created && row.name !== name) { row.name = name; await row.save(); }
     } catch { /* the rename stands regardless */ }
   }
-  return { ok: true, renamed: hit.length, from: String(from).trim(), to: name, remembered: Boolean(alias) };
+  return { ok: true, renamed: hit.length, from: String(from).trim(), to: name, remembered: Boolean(alias), ...(spelledAs ? { spelledAs } : {}) };
 }
 
 module.exports = {

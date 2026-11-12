@@ -18,6 +18,7 @@ const { safeError } = require('../lib/safeguards');
 const X = require('./exercise-manage');
 const S = require('./exercise-stats');
 const { bestPerExercise } = require('./pr-detect');
+const { groupKey, dominantSpelling } = require('./exercise-names');
 
 function sameOriginJson(req, res, next) {
   const origin = req.get('origin');
@@ -32,16 +33,27 @@ function sameOriginJson(req, res, next) {
   next();
 }
 
+/**
+ * One exercise = every spelling of it (same canonical key and iso / single-arm signature), so a
+ * "Pull ups" never splits the record of a "Pull-up". Shown under the dominant spelling; `spellings`
+ * lists the rest so the page can say so.
+ */
 async function detail(db, name) {
-  const rows = await X.setsFor(db, name);
+  const stats = await X.spellingStats(db);
+  const gk = groupKey(name);
+  const same = stats.filter(r => groupKey(r.name) === gk);
+  if (!same.length) return null;
+  const names = same.map(r => r.name);
+  const shown = dominantSpelling(names, stats);
+  const rows = await X.setsFor(db, names);
   if (!rows.length) return null;
   const a = S.analyse(rows);
   let stored = null;
   try {
-    const recs = await db.PersonalRecord.findAll({ where: { exerciseName: name } });
-    stored = bestPerExercise(recs.map(r => r.toJSON()))[0] || null;
+    const recs = (await db.PersonalRecord.findAll()).filter(r => groupKey(r.exerciseName) === gk);
+    stored = bestPerExercise(recs.map(r => r.toJSON()), stats)[0] || null;
   } catch { /* the computed PRs stand on their own */ }
-  return { name, totalSets: rows.length, ...a, storedRecord: stored };
+  return { name: shown, spellings: names, totalSets: rows.length, ...a, storedRecord: stored };
 }
 
 module.exports = function mountExercises(app, { requireLogin, getDatabase }) {
@@ -55,8 +67,10 @@ module.exports = function mountExercises(app, { requireLogin, getDatabase }) {
 
   app.get('/logs/exercises', requireLogin, async (req, res) => {
     try {
-      const list = await X.listExercises(dbFor(req));
-      res.render('exercises-list', { title: 'Exercises in your log', user: req.user, activeTab: 'logs', list });
+      const db = dbFor(req);
+      const list = await X.listExercises(db);
+      const review = await X.reviewExercises(db);
+      res.render('exercises-list', { title: 'Exercises in your log', user: req.user, activeTab: 'logs', list, review });
     } catch (e) { res.status(500).send('Could not load exercises'); }
   });
 
@@ -74,7 +88,14 @@ module.exports = function mountExercises(app, { requireLogin, getDatabase }) {
     const d = await detail(db, String(req.query.name || '').trim());
     return d ? { ok: true, ...d } : { ok: false, status: 404, error: 'no such exercise' };
   }));
+  app.get('/logs/api/exercises/review', requireLogin, api(async db => ({ ok: true, ...(await X.reviewExercises(db)) })));
+  // Rename / merge one name. `exact` = "make this THE spelling" (the UI sets it for a typed or picked
+  // target); without it a target that is another spelling of an existing exercise is redirected to the dominant one.
   app.post('/logs/api/exercises/move', requireLogin, sameOriginJson,
-    api((db, req) => X.moveExercise(db, (req.body || {}).from, (req.body || {}).to, { confirm: (req.body || {}).confirm === true })));
+    api((db, req) => X.moveExercise(db, (req.body || {}).from, (req.body || {}).to,
+      { confirm: (req.body || {}).confirm === true, exact: (req.body || {}).exact === true })));
+  // Merge every spelling of one exercise into the chosen one: preview, then confirm.
+  app.post('/logs/api/exercises/merge-group', requireLogin, sameOriginJson,
+    api((db, req) => X.mergeGroup(db, (req.body || {}).names, (req.body || {}).target, { confirm: (req.body || {}).confirm === true })));
 };
 module.exports.detail = detail;
