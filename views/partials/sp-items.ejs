@@ -1,0 +1,27 @@
+<%# Items of one session. Needs: items, stills (per item), level (heading level). Shared by the session and plan pages. %>
+  <ol class="sp-items">
+    <% items.forEach(function (it, n) { %>
+    <li class="sp-item">
+      <h<%= level %>><span class="sp-n"><%= n + 1 %>.</span> <%= it.name %></h<%= level %>>
+      <% if (it.dose) { %><p class="sp-dose"><%= it.dose %></p><% } %>
+      <% if (it.poseKey && !(stills[n] || []).length) { %>
+      <p class="sp-nodiagram">No diagram yet</p>
+      <% } else if (it.poseKey) { %>
+      <div class="sp-fig">
+        <div class="sp-live" data-pose="<%= it.poseKey %>" aria-hidden="true"></div>
+        <div class="sp-stills">
+          <% (stills[n] || []).forEach(function (st, k) { %>
+          <figure class="sp-still">
+            <%- st.svg %>
+            <figcaption><%= (k + 1) + (st.label ? '. ' + st.label : '') %></figcaption>
+          </figure>
+          <% }) %>
+        </div>
+      </div>
+      <% } %>
+      <% if (it.cues.length) { %><ul class="sp-cues"><% it.cues.forEach(function (c) { %><li><%= c %></li><% }) %></ul><% } %>
+      <% if (it.instructions) { %><p class="sp-how"><%= it.instructions %></p><% } %>
+      <% if (it.note) { %><p class="sp-note"><%= it.note %></p><% } %>
+    </li>
+    <% }) %>
+  </ol>

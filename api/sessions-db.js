@@ -48,7 +48,25 @@ function getSharedDatabase() {
     indexes: [{ unique: true, fields: ['token'] }, { unique: true, fields: ['slug'] }, { fields: ['owner'] }],
   });
 
-  const handle = { sequelize, SharedSession, ready: null };
+  // A PLAN groups the same owner's sessions into weeks of days under one link (api/plans-store.js).
+  // New table, created by sync(); nothing existing is altered.
+  const SharedPlan = sequelize.define('SharedPlan', {
+    owner:       { type: DataTypes.STRING, allowNull: false },
+    title:       { type: DataTypes.STRING, allowNull: false, defaultValue: 'Untitled plan' },
+    intro:       { type: DataTypes.TEXT, allowNull: false, defaultValue: '' },
+    // JSON: [{ title, days: [{ label, sessionId|null, note }] }]. Sessions are referenced by id and
+    // read LIVE on every page view, never copied.
+    weeks:       { type: DataTypes.TEXT, allowNull: false, defaultValue: '[]' },
+    visibility:  { type: DataTypes.STRING, allowNull: false, defaultValue: 'private' },
+    token:       { type: DataTypes.STRING, allowNull: false },
+    slug:        { type: DataTypes.STRING, allowNull: true },
+    publishedAt: { type: DataTypes.DATE, allowNull: true },
+  }, {
+    tableName: 'SharedPlans',
+    indexes: [{ unique: true, fields: ['token'] }, { unique: true, fields: ['slug'] }, { fields: ['owner'] }],
+  });
+
+  const handle = { sequelize, SharedSession, SharedPlan, ready: null };
   handle.ready = () => (handle._p = handle._p || sequelize.sync().then(() => handle));
   cache.set(storage, handle);
   return handle;

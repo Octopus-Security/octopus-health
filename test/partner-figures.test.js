@@ -245,7 +245,7 @@ test('library.ejs: figures are rebuilt on every render, caught per card, and nev
 });
 
 test('the public session page shows a note, not an empty figure box, when no still could be drawn', () => {
-  const src = fs.readFileSync(path.join(root, 'views', 'public-session.ejs'), 'utf8');
+  const src = fs.readFileSync(path.join(root, 'views', 'partials', 'sp-items.ejs'), 'utf8'); // the item markup is shared by session and plan pages
   assert.match(src, /No diagram yet/);
   assert.strictEqual(stillsFor('nope/nope').length, 0);
 });

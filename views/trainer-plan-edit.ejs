@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <%- include('partials/favicon') %>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="<%= asset('/theme.css') %>">
+  <%- include('partials/dialog') %>
+  <link rel="stylesheet" href="<%= asset('/sessions.css') %>">
+</head>
+<body>
+<%- include('partials/nav') %>
+<div class="container" id="sx-root">
+  <p><a href="/trainer-plans">&larr; All plans</a></p>
+  <p class="sx-msg" id="sx-msg" role="status"></p>
+
+  <div class="card">
+    <h2>The plan</h2>
+    <label class="sx-field">Title (shown to whoever has the link)<input type="text" id="px-title" maxlength="120"></label>
+    <label class="sx-field">Intro (shown to whoever has the link)<textarea id="px-intro" rows="3" maxlength="2000"></textarea></label>
+  </div>
+
+  <div class="card">
+    <h2>Weeks and days</h2>
+    <p class="fx-meta">Each day can point at one of your sessions, carry a note ("rest", "easy 20 min run"), or both. Sessions are read live: change one and every plan using it changes. A day may point at a private session; the plan's sharing setting decides who sees it, so the session appears inside the plan even though its own link stays closed. Who-it-is-for and limits notes are never shown.</p>
+    <div id="px-weeks"></div>
+    <p class="fx-meta" id="px-empty">No weeks yet.</p>
+    <button type="button" id="px-addweek" class="sx-btn">Add a week</button>
+  </div>
+
+  <div class="card">
+    <h2>Sharing</h2>
+    <fieldset class="sx-field"><legend>Who can open it</legend>
+      <label class="sx-radio"><input type="radio" name="sx-vis" value="private"> Private: only you</label>
+      <label class="sx-radio"><input type="radio" name="sx-vis" value="unlisted"> Unlisted: anyone with the link, not listed or searchable</label>
+      <label class="sx-radio"><input type="radio" name="sx-vis" value="public"> Public: in the plan sitemap and searchable</label>
+    </fieldset>
+    <p class="fx-meta">Unlisted and public pages show the plan, every day's note and each referenced session's title, intro, items and item notes.</p>
+    <div id="sx-link" class="sx-linkbox" hidden>
+      <input type="text" id="sx-url" readonly aria-label="Share link">
+      <button type="button" id="sx-copy" class="sx-btn">Copy link</button>
+      <a id="sx-open" class="sx-btn" target="_blank" rel="noopener noreferrer">Open as a visitor</a>
+      <button type="button" id="sx-rotate" class="sx-btn">New link (old one stops working)</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="btn-row">
+      <button type="button" id="sx-save" class="sx-btn sx-primary">Save</button>
+      <button type="button" id="sx-delete" class="sx-btn sx-danger">Delete plan</button>
+    </div>
+  </div>
+</div>
+<script type="application/json" id="sx-data"><%- planJson %></script>
+<script src="<%= asset('/js/plan-edit.js') %>"></script>
+</body>
+</html>

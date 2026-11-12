@@ -52,3 +52,12 @@ h2 { font-size: 1.15rem; margin: 0 0 4px; }
   .sp-note { background: #fff; border-left-color: #000; }
   .sp-wrap { max-width: none; padding: 0; }
 }
+
+/* Plan page: weeks > days > a session inline. */
+.sp-week { margin: 0 0 24px; }
+.sp-weektitle { font-size: 1.3rem; border-bottom: 1px solid var(--line); padding-bottom: 4px; margin: 24px 0 12px; }
+.sp-day { margin: 0 0 20px; }
+.sp-daytitle { font-size: 1.1rem; color: var(--head); margin: 0 0 6px; }
+.sp-sesstitle { font-size: 1rem; color: var(--head); margin: 8px 0 4px; }
+.sp-plan .sp-item h5 { font-size: 1.05rem; color: var(--head); margin: 0 0 4px; }
+@media print { .sp-week { break-before: auto; } .sp-day { break-inside: auto; } .sp-weektitle, .sp-daytitle { color: #000; break-after: avoid; } .sp-sesstitle { color: #000; } .sp-plan .sp-item h5 { color: #000; } }

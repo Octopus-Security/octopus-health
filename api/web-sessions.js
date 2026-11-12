@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * web-sessions.js - AUTHORING for shareable sessions (phase 1: admin only).
+ * web-sessions.js - AUTHORING for shareable sessions (trainer or admin).
  *
  *   GET    /sessions                          list page
  *   GET    /sessions/:id                      editor page
@@ -14,7 +14,7 @@
  *   GET    /sessions/api/library              picker contents + vocabulary
  *   POST   /sessions/api/suggest              {tailoring} -> suggestions (never adds anything)
  *
- * Everyone who is not an admin gets 404 on every one of these (not 403: do not confirm the
+ * Everyone who is not a trainer or admin (role re-checked within ~30 s, see trainer-guard.js) gets 404 on every one of these (not 403: do not confirm the
  * feature exists). A foreign session id is a 404 for the same reason. The shared database is the
  * only store touched here; no per-user database is joined to it except to READ the admin's own
  * exercise library for the picker.
@@ -29,11 +29,11 @@ const E = require('./equipment');
 const mobility = require('./mobility');
 const { getSharedDatabase } = require('./sessions-db');
 
+const { trainerGuard, isTrainerRole } = require('./trainer-guard');
 const isAdmin = (req) => !!(req.user && req.user.role === 'admin');
 
-function mount(app, { requireLogin, getDatabase }) {
-  const adminOnly = (req, res, next) => (isAdmin(req) ? next() : res.status(404).type('text/plain').send('Not found'));
-  const guard = [requireLogin, adminOnly];
+function mount(app, { requireLogin, getDatabase, verifyFresh }) {
+  const guard = [requireLogin, trainerGuard(verifyFresh)];
 
   function sameOriginJson(req, res, next) {
     const origin = req.get('origin');
@@ -97,3 +97,4 @@ function mount(app, { requireLogin, getDatabase }) {
 
 module.exports = mount;
 module.exports.isAdmin = isAdmin;
+module.exports.isTrainerRole = isTrainerRole;

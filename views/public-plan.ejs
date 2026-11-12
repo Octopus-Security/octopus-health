@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title><%= title %></title>
+  <%# PRIVACY: receives only plans-store.planPublicView(): no owner, ids or tailoring. %>
+  <meta name="referrer" content="no-referrer">
+  <% if (unlisted) { %><meta name="robots" content="noindex, nofollow, noarchive"><% } else { %>
+  <meta name="description" content="<%= String(plan.intro || 'A training plan.').replace(/\s+/g, ' ').slice(0, 160) %>">
+  <link rel="canonical" href="<%= canonical %>"><% } %>
+  <link rel="stylesheet" href="<%= asset('/sessions-public.css') %>">
+  <script src="<%= asset('/stick-figure.js') %>" defer></script>
+  <script src="<%= asset('/js/session-public.js') %>" defer></script>
+</head>
+<body>
+<main class="sp-wrap sp-plan">
+  <header class="sp-head">
+    <h1><%= plan.title %></h1>
+    <p class="sp-by">Shared by Serpopard</p>
+    <% if (plan.intro) { %><p class="sp-intro"><%= plan.intro %></p><% } %>
+    <p class="sp-actions"><button type="button" class="sp-btn" data-print>Print or save as PDF</button></p>
+  </header>
+
+  <% if (!plan.weeks.length) { %><p class="sp-empty">This plan has no days yet.</p><% } %>
+  <% plan.weeks.forEach(function (w, wi) { %>
+  <section class="sp-week">
+    <h2 class="sp-weektitle"><%= w.title || ('Week ' + (wi + 1)) %></h2>
+    <% w.days.forEach(function (d, di) { %>
+    <div class="sp-day">
+      <h3 class="sp-daytitle"><%= d.label || ('Day ' + (di + 1)) %></h3>
+      <% if (d.note) { %><p class="sp-note"><%= d.note %></p><% } %>
+      <% if (d.missing) { %><p class="sp-empty">This session is no longer available.</p><% } %>
+      <% if (d.session) { %>
+      <div class="sp-sess">
+        <h4 class="sp-sesstitle"><%= d.session.title %></h4>
+        <% if (d.session.intro) { %><p class="sp-intro"><%= d.session.intro %></p><% } %>
+        <% if (!d.session.items.length) { %><p class="sp-empty">This session has no exercises yet.</p><% } %>
+        <%- include('partials/sp-items', { items: d.session.items, stills: d.session.items.map(function (i) { return stillsFor(i.poseKey); }), level: 5 }) %>
+      </div>
+      <% } %>
+    </div>
+    <% }) %>
+  </section>
+  <% }) %>
+
+  <footer class="sp-foot">
+    <p>This is general information, not medical advice. It is not written for any one person's medical situation. Stop if something hurts in a way that feels wrong, and check with a doctor or physiotherapist before starting if you are injured, ill, pregnant or unsure.</p>
+  </footer>
+</main>
+</body>
+</html>

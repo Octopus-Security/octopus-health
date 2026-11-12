@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <%- include('partials/favicon') %>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="<%= asset('/theme.css') %>">
+  <%- include('partials/dialog') %>
+  <link rel="stylesheet" href="<%= asset('/sessions.css') %>">
+</head>
+<body>
+<%- include('partials/nav') %>
+<div class="container">
+  <div class="card">
+    <h2>Shared plans</h2>
+    <p class="fx-meta">A plan strings your own sessions into weeks and days under one link. Edit the plan or any session in it and the same link shows the change. New plans are private until you change that.</p>
+    <p class="sx-msg" id="sx-msg" role="status"></p>
+    <button type="button" id="sx-new" class="sx-btn" data-api="/trainer-plans/api" data-open="/trainer-plans/">New plan</button>
+    <a class="sx-btn" href="/sessions">Your sessions</a>
+  </div>
+
+  <% if (!plans.length) { %><div class="card"><p class="fx-meta">No plans yet.</p></div><% } %>
+  <% plans.forEach(function (p) { %>
+  <div class="card sx-row">
+    <h3><a href="/trainer-plans/<%= p.id %>"><%= p.title %></a>
+      <span class="fx-chip sx-vis sx-vis-<%= p.visibility %>"><%= p.visibility %></span></h3>
+    <p class="fx-meta"><%= p.weeks.length %> week<%= p.weeks.length === 1 ? '' : 's' %></p>
+  </div>
+  <% }) %>
+</div>
+<script src="<%= asset('/js/session-list.js') %>"></script>
+</body>
+</html>
