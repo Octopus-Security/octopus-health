@@ -1,4 +1,5 @@
 'use strict';
+const { safeError } = require('../lib/safeguards');
 
 /**
  * web-exercises.js - the Exercises section of the Logs area.
@@ -49,7 +50,7 @@ module.exports = function mountExercises(app, { requireLogin, getDatabase }) {
     try {
       const r = await fn(dbFor(req), req);
       res.status(r.ok ? 200 : (r.status || 400)).json(r);
-    } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+    } catch (e) { console.error('[health] request failed:', safeError(e)); res.status(500).json({ ok: false, error: 'Something went wrong' }); }
   };
 
   app.get('/logs/exercises', requireLogin, async (req, res) => {

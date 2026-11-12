@@ -1,4 +1,5 @@
 'use strict';
+const { safeError } = require('../lib/safeguards');
 
 /**
  * Browser routes for correcting the log — the Logs page's door into
@@ -54,7 +55,7 @@ module.exports = function mountLogEdit(app, { requireLogin, getDatabase }) {
   const send = (res, r) => res.status(r.ok ? 200 : (r.status || 400)).json(r);
   const route = fn => async (req, res) => {
     try { send(res, await fn(await dbFor(req), req)); }
-    catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+    catch (e) { console.error('[health] request failed:', safeError(e)); res.status(500).json({ ok: false, error: 'Something went wrong' }); }
   };
 
   app.get('/workout/api/known-names', requireLogin,

@@ -1,3 +1,4 @@
+const { safeError } = require('../../lib/safeguards');
 const express = require('express');
 const getDatabase = require('../../database');
 const { requireUser } = require('../middleware/auth');
@@ -24,7 +25,7 @@ router.get('/exercises', async (req, res) => {
         if (q)         exercises = exercises.filter(e => e.name.toLowerCase().includes(q.toLowerCase()));
         res.json({ success: true, data: exercises });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('[health] request failed:', safeError(err)); res.status(500).json({ success: false, error: 'Something went wrong' });
     }
 });
 
@@ -41,7 +42,7 @@ router.post('/exercises', async (req, res) => {
         });
         res.status(201).json({ success: true, data: ex });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('[health] request failed:', safeError(err)); res.status(500).json({ success: false, error: 'Something went wrong' });
     }
 });
 
@@ -62,7 +63,7 @@ router.get('/sessions', async (req, res) => {
         }));
         res.json({ success: true, data: result });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('[health] request failed:', safeError(err)); res.status(500).json({ success: false, error: 'Something went wrong' });
     }
 });
 
@@ -74,7 +75,7 @@ router.post('/sessions', async (req, res) => {
         const session = await WorkoutSession.create({ date, type, title, notes, startedAt: new Date(), status: 'active' });
         res.status(201).json({ success: true, data: session });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('[health] request failed:', safeError(err)); res.status(500).json({ success: false, error: 'Something went wrong' });
     }
 });
 
@@ -86,7 +87,7 @@ router.get('/sessions/:id', async (req, res) => {
         const sets = await WorkoutSet.findAll({ where: { sessionId: session.id }, order: [['exerciseOrder','ASC'],['setNumber','ASC']] });
         res.json({ success: true, data: { ...session.toJSON(), sets } });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('[health] request failed:', safeError(err)); res.status(500).json({ success: false, error: 'Something went wrong' });
     }
 });
 
@@ -101,7 +102,7 @@ router.put('/sessions/:id', async (req, res) => {
         await session.save();
         res.json({ success: true, data: session });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('[health] request failed:', safeError(err)); res.status(500).json({ success: false, error: 'Something went wrong' });
     }
 });
 
@@ -112,7 +113,7 @@ router.delete('/sessions/:id', async (req, res) => {
         await WorkoutSession.destroy({ where: { id: req.params.id } });
         res.json({ success: true });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('[health] request failed:', safeError(err)); res.status(500).json({ success: false, error: 'Something went wrong' });
     }
 });
 
@@ -142,7 +143,7 @@ router.post('/sessions/:id/sets', async (req, res) => {
 
         res.status(201).json({ success: true, data: set, newPR });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('[health] request failed:', safeError(err)); res.status(500).json({ success: false, error: 'Something went wrong' });
     }
 });
 
@@ -156,7 +157,7 @@ router.put('/sets/:id', async (req, res) => {
         await set.save();
         res.json({ success: true, data: set });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('[health] request failed:', safeError(err)); res.status(500).json({ success: false, error: 'Something went wrong' });
     }
 });
 
@@ -166,7 +167,7 @@ router.delete('/sets/:id', async (req, res) => {
         await WorkoutSet.destroy({ where: { id: req.params.id } });
         res.json({ success: true });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('[health] request failed:', safeError(err)); res.status(500).json({ success: false, error: 'Something went wrong' });
     }
 });
 
@@ -179,7 +180,7 @@ router.get('/plans', async (req, res) => {
         const active = await TrainingPlanAssignment.findOne({ where: { status: 'active' }, order: [['createdAt','DESC']] });
         res.json({ success: true, data: plans, activeAssignment: active });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('[health] request failed:', safeError(err)); res.status(500).json({ success: false, error: 'Something went wrong' });
     }
 });
 
@@ -192,7 +193,7 @@ router.post('/plans/assign', async (req, res) => {
         const assignment = await TrainingPlanAssignment.create({ planId, startDate, status: 'active' });
         res.status(201).json({ success: true, data: assignment });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('[health] request failed:', safeError(err)); res.status(500).json({ success: false, error: 'Something went wrong' });
     }
 });
 
@@ -217,7 +218,7 @@ router.post('/plans/start', async (req, res) => {
             startDate, compDate, assignment,
         } });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('[health] request failed:', safeError(err)); res.status(500).json({ success: false, error: 'Something went wrong' });
     }
 });
 
@@ -241,7 +242,7 @@ router.get('/plans/today', async (req, res) => {
         const todaySession = currentPhase?.weeklySchedule?.find(d => d.day === dayOfWeek) || null;
         res.json({ success: true, data: { plan: plan.name, phase: currentPhase?.name, weekNumber, todaySession, assignment } });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('[health] request failed:', safeError(err)); res.status(500).json({ success: false, error: 'Something went wrong' });
     }
 });
 
@@ -253,7 +254,7 @@ router.get('/exercise-plans', async (req, res) => {
         const plans = await ExercisePlan.findAll({ order: [['updatedAt', 'DESC']] });
         res.json({ success: true, data: plans.map(p => ({ ...p.toJSON(), items: JSON.parse(p.items || '[]') })) });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('[health] request failed:', safeError(err)); res.status(500).json({ success: false, error: 'Something went wrong' });
     }
 });
 
@@ -270,7 +271,7 @@ router.post('/exercise-plans', async (req, res) => {
         });
         res.status(201).json({ success: true, data: { ...plan.toJSON(), items: JSON.parse(plan.items) } });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('[health] request failed:', safeError(err)); res.status(500).json({ success: false, error: 'Something went wrong' });
     }
 });
 
@@ -282,7 +283,7 @@ router.delete('/exercise-plans/:id', async (req, res) => {
         await plan.destroy();
         res.json({ success: true });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('[health] request failed:', safeError(err)); res.status(500).json({ success: false, error: 'Something went wrong' });
     }
 });
 
@@ -336,7 +337,7 @@ router.get('/exercise-history', async (req, res) => {
 
         res.json({ success: true, data: entries, stats });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('[health] request failed:', safeError(err)); res.status(500).json({ success: false, error: 'Something went wrong' });
     }
 });
 
@@ -347,7 +348,7 @@ router.get('/prs', async (req, res) => {
         const all = await PersonalRecord.findAll({ order: [['date', 'DESC']] });
         res.json({ success: true, data: bestPerExercise(all.map(pr => pr.toJSON())) });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('[health] request failed:', safeError(err)); res.status(500).json({ success: false, error: 'Something went wrong' });
     }
 });
 
@@ -360,7 +361,7 @@ router.post('/prs', async (req, res) => {
         const pr = await PersonalRecord.create({ exerciseName, weight, weightUnit: weightUnit || 'lbs', reps, durationSecs, date, notes });
         res.status(201).json({ success: true, data: pr });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('[health] request failed:', safeError(err)); res.status(500).json({ success: false, error: 'Something went wrong' });
     }
 });
 
@@ -371,7 +372,7 @@ router.delete('/prs/:id', async (req, res) => {
         await PersonalRecord.destroy({ where: { id: req.params.id } });
         res.json({ success: true });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('[health] request failed:', safeError(err)); res.status(500).json({ success: false, error: 'Something went wrong' });
     }
 });
 
@@ -393,7 +394,7 @@ router.post('/prs/rebuild', async (req, res) => {
             prs: created.map(p => ({ exerciseName: p.exerciseName, weight: p.weight, reps: p.reps, durationSecs: p.durationSecs, date: p.date })),
         });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('[health] request failed:', safeError(err)); res.status(500).json({ success: false, error: 'Something went wrong' });
     }
 });
 
@@ -411,7 +412,7 @@ router.get('/exercise-names', async (req, res) => {
         });
         res.json({ success: true, data: rows.map(r => r.exerciseName) });
     } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
+        console.error('[health] request failed:', safeError(err)); res.status(500).json({ success: false, error: 'Something went wrong' });
     }
 });
 
