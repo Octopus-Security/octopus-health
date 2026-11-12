@@ -70,3 +70,18 @@
 .rv-go, .rv-sp .mini { min-height: 44px; margin-top: 8px; }
 .rv-ok { padding: 8px 0; text-align: left; }
 .rv-h3 { font-size: 1rem; }
+
+/* Selective merge: Include (checkbox) + Keep (radio) per row; every label is a 44px target */
+.rv-pair { display: flex; gap: 6px; flex-wrap: wrap; }
+.rv-pick.rv-inc, .rv-pick.rv-kp { min-width: 44px; padding: 0 10px 0 0; }
+.rv-lab { font-size: 0.8rem; color: #888; }
+.rv-go[disabled] { opacity: .45; cursor: not-allowed; }
+.rv-go { max-width: 100%; white-space: normal; text-align: left; overflow-wrap: anywhere; }
+
+/* All / Needs tidying */
+.ex-seg { display: flex; gap: 0; margin: 0 0 12px; border: 1px solid #2a2a2a; border-radius: 8px; overflow: hidden; }
+.ex-seg-b { flex: 1 1 50%; min-height: 44px; background: none; border: 0; color: #aaa; font: inherit; font-size: 0.9rem; cursor: pointer; padding: 8px 10px; }
+.ex-seg-b + .ex-seg-b { border-left: 1px solid #2a2a2a; }
+.ex-seg-b[aria-pressed="true"] { background: #142014; color: #2ecc71; font-weight: 600; }
+.ex-del { color: #e67e22; }
+.ex-none { color: #777; padding: 12px 0; }

@@ -1,6 +1,6 @@
 'use strict';
 
-const { canonicalKey, variantsDiffer } = require('./exercise-names');
+const { canonicalKey, variantsDiffer, conversationalReason } = require('./exercise-names');
 const { dominantFor } = require('./exercise-manage');
 
 const etToday = () => new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
@@ -215,6 +215,12 @@ async function renameExercise(db, sessionId, from, to, opts = {}) {
   if (!opts.exact) {
     const dom = await dominantFor(db, name);
     if (dom && dom !== name) { spelledAs = name; name = dom; }
+  }
+  // A chat reply is not a name (2026-10-29: "yes but it was with dumbbells" was applied as one). Only
+  // a name the log does not already hold is checked, and only when it is not the person's typed `exact`.
+  if (!opts.exact) {
+    const why = conversationalReason(name);
+    if (why && !(await dominantFor(db, name))) return bad(`"${name}" is not an exercise name (${why}). Ask which exercise was meant. Nothing was changed.`);
   }
   const fromKey = canonicalKey(from), toKey = canonicalKey(name);
   if (spelledAs && hit.every(x => x.exerciseName === name)) {   // already the dominant spelling: nothing to do

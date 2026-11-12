@@ -240,7 +240,7 @@ test('page: review section, merge-all buttons, suggestions, search, link from Lo
   const html = await (await web(A, 'GET', '/logs/exercises')).text();
   assert.match(html, /Review &amp; consolidate/);
   assert.match(html, /Possibly the same\?/);
-  assert.match(html, /Merge all into/);
+  assert.match(html, /data-act="merge-sel"/);   // selective merge: Include + Keep per row (was "Merge all into")
   assert.match(html, /id="ex-filter"/);
   assert.match(html, /Single-Arm Row/);
   assert.doesNotMatch(html, /\b(?:confirm|alert|prompt)\(/);

@@ -9,6 +9,9 @@ const { safeError } = require('../lib/safeguards');
  *   GET  /logs/api/exercises             the list as JSON
  *   GET  /logs/api/exercises/stats?name= the detail as JSON
  *   POST /logs/api/exercises/move        { from, to, confirm } - rename / merge (preview first)
+ *   POST /logs/api/exercises/merge-group { names, target, confirm }
+ *   POST /logs/api/exercises/merge-selected { from[], to, confirm } - merge only the chosen names
+ *   POST /logs/api/exercises/delete      { name, confirm, typed } - delete every set of one exact name (preview first)
  *
  * The name is a QUERY parameter, not a path segment: exercise names hold slashes,
  * parentheses and em dashes, and a path segment has to survive every proxy intact.
@@ -97,5 +100,12 @@ module.exports = function mountExercises(app, { requireLogin, getDatabase }) {
   // Merge every spelling of one exercise into the chosen one: preview, then confirm.
   app.post('/logs/api/exercises/merge-group', requireLogin, sameOriginJson,
     api((db, req) => X.mergeGroup(db, (req.body || {}).names, (req.body || {}).target, { confirm: (req.body || {}).confirm === true })));
+  // Merge only the chosen names into one: preview, then confirm. Unchosen names are untouched.
+  app.post('/logs/api/exercises/merge-selected', requireLogin, sameOriginJson,
+    api((db, req) => X.mergeSelected(db, (req.body || {}).from, (req.body || {}).to, { confirm: (req.body || {}).confirm === true })));
+  // Delete every set logged under one exact name: preview (writes nothing), then confirm.
+  app.post('/logs/api/exercises/delete', requireLogin, sameOriginJson,
+    api((db, req) => X.deleteExercise(db, (req.body || {}).name,
+      { confirm: (req.body || {}).confirm === true, typed: (req.body || {}).typed })));
 };
 module.exports.detail = detail;

@@ -17,12 +17,12 @@
         <h2>📋 Exercises in your log</h2>
         <a href="/logs" class="btn">← Logs</a>
       </div>
-      <p class="ex-sub">Every name you have logged. Tap one for its records, graph and plateau check. <strong>Rename</strong> fixes a typo everywhere; <strong>Merge</strong> folds one name into another. Future logs of the old name then land on the new one. Nothing is deleted.</p>
+      <p class="ex-sub">Every name you have logged. Tap one for its records, graph and plateau check. <strong>Rename</strong> fixes a typo everywhere; <strong>Merge</strong> folds one name into another. Future logs of the old name then land on the new one. Rename and Merge delete nothing. <strong>Delete…</strong> removes every set logged under that exact name (for a name that should never have been an exercise).</p>
 
       <% if (list.length) { %>
       <section class="rv" id="review" aria-labelledby="rv-h">
         <h3 id="rv-h">Review &amp; consolidate</h3>
-        <p class="ex-sub">Records only count when a lift is under one name. Merging moves every set to the spelling you pick, so "Pull-up" and "Pull ups" become one history and one set of records. Nothing is deleted. Each merge shows a count first.</p>
+        <p class="ex-sub">Records only count when a lift is under one name. Merging moves every set to the spelling you pick, so "Pull-up" and "Pull ups" become one history and one set of records. Tick the names that are the same lift and pick the one to keep; unticked names are left alone. Nothing is deleted. Each merge shows a count first.</p>
 
         <h4>Same exercise, different spellings <span class="rv-n">(<%= review.groups.length %>)</span></h4>
         <% if (!review.groups.length) { %>
@@ -34,23 +34,24 @@
             <div class="rv-title"><%= g.dominant %> <span class="ex-meta"><%= g.sets %> sets in total</span></div>
             <ul class="rv-sp">
               <% g.spellings.forEach(function (sp, si) { %>
-              <li>
-                <label class="rv-pick">
-                  <input type="radio" name="keep-<%= gi %>" value="<%= sp.name %>"<%= sp.name === g.dominant ? ' checked' : '' %>>
-                  <span class="rv-name"><%= sp.name %><% if (sp.name === g.dominant) { %> <em>most used</em><% } %></span>
-                </label>
+              <li data-row data-names="<%= JSON.stringify([sp.name]) %>" data-keep="<%= sp.name %>">
+                <div class="rv-pair">
+                  <label class="rv-pick rv-inc"><input type="checkbox" class="rv-include" aria-label="Include <%= sp.name %>"<%= sp.name === g.dominant ? ' disabled' : ' checked' %>><span class="rv-lab">Include</span></label>
+                  <label class="rv-pick rv-kp"><input type="radio" name="keep-<%= gi %>" value="<%= sp.name %>"<%= sp.name === g.dominant ? ' checked' : '' %>><span class="rv-lab">Keep</span></label>
+                </div>
+                <span class="rv-name"><%= sp.name %><% if (sp.name === g.dominant) { %> <em>most used</em><% } %></span>
                 <div class="ex-meta"><%= sp.sets %> set<%= sp.sets === 1 ? '' : 's' %> · <%= sp.sessions %> session<%= sp.sessions === 1 ? '' : 's' %><% if (sp.last) { %> · last <%= sp.last %><% } %><% if (sp.best) { %> · best <%= sp.best %><% } %></div>
               </li>
               <% }) %>
             </ul>
-            <button type="button" class="mini rv-go" data-act="merge-all">Merge all into “<span class="rv-target"><%= g.dominant %></span>”</button>
+            <button type="button" class="mini rv-go" data-act="merge-sel" disabled>Merge selected</button>
           </li>
           <% }) %>
         </ul>
         <% } %>
 
         <h4>Possibly the same? <span class="rv-n">(<%= review.suggestions.length %>)</span></h4>
-        <p class="ex-sub">Same movement, different equipment or wording. These are only suggestions: <em>Cable Face Pull</em> and <em>Band Face Pull</em> may be different lifts at different loads. Iso and single-arm versions are never suggested for their plain twin.</p>
+        <p class="ex-sub">Same movement, different equipment or wording. These are only suggestions, and you choose which to merge: tick the ones that are the same lift, pick the one to keep, leave the rest alone. <em>Cable Face Pull</em> and <em>Band Face Pull</em> may be different lifts at different loads. Iso and single-arm versions are never suggested for their plain twin.</p>
         <% if (!review.suggestions.length) { %>
           <p class="ex-empty rv-ok">Nothing looks like a near match.</p>
         <% } else { %>
@@ -60,13 +61,17 @@
             <div class="rv-title"><%= sg.movement %></div>
             <ul class="rv-sp">
               <% sg.groups.forEach(function (gr, gi) { %>
-              <li>
+              <li data-row data-names="<%= JSON.stringify(gr.names) %>" data-keep="<%= gr.name %>">
+                <div class="rv-pair">
+                  <label class="rv-pick rv-inc"><input type="checkbox" class="rv-include" aria-label="Include <%= gr.name %>"<%= gi === 0 ? ' disabled' : '' %>><span class="rv-lab">Include</span></label>
+                  <label class="rv-pick rv-kp"><input type="radio" name="skeep-<%= si %>" value="<%= gr.name %>"<%= gi === 0 ? ' checked' : '' %>><span class="rv-lab">Keep</span></label>
+                </div>
                 <span class="rv-name"><%= gr.name %></span>
                 <div class="ex-meta"><%= gr.sets %> set<%= gr.sets === 1 ? '' : 's' %><% if (gr.last) { %> · last <%= gr.last %><% } %></div>
-                <button type="button" class="mini" data-act="merge-others" data-sug="<%= si %>" data-grp="<%= gi %>">Merge the others into this</button>
               </li>
               <% }) %>
             </ul>
+            <button type="button" class="mini rv-go" data-act="merge-sel" disabled>Merge selected</button>
           </li>
           <% }) %>
         </ul>
@@ -79,21 +84,33 @@
       <% if (!list.length) { %>
         <p class="ex-empty">Nothing logged yet. Use the <a href="/workout">logger</a>.</p>
       <% } else { %>
+        <%
+          var tidySet = {};
+          review.groups.forEach(function (g) { g.spellings.forEach(function (x) { tidySet[x.name] = 1; }); });
+          review.suggestions.forEach(function (sg) { sg.groups.forEach(function (gr) { gr.names.forEach(function (n) { tidySet[n] = 1; }); }); });
+          var tidyCount = list.filter(function (e) { return tidySet[e.name] || e.similar.length; }).length;
+        %>
+        <div class="ex-seg" role="group" aria-label="Which names to show">
+          <button type="button" class="ex-seg-b" id="seg-all" aria-pressed="true">All (<%= list.length %>)</button>
+          <button type="button" class="ex-seg-b" id="seg-tidy" aria-pressed="false">Needs tidying (<%= tidyCount %>)</button>
+        </div>
         <label class="ex-find" for="ex-filter">Search every name</label>
         <input id="ex-filter" type="search" placeholder="Type to filter" autocomplete="off">
         <ul class="ex-list" id="ex-list">
           <% list.forEach(function (e) { %>
-          <li class="ex-row" data-name="<%= e.name %>">
+          <li class="ex-row" data-name="<%= e.name %>"<%- (tidySet[e.name] || e.similar.length) ? ' data-tidy="1"' : '' %>>
             <a class="ex-name" href="/logs/exercises/detail?name=<%= encodeURIComponent(e.name) %>"><%= e.name %></a>
             <div class="ex-meta"><%= e.sets %> set<%= e.sets === 1 ? '' : 's' %> · <%= e.sessions %> session<%= e.sessions === 1 ? '' : 's' %><% if (e.last) { %> · last <%= e.last %><% } %></div>
             <% if (e.similar.length) { %><div class="ex-similar">Also logged as: <%= e.similar.join(', ') %></div><% } %>
             <div class="ex-actions">
               <button type="button" class="mini" data-act="rename">Rename</button>
               <button type="button" class="mini" data-act="merge">Merge into…</button>
+              <button type="button" class="mini ex-del" data-act="delete">Delete…</button>
             </div>
           </li>
           <% }) %>
         </ul>
+        <p class="ex-none" id="ex-none" hidden>No names match.</p>
       <% } %>
     </div>
 

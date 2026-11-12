@@ -1,4 +1,4 @@
-/* Exercises list: filter, Rename, Merge. Every change is previewed first (the server
+/* Exercises list: filter (text + Needs tidying), Rename, Merge, Delete. Every change is previewed first (the server
    writes nothing without confirm:true) and confirmed in the themed dialog. */
 (function () {
   'use strict';
@@ -9,10 +9,24 @@
   var filter = document.getElementById('ex-filter');
 
   function norm(s) { return String(s || '').toLowerCase(); }
-  if (filter) filter.addEventListener('input', function () {
-    var q = norm(filter.value);
-    Array.prototype.forEach.call(list.children, function (li) { li.hidden = q && norm(li.getAttribute('data-name')).indexOf(q) === -1; });
-  });
+  var segAll = document.getElementById('seg-all'), segTidy = document.getElementById('seg-tidy');
+  var tidyOnly = false;
+  try { tidyOnly = localStorage.getItem('exTidyOnly') === '1'; } catch (e) { /* storage blocked: default to All */ }
+  function applyFilter() {
+    if (!list) return;
+    var q = filter ? norm(filter.value) : '', shown = 0;
+    Array.prototype.forEach.call(list.children, function (li) {
+      var hide = (q && norm(li.getAttribute('data-name')).indexOf(q) === -1) || (tidyOnly && !li.hasAttribute('data-tidy'));
+      li.hidden = !!hide; if (!hide) shown++;
+    });
+    var none = document.getElementById('ex-none');
+    if (none) none.hidden = shown > 0;
+    if (segAll) { segAll.setAttribute('aria-pressed', tidyOnly ? 'false' : 'true'); segTidy.setAttribute('aria-pressed', tidyOnly ? 'true' : 'false'); }
+  }
+  function setTidy(on) { tidyOnly = on; try { localStorage.setItem('exTidyOnly', on ? '1' : '0'); } catch (e) { /* not remembered */ } applyFilter(); }
+  if (segAll) { segAll.addEventListener('click', function () { setTidy(false); }); segTidy.addEventListener('click', function () { setTidy(true); }); }
+  if (filter) filter.addEventListener('input', applyFilter);
+  applyFilter();
 
   function post(body) {
     return fetch('/logs/api/exercises/move', {
@@ -74,64 +88,89 @@
   function done(r) {
     return oDialog.alert({ title: 'Done', body: plural(r, 'set') + ' moved.' }).then(function () { location.reload(); });
   }
-  // One group: every spelling into the radio-picked one. Preview first, then the themed confirm.
-  function mergeAll(card, gi) {
-    var names = all.groups[gi], picked = card.querySelector('input[type=radio]:checked');
-    if (!picked) return null;
-    var target = picked.value, base = { names: names, target: target };
-    return api('/logs/api/exercises/merge-group', base).then(function (p) {
+  // A card (spelling group or suggestion): rows with Include + Keep. Only the ticked rows move into the kept one.
+  function rowsOf(card) { return Array.prototype.slice.call(card.querySelectorAll('li[data-row]')); }
+  function keptRow(card) { var r = card.querySelector('input[type=radio]:checked'); return r ? r.closest('li[data-row]') : null; }
+  function chosen(card) {
+    var keep = keptRow(card), from = [];
+    rowsOf(card).forEach(function (li) {
+      if (li === keep) return;
+      var cb = li.querySelector('.rv-include');
+      if (cb && cb.checked) JSON.parse(li.getAttribute('data-names')).forEach(function (n) { from.push(n); });
+    });
+    return { keep: keep ? keep.getAttribute('data-keep') : null, from: from };
+  }
+  function refreshCard(card) {
+    var keep = keptRow(card), n = 0;
+    rowsOf(card).forEach(function (li) {
+      var cb = li.querySelector('.rv-include');
+      if (li === keep) { cb.checked = false; cb.disabled = true; } else { cb.disabled = false; if (cb.checked) n++; }
+    });
+    var btn = card.querySelector('[data-act=merge-sel]'), c = chosen(card);
+    btn.disabled = n === 0;
+    btn.textContent = n === 0 ? 'Tick at least one other name to merge' : 'Merge ' + n + ' selected into “' + c.keep + '”';
+  }
+  function mergeSelected(card) {
+    var c = chosen(card);
+    if (!c.keep || !c.from.length) return null;
+    return api('/logs/api/exercises/merge-selected', { from: c.from, to: c.keep }).then(function (p) {
       if (!p.ok) return oDialog.alert({ title: 'Cannot do that', body: p.error || 'Failed.' });
-      if (p.alreadyDone) return oDialog.alert({ title: 'Nothing to do', body: 'Already one spelling.' });
+      if (p.alreadyDone) return oDialog.alert({ title: 'Nothing to do', body: 'Already merged.' });
+      var lines = p.names.map(function (x) { return '“' + x.name + '” (' + plural(x.sets, 'set') + ')'; }).join(', ');
       return oDialog.confirm({
-        title: 'Merge all into “' + target + '”?',
-        body: plural(p.sets, 'set') + ' in ' + plural(p.sessions, 'session') + ' from ' + plural(p.spellings, 'other spelling') + ' will move into “' + target + '”, which has ' + plural(p.targetSets, 'set') + '. Future logs of those spellings land on it. No set is deleted.',
-        confirmLabel: 'Merge',
+        title: 'Merge into “' + c.keep + '”?',
+        body: 'These will move into “' + c.keep + '” (' + plural(p.sets, 'set') + ' in ' + plural(p.sessions, 'session') + ' in all): ' + lines + '. Names you did not tick are left alone. No set is deleted.',
+        confirmLabel: 'Merge ' + plural(p.sets, 'set'),
       }).then(function (yes) {
         if (!yes) return null;
-        return api('/logs/api/exercises/merge-group', { names: names, target: target, confirm: true }).then(function (r) {
+        return api('/logs/api/exercises/merge-selected', { from: c.from, to: c.keep, confirm: true }).then(function (r) {
           return r.ok ? done(r.moved) : oDialog.alert({ title: 'Failed', body: r.error || 'Failed.' });
         });
       });
     });
   }
-  // A suggestion: the person picks which exercise to KEEP; every spelling of the others moves into it.
-  function mergeOthers(si, gi) {
-    var groups = all.suggest[si], keep = groups[gi][0];
-    var from = [];
-    groups.forEach(function (names, i) { if (i !== gi) names.forEach(function (n) { from.push(n); }); });
-    return Promise.all(from.map(function (n) { return post({ from: n, to: keep, exact: true }); })).then(function (ps) {
-      var bad = ps.filter(function (p) { return !p.ok; })[0];
-      if (bad) return oDialog.alert({ title: 'Cannot do that', body: bad.error || 'Failed.' });
-      var sets = ps.reduce(function (n, p) { return n + p.sets; }, 0), sess = ps.reduce(function (n, p) { return n + p.sessions; }, 0);
-      return oDialog.confirm({
-        title: 'These are the same exercise?',
-        body: plural(sets, 'set') + ' in ' + plural(sess, 'session') + ' will move into “' + keep + '”. Only do this if they really are one lift (same equipment, same movement). No set is deleted.',
-        confirmLabel: 'Merge',
-      }).then(function (yes) {
-        if (!yes) return null;
-        return from.reduce(function (chain, n) {
-          return chain.then(function (acc) { return post({ from: n, to: keep, exact: true, confirm: true }).then(function (r) { return acc + (r.ok ? r.moved : 0); }); });
-        }, Promise.resolve(0)).then(done);
-      });
-    });
-  }
   var review = document.getElementById('review');
   if (review) {
+    Array.prototype.forEach.call(review.querySelectorAll('.rv-card'), refreshCard);
     review.addEventListener('change', function (ev) {
-      var radio = ev.target.closest('input[type=radio]');
-      if (!radio) return;
-      var card = radio.closest('.rv-card');
-      card.querySelector('.rv-target').textContent = radio.value;
+      var card = ev.target.closest('.rv-card');
+      if (!card) return;
+      // A newly chosen keeper: the old keeper becomes a candidate again (ticked for a spelling group).
+      if (ev.target.type === 'radio' && card.hasAttribute('data-group')) {
+        rowsOf(card).forEach(function (li) { var cb = li.querySelector('.rv-include'); if (cb.disabled && li !== keptRow(card)) cb.checked = true; });
+      }
+      refreshCard(card);
     });
     review.addEventListener('click', function (ev) {
-      var btn = ev.target.closest('button[data-act]');
-      if (!btn) return;
-      if (btn.getAttribute('data-act') === 'merge-all') {
-        var card = btn.closest('.rv-card');
-        mergeAll(card, Number(card.getAttribute('data-group')));
-      } else if (btn.getAttribute('data-act') === 'merge-others') {
-        mergeOthers(Number(btn.getAttribute('data-sug')), Number(btn.getAttribute('data-grp')));
-      }
+      var btn = ev.target.closest('button[data-act=merge-sel]');
+      if (btn && !btn.disabled) mergeSelected(btn.closest('.rv-card'));
+    });
+  }
+
+  // Delete every set under one exact name: preview (nothing written), themed confirm, typed name over 20 sets.
+  function deleteExercise(name) {
+    return api('/logs/api/exercises/delete', { name: name }).then(function (p) {
+      if (!p.ok) return oDialog.alert({ title: 'Cannot do that', body: p.error || 'Failed.' });
+      if (p.alreadyDone) return oDialog.alert({ title: 'Nothing to do', body: 'No sets are logged under that name.' }).then(function () { location.reload(); });
+      var when = p.dates && p.dates.length ? ' Dates: ' + p.dates.join(', ') + '.' : '';
+      var emptied = p.emptiedSessions ? ' ' + plural(p.emptiedSessions, 'session') + ' left with no sets will be deleted too.' : '';
+      return oDialog.confirm({
+        title: 'Delete “' + name + '”?',
+        body: plural(p.sets, 'set') + ' in ' + plural(p.sessions, 'session') + ' will be deleted.' + when + emptied + ' This cannot be undone.',
+        confirmLabel: 'Delete ' + plural(p.sets, 'set'), danger: true,
+      }).then(function (yes) {
+        if (!yes) return null;
+        var typedStep = p.requiresTyped
+          ? oDialog.prompt({ title: 'Type the name to confirm', label: 'Type “' + name + '” exactly', required: true, confirmLabel: 'Delete' })
+          : Promise.resolve(null);
+        return typedStep.then(function (typed) {
+          if (p.requiresTyped && typed !== name) return oDialog.alert({ title: 'Not deleted', body: 'The name did not match, so nothing was deleted.' });
+          return api('/logs/api/exercises/delete', { name: name, confirm: true, typed: typed }).then(function (r) {
+            if (!r.ok) return oDialog.alert({ title: 'Failed', body: r.error || 'Failed.' });
+            return oDialog.alert({ title: 'Deleted', body: plural(r.deleted, 'set') + ' deleted.' }).then(function () { location.reload(); });
+          });
+        });
+      });
     });
   }
 
@@ -139,7 +178,9 @@
     var btn = ev.target.closest('button[data-act]');
     if (!btn) return;
     var from = btn.closest('li').getAttribute('data-name');
-    if (btn.getAttribute('data-act') === 'merge') {
+    if (btn.getAttribute('data-act') === 'delete') {
+      deleteExercise(from);
+    } else if (btn.getAttribute('data-act') === 'merge') {
       pickFrom = from; pickFilter.value = ''; renderPick(); bg.hidden = false; pickFilter.focus();
     } else {
       oDialog.prompt({ title: 'Rename exercise', label: 'New name for "' + from + '"', value: from, required: true, confirmLabel: 'Next' })
