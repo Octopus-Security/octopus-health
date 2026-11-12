@@ -64,6 +64,7 @@ function getActiveTab(requestPath) {
     if (requestPath.startsWith('/constraints')) return 'constraints';
     if (requestPath.startsWith('/plan-maker')) return 'plan-maker';
     if (requestPath.startsWith('/exercises') || requestPath.startsWith('/library') || requestPath.startsWith('/exercise') || requestPath.startsWith('/workout')) return 'exercises';
+    if (requestPath === '/volume' || requestPath.startsWith('/volume/')) return 'body';
     if (requestPath === '/body' || requestPath.startsWith('/body/') || requestPath.startsWith('/body?')) return 'body';
     if (requestPath.startsWith('/stretch') || requestPath.startsWith('/routines')) return 'stretch';
     // '/meal-templates' is listed on its own because it does NOT start with
@@ -1405,6 +1406,7 @@ app.get('/exercises', requireLogin, async (req, res) => {
 });
 
 require('./api/body-map')(app, { requireLogin, getDatabase });
+require('./api/volume')(app, { requireLogin, getDatabase });
 require('./api/today')(app, { requireLogin, getDatabase });
 require('./api/daily-stretches')(app, { requireLogin, getDatabase });
 require('./api/mobility')(app, { requireLogin, getDatabase });
