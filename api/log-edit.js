@@ -1,6 +1,8 @@
 'use strict';
 
-const { canonicalKey } = require('./exercise-names');
+const { canonicalKey, variantsDiffer } = require('./exercise-names');
+
+const etToday = () => new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
 
 /**
  * Correcting a workout that is already in the log.
@@ -190,7 +192,7 @@ async function addSet(db, sessionId, body = {}) {
 }
 
 /** Rename every set of one exercise within a session — "that was Hanging Leg Raise". */
-async function renameExercise(db, sessionId, from, to) {
+async function renameExercise(db, sessionId, from, to, opts = {}) {
   const name = String(to || '').trim();
   if (!name) return bad('new name cannot be empty');
   const s = await db.WorkoutSession.findByPk(sessionId);
@@ -198,6 +200,28 @@ async function renameExercise(db, sessionId, from, to) {
   const sets = await db.WorkoutSet.findAll({ where: { sessionId: s.id } });
   const hit = sets.filter(x => x.exerciseName.toLowerCase() === String(from || '').trim().toLowerCase());
   if (!hit.length) return notFound(`exercise "${from}" in that session`);
+
+  // ── Confirmation guard (2026-11-12). Enforced here, not in the prompt. ──
+  // A rename that turns an exercise into a DIFFERENT exercise the account
+  // already has (or an iso/single-arm variant into its bilateral twin or back),
+  // or that edits a session that is not today's, is not a spelling fix: it
+  // rewrites history. It needs an explicit `confirm: true` (the approval card).
+  const fromKey = canonicalKey(from), toKey = canonicalKey(name);
+  if (!opts.confirm) {
+    const reasons = [];
+    if (variantsDiffer(from, name)) reasons.push(`"${from}" and "${name}" are different exercises (iso / single-arm variants are not interchangeable)`);
+    if (toKey !== fromKey) {
+      const all = await db.WorkoutSet.findAll({ attributes: ['exerciseName'], group: ['exerciseName'] });
+      const other = all.map(r => r.exerciseName).find(n => canonicalKey(n) === toKey);
+      if (other) reasons.push(`"${other}" is already an exercise in the log; this would merge "${from}" into it`);
+    }
+    if (toKey !== fromKey && s.date !== etToday()) reasons.push(`session ${s.id} is dated ${s.date}, not today`);
+    if (reasons.length) {
+      return { ok: false, status: 409, needsConfirmation: true, sessionId: s.id, sessionDate: s.date,
+        from: String(from).trim(), to: name, sets: hit.length,
+        error: `Needs explicit confirmation before renaming: ${reasons.join('; ')}. Nothing was changed. Re-send with confirm:true after the owner approves.` };
+    }
+  }
   for (const x of hit) { x.exerciseName = name; await x.save(); }
   // A rename IS the answer to "which did you mean?", so remember it.
   //
@@ -208,7 +232,7 @@ async function renameExercise(db, sessionId, from, to) {
   // the name the same way — which is the loop the question was built to avoid.
   // Best-effort: a failure here must never cost a rename that already worked.
   const alias = canonicalKey(String(from || ''));
-  if (alias && db.ExerciseAlias) {
+  if (alias && db.ExerciseAlias && !variantsDiffer(from, name)) {   // never alias iso <-> bilateral
     try {
       const [row, created] = await db.ExerciseAlias.findOrCreate({ where: { key: alias }, defaults: { name } });
       if (!created && row.name !== name) { row.name = name; await row.save(); }

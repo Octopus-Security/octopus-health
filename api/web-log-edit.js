@@ -68,7 +68,7 @@ module.exports = function mountLogEdit(app, { requireLogin, getDatabase }) {
   app.post('/logs/api/session/:id/sets', requireLogin, sameOriginJson,
     route((db, req) => E.addSet(db, req.params.id, req.body || {})));
   app.post('/logs/api/session/:id/rename', requireLogin, sameOriginJson,
-    route((db, req) => E.renameExercise(db, req.params.id, (req.body || {}).from, (req.body || {}).to)));
+    route((db, req) => E.renameExercise(db, req.params.id, (req.body || {}).from, (req.body || {}).to, { confirm: true })));   // a human clicked it
   app.patch('/logs/api/set/:id', requireLogin, sameOriginJson,
     route((db, req) => E.editSet(db, req.params.id, req.body || {})));
   app.delete('/logs/api/set/:id', requireLogin, sameOriginJson,
