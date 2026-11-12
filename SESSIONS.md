@@ -114,6 +114,12 @@ had none and one would cover the whole app host); submit `/s/sitemap.xml` to a s
    its own design; anything about a named person's health would then need real storage and consent
    rules (compliance pack, HANDOFF items 75, 86). *Assumed:* none of that is covered by phase 1.
 
+   **Design (2026-11-11):** octopus-coach (train.octopustechnology.net) is designed in the private estate
+   vault (`octopus-vault/COACH.md`). Trainers (not only the admin) would author here, a `plan` object would
+   group sessions under one public or unlisted link that updates live, and health stays database-per-user.
+   A client's own health data would be readable only through a client-granted, revocable share. Nothing is
+   built: there is no plan object, trainer role, or service route for sessions today.
+
 ## Not done / not verified
 
 Not exercised against production or Cloudflare. Nothing is deployed until merged (a push to `main`
