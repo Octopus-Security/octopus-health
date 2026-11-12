@@ -35,8 +35,13 @@
 .bm-panel h4 { margin: var(--space-4) 0 var(--space-2); font-size: 0.85rem; }
 .bm-sub, .bm-count { color: var(--bm-muted); font-size: 0.8rem; font-weight: 400; }
 .bm-list { list-style: none; padding: 0; }
+/* layout-ok: grid-auto-track (every child is placed in column 1 or 2 explicitly, below) */
 .bm-list li { padding: 6px 0; border-bottom: 1px solid var(--bm-border); font-size: 0.88rem; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 8px; align-items: center; }
 .bm-list li .ds-toggle { grid-column: 2; grid-row: 1 / span 2; }
+/* The name and the detail ALWAYS share column 1, stacked. Without this a row with no daily toggle put the detail in the
+   auto column 2, which took its full max-content width and squeezed the name to 0px, so the two drew on top of each other. */
+.bm-list li > :not(.ds-toggle) { grid-column: 1; min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
+.bm-list li .demo-link { text-align: left; white-space: normal; }
 .bm-list li.bm-none { display: block; }
 .bm-list a, .bm-list .demo-link { color: var(--bm-accent); text-decoration: none; }
 .bm-list .demo-link { background: none; border: none; padding: 0; font: inherit; font-weight: 400; text-align: left; cursor: pointer; transform: none; display: inline; }

@@ -120,3 +120,13 @@ test('mobile nav panel scrolls inside itself and can never overflow upward behin
   assert.match(panel, /max-height: calc\(100dvh - var\(--nav-h\) - env\(safe-area-inset-top\)\)/);
   assert.match(mobile, /nav\.site-nav \{[^}]*position: sticky; top: 0/);
 });
+
+test('body map list: name and detail share one column, so a row without the daily toggle cannot squeeze the name to nothing', () => {
+  const bm = read('public', 'body-map.css');
+  assert.match(bm, /\.bm-list li > :not\(\.ds-toggle\) \{[^}]*grid-column: 1[^}]*min-width: 0/);
+  assert.match(bm, /\.bm-list li \.ds-toggle \{[^}]*grid-column: 2/);
+});
+
+test('phones: inputs are 16px even where a page sizes its own inputs in an inline style', () => {
+  assert.match(css, /select, textarea \{ font-size: 16px !important; \}/);
+});
