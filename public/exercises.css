@@ -53,3 +53,20 @@
 .ex-tips strong { color: #e8e8e8; }
 .ex-fine { color: #666; font-size: 0.78rem; margin-top: 8px; }
 .ex-note { color: #999; font-size: 0.85rem; margin: 0 0 8px; }
+
+/* Review & consolidate */
+.rv h3, .rv-h3 { margin: 18px 0 6px; }
+.rv h4 { margin: 18px 0 6px; font-size: 0.95rem; color: #e8e8e8; }
+.rv-n { color: #777; font-weight: 400; }
+.rv-list, .rv-sp { list-style: none; margin: 0; padding: 0; }
+.rv-card { background: #0d0d0d; border: 1px solid #2a2a2a; border-radius: 10px; padding: 12px 14px; margin-bottom: 10px; }
+.rv-title { font-weight: 600; color: #e8e8e8; overflow-wrap: anywhere; }
+.rv-sp > li { border-top: 1px solid #1a1a1a; padding: 6px 0; }
+.rv-sp > li:first-child { border-top: none; }
+.rv-pick { display: flex; align-items: center; gap: 10px; min-height: 44px; cursor: pointer; }
+.rv-pick input { width: 22px; height: 22px; flex-shrink: 0; }
+.rv-name { overflow-wrap: anywhere; color: #ddd; }
+.rv-name em { color: #2ecc71; font-size: 0.72rem; font-style: normal; margin-left: 4px; }
+.rv-go, .rv-sp .mini { min-height: 44px; margin-top: 8px; }
+.rv-ok { padding: 8px 0; text-align: left; }
+.rv-h3 { font-size: 1rem; }

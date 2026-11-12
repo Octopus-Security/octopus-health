@@ -346,7 +346,8 @@ router.get('/prs', async (req, res) => {
     try {
         const { PersonalRecord, sequelize } = getDatabase(req.user.username);
         const all = await PersonalRecord.findAll({ order: [['date', 'DESC']] });
-        res.json({ success: true, data: bestPerExercise(all.map(pr => pr.toJSON())) });
+        const stats = await require('../exercise-manage').spellingStats(getDatabase(req.user.username)).catch(() => []);
+        res.json({ success: true, data: bestPerExercise(all.map(pr => pr.toJSON()), stats) });
     } catch (err) {
         console.error('[health] request failed:', safeError(err)); res.status(500).json({ success: false, error: 'Something went wrong' });
     }

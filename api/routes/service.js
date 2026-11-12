@@ -15,7 +15,8 @@ const { partition } = require('../dedupe-sets');
 const { detectPR, rebuildPRs } = require('../pr-detect');
 const { macrosForTemplate, describe, provenance } = require('../meal-template');
 const { isFinished, mealFor } = require('../meal-prep');
-const { resolveExerciseNames, questionText, canonicalKey, variantsDiffer } = require('../exercise-names');
+const { resolveExerciseNames, questionText, canonicalKey, variantsDiffer, groupKey, dominantSpelling } = require('../exercise-names');
+const { spellingStats } = require('../exercise-manage');
 const { parseWorkout } = require('../workout-parse');
 const { resolveSessionTitle, titleQuestionText, seedSessionTitles } = require('../session-titles');
 
@@ -129,11 +130,10 @@ async function getDB(req) {
 router.get('/prs', requireToken, async (req, res) => {
   try {
     const { PersonalRecord } = await getDB(req);
-    const where = req.query.exercise ? { exerciseName: req.query.exercise } : {};
-    const rows = await PersonalRecord.findAll({
-      where, order: [['date', 'DESC'], ['createdAt', 'DESC']], limit: 100,
-    });
-    res.json({ ok: true, prs: rows });
+    let rows = await PersonalRecord.findAll({ order: [['date', 'DESC'], ['createdAt', 'DESC']] });
+    // One record per exercise, not per spelling: "Pull-up" and "Pull ups" are the same lift.
+    if (req.query.exercise) { const gk = groupKey(req.query.exercise); rows = rows.filter(r => groupKey(r.exerciseName) === gk); }
+    res.json({ ok: true, prs: rows.slice(0, 100) });
   } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
 });
 
@@ -160,7 +160,8 @@ router.post('/prs', requireToken, async (req, res) => {
 // GET /api/service/prs/bests
 router.get('/prs/bests', requireToken, async (req, res) => {
   try {
-    const { PersonalRecord, sequelize } = await getDB(req);
+    const dbB = await getDB(req);
+    const { sequelize } = dbB;
     const { QueryTypes } = require('sequelize');
     const rows = await sequelize.query(
       `SELECT exerciseName,
@@ -171,7 +172,20 @@ router.get('/prs/bests', requireToken, async (req, res) => {
        GROUP BY exerciseName`,
       { type: QueryTypes.SELECT }
     );
-    res.json({ ok: true, bests: rows });
+    // Fold spellings of one exercise into one row, shown under the dominant spelling.
+    const stats = await spellingStats(dbB).catch(() => []);
+    const grouped = new Map();
+    for (const r of rows) {
+      const k = groupKey(r.exerciseName);
+      const g = grouped.get(k);
+      if (!g) { grouped.set(k, { ...r, _names: [r.exerciseName] }); continue; }
+      g._names.push(r.exerciseName);
+      g.bestReps = Math.max(g.bestReps || 0, r.bestReps || 0) || null;
+      g.bestDurationSecs = Math.max(g.bestDurationSecs || 0, r.bestDurationSecs || 0) || null;
+      if (String(r.lastLogged || '') > String(g.lastLogged || '')) g.lastLogged = r.lastLogged;
+    }
+    const bests = [...grouped.values()].map(({ _names, ...g }) => ({ ...g, exerciseName: dominantSpelling(_names, stats) }));
+    res.json({ ok: true, bests });
   } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
 });
 
@@ -285,9 +299,10 @@ async function logSession(req, res) {
     }
 
     if (sets.length) {
-      const known = await knownExerciseNames(await getDB(req));
+      const dbN = await getDB(req);
+      const known = await knownExerciseNames(dbN);
       const { resolved, questions: asked } = resolveExerciseNames(
-        sets.map(s => s.exerciseName).filter(Boolean), known);
+        sets.map(s => s.exerciseName).filter(Boolean), known, await spellingStats(dbN));
       const questions = asked.filter(q => !answered.has(q.exerciseName));
 
       // ── An ambiguous name is now a FOLLOW-UP, not a refusal ──────────────

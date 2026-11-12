@@ -19,10 +19,67 @@
       </div>
       <p class="ex-sub">Every name you have logged. Tap one for its records, graph and plateau check. <strong>Rename</strong> fixes a typo everywhere; <strong>Merge</strong> folds one name into another. Future logs of the old name then land on the new one. Nothing is deleted.</p>
 
+      <% if (list.length) { %>
+      <section class="rv" id="review" aria-labelledby="rv-h">
+        <h3 id="rv-h">Review &amp; consolidate</h3>
+        <p class="ex-sub">Records only count when a lift is under one name. Merging moves every set to the spelling you pick, so "Pull-up" and "Pull ups" become one history and one set of records. Nothing is deleted. Each merge shows a count first.</p>
+
+        <h4>Same exercise, different spellings <span class="rv-n">(<%= review.groups.length %>)</span></h4>
+        <% if (!review.groups.length) { %>
+          <p class="ex-empty rv-ok">Every exercise is under one spelling.</p>
+        <% } else { %>
+        <ul class="rv-list" id="rv-groups">
+          <% review.groups.forEach(function (g, gi) { %>
+          <li class="rv-card" data-group="<%= gi %>">
+            <div class="rv-title"><%= g.dominant %> <span class="ex-meta"><%= g.sets %> sets in total</span></div>
+            <ul class="rv-sp">
+              <% g.spellings.forEach(function (sp, si) { %>
+              <li>
+                <label class="rv-pick">
+                  <input type="radio" name="keep-<%= gi %>" value="<%= sp.name %>"<%= sp.name === g.dominant ? ' checked' : '' %>>
+                  <span class="rv-name"><%= sp.name %><% if (sp.name === g.dominant) { %> <em>most used</em><% } %></span>
+                </label>
+                <div class="ex-meta"><%= sp.sets %> set<%= sp.sets === 1 ? '' : 's' %> · <%= sp.sessions %> session<%= sp.sessions === 1 ? '' : 's' %><% if (sp.last) { %> · last <%= sp.last %><% } %><% if (sp.best) { %> · best <%= sp.best %><% } %></div>
+              </li>
+              <% }) %>
+            </ul>
+            <button type="button" class="mini rv-go" data-act="merge-all">Merge all into “<span class="rv-target"><%= g.dominant %></span>”</button>
+          </li>
+          <% }) %>
+        </ul>
+        <% } %>
+
+        <h4>Possibly the same? <span class="rv-n">(<%= review.suggestions.length %>)</span></h4>
+        <p class="ex-sub">Same movement, different equipment or wording. These are only suggestions: <em>Cable Face Pull</em> and <em>Band Face Pull</em> may be different lifts at different loads. Iso and single-arm versions are never suggested for their plain twin.</p>
+        <% if (!review.suggestions.length) { %>
+          <p class="ex-empty rv-ok">Nothing looks like a near match.</p>
+        <% } else { %>
+        <ul class="rv-list" id="rv-suggest">
+          <% review.suggestions.forEach(function (sg, si) { %>
+          <li class="rv-card" data-sug="<%= si %>">
+            <div class="rv-title"><%= sg.movement %></div>
+            <ul class="rv-sp">
+              <% sg.groups.forEach(function (gr, gi) { %>
+              <li>
+                <span class="rv-name"><%= gr.name %></span>
+                <div class="ex-meta"><%= gr.sets %> set<%= gr.sets === 1 ? '' : 's' %><% if (gr.last) { %> · last <%= gr.last %><% } %></div>
+                <button type="button" class="mini" data-act="merge-others" data-sug="<%= si %>" data-grp="<%= gi %>">Merge the others into this</button>
+              </li>
+              <% }) %>
+            </ul>
+          </li>
+          <% }) %>
+        </ul>
+        <% } %>
+      </section>
+
+      <h3 class="rv-h3">Every name</h3>
+      <% } %>
+
       <% if (!list.length) { %>
         <p class="ex-empty">Nothing logged yet. Use the <a href="/workout">logger</a>.</p>
       <% } else { %>
-        <label class="ex-find" for="ex-filter">Find an exercise</label>
+        <label class="ex-find" for="ex-filter">Search every name</label>
         <input id="ex-filter" type="search" placeholder="Type to filter" autocomplete="off">
         <ul class="ex-list" id="ex-list">
           <% list.forEach(function (e) { %>
@@ -50,7 +107,7 @@
       </div>
     </div>
 
-    <script type="application/json" id="ex-data"><%- JSON.stringify(list.map(function (e) { return { name: e.name, sets: e.sets }; })).replace(/</g, '\\u003c') %></script>
+    <script type="application/json" id="ex-data"><%- JSON.stringify({ names: list.map(function (e) { return { name: e.name, sets: e.sets }; }), groups: review.groups.map(function (g) { return g.spellings.map(function (x) { return x.name; }); }), suggest: review.suggestions.map(function (sg) { return sg.groups.map(function (gr) { return gr.names; }); }) }).replace(/</g, '\\u003c') %></script>
     <script src="<%= asset('/js/exercises-list.js') %>"></script>
 </body>
 </html>
