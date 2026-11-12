@@ -307,3 +307,31 @@ test('dedupe and force still work exactly as before, now against the merged sess
   assert.deepStrictEqual(sets.map(s => s.setNumber), [1, 2]);
   assert.strictEqual(sets[0].exerciseOrder, sets[1].exerciseOrder, 'joined the same exercise group');
 });
+
+// ── 2026-11-12: a stale cross-variant alias must not rewrite a new log ─────────
+// Neith renamed Iso Leg Press -> Leg Press on 2026-11-12, and the rename path
+// may have saved ExerciseAlias("iso leg press" -> "Leg Press"). Iso Leg Press
+// and Leg Press are different machines, so that row is ignored at read time.
+// A same-variant alias in the same account is the positive control: it must
+// still apply, or the filter would be silently dropping every alias.
+test('a saved iso -> bilateral alias is ignored; a same-variant alias still applies', { skip }, async () => {
+  const user = userFor('xvariant');
+  const db = getDatabase(user);
+  await db.sequelize.sync();
+  const { canonicalKey } = require('../api/exercise-names');
+  await db.ExerciseAlias.create({ key: canonicalKey('Iso Leg Press'), name: 'Leg Press' });
+  await db.ExerciseAlias.create({ key: canonicalKey('Bi Curl'), name: 'Bicep Curl' });
+
+  const r = await post(user, {
+    type: 'strength',
+    sets: [
+      { exerciseName: 'Iso Leg Press', sets: [{ reps: 10, weight: 180 }] },
+      { exerciseName: 'Bi Curl', sets: [{ reps: 10, weight: 30 }] },
+    ],
+  });
+  assert.strictEqual(r.status, 200);
+  const names = (await db.WorkoutSet.findAll({ where: { sessionId: r.body.sessionId } })).map(s => s.exerciseName);
+  assert.ok(names.includes('Iso Leg Press'), `iso stays iso, got ${JSON.stringify(names)}`);
+  assert.ok(!names.includes('Leg Press'), 'the stale alias must not turn it into Leg Press');
+  assert.ok(names.includes('Bicep Curl'), 'positive control: a same-variant alias still rewrites');
+});
