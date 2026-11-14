@@ -56,7 +56,7 @@ const appAccessGate = require('./appGate');
 
 function getActiveTab(requestPath) {
     if (requestPath === '/') return 'dashboard';
-    if (requestPath.startsWith('/tools') || requestPath.startsWith('/timers') || requestPath.startsWith('/skills') || requestPath.startsWith('/tests') || requestPath.startsWith('/benchmarks')) return 'tools';
+    if (requestPath.startsWith('/tools') || requestPath.startsWith('/timers') || requestPath.startsWith('/ladder') || requestPath.startsWith('/skills') || requestPath.startsWith('/tests') || requestPath.startsWith('/benchmarks')) return 'tools';
     // Before the /exercise* line below, which would otherwise swallow it —
     // startsWith('/plan-maker') never got a chance because the same branch
     // returned 'exercises' for it, so BOTH nav links lit up and only cleared
@@ -405,6 +405,8 @@ require('./api/web-exercises')(app, { requireLogin, getDatabase });
 app.get('/tools', requireLogin, (req, res) => {
     res.render('tools', { title: 'Tools', user: req.user });
 });
+
+require('./api/web-ladder')(app, { requireLogin });
 
 // Weight tracking routes
 app.get('/weight', requireLogin, async (req, res) => {
@@ -1483,6 +1485,29 @@ app.put('/timers/api/protocols', requireLogin, async (req, res) => {
         if (e.status) return res.status(e.status).json({ error: e.message });
         console.error('[tempo] save failed');
         res.status(500).json({ error: 'could not save protocols' });
+    }
+});
+
+// Saved setups for the other timer tabs. Same database boundary as tempo:
+// getDatabase(req.user.username), so the list is that account's.
+const timerPresets = require('./api/timer-presets');
+app.get('/timers/api/presets', requireLogin, async (req, res) => {
+    try {
+        res.json({ presets: await timerPresets.list(getDatabase(req.user.username)) });
+    } catch (e) {
+        console.error('[timers] list failed');
+        res.status(500).json({ error: 'could not load timers' });
+    }
+});
+app.put('/timers/api/presets', requireLogin, async (req, res) => {
+    try {
+        const body = req.body || {};
+        const presets = await timerPresets.save(getDatabase(req.user.username), body.kind, body.presets);
+        res.json({ presets });
+    } catch (e) {
+        if (e.status) return res.status(e.status).json({ error: e.message });
+        console.error('[timers] save failed');
+        res.status(500).json({ error: 'could not save timers' });
     }
 });
 

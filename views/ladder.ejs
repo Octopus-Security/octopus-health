@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('partials/favicon') %>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="<%= asset('/theme.css') %>">
+  <%- include('partials/dialog') %>
+  <style>
+    .ladder-page { max-width: 980px; }
+    .ladder-lead { color: #9a9a9a; line-height: 1.55; margin: 8px 0 18px; max-width: 68ch; }
+    .ladder-presets, .ladder-path { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; min-width: 0; }
+    .ladder-presets button, .ladder-path button, #download {
+      min-height: var(--tap); min-width: 44px; max-width: 100%;
+      flex: 1 1 150px; white-space: normal; overflow-wrap: anywhere; text-align: center;
+    }
+    .ladder-presets button[aria-pressed="true"] { border-color: #2ecc71; color: #2ecc71; }
+    .ladder-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px; margin-bottom: 16px; min-width: 0;
+    }
+    .ladder-field { display: flex; flex-direction: column; gap: 4px; min-width: 0; margin: 0; }
+    .ladder-field > span { color: #999; font-size: 0.8rem; }
+    .ladder-page input, .ladder-page select {
+      font-size: 16px; min-height: var(--tap); width: 100%;
+    }
+    .ladder-fit { background: #111; border: 1px solid #1e1e1e; border-radius: 14px; padding: 16px; margin: 8px 0 16px; }
+    .ladder-fit p { margin: 0 0 8px; line-height: 1.5; overflow-wrap: anywhere; }
+    .ladder-fit p:last-child { margin-bottom: 0; }
+    #fit-line { color: #e8e8e8; font-size: 1.05rem; }
+    #notice { color: #e6c36a; }
+    #counts, #ports-note, #path-text { color: #8d8d8d; }
+    .ladder-preview { background: #0e0e0e; border: 1px solid #1e1e1e; border-radius: 14px; overflow: hidden; margin-bottom: 16px; max-width: 100%; }
+    .ladder-preview svg { width: 100%; height: auto; display: block; }
+    .ladder-parts { list-style: none; padding: 0; margin: 0 0 16px; }
+    .ladder-parts li { padding: 10px 0; border-bottom: 1px solid #1e1e1e; overflow-wrap: anywhere; }
+    #ladder-check { margin-top: 12px; color: #888; }
+    h2 { margin-bottom: 0; }
+    h3 { margin: 8px 0; font-size: 1rem; }
+  </style>
+</head>
+<body>
+<%- include('partials/nav') %>
+<%
+  function pathBit(run) {
+    var s = run.squares + (run.squares === 1 ? ' bay' : ' bays');
+    if (run.turn) s += ', then ' + (run.turn > 0 ? 'left ' : 'right ') + Math.abs(run.turn) + '°';
+    return s;
+  }
+  var pathLabel = (input.runs || []).map(pathBit).join(' · ');
+  var extra = (plan.messages || []).slice(2).concat(plan.warnings || []);
+  var counts = plan.counts || { couplers: 0, pins: 0, joiners: 0, rungPieces: 0, railPieces: 0 };
+  var showCord = input.rails === 'cord' || input.rungs === 'cord';
+  var showStick = input.rails === 'stick' || input.rungs === 'stick';
+  var showDowel = input.rails === 'dowel' || input.rungs === 'dowel';
+%>
+<div class="container ladder-page">
+  <h2>Agility ladder</h2>
+  <p class="ladder-lead">Design a collapsible ladder and download the parts. Rails and rungs can each be paracord, printed bars, or dowels you cut. The connector is only the joint. A long rung is split into pieces that fit the bed.</p>
+
+  <div class="ladder-presets" id="presets">
+    <button type="button" data-preset="cord-stick" aria-pressed="true">Paracord rails, printed rungs</button>
+    <button type="button" data-preset="cord-dowel" aria-pressed="false">Paracord rails, dowel rungs</button>
+    <button type="button" data-preset="all-stick" aria-pressed="false">All printed bars</button>
+    <button type="button" data-preset="narrow" aria-pressed="false">Narrow, one piece</button>
+  </div>
+
+  <form id="ladder-form" autocomplete="off">
+    <div class="ladder-grid">
+      <label class="ladder-field">
+        <span>Printer</span>
+        <select id="printer">
+          <option value="a1-mini"<%= input.printer === 'a1-mini' ? ' selected' : '' %>>A1 mini, 180 mm</option>
+          <option value="a1"<%= input.printer === 'a1' ? ' selected' : '' %>>A1, 256 mm</option>
+          <option value="custom"<%= input.printer === 'custom' ? ' selected' : '' %>>Other bed</option>
+        </select>
+      </label>
+      <label class="ladder-field" id="field-bed"<%= input.printer === 'custom' ? '' : ' hidden' %>>
+        <span>Bed (mm)</span>
+        <input id="bed" type="number" inputmode="numeric" min="120" max="350" step="1" value="<%= input.bed %>">
+      </label>
+      <label class="ladder-field">
+        <span>Rails</span>
+        <select id="rails">
+          <option value="cord"<%= input.rails === 'cord' ? ' selected' : '' %>>Paracord</option>
+          <option value="stick"<%= input.rails === 'stick' ? ' selected' : '' %>>Printed bars</option>
+          <option value="dowel"<%= input.rails === 'dowel' ? ' selected' : '' %>>Cut dowels</option>
+        </select>
+      </label>
+      <label class="ladder-field">
+        <span>Rungs</span>
+        <select id="rungs">
+          <option value="cord"<%= input.rungs === 'cord' ? ' selected' : '' %>>Paracord</option>
+          <option value="stick"<%= input.rungs === 'stick' ? ' selected' : '' %>>Printed bars</option>
+          <option value="dowel"<%= input.rungs === 'dowel' ? ' selected' : '' %>>Cut dowels</option>
+        </select>
+      </label>
+      <label class="ladder-field">
+        <span>Width (mm)</span>
+        <input id="width" type="number" inputmode="numeric" min="120" max="800" step="1" value="<%= input.width %>">
+      </label>
+      <label class="ladder-field">
+        <span>Spacing (mm)</span>
+        <input id="spacing" type="number" inputmode="numeric" min="150" max="800" step="1" value="<%= input.spacing %>">
+      </label>
+      <label class="ladder-field">
+        <span>Grip (mm)</span>
+        <input id="grip" type="number" inputmode="decimal" min="16" max="60" step="1" value="<%= input.grip %>">
+      </label>
+      <label class="ladder-field">
+        <span>Sockets</span>
+        <select id="ports">
+          <option value="auto"<%= String(input.ports) === 'auto' ? ' selected' : '' %>>Auto</option>
+          <option value="4">4</option>
+          <option value="8">8</option>
+        </select>
+      </label>
+      <label class="ladder-field" id="field-cord"<%= showCord ? '' : ' hidden' %>>
+        <span>Paracord diameter (mm)</span>
+        <input id="cord" type="number" inputmode="decimal" min="2" max="8" step="0.5" value="<%= input.cord %>">
+      </label>
+      <label class="ladder-field" id="field-stick-w"<%= showStick ? '' : ' hidden' %>>
+        <span>Bar width (mm)</span>
+        <input id="stickW" type="number" inputmode="numeric" min="8" max="25" step="1" value="<%= input.stickW %>">
+      </label>
+      <label class="ladder-field" id="field-stick-h"<%= showStick ? '' : ' hidden' %>>
+        <span>Bar thickness (mm)</span>
+        <input id="stickH" type="number" inputmode="numeric" min="4" max="15" step="1" value="<%= input.stickH %>">
+      </label>
+      <label class="ladder-field" id="field-dowel"<%= showDowel ? '' : ' hidden' %>>
+        <span>Dowel diameter (mm)</span>
+        <input id="dowel" type="number" inputmode="numeric" min="8" max="30" step="1" value="<%= input.dowel %>">
+      </label>
+    </div>
+  </form>
+
+  <div class="ladder-path" id="path">
+    <button type="button" id="add-bay">Add a bay</button>
+    <button type="button" id="left-45">Left 45°</button>
+    <button type="button" id="right-45">Right 45°</button>
+    <button type="button" id="left-90">Left 90°</button>
+    <button type="button" id="right-90">Right 90°</button>
+    <button type="button" id="undo">Undo</button>
+  </div>
+  <p id="path-text"><%= pathLabel %></p>
+
+  <section class="ladder-fit" id="fit" data-token="0" aria-live="polite">
+    <p id="fit-line"><%= plan.fitLine || (plan.lines && plan.lines[0]) || '' %></p>
+    <p id="grip-line"<%= plan.gripLine ? '' : ' hidden' %>><%= plan.gripLine || '' %></p>
+    <p id="rung-line"<%= plan.rungLine ? '' : ' hidden' %>><%= plan.rungLine || '' %></p>
+    <p id="rail-line"<%= plan.railLine ? '' : ' hidden' %>><%= plan.railLine || '' %></p>
+    <p id="cord-line"<%= plan.cordLine ? '' : ' hidden' %>><%= plan.cordLine || '' %></p>
+    <p id="dowel-line"<%= plan.dowelLine && plan.dowelLine !== plan.rungLine ? '' : ' hidden' %>><%= plan.dowelLine && plan.dowelLine !== plan.rungLine ? plan.dowelLine : '' %></p>
+    <p id="notice"<%= extra.length ? '' : ' hidden' %>><%= extra.join(' ') %></p>
+    <p id="ports-note"><%= plan.portsNote || '' %></p>
+    <p id="counts"><%= counts.couplers %> connectors · <%= counts.pins %> pins · <%= counts.joiners %> joiners · <%= counts.rungPieces %> rung pieces · <%= counts.railPieces %> rail pieces</p>
+  </section>
+
+  <h3>Layout</h3>
+  <div id="preview" class="ladder-preview"><%- plan.svg || '' %></div>
+
+  <h3>Print these</h3>
+  <ul class="ladder-parts" id="parts">
+    <% (plan.parts || []).forEach(function (row) { %>
+    <li><%= row.count %> × <%= row.name %> (<%= row.size %>)</li>
+    <% }) %>
+  </ul>
+  <p id="pack-note" class="ladder-lead">Paracord connectors slide along the cord. Push them together to pack the ladder. The knots stay in the cups on the ends. Printed bars pull out after you push the pins up from below.</p>
+  <button type="button" id="download" class="btn">Download all</button>
+  <p id="ladder-check" hidden></p>
+</div>
+<script id="ladder-boot" type="application/json"><%- JSON.stringify({ input: input }).replace(/</g, '\\u003c') %></script>
+<script src="<%= asset('/js/ladder-page.js') %>"></script>
+</body>
+</html>

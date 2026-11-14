@@ -70,6 +70,11 @@
     #tp-saved { margin-bottom:16px; }
     #tp-saved .it-preset { min-height:44px; justify-content:center; }
     #panel-tempo .config-item input, .tp-row input { min-height:44px; }
+    .timer-presets { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:16px; }
+    .timer-saved { display:contents; }
+    .timer-presets .it-preset { min-height:44px; max-width:100%; justify-content:center; overflow-wrap:anywhere; }
+    .timer-add, .timer-del { min-width:44px; min-height:44px; padding:0 14px; font-size:1.35rem; line-height:1; flex:0 0 auto; }
+    .timer-del[hidden] { display:none !important; }
     @media (max-width:520px) {
       .tp-row { grid-template-columns:1fr 1fr; }
     }
@@ -94,6 +99,11 @@
   <!-- ── Round Timer ── -->
   <div class="timer-panel active" id="panel-round">
     <div class="timer-card">
+      <div class="timer-presets" aria-label="Round timers">
+        <div id="rt-saved" class="timer-saved"></div>
+        <button type="button" class="it-preset timer-add" id="rt-add" aria-label="Add timer">+</button>
+        <button type="button" class="it-preset timer-del" id="rt-del" hidden aria-label="Delete timer">✕</button>
+      </div>
       <div class="config-grid config-grid-3">
         <div class="config-item">
           <label>Rounds</label>
@@ -137,8 +147,8 @@
     <div class="timer-card">
       <!-- Quick presets -->
       <div style="margin-bottom:16px;">
-        <div style="font-size:0.72rem;color:#555;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Quick Presets</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <div style="font-size:0.72rem;color:#555;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Timers</div>
+        <div class="timer-presets">
           <button class="it-preset" onclick="itPreset(8,20,10)">Tabata<span>20/10×8</span></button>
           <button class="it-preset" onclick="itPreset(10,30,30)">30/30<span>×10</span></button>
           <button class="it-preset" onclick="itPreset(10,40,20)">40/20<span>×10</span></button>
@@ -147,6 +157,9 @@
           <button class="it-preset bike" onclick="itPreset(10,20,40)">🚴 Bike 20/40<span>×10</span></button>
           <button class="it-preset bike" onclick="itPreset(10,30,30)">🚴 Bike 30/30<span>×10</span></button>
           <button class="it-preset bike" onclick="itPreset(8,40,20)">🚴 Bike 40/20<span>×8</span></button>
+          <div id="it-saved" class="timer-saved"></div>
+          <button type="button" class="it-preset timer-add" id="it-add" aria-label="Add timer">+</button>
+          <button type="button" class="it-preset timer-del" id="it-del" hidden aria-label="Delete timer">✕</button>
         </div>
       </div>
       <div class="config-grid config-grid-3">
@@ -178,6 +191,11 @@
   <!-- ── EMOM ── -->
   <div class="timer-panel" id="panel-emom">
     <div class="timer-card">
+      <div class="timer-presets" aria-label="EMOM timers">
+        <div id="em-saved" class="timer-saved"></div>
+        <button type="button" class="it-preset timer-add" id="em-add" aria-label="Add timer">+</button>
+        <button type="button" class="it-preset timer-del" id="em-del" hidden aria-label="Delete timer">✕</button>
+      </div>
       <div class="config-grid">
         <div class="config-item">
           <label>Minutes</label>
@@ -203,6 +221,11 @@
   <!-- ── AMRAP ── -->
   <div class="timer-panel" id="panel-amrap">
     <div class="timer-card">
+      <div class="timer-presets" aria-label="AMRAP timers">
+        <div id="am-saved" class="timer-saved"></div>
+        <button type="button" class="it-preset timer-add" id="am-add" aria-label="Add timer">+</button>
+        <button type="button" class="it-preset timer-del" id="am-del" hidden aria-label="Delete timer">✕</button>
+      </div>
       <div class="config-grid">
         <div class="config-item">
           <label>Duration (min)</label>
@@ -228,6 +251,11 @@
   <!-- ── Combo Caller ── -->
   <div class="timer-panel" id="panel-combos">
     <div class="timer-card" style="max-width:640px">
+      <div class="timer-presets" aria-label="Combo timers">
+        <div id="cb-saved" class="timer-saved"></div>
+        <button type="button" class="it-preset timer-add" id="cb-add" aria-label="Add timer">+</button>
+        <button type="button" class="it-preset timer-del" id="cb-del" hidden aria-label="Delete timer">✕</button>
+      </div>
 
       <!-- Strike toggles -->
       <div style="margin-bottom:16px">
@@ -294,7 +322,7 @@
   <!-- ── Tempo (strict pull-up and saved protocols) ── -->
   <div class="timer-panel" id="panel-tempo">
     <div class="timer-card" style="max-width:640px">
-      <p class="round-info" id="tp-hint" style="margin-bottom:12px">One rep is the phases in order. Strict pull-up is 5 seconds up, at the top, down, and in a dead hang.</p>
+      <p class="round-info" id="tp-hint" style="margin-bottom:12px">Tap + to keep this timer. One rep is the phases in order. Strict pull-up is 5 seconds up, at the top, down, and in a dead hang.</p>
       <div class="strike-toggles" id="tp-saved"></div>
       <div class="config-grid">
         <div class="config-item">
@@ -341,6 +369,7 @@
 </div>
 
 <script src="<%= asset('/js/tempo-page.js') %>"></script>
+<script src="<%= asset('/js/timer-presets.js') %>"></script>
 <script>
 // ── Tab switching ─────────────────────────────────────────────────────────────
 document.querySelectorAll('.timer-tab').forEach(btn => {
@@ -477,6 +506,7 @@ function rtReset() {
 // ── Interval Timer ────────────────────────────────────────────────────────────
 let itState = null; let itTick = null;
 function itPreset(rounds, work, rest) {
+  if (window.TimerPresets) TimerPresets.deselect('interval');
   document.getElementById('it-rounds').value = rounds;
   document.getElementById('it-work').value   = work;
   document.getElementById('it-rest').value   = rest;
@@ -903,6 +933,98 @@ function cbReset(keepHistory) {
   document.getElementById('cb-pause').style.display = 'none';
   document.getElementById('cb-skip').style.display  = 'none';
   document.getElementById('cb-pause').textContent   = '⏸ Pause';
+}
+
+function timerField(id) { return document.getElementById(id).value; }
+function timerSet(id, value) { document.getElementById(id).value = value; }
+if (window.TimerPresets) {
+  TimerPresets.configure({
+    toast: function (msg) { if (window.oDialog && oDialog.toast) oDialog.toast(msg); else window.alert(msg); },
+    confirmDelete: function (name) {
+      if (!window.oDialog || !oDialog.confirm) return Promise.resolve(window.confirm('Delete ' + name + '?'));
+      return oDialog.confirm({ title: 'Delete this timer?', body: name, confirmLabel: 'Delete', danger: true });
+    },
+  });
+  TimerPresets.mount({
+    kind: 'round',
+    panel: document.getElementById('panel-round'),
+    saved: document.getElementById('rt-saved'),
+    add: document.getElementById('rt-add'),
+    del: document.getElementById('rt-del'),
+    running: function () { return !!rtState; },
+    read: function () {
+      return {
+        rounds: timerField('rt-rounds'), workMin: timerField('rt-work-min'), workSec: timerField('rt-work-sec'),
+        restMin: timerField('rt-rest-min'), restSec: timerField('rt-rest-sec'), countdown: timerField('rt-countdown'),
+      };
+    },
+    write: function (p) {
+      timerSet('rt-rounds', p.rounds); timerSet('rt-work-min', p.workMin); timerSet('rt-work-sec', p.workSec);
+      timerSet('rt-rest-min', p.restMin); timerSet('rt-rest-sec', p.restSec); timerSet('rt-countdown', p.countdown);
+      rtReset();
+    },
+  });
+  TimerPresets.mount({
+    kind: 'interval',
+    panel: document.getElementById('panel-interval'),
+    saved: document.getElementById('it-saved'),
+    add: document.getElementById('it-add'),
+    del: document.getElementById('it-del'),
+    running: function () { return !!itState; },
+    read: function () {
+      return { rounds: timerField('it-rounds'), work: timerField('it-work'), rest: timerField('it-rest') };
+    },
+    write: function (p) {
+      timerSet('it-rounds', p.rounds); timerSet('it-work', p.work); timerSet('it-rest', p.rest);
+      itReset();
+    },
+  });
+  TimerPresets.mount({
+    kind: 'emom',
+    panel: document.getElementById('panel-emom'),
+    saved: document.getElementById('em-saved'),
+    add: document.getElementById('em-add'),
+    del: document.getElementById('em-del'),
+    running: function () { return !!emState; },
+    read: function () { return { minutes: timerField('em-minutes'), work: timerField('em-work') }; },
+    write: function (p) { timerSet('em-minutes', p.minutes); timerSet('em-work', p.work); emReset(); },
+  });
+  TimerPresets.mount({
+    kind: 'amrap',
+    panel: document.getElementById('panel-amrap'),
+    saved: document.getElementById('am-saved'),
+    add: document.getElementById('am-add'),
+    del: document.getElementById('am-del'),
+    running: function () { return !!amState; },
+    read: function () { return { minutes: timerField('am-minutes'), seconds: timerField('am-seconds') }; },
+    write: function (p) { timerSet('am-minutes', p.minutes); timerSet('am-seconds', p.seconds); amReset(); },
+  });
+  TimerPresets.mount({
+    kind: 'combo',
+    panel: document.getElementById('panel-combos'),
+    saved: document.getElementById('cb-saved'),
+    add: document.getElementById('cb-add'),
+    del: document.getElementById('cb-del'),
+    running: function () { return !!cbState; },
+    read: function () {
+      return {
+        min: timerField('cb-min'), max: timerField('cb-max'), delay: timerField('cb-delay'),
+        rounds: timerField('cb-rounds'), roundMin: timerField('cb-rmin'), rest: timerField('cb-rest'),
+        strikes: ['1', '2', '3', '4', '5', '6', 'E', 'K', 'N'].filter(function (k) { return document.getElementById('cb-' + k).checked; }),
+      };
+    },
+    write: function (p) {
+      timerSet('cb-min', p.min); timerSet('cb-max', p.max); timerSet('cb-delay', p.delay);
+      timerSet('cb-rounds', p.rounds); timerSet('cb-rmin', p.roundMin); timerSet('cb-rest', p.rest);
+      ['1', '2', '3', '4', '5', '6', 'E', 'K', 'N'].forEach(function (k) {
+        var on = p.strikes.indexOf(k) !== -1;
+        document.getElementById('cb-' + k).checked = on;
+        document.getElementById('tog-' + k).classList.toggle('on', on);
+      });
+      cbReset();
+    },
+  });
+  TimerPresets.load();
 }
 
 if (window.TempoPage) {

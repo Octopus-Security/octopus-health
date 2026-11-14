@@ -6,7 +6,7 @@
  * Voice is the combo caller's speechSynthesis settings, passed in as `speak`.
  */
 (function () {
-  var KEY_HINT = 'Saved on your account. The strict pull-up is always here.';
+  var KEY_HINT = 'Tap + to keep this timer. It is saved on your account. The strict pull-up is always here.';
 
   function $(id) { return document.getElementById(id); }
 
@@ -21,6 +21,9 @@
     var currentId = 'strict-pull-up';
     var timer = null;
     var running = null;
+    var saveTimer = null;
+    var ready = false;
+    var busy = false;
 
     function builtin() {
       return {
@@ -54,6 +57,7 @@
     }
 
     function fillForm(p) {
+      clearTimeout(saveTimer);
       currentId = p.id || '';
       $('tp-name').value = p.name;
       $('tp-reps').value = p.reps;
@@ -78,6 +82,7 @@
       row.querySelector('.tp-remove').addEventListener('click', function () {
         if (document.querySelectorAll('#tp-phases .tp-row').length <= 1) return;
         row.remove();
+        scheduleSave();
       });
       return row;
     }
@@ -101,6 +106,27 @@
         });
         box.appendChild(b);
       });
+      var add = document.createElement('button');
+      add.type = 'button';
+      add.id = 'tp-add-timer';
+      add.className = 'it-preset timer-add';
+      add.textContent = '+';
+      add.setAttribute('aria-label', 'Add timer');
+      add.disabled = !ready || busy;
+      add.addEventListener('click', addProtocol);
+      box.appendChild(add);
+    }
+
+    function uniqueName(base) {
+      var taken = {};
+      saved.forEach(function (p) { taken[p.name.toLowerCase()] = true; });
+      var name = base;
+      var i = 2;
+      while (taken[name.toLowerCase()]) {
+        name = base + ' ' + i;
+        i += 1;
+      }
+      return name;
     }
 
     function activePhases() {
@@ -264,14 +290,58 @@
       if (running) return;
       if (document.querySelectorAll('#tp-phases .tp-row').length >= 8) return;
       $('tp-phases').appendChild(rowEl(blankPhase()));
+      scheduleSave();
     });
+
+    function scheduleSave() {
+      if (!ready || busy || running || !currentId || currentId === 'strict-pull-up') return;
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(saveCurrent, 400);
+    }
+
+    function saveCurrent() {
+      if (!ready || busy || running || !currentId || currentId === 'strict-pull-up') return;
+      var previous = saved.find(function (p) { return p.id === currentId; });
+      if (!previous) return;
+      var name = ($('tp-name').value || '').trim();
+      if (!name || name.toLowerCase() === 'strict pull-up') name = previous.name;
+      var body = { id: currentId, name: name, reps: $('tp-reps').value, phases: activePhases() };
+      var next = saved.map(function (p) { return p.id === currentId ? body : p; });
+      busy = true;
+      persist(next).catch(function (e) { toast(e.message); }).then(function () { busy = false; renderChips(); });
+    }
+
+    function addProtocol() {
+      clearTimeout(saveTimer);
+      if (!ready || running || busy) return;
+      var name = ($('tp-name').value || '').trim();
+      if (!name || name.toLowerCase() === 'strict pull-up') name = 'Custom';
+      name = uniqueName(name);
+      var body = { name: name, reps: $('tp-reps').value, phases: activePhases() };
+      busy = true;
+      renderChips();
+      persist([body].concat(saved)).then(function () {
+        var stored = saved.find(function (p) { return p.name.toLowerCase() === name.toLowerCase(); });
+        if (stored) {
+          fillForm(stored);
+          resetDisplay();
+          $('tp-name').focus();
+          try { $('tp-name').select(); } catch (e) { /* the name is still there to edit */ }
+        }
+      }).catch(function (e) { toast(e.message); }).then(function () { busy = false; renderChips(); });
+    }
 
     $('tp-start').addEventListener('click', start);
     $('tp-pause').addEventListener('click', pause);
     $('tp-reset').addEventListener('click', reset);
 
+    $('tp-name').addEventListener('input', scheduleSave);
+    $('tp-reps').addEventListener('input', scheduleSave);
+    $('tp-phases').addEventListener('input', scheduleSave);
+
     $('tp-save').addEventListener('click', function () {
-      if (running) return;
+      clearTimeout(saveTimer);
+      if (!ready || running || busy) return;
       var form = readForm();
       var phases = activePhases();
       var body = {
@@ -288,11 +358,13 @@
       if (existing) body.id = existing.id;
       var next = saved.filter(function (p) { return p.id !== body.id; });
       next.unshift(body);
+      busy = true;
+      renderChips();
       persist(next).then(function () {
         var stored = saved.find(function (p) { return p.name.toLowerCase() === body.name.toLowerCase(); });
         if (stored) fillForm(stored);
         toast('Saved.');
-      }).catch(function (e) { toast(e.message); });
+      }).catch(function (e) { toast(e.message); }).then(function () { busy = false; renderChips(); });
     });
 
     $('tp-delete').addEventListener('click', function () {
@@ -313,7 +385,12 @@
 
     fetch('/timers/api/protocols', { credentials: 'same-origin' })
       .then(function (r) { if (!r.ok) throw new Error('load'); return r.json(); })
-      .then(function (body) { saved = body.protocols || []; renderChips(); })
+      .then(function (body) {
+        if (busy) return;
+        saved = body.protocols || [];
+        ready = true;
+        renderChips();
+      })
       .catch(function () { $('tp-hint').textContent = 'Could not load saved protocols. The strict pull-up still runs.'; });
   }
 
