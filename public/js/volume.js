@@ -145,7 +145,12 @@
   document.querySelectorAll('.bm-view-btn').forEach(function (b) {
     b.addEventListener('click', function () {
       var v = b.getAttribute('data-view');
-      document.querySelectorAll('.bm-svg').forEach(function (s) { s.hidden = s.getAttribute('data-view') !== v; });
+      document.querySelectorAll('.bm-svg').forEach(function (s) {
+        var on = s.getAttribute('data-view') === v;
+        s.classList.toggle('bm-on', on);
+        if (on) s.removeAttribute('hidden');
+        else s.setAttribute('hidden', '');
+      });
       document.querySelectorAll('.bm-view-btn').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
     });
   });

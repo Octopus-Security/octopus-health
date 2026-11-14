@@ -269,6 +269,47 @@ test('the page renders every drawn muscle, every joint, and uses versioned asset
   for (const id of Object.keys(M.JOINTS)) assert.ok(text.includes(`data-kind="joint" data-id="${id}"`), `no control for joint ${id}`);
   assert.match(text, /\/body-map\.css\?v=|\/body-map\.css/);
   assert.match(text, /aria-label="Chest \(muscle\)/);
+  assert.match(text, /class="bm-svg bm-on" data-view="front"/);
+  assert.match(text, /class="bm-svg" data-view="back"[^>]*hidden/);
+  assert.match(text, /data-week-from="\d{4}-\d{2}-\d{2}"/);
+  assert.match(text, /data-week-to="\d{4}-\d{2}-\d{2}"/);
+  assert.match(text, /data-id="abs"[^>]*data-view="front"/);
+  assert.match(text, /data-id="lower_back"/);
+  assert.ok(!/data-id="abs"[^>]*data-view="back"/.test(text.split('data-view="back"')[1] || ''), 'abs is not a back muscle');
+});
+
+test('front and back figures list different muscles, and the view switch does not use the SVG hidden property', () => {
+  const front = new Set(GEOMETRY.front.shapes.map(s => s.id).filter(id => !id.startsWith('@')));
+  const back = new Set(GEOMETRY.back.shapes.map(s => s.id).filter(id => !id.startsWith('@')));
+  assert.ok(front.has('abs') && !back.has('abs'));
+  assert.ok(back.has('lower_back') && !front.has('lower_back'));
+  assert.ok(back.has('traps') && back.has('hamstrings') && front.has('quads') && front.has('chest'));
+  const css = fs.readFileSync(path.join(__dirname, '..', 'public/body-map.css'), 'utf8');
+  const js = fs.readFileSync(path.join(__dirname, '..', 'public/js/body-map.js'), 'utf8');
+  const vol = fs.readFileSync(path.join(__dirname, '..', 'public/js/volume.js'), 'utf8');
+  const page = fs.readFileSync(path.join(__dirname, '..', 'views/body.ejs'), 'utf8');
+  const route = fs.readFileSync(path.join(__dirname, '..', 'api/body-map.js'), 'utf8');
+  assert.match(css, /\.bm-svg:not\(\.bm-on\) \{ display: none !important; \}/);
+  assert.match(css, /\.bm-svg\.bm-on \{ display: block !important; \}/);
+  assert.match(css, /\.bm-part\[data-week="under"\] polygon \{ fill: var\(--bm-week-under\); \}/);
+  assert.match(css, /\.bm-part\[data-week="ok"\] polygon \{ fill: var\(--bm-week-ok\); \}/);
+  assert.match(css, /\.bm-part\[data-week="over"\] polygon \{ fill: var\(--bm-week-over\); \}/);
+  // Selection is a stroke after the week fill, so the week's colour stays visible.
+  assert.ok(css.indexOf('[data-week="over"]') < css.indexOf('[aria-pressed="true"] polygon { stroke: var(--bm-fill-sel)'));
+  const setView = js.slice(js.indexOf('function setView'), js.indexOf('function viewNote'));
+  assert.ok(setView.includes('function setView'));
+  assert.doesNotMatch(setView, /\.hidden\s*=/);
+  assert.match(setView, /classList\.toggle\('bm-on'/);
+  assert.match(setView, /removeAttribute\('hidden'\)/);
+  assert.match(setView, /setAttribute\('hidden'/);
+  assert.match(js, /\/volume\/api\/windows\?from=/);
+  assert.match(js, /length=7&step=7/);
+  assert.match(js, /setAttribute\('data-week'/);
+  assert.match(page, /data-week-from="<%= weekFrom %>"/);
+  assert.match(page, /id="bm-week"/);
+  assert.match(route, /weekFrom: addDays\(weekTo, -6\)/);
+  assert.doesNotMatch(vol, /\.hidden\s*=/);
+  assert.match(vol, /classList\.toggle\('bm-on'/);
 });
 
 test('JSON route: built-in stretches and exercises for a muscle and a joint', { skip }, async () => {

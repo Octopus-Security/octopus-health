@@ -1,6 +1,7 @@
 /* Body map. Dark only, like the rest of the app (it has no light theme to follow). */
 .bm {
   --bm-fill: #2a3a44; --bm-fill-hover: #3b6a86; --bm-fill-sel: #2ecc71;
+  --bm-week-under: hsl(210, 70%, 42%); --bm-week-ok: hsl(140, 55%, 32%); --bm-week-over: hsl(25, 85%, 46%);
   --bm-stroke: #0d0d0d; --bm-head: #1c1c1c; --bm-joint: rgba(230,126,34,.35); --bm-joint-line: #e67e22;
   --bm-text: #d4d4d4; --bm-muted: #888; --bm-surface: #111; --bm-border: #2a2a2a; --bm-accent: #2ecc71;
   --bm-focus: #7fcbff;
@@ -14,20 +15,47 @@
 .bm-toggle { display: flex; gap: 8px; justify-content: center; margin-bottom: var(--space-3); }
 .bm-view-btn { padding: 6px 18px; background: transparent; color: var(--bm-muted); border: 1px solid var(--bm-border); }
 .bm-view-btn[aria-pressed="true"] { color: var(--bm-accent); border-color: var(--bm-accent); }
-.bm-svg { display: block; width: 100%; max-width: 360px; max-height: 70vh; margin: 0 auto; }
+.bm-week-legend { color: var(--bm-muted); font-size: 0.8rem; text-align: center; margin: 0 0 var(--space-2); overflow-wrap: break-word; }
+.bm-legend { display: flex; flex-wrap: wrap; gap: 8px 14px; justify-content: center; list-style: none; padding: 0; margin: 0 0 var(--space-3); color: var(--bm-muted); font-size: 0.75rem; }
+.bm-legend li { display: inline-flex; align-items: center; gap: 6px; }
+.bm-swatch { width: 14px; height: 14px; border-radius: 3px; display: inline-block; background: var(--bm-fill); border: 1px solid #0006; }
+.bm-swatch[data-week="under"] { background: var(--bm-week-under); }
+.bm-swatch[data-week="ok"] { background: var(--bm-week-ok); }
+.bm-swatch[data-week="over"] { background: var(--bm-week-over); }
+/* The view switch used to set the hidden attribute and also `display: block` on
+   .bm-svg. On an SVG that loses: the hidden property is not reliable, and an
+   author display rule beats the browser's own [hidden] rule. Both figures
+   stayed in the page, the front one above the fold, so Back changed the button
+   and left the front muscles on screen. The class is what shows a figure.
+   theme.css also sets `[hidden] { display: none !important }`. A shown figure
+   can still carry that attribute for a moment, so the on-state needs
+   !important too. Higher specificity then beats the attribute rule. */
+.bm-svg { width: 100%; max-width: 360px; max-height: 70vh; margin: 0 auto; }
+.bm-svg:not(.bm-on) { display: none !important; }
+.bm-svg.bm-on { display: block !important; }
 .bm-head { fill: var(--bm-head); stroke: var(--bm-stroke); stroke-width: 3; }
 .bm-part { cursor: pointer; outline: none; }
-.bm-part polygon { fill: var(--bm-fill); stroke: var(--bm-stroke); stroke-width: 3; transition: fill .12s; }
-.bm-part:hover polygon, .bm-part:focus polygon { fill: var(--bm-fill-hover); }
+.bm-part polygon { fill: var(--bm-fill); stroke: var(--bm-stroke); stroke-width: 3; transition: fill .12s, stroke .12s; }
+/* Week colour stays on the fill. Selection and hover use the stroke, so tapping
+   a muscle does not paint over the answer "how much did this get this week". */
+.bm-part[data-week="untrained"] polygon { fill: var(--bm-fill); }
+.bm-part[data-week="under"] polygon { fill: var(--bm-week-under); }
+.bm-part[data-week="ok"] polygon { fill: var(--bm-week-ok); }
+.bm-part[data-week="over"] polygon { fill: var(--bm-week-over); }
+.bm-part.bm-joint:not(.bm-dot) polygon { stroke: var(--bm-joint-line); stroke-width: 5; }
+.bm-part:hover polygon, .bm-part:focus polygon { stroke: var(--bm-fill-hover); stroke-width: 8; }
+.bm-part[aria-pressed="true"] polygon { stroke: var(--bm-fill-sel); stroke-width: 10; }
 .bm-part:focus-visible polygon, .bm-part:focus-visible circle { stroke: var(--bm-focus); stroke-width: 8; }
-.bm-part[aria-pressed="true"] polygon { fill: var(--bm-fill-sel); }
 .bm-dot circle { fill: var(--bm-joint); stroke: var(--bm-joint-line); stroke-width: 4; transition: fill .12s; }
 .bm-dot:hover circle, .bm-dot:focus circle { fill: var(--bm-joint-line); }
 .bm-dot[aria-pressed="true"] circle { fill: var(--bm-joint-line); stroke: var(--bm-text); }
-.bm-part.bm-joint:not(.bm-dot) polygon { stroke: var(--bm-joint-line); stroke-width: 5; }
 .bm-extra h3 { font-size: 0.8rem; color: var(--bm-muted); margin: var(--space-4) 0 var(--space-2); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
 .bm-chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
 .bm-chip { padding: 5px 12px; font-size: 0.78rem; background: transparent; color: var(--bm-text); border: 1px solid var(--bm-border); border-radius: 16px; }
+.bm-chip[hidden] { display: none !important; }
+.bm-chip[data-week="under"] { box-shadow: inset 3px 0 0 var(--bm-week-under); }
+.bm-chip[data-week="ok"] { box-shadow: inset 3px 0 0 var(--bm-week-ok); }
+.bm-chip[data-week="over"] { box-shadow: inset 3px 0 0 var(--bm-week-over); }
 .bm-chip[aria-pressed="true"] { color: var(--bm-accent); border-color: var(--bm-accent); }
 .bm button:focus-visible, .bm a:focus-visible { outline: 2px solid var(--bm-focus); outline-offset: 2px; }
 .bm-panel { position: sticky; top: 12px; margin-bottom: 0; max-height: calc(100vh - 24px); overflow-y: auto; }

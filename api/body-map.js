@@ -18,14 +18,19 @@ const { excludedFromPlans } = require('../lib/martial-scope');
 
 const M = require('../lib/muscles');
 const GEOMETRY = require('../lib/body-geometry.json');
+const { todayET, addDays } = require('../lib/et');
 
 module.exports = (app, { requireLogin, getDatabase }) => {
   app.get('/body', requireLogin, (req, res) => {
+    const weekTo = todayET();
     res.render('body', {
       title: 'Body Map',
       user: req.user,
       vocab: M.publicVocabulary(),
       geometry: GEOMETRY,
+      // Rolling 7 ET days ending today. The page asks /volume for exactly this window.
+      weekFrom: addDays(weekTo, -6),
+      weekTo,
     });
   });
 

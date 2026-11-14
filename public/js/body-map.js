@@ -4,13 +4,41 @@
   var panel = document.getElementById('bm-panel');
   if (!panel) return;
   var $ = function (id) { return document.getElementById(id); };
-  var selected = null, seq = 0;
+  var selected = null, seq = 0, currentView = 'front';
 
+  // Class, not the SVG hidden property. Setting .hidden on an SVG does not
+  // reliably change the attribute, and display:block on .bm-svg then keeps
+  // both figures. The front one stays on screen, so Back looks selected
+  // while the front muscles are what you still see and tap.
   function setView(view) {
-    document.querySelectorAll('.bm-svg').forEach(function (s) { s.hidden = s.getAttribute('data-view') !== view; });
-    document.querySelectorAll('.bm-view-btn').forEach(function (b) {
-      b.setAttribute('aria-pressed', String(b.getAttribute('data-view') === view));
+    currentView = view === 'back' ? 'back' : 'front';
+    document.querySelectorAll('.bm-svg').forEach(function (s) {
+      var on = s.getAttribute('data-view') === currentView;
+      s.classList.toggle('bm-on', on);
+      if (on) s.removeAttribute('hidden');
+      else s.setAttribute('hidden', '');
     });
+    document.querySelectorAll('.bm-view-btn').forEach(function (b) {
+      b.setAttribute('aria-pressed', String(b.getAttribute('data-view') === currentView));
+    });
+    document.querySelectorAll('.bm-chip[data-view]').forEach(function (c) {
+      var v = c.getAttribute('data-view');
+      var show = v === 'both' || v === currentView;
+      if (show) c.removeAttribute('hidden');
+      else c.setAttribute('hidden', '');
+    });
+    viewNote();
+  }
+
+  function viewNote() {
+    var note = $('bm-view-note');
+    if (!note) return;
+    if (!selected || selected.kind !== 'muscle') { note.textContent = ''; return; }
+    var chip = document.querySelector('.bm-chip[data-kind="muscle"][data-id="' + selected.id + '"]');
+    var mv = chip && chip.getAttribute('data-view');
+    note.textContent = (mv && mv !== 'both' && mv !== currentView)
+      ? 'That muscle is drawn on the ' + mv + '. This view shows the other side.'
+      : '';
   }
   document.querySelectorAll('.bm-view-btn').forEach(function (b) {
     b.addEventListener('click', function () { setView(b.getAttribute('data-view')); });
@@ -79,9 +107,60 @@
   $('bm-close').addEventListener('click', close);
   document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') close(); });
 
+  var week = null;
+  var WEEK_STATUS = { untrained: 1, under: 1, ok: 1, over: 1 };
+
+  function weekLine(id) {
+    var el = $('bm-week');
+    if (!el) return;
+    var c = week && week.byId && week.byId[id];
+    if (!c) { el.textContent = ''; return; }
+    var g = week.guideline || { min: 10, max: 20 };
+    var sentence = c.weeklySets + ' hard sets in the last 7 days. ';
+    if (c.status === 'untrained') sentence += 'Nothing logged hits this muscle. The primary exercises below are the direct work.';
+    else if (c.status === 'under') sentence += 'Short of ' + g.min + '. The primary list is what adds sets.';
+    else if (c.status === 'ok') sentence += 'Inside ' + g.min + ' to ' + g.max + '.';
+    else if (c.status === 'over') sentence += 'Past ' + g.max + '. More sets are optional. That ceiling is a working assumption.';
+    el.textContent = sentence;
+  }
+
+  function applyWeek(report) {
+    var w = report.windows[report.windows.length - 1];
+    week = { byId: w.muscles, guideline: report.params.guideline, start: w.start, end: w.end };
+    document.querySelectorAll('.bm-part[data-kind="muscle"], .bm-chip[data-kind="muscle"]').forEach(function (el) {
+      var c = w.muscles[el.getAttribute('data-id')];
+      if (!c || !WEEK_STATUS[c.status]) { el.removeAttribute('data-week'); return; }
+      el.setAttribute('data-week', c.status);
+      if (el.classList.contains('bm-chip')) el.title = c.weeklySets + ' hard sets, ' + c.status;
+    });
+    var legend = $('bm-week-legend');
+    if (legend) legend.textContent = w.start + ' to ' + w.end + '.';
+    if (selected && selected.kind === 'muscle') weekLine(selected.id);
+  }
+
+  function loadWeek() {
+    var fig = document.querySelector('.bm-figure');
+    var from = fig && fig.getAttribute('data-week-from');
+    var to = fig && fig.getAttribute('data-week-to');
+    var legend = $('bm-week-legend');
+    if (!from || !to) return;
+    fetch('/volume/api/windows?from=' + encodeURIComponent(from) + '&to=' + encodeURIComponent(to) + '&length=7&step=7', { credentials: 'same-origin', headers: { Accept: 'application/json' } })
+      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+      .then(function (res) {
+        if (!res.ok || !res.j.success || !res.j.windows || !res.j.windows.length) throw new Error('no window');
+        applyWeek(res.j);
+      })
+      .catch(function () {
+        if (legend) legend.textContent = 'This week\'s sets could not load. Muscles and exercises still work.';
+      });
+  }
+
   function select(kind, id) {
     selected = { kind: kind, id: id };
     mark(kind, id);
+    viewNote();
+    if (kind === 'muscle') weekLine(id);
+    else if ($('bm-week')) $('bm-week').textContent = '';
     var mine = ++seq;
     $('bm-empty').hidden = true;
     $('bm-result').hidden = false;
@@ -112,6 +191,8 @@
   }
 
   if (window.DailyStretches) window.DailyStretches.load().catch(function () { /* toggles just read 'add' until it loads */ });
+
+  loadWeek();
 
   document.querySelectorAll('[data-kind][data-id]').forEach(function (el) {
     el.addEventListener('click', function () { select(el.getAttribute('data-kind'), el.getAttribute('data-id')); });

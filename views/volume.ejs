@@ -69,7 +69,7 @@
       <% }) %>
     </div>
     <% views.forEach(function (v, i) { const g = geometry[v.key]; %>
-      <svg class="bm-svg" data-view="<%= v.key %>" viewBox="<%= geometry.viewBox %>" role="group" aria-label="<%= v.label %> view heat map" <%= i === 0 ? '' : 'hidden' %>>
+      <svg class="bm-svg<%= i === 0 ? ' bm-on' : '' %>" data-view="<%= v.key %>" viewBox="<%= geometry.viewBox %>" role="group" aria-label="<%= v.label %> view heat map" <%= i === 0 ? '' : 'hidden' %>>
         <% g.shapes.filter(function (s) { return s.id === '@head'; }).forEach(function (s) { %>
           <polygon class="bm-head" points="<%= s.points %>" aria-hidden="true"/>
         <% }) %>
