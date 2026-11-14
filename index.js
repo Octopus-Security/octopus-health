@@ -1463,6 +1463,29 @@ app.get('/timers', requireLogin, (req, res) => {
     res.render('timers', { title: 'Timers', user: req.user });
 });
 
+// Saved tempo protocols (strict pull-up is built in and not stored). The database
+// is the signed-in user's own file. A failure message stays generic: the client
+// only needs to know it did not save.
+const tempoApi = require('./api/tempo');
+app.get('/timers/api/protocols', requireLogin, async (req, res) => {
+    try {
+        res.json({ protocols: await tempoApi.list(getDatabase(req.user.username)) });
+    } catch (e) {
+        console.error('[tempo] list failed');
+        res.status(500).json({ error: 'could not load protocols' });
+    }
+});
+app.put('/timers/api/protocols', requireLogin, async (req, res) => {
+    try {
+        const protocols = await tempoApi.save(getDatabase(req.user.username), req.body && req.body.protocols);
+        res.json({ protocols });
+    } catch (e) {
+        if (e.status) return res.status(e.status).json({ error: e.message });
+        console.error('[tempo] save failed');
+        res.status(500).json({ error: 'could not save protocols' });
+    }
+});
+
 // ── Training Plans ────────────────────────────────────────────────────────────
 
 app.get('/plans', requireLogin, async (req, res) => {
