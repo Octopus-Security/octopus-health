@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('partials/favicon') %>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="<%= asset('/theme.css') %>">
+  <%- include('partials/dialog') %>
+  <style>
+    .landmine-page { max-width: 980px; }
+    .landmine-lead { color: #9a9a9a; line-height: 1.55; margin: 8px 0 14px; max-width: 68ch; overflow-wrap: break-word; }
+    .landmine-page p { overflow-wrap: break-word; }
+    .landmine-bars { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; min-width: 0; }
+    .landmine-bars button, #download {
+      min-height: var(--tap); min-width: 44px; max-width: 100%;
+      flex: 1 1 140px; white-space: normal; overflow-wrap: break-word; text-align: center;
+    }
+    .landmine-bars button[aria-pressed="true"] { border-color: #2ecc71; color: #2ecc71; }
+    .landmine-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px; margin-bottom: 16px; min-width: 0;
+    }
+    .landmine-field { display: flex; flex-direction: column; gap: 4px; min-width: 0; margin: 0; }
+    .landmine-field > span { color: #999; font-size: 0.8rem; }
+    .landmine-page input, .landmine-page select { font-size: 16px; min-height: var(--tap); width: 100%; max-width: 100%; }
+    .landmine-page button, .landmine-page .btn { min-height: var(--tap); min-width: 44px; }
+    #preview-canvas { display: block; width: 100%; max-width: 100%; height: 320px; background: #0e0e0e; border-radius: 14px; touch-action: none; }
+    .landmine-fit { background: #111; border: 1px solid #1e1e1e; border-radius: 14px; padding: 16px; margin: 8px 0 16px; }
+    .landmine-fit p { margin: 0 0 8px; line-height: 1.5; overflow-wrap: break-word; }
+    .landmine-fit p:last-child { margin-bottom: 0; }
+    #fit-line { color: #e8e8e8; }
+    #notice { color: #e6c36a; }
+    .landmine-parts { list-style: none; padding: 0; margin: 0 0 16px; }
+    .landmine-parts li { padding: 10px 0; border-bottom: 1px solid #1e1e1e; overflow-wrap: break-word; }
+    #landmine-check { margin-top: 12px; color: #888; }
+    h2 { margin-bottom: 0; }
+    h3 { margin: 8px 0; font-size: 1rem; }
+  </style>
+</head>
+<body>
+<%- include('partials/nav') %>
+<div class="container landmine-page">
+  <h2>Landmine</h2>
+  <p class="landmine-lead">A ball for the end of a barbell. Two pieces screw together on a coarse thread, <% if (plan.pitch) { %><%= plan.pitch %> mm per turn and <%= plan.depth %> mm deep<% } else { %>deep, with a wide crest<% } %>, so wear does not wipe it out. The ball is smooth so it rolls, and so the print needs no supports. Set the ball and the bar to match what you have.</p>
+
+  <div class="landmine-bars" id="bars">
+    <% (bars || []).forEach(function (row) { %>
+      <button type="button" data-bar="<%= row.bar %>" aria-pressed="<%= row.bar === 50.8 ? 'true' : 'false' %>"><%= row.label %></button>
+    <% }) %>
+  </div>
+
+  <div class="landmine-grid">
+    <label class="landmine-field" for="bar">
+      <span>Bar diameter (mm)</span>
+      <input id="bar" type="number" inputmode="decimal" min="20" max="70" step="0.1" value="50.8">
+    </label>
+    <label class="landmine-field" for="ball">
+      <span>Ball diameter (mm)</span>
+      <input id="ball" type="number" inputmode="numeric" min="60" max="240" step="1" value="100">
+    </label>
+    <label class="landmine-field" for="printer">
+      <span>Printer</span>
+      <select id="printer">
+        <option value="a1-mini" selected>A1 mini, 180 mm</option>
+        <option value="a1">A1, 256 mm</option>
+        <option value="custom">Other bed</option>
+      </select>
+    </label>
+    <label class="landmine-field" id="field-bed" for="bed" hidden>
+      <span>Bed (mm)</span>
+      <input id="bed" type="number" inputmode="numeric" min="120" max="400" step="1" value="180">
+    </label>
+  </div>
+
+  <div class="landmine-fit">
+    <p id="hole-line"><%= plan.holeLine || '' %></p>
+    <p id="ball-line"><%= plan.ballLine || '' %></p>
+    <p id="fit-line"><%= plan.fitLine || '' %></p>
+    <p id="thread-line"><%= plan.threadLine || '' %></p>
+    <p id="notice"><%= (plan.notes || []).join(' ') %></p>
+  </div>
+
+  <div class="landmine-fit">
+    <p>Print in PETG. 0.2 mm layers, 6 walls, about 50% infill. No supports.</p>
+    <p>Print the sleeve with the flat seam on the bed and the tube pointing up. Print the rocker with the thread on the bed and the dome pointing up. A brim on the rocker helps the first layer.</p>
+    <p>Screw the rocker into the sleeve until the seam closes. It is a right-hand thread. Stop when it seats. Do not force a cross-thread. Then slide the bar in until it stops.</p>
+    <p>The hole is 1.2 mm larger than the bar you enter. It is not a clamp. Generate the parts again for a different bar.</p>
+    <p>Look at the thread and the seam before you load the bar. If the plastic cracks, retire the print. This page does not rate a working load.</p>
+  </div>
+
+  <h3>Part preview</h3>
+  <p class="landmine-lead">Spin a part here. It is the same mesh as the file in the download.</p>
+  <label class="landmine-field" for="preview-part">
+    <span>Part</span>
+    <select id="preview-part"></select>
+  </label>
+  <canvas id="preview-canvas" width="640" height="320" aria-label="3D preview of the selected part"></canvas>
+  <p id="preview-note" class="landmine-lead"></p>
+
+  <h3>Print these</h3>
+  <ul class="landmine-parts" id="parts">
+    <% (plan.parts || []).forEach(function (row) { %>
+    <li><%= row.count %> × <%= row.name %> (<%= row.size %>)</li>
+    <% }) %>
+  </ul>
+  <button type="button" id="download" class="btn">Download both parts</button>
+  <p class="landmine-lead"><a href="/rope">Jump-rope handles</a> · <a href="/ladder">Agility ladder</a></p>
+  <p id="landmine-check" hidden></p>
+</div>
+<script src="<%= asset('/js/mesh-view.js') %>"></script>
+<script src="<%= asset('/js/landmine-page.js') %>"></script>
+</body>
+</html>

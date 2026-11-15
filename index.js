@@ -49,6 +49,7 @@ const { createVerifyCache } = require('./lib/verify-cache');
 const { parseWorkout, buildPreview } = require('./api/workout-parse');
 const { detectPR } = require('./api/pr-detect');
 const goalsApi = require('./api/goals');
+const goalPlan = require('./lib/goal-plan');
 
 const auth = new AuthClient();
 const AUTH_URL = process.env.AUTH_SERVICE_URL || 'http://octopus-auth:3002';
@@ -56,7 +57,7 @@ const appAccessGate = require('./appGate');
 
 function getActiveTab(requestPath) {
     if (requestPath === '/') return 'dashboard';
-    if (requestPath.startsWith('/tools') || requestPath.startsWith('/timers') || requestPath.startsWith('/ladder') || requestPath.startsWith('/skills') || requestPath.startsWith('/tests') || requestPath.startsWith('/benchmarks')) return 'tools';
+    if (requestPath.startsWith('/tools') || requestPath.startsWith('/timers') || requestPath.startsWith('/ladder') || requestPath.startsWith('/rope') || requestPath.startsWith('/landmine') || requestPath.startsWith('/skills') || requestPath.startsWith('/tests') || requestPath.startsWith('/benchmarks')) return 'tools';
     // Before the /exercise* line below, which would otherwise swallow it —
     // startsWith('/plan-maker') never got a chance because the same branch
     // returned 'exercises' for it, so BOTH nav links lit up and only cleared
@@ -408,6 +409,8 @@ app.get('/tools', requireLogin, (req, res) => {
 });
 
 require('./api/web-ladder')(app, { requireLogin });
+require('./api/web-rope')(app, { requireLogin });
+require('./api/web-landmine')(app, { requireLogin });
 
 // Weight tracking routes
 app.get('/weight', requireLogin, async (req, res) => {
@@ -692,9 +695,10 @@ app.post('/meal-preps/:id/delete', requireLogin, async (req, res) => {
 
 // Goals routes
 app.get('/goals', requireLogin, async (req, res) => {
-    const { Goal } = getDatabase(req.user.username);
+    const { Goal, GoalAddon } = getDatabase(req.user.username);
     const goals = await goalsApi.listAll(Goal);
     const todayET = goalsApi.etDay();
+    const plans = goalPlan.forGoals(goals, await GoalAddon.findAll(), todayET);
     // What tomorrow morning's brief will list: the same query cortex makes (?active=1&brief=1),
     // judged against TOMORROW's ET date because that is when the brief runs.
     const briefGoals = await goalsApi.listActive(Goal, { brief: true, day: goalsApi.etDay(1) });
@@ -709,7 +713,7 @@ app.get('/goals', requireLogin, async (req, res) => {
             down: i < goals.length - 1 && goals[i + 1].status === g.status ? swap(i + 1) : null,
         };
     });
-    res.render('goals', { title: 'Goals', goals, user: req.user, todayET, briefGoals, swaps,
+    res.render('goals', { title: 'Goals', goals, user: req.user, todayET, briefGoals, swaps, plans,
         STATUSES: goalsApi.STATUSES, KINDS: goalsApi.KINDS, editId: parseInt(req.query.edit, 10) || null });
 });
 

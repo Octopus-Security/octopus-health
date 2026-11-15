@@ -7,6 +7,16 @@
     <title><%= title %></title>
     <link rel="stylesheet" href="<%= asset('/theme.css') %>">
     <%- include('partials/dialog') %>
+    <style>
+        .goal-plan { margin-top: 10px; min-width: 0; }
+        .goal-plan ol, .goal-plan ul { margin: 4px 0 10px; padding-left: 1.25em; }
+        .goal-plan li { margin: 4px 0; overflow-wrap: anywhere; }
+        .goal-plan-h { margin: 12px 0 4px; font-weight: 600; }
+        .goal-plan-how { color: #9aa; }
+        .goal-plan-note { margin: 8px 0; padding: 10px 12px; border-radius: 8px; background: #1a1f26; overflow-wrap: anywhere; }
+        .goal-phase { margin: 10px 0; padding: 4px 0 4px 10px; border-left: 2px solid #2a2a2a; }
+        .goal-phase.is-current { border-left-color: #2ecc71; }
+    </style>
 </head>
 <body>
     <%- include('partials/nav') %>
@@ -132,9 +142,63 @@
                             <button type="submit" class="toggle-btn">Update</button>
                         </form>
                         <% } %>
-                        <% if (goal.progression) { %>
+                        <% var goalPlan = (typeof plans !== 'undefined' && plans) ? plans[goal.id] : null; %>
+                        <% if (goalPlan && goalPlan.steps && goalPlan.steps.length) { %>
+                            <div class="goal-plan">
+                                <p class="goal-plan-h">Parts of this plan</p>
+                                <ol>
+                                    <% goalPlan.steps.forEach(function (step) { %><li><%= step %></li><% }); %>
+                                </ol>
+                            </div>
+                        <% } else if (goal.progression) { %>
                             <div style="margin-top: 8px; color: #aaa;">
                                 <strong>Progression:</strong> <%= goal.progression %>
+                            </div>
+                        <% } %>
+                        <% if (goalPlan && goalPlan.skill && goalPlan.skill.steps.length) { %>
+                            <div class="goal-plan">
+                                <p class="goal-plan-h">Exercises on the way to <%= goalPlan.skill.title %></p>
+                                <ol>
+                                    <% goalPlan.skill.steps.forEach(function (step) { %>
+                                        <li>
+                                            <strong><%= step.name %></strong><% if (step.detail) { %> <span class="goal-plan-how"><%= step.detail %></span><% } %>
+                                            <% if (step.how) { %><div class="goal-plan-how"><%= step.how %></div><% } %>
+                                        </li>
+                                    <% }); %>
+                                </ol>
+                            </div>
+                        <% } %>
+                        <% if (goalPlan && goalPlan.addon) { %>
+                            <div class="goal-plan">
+                                <p class="goal-plan-h"><%= goalPlan.addon.title %>: every phase</p>
+                                <% if (goalPlan.addon.honesty) { %>
+                                    <p class="goal-plan-note"><strong>What this can and cannot do.</strong> <%= goalPlan.addon.honesty %></p>
+                                <% } %>
+                                <% goalPlan.addon.phases.forEach(function (ph) { %>
+                                    <div class="goal-phase<%= ph.current ? ' is-current' : '' %>">
+                                        <p><strong><%= ph.label %></strong><%= ph.current ? ' (this week)' : '' %> — <%= ph.focus %></p>
+                                        <% ph.tracks.forEach(function (tr) { %>
+                                            <p class="goal-plan-how"><%= tr.times %>, <%= tr.where %>.</p>
+                                            <% tr.sessions.forEach(function (sess) { %>
+                                                <% if (tr.sessions.length > 1) { %><p class="goal-plan-how"><%= sess.label %></p><% } %>
+                                                <ul>
+                                                    <% sess.items.forEach(function (it) { %>
+                                                        <li>
+                                                            <%= it.name %><% if (it.detail) { %> <span class="goal-plan-how"><%= it.detail %></span><% } %><% if (it.note) { %> — <%= it.note %><% } %>
+                                                            <% if (it.drills && it.drills.length) { %>
+                                                                <ul>
+                                                                    <% it.drills.forEach(function (d) { %>
+                                                                        <li><%= d.name %><% if (d.detail) { %> <span class="goal-plan-how"><%= d.detail %></span><% } %></li>
+                                                                    <% }); %>
+                                                                </ul>
+                                                            <% } %>
+                                                        </li>
+                                                    <% }); %>
+                                                </ul>
+                                            <% }); %>
+                                        <% }); %>
+                                    </div>
+                                <% }); %>
                             </div>
                         <% } %>
                         <% if (goal.description) { %>

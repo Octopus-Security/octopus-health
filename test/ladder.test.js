@@ -131,6 +131,30 @@ test('a stick shorter than two grips is refused by the splitter', () => {
     assert.equal(split.ok, false);
 });
 
+test('deleting the bay before a corner keeps the corner', () => {
+    const next = ladder.deleteBay([{ squares: 10, turn: 45 }, { squares: 2, turn: 0 }], 9);
+    assert.deepEqual(next, [{ squares: 9, turn: 45 }, { squares: 2, turn: 0 }]);
+    assert.deepEqual(ladder.deleteBay([{ squares: 1, turn: 0 }], 0), [{ squares: 1, turn: 0 }]);
+});
+
+test('shape presets are fixed layouts and do not change a one-bay ladder into nothing', () => {
+    assert.deepEqual(ladder.shapeRuns('straight'), [{ squares: 8, turn: 0 }]);
+    assert.equal(ladder.SHAPES.l[0].turn, 90);
+    assert.equal(ladder.SHAPES.square.length, 4);
+    assert.equal(ladder.SHAPES.zigzag[1].turn, -45);
+    assert.equal(ladder.SHAPES.u.length, 3);
+    assert.equal(ladder.shapeRuns('nope'), null);
+});
+
+test('the layout drawing marks every bay for a click', () => {
+    const plan = ladder.plan({});
+    const hits = plan.svg.match(/class="bay-hit"/g) || [];
+    assert.equal(hits.length, 4);
+    assert.match(plan.svg, /data-bay="0"/);
+    assert.match(plan.svg, /data-bay="3"/);
+    assert.match(plan.svg, /scale\(1,-1\)/);
+});
+
 test('dowel rungs ask for a zip tie and do not add pins', () => {
     const plan = ladder.plan({ rails: 'cord', rungs: 'dowel', dowel: 16 });
     assert.match(plan.dowelLine, /zip tie/);

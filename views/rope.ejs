@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('partials/favicon') %>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="<%= asset('/theme.css') %>">
+  <%- include('partials/dialog') %>
+  <style>
+    .rope-page { max-width: 980px; }
+    .rope-lead { color: #9a9a9a; line-height: 1.55; margin: 8px 0 14px; max-width: 68ch; overflow-wrap: anywhere; }
+    .rope-page p { overflow-wrap: anywhere; }
+    .rope-field { display: flex; flex-direction: column; gap: 4px; min-width: 0; max-width: 280px; margin: 0 0 16px; }
+    .rope-field > span { color: #999; font-size: 0.8rem; }
+    .rope-page input, .rope-page select { font-size: 16px; min-height: var(--tap); width: 100%; max-width: 100%; }
+    .rope-page button, .rope-page .btn { min-height: var(--tap); min-width: 44px; white-space: normal; }
+    #preview-canvas { display: block; width: 100%; max-width: 100%; height: 320px; background: #0e0e0e; border-radius: 14px; touch-action: none; }
+    .rope-parts { list-style: none; padding: 0; margin: 0 0 16px; }
+    .rope-parts li { padding: 10px 0; border-bottom: 1px solid #1e1e1e; overflow-wrap: anywhere; }
+    .rope-note { background: #111; border: 1px solid #1e1e1e; border-radius: 14px; padding: 16px; margin: 8px 0 16px; }
+    #rope-check { margin-top: 12px; color: #888; }
+    h2 { margin-bottom: 0; }
+    h3 { margin: 8px 0; font-size: 1rem; }
+  </style>
+</head>
+<body>
+<%- include('partials/nav') %>
+<div class="container rope-page">
+  <h2>Jump-rope handles</h2>
+  <p class="rope-lead">Two printed pieces and a length of paracord. The cap holds a double knot. The handle screws into the cap, so the rope can be changed. The thread is coarse: <% if (plan.pitch) { %><%= plan.pitch %> mm per turn and <%= plan.depth %> mm deep, with a wide crest, so wear does not wipe it out.<% } else { %>a wide crest and a deep groove, so wear does not wipe it out.<% } %></p>
+  <% if (plan.holeDia) { %>
+  <p class="rope-lead">The cord hole is <%= plan.holeDia %> mm. A 4 mm paracord passes. A double knot does not. Clearance between the threads is <%= plan.clearance %> mm.</p>
+  <% } %>
+
+  <label class="rope-field" for="height">
+    <span>Your height (cm), for the cord length</span>
+    <input id="height" type="number" inputmode="numeric" min="120" max="220" step="1" value="170">
+  </label>
+
+  <div class="rope-note">
+    <% (plan.lines || []).forEach(function (line) { %>
+      <% if (!line) { %>
+        <p class="rope-lead"></p>
+      <% } else if (line.indexOf('plus about 90 cm') !== -1) { %>
+        <p id="cord-length"><%= line %></p>
+      <% } else if (/^\d+\./.test(line) || line === 'Assembly' || line === 'Octopus jump-rope handles') { %>
+        <p><%= line %></p>
+      <% } else { %>
+        <p class="rope-lead"><%= line %></p>
+      <% } %>
+    <% }) %>
+  </div>
+
+  <h3>Part preview</h3>
+  <p class="rope-lead">Spin a part here. It is the same mesh as the file in the download.</p>
+  <label class="rope-field" for="preview-part">
+    <span>Part</span>
+    <select id="preview-part"></select>
+  </label>
+  <canvas id="preview-canvas" width="640" height="320" aria-label="3D preview of the selected part"></canvas>
+  <p id="preview-note" class="rope-lead"></p>
+
+  <h3>Print these</h3>
+  <ul class="rope-parts" id="parts">
+    <% (plan.parts || []).forEach(function (row) { %>
+    <li><%= row.count %> × <%= row.name %> (<%= row.size %>)</li>
+    <% }) %>
+  </ul>
+  <button type="button" id="download" class="btn">Download both parts</button>
+  <p class="rope-lead"><a href="/ladder">Agility ladder</a> · <a href="/landmine">Landmine</a></p>
+  <p id="rope-check" hidden></p>
+</div>
+<script src="<%= asset('/js/mesh-view.js') %>"></script>
+<script src="<%= asset('/js/rope-page.js') %>"></script>
+</body>
+</html>

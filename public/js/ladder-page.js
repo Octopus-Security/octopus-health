@@ -16,6 +16,18 @@
   var token = 0;
   var timer = null;
   var writing = false;
+  var selectedBay = null;
+  var previewTimer = null;
+  var previewSeq = 0;
+  var previewParts = [];
+  var previewNote = document.getElementById('preview-note');
+  var previewSelect = document.getElementById('preview-part');
+  var view = window.MeshView
+    ? window.MeshView.mount(document.getElementById('preview-canvas'))
+    : { ok: false, setStl: function () {} };
+  if (!view.ok && previewNote) {
+    previewNote.textContent = 'This browser cannot draw the part here. The download is the same part.';
+  }
 
   function val(id) {
     return document.getElementById(id).value;
@@ -114,6 +126,7 @@
     });
     var preview = document.getElementById('preview');
     preview.innerHTML = plan.svg || '';
+    paintBays();
     if (plan.rails) {
       var pack = [];
       if (plan.rails === 'cord' || plan.rungs === 'cord') pack.push('Paracord connectors slide along the cord. Push them together to pack the ladder. The knots stay in the cups on the ends.');
@@ -149,13 +162,20 @@
     });
   }
 
+  function soonPreview() {
+    clearTimeout(previewTimer);
+    previewTimer = setTimeout(refreshPreview, 700);
+  }
+
   function soon() {
     clearTimeout(timer);
     timer = setTimeout(refresh, 250);
+    soonPreview();
   }
 
   function now() {
     clearTimeout(timer);
+    soonPreview();
     return refresh();
   }
 
@@ -233,6 +253,148 @@
   document.getElementById('right-90').addEventListener('click', function () { turn(-90); now(); });
   document.getElementById('undo').addEventListener('click', function () { undo(); now(); });
 
+  function bayTotal() {
+    return window.LadderPath ? window.LadderPath.expandRuns(runs).length : runs.reduce(function (n, run) {
+      return n + run.squares;
+    }, 0);
+  }
+
+  function markHits() {
+    var box = document.getElementById('preview');
+    if (!box) return;
+    box.querySelectorAll('.bay-hit').forEach(function (line) {
+      var on = selectedBay != null && line.getAttribute('data-bay') === String(selectedBay);
+      line.setAttribute('stroke', on ? '#f1c40f' : 'transparent');
+    });
+  }
+
+  function paintBays() {
+    var total = bayTotal();
+    if (selectedBay != null && (selectedBay < 0 || selectedBay >= total)) selectedBay = null;
+    var box = document.getElementById('bays');
+    box.replaceChildren();
+    for (var i = 0; i < total; i++) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'bay-btn';
+      btn.setAttribute('data-bay', String(i));
+      btn.setAttribute('aria-pressed', selectedBay === i ? 'true' : 'false');
+      btn.setAttribute('aria-label', 'Bay ' + (i + 1));
+      btn.textContent = String(i + 1);
+      box.appendChild(btn);
+    }
+    var del = document.getElementById('delete-bay');
+    del.disabled = selectedBay == null || total <= 1;
+    markHits();
+  }
+
+  function chooseBay(index) {
+    if (!isFinite(index)) return;
+    selectedBay = selectedBay === index ? null : index;
+    paintBays();
+  }
+
+  function removeSelected() {
+    if (selectedBay == null || !window.LadderPath) return;
+    runs = window.LadderPath.deleteBay(runs, selectedBay);
+    selectedBay = null;
+    now();
+  }
+
+  document.getElementById('shapes').addEventListener('click', function (ev) {
+    var btn = ev.target.closest('button');
+    if (!btn || !window.LadderPath) return;
+    var next = window.LadderPath.shapeRuns(btn.getAttribute('data-shape'));
+    if (!next) return;
+    runs = next;
+    selectedBay = null;
+    now();
+  });
+
+  document.getElementById('bays').addEventListener('click', function (ev) {
+    var btn = ev.target.closest('button');
+    if (!btn) return;
+    chooseBay(Number(btn.getAttribute('data-bay')));
+  });
+
+  document.getElementById('preview').addEventListener('click', function (ev) {
+    var hit = ev.target.closest && ev.target.closest('[data-bay]');
+    if (!hit || !document.getElementById('preview').contains(hit)) return;
+    chooseBay(Number(hit.getAttribute('data-bay')));
+  });
+
+  document.getElementById('delete-bay').addEventListener('click', removeSelected);
+
+  document.addEventListener('keydown', function (ev) {
+    if (ev.key !== 'Backspace' && ev.key !== 'Delete') return;
+    var tag = document.activeElement && document.activeElement.tagName;
+    if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') return;
+    if (selectedBay == null) return;
+    ev.preventDefault();
+    removeSelected();
+  });
+
+  function decodeStl(b64) {
+    var bin = atob(b64);
+    var buf = new ArrayBuffer(bin.length);
+    var bytes = new Uint8Array(buf);
+    for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return buf;
+  }
+
+  function showPart(name) {
+    if (!view.ok) return;
+    var part = null;
+    for (var i = 0; i < previewParts.length; i++) {
+      if (previewParts[i].name === name) part = previewParts[i];
+    }
+    if (!part || !part.stl) return;
+    try {
+      view.setStl(decodeStl(part.stl));
+      if (previewNote && !previewNote.textContent) previewNote.textContent = '';
+    } catch (e) {
+      previewNote.textContent = 'Could not draw that part. The download is the same part.';
+    }
+  }
+
+  function fillPreview() {
+    var keep = previewSelect.value;
+    previewSelect.replaceChildren();
+    previewParts.forEach(function (part) {
+      var opt = document.createElement('option');
+      opt.value = part.name;
+      opt.textContent = (part.count || 1) + ' × ' + part.name + (part.size ? ' (' + part.size + ')' : '');
+      previewSelect.appendChild(opt);
+    });
+    if (keep && previewParts.some(function (part) { return part.name === keep; })) previewSelect.value = keep;
+    if (previewParts.length) showPart(previewSelect.value);
+  }
+
+  function refreshPreview() {
+    var mine = ++previewSeq;
+    return fetch('/ladder/api/preview', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload()),
+    }).then(function (res) {
+      return res.json();
+    }).then(function (body) {
+      if (mine !== previewSeq) return;
+      previewParts = (body && body.parts) || [];
+      fillPreview();
+      if (!previewParts.length) {
+        previewNote.textContent = (body && body.error) || 'No part to preview. The download is the same part.';
+      } else if (view.ok) {
+        previewNote.textContent = '';
+      }
+    }).catch(function () {
+      if (mine !== previewSeq) return;
+      previewNote.textContent = 'Could not load the part preview. The download is the same part.';
+    });
+  }
+
+  previewSelect.addEventListener('change', function () { showPart(previewSelect.value); });
+
   document.getElementById('download').addEventListener('click', function () {
     var btn = this;
     btn.disabled = true;
@@ -266,8 +428,10 @@
 
   showFields();
   markPresets();
+  paintBays();
   token = 1;
   fit.dataset.token = '1';
+  soonPreview();
 
   function waitUntil(fn) {
     return new Promise(function (resolve) {
@@ -348,6 +512,19 @@
     });
     if (!/Shortened the grip to \d/.test(document.getElementById('notice').textContent)) {
       problems.push('grip clamp ' + document.getElementById('notice').textContent);
+    }
+
+    await after('straight shape', function () { document.querySelector('[data-shape="straight"]').click(); });
+    if (!/^8 bays$/.test(document.getElementById('path-text').textContent.trim())) {
+      problems.push('straight ' + document.getElementById('path-text').textContent);
+    }
+    document.querySelector('#bays button[data-bay="2"]').click();
+    if (document.querySelector('#bays button[data-bay="2"]').getAttribute('aria-pressed') !== 'true') {
+      problems.push('bay 2 was not selected');
+    }
+    await after('delete bay', function () { document.getElementById('delete-bay').click(); });
+    if (!/^7 bays$/.test(document.getElementById('path-text').textContent.trim())) {
+      problems.push('delete ' + document.getElementById('path-text').textContent);
     }
 
     var vw = document.documentElement.clientWidth;

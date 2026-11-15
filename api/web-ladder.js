@@ -47,6 +47,14 @@ function mount(app, { requireLogin }) {
         }
     });
 
+    app.post('/ladder/api/preview', requireLogin, (req, res) => {
+        try {
+            res.json(ladder.preview(req.body || {}));
+        } catch (e) {
+            res.status(e.status || 400).json({ ok: false, error: e.message || 'Could not preview that ladder', parts: [] });
+        }
+    });
+
     app.post('/ladder/api/kit', requireLogin, (req, res) => {
         try {
             const zip = ladder.kitZip(req.body || {});
