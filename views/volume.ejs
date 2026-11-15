@@ -31,6 +31,13 @@
       Bodyweight and timed sets count as sets but add no tonnage. <a href="/body">Body map</a> · <a href="/logs">Logs</a></p>
   </div>
 
+  <section class="card bm-unassigned" id="vol-unassigned" hidden>
+    <h3>Unassigned exercises</h3>
+    <p class="bm-sub" data-unassigned-note>Loading.</p>
+    <p class="bm-sub">A pose is chosen on <a href="/library">Exercises</a>. Assigning muscles here is what puts the sets on the figure.</p>
+    <ul class="bm-unassigned-list" data-unassigned-list></ul>
+  </section>
+
   <form class="card vol-controls" id="vol-form" autocomplete="off">
     <label>From <input type="date" name="from"></label>
     <label>To <input type="date" name="to"></label>
@@ -91,6 +98,8 @@
     <div class="o-table-wrap vol-grid-wrap"><table class="vol-grid" id="vol-grid"><caption class="bm-sub">One column per window, oldest first. The highlighted column is the one on the figure.</caption></table></div>
   </section>
 </div>
+<script type="application/json" id="vol-muscles"><%- JSON.stringify(vocab.muscles).replace(/</g, '\\u003c') %></script>
+<script src="<%= asset('/js/unassigned.js') %>"></script>
 <script src="<%= asset('/js/volume.js') %>"></script>
 </body>
 </html>

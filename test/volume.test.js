@@ -55,7 +55,40 @@ test('compute: fixture totals per muscle', () => {
   assert.strictEqual(m.biceps.hardSets, 0.5);
   assert.deepStrictEqual([m.abs.hardSets, m.abs.seconds], [1, 45]);
   assert.strictEqual(m.chest.weeklySets, 0.5); // 2 x 7 / 30 = 0.47
-  assert.deepStrictEqual(r.skipped, { unmapped: 1, considered: 5 }); // stretch ignored entirely
+  assert.deepStrictEqual(r.skipped, {
+    unmapped: 1,
+    considered: 5, // stretch ignored entirely
+    exercises: [{ name: 'Wibble', sets: 1, hardSets: 1, reason: 'no-muscles', exerciseId: 5 }],
+  });
+});
+
+test('unmapped names are grouped, a warm-up is not a hard set, and a similar name is not used', () => {
+  const sets = [
+    { date: '2026-01-05', exerciseName: 'Chest Fly Sitting Forward', reps: 8 },
+    { date: '2026-01-05', exerciseName: 'chest fly sitting forward', reps: 8, rpe: 3 },
+    { date: '2026-01-05', exerciseName: 'Wide Chest Press Machine', reps: 10 },
+    { date: '2026-01-05', reps: 10 },
+  ];
+  const r = V.compute(sets, () => null, P());
+  assert.strictEqual(r.windows[0].muscles.chest.sets, 0);
+  assert.deepStrictEqual(r.skipped.exercises.map(e => [e.name, e.sets, e.hardSets, e.reason, e.exerciseId]), [
+    ['Chest Fly Sitting Forward', 2, 1, 'unknown', null],
+    ['Untitled', 1, 1, 'unknown', null],
+    ['Wide Chest Press Machine', 1, 1, 'unknown', null],
+  ]);
+});
+
+test('pickDef uses a row that has muscles and does not fuzzy-match', () => {
+  const credits = V.creditsFor;
+  const empty = { id: 9, name: 'Chest Fly Sitting Forward', category: 'strength', primaryMuscles: '[]', secondaryMuscles: '[]' };
+  const named = { id: 10, name: 'Chest Fly Sitting Forward', category: 'strength', primaryMuscles: '["chest"]', secondaryMuscles: '[]' };
+  const other = { name: 'Cable Chest Fly', category: 'strength', primaryMuscles: '["chest"]', secondaryMuscles: '[]' };
+  assert.strictEqual(V.pickDef(named, empty, other, credits), named);
+  assert.strictEqual(V.pickDef(empty, named, other, credits), named);
+  assert.strictEqual(V.pickDef(DEFS.stretch, named, null, credits), named);
+  assert.strictEqual(V.pickDef(null, null, other, credits), other);
+  assert.strictEqual(V.pickDef(null, null, null, credits), null);
+  assert.strictEqual(V.pickDef(empty, null, null, credits).id, 9);
 });
 
 test('status against the guideline, and a configurable guideline', () => {

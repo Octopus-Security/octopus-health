@@ -15,7 +15,9 @@ no service-token variant yet (a cortex or octopus-coach consumer needs one added
   sets, hard sets and reps but add no tonnage, because body mass is not in the log. A weight logged on a
   bodyweight exercise (belt, vest) is tonnage. **Timed sets** count as one hard set and add `seconds`.
 - Stretches (`category: recovery`) are ignored. Sets matching no known muscle are counted in
-  `skipped.unmapped`, never guessed. `full_body` credits nine major muscles in full (a Body Map decision).
+  `skipped.unmapped` and listed by logged name in `skipped.exercises` (`unknown` means no
+  exercise row, `no-muscles` means a row whose muscles are empty or not in the vocabulary).
+  Names are never guessed. `full_body` credits nine major muscles in full (a Body Map decision).
 - Guideline (default 10-20 weekly hard sets per muscle). The 10 is from Schoenfeld, Ogborn & Krieger
   (2017), J Sports Sci 35(11), dose-response of weekly sets and hypertrophy. The 20 is a conservative
   working ceiling and is **an assumption**. Status: `untrained` (0), `under` (< min), `ok`, `over` (> max).
@@ -44,7 +46,7 @@ step 1. Limits: length and step 1-366, at most 2000 windows (400 with a message 
       "muscles": { "chest": { "sets": 12, "hardSets": 10.5, "weeklySets": 2.4, "reps": 96,
                               "tonnageLbs": 14200, "seconds": 0, "status": "under" } } }
   ],
-  "skipped": { "unmapped": 0, "considered": 120 }
+  "skipped": { "unmapped": 0, "considered": 120, "exercises": [] }
 }
 ```
 

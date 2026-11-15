@@ -154,9 +154,12 @@
     .modal h3 { color:#e8e8e8; margin-bottom:16px; }
     .form-group { margin-bottom:12px; }
     .form-group label { display:block; font-size:0.8rem; color:#888; margin-bottom:4px; }
-    .form-group input, .form-group select, .form-group textarea { width:100%; background:#0d0d0d; border:1px solid #2a2a2a; border-radius:8px; padding:8px 12px; color:#e8e8e8; font-size:0.9rem; box-sizing:border-box; }
+    .form-group input, .form-group select, .form-group textarea { width:100%; background:#0d0d0d; border:1px solid #2a2a2a; border-radius:8px; padding:8px 12px; color:#e8e8e8; font-size:16px; box-sizing:border-box; min-height:44px; }
     .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline:none; border-color:#2ecc71; }
     .form-group textarea { resize:vertical; min-height:70px; }
+    .muscle-picks { display:flex; flex-wrap:wrap; gap:8px; max-width:100%; }
+    .muscle-picks label { display:inline-flex; align-items:center; gap:6px; min-height:44px; margin:0; padding:4px 8px; border:1px solid #2a2a2a; border-radius:8px; color:#ccc; font-size:16px; max-width:100%; overflow-wrap:anywhere; }
+    .modal { width:min(640px,95vw); }
   </style>
 </head>
 <body>
@@ -167,7 +170,8 @@
     <h2 style="margin:0">📚 <%= title %></h2>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <a href="/body" class="btn">Body map</a>
-      <button onclick="document.getElementById('add-modal').classList.add('open')" class="btn">+ Custom Exercise</button>
+      <% if (user && user.role === 'admin') { %><a href="/library/review" class="btn">Review catalogue</a><% } %>
+      <button type="button" onclick="document.getElementById('add-modal').classList.add('open')" class="btn">+ Custom Exercise</button>
     </div>
   </div>
 
@@ -221,6 +225,7 @@
     <span class="count-badge" id="count-label"></span>
   </div>
   <p id="rec-note" hidden style="color:#777;font-size:0.82rem;margin:0 0 12px"><%= locals.recoveryNote || "" %></p>
+  <% if (pendingCount) { %><p style="color:#aaa;font-size:16px;margin:0 0 12px">You have <%= pendingCount %> exercise<%= pendingCount === 1 ? '' : 's' %> waiting for catalogue review. They stay on your account either way.</p><% } %>
 
   <div class="lib-grid" id="lib-grid"></div>
 </div>
@@ -263,9 +268,31 @@
           <option value="none">None</option>
         </select>
       </div>
+      <fieldset class="form-group">
+        <legend>Primary muscles</legend>
+        <p class="bm-sub" style="color:#888;font-size:16px;margin:0 0 8px">The body map uses these. Pick them yourself. Nothing is guessed.</p>
+        <div class="muscle-picks">
+          <% (muscles || []).forEach(function (m) { %>
+            <label><input type="checkbox" name="primary" value="<%= m.id %>"> <%= m.name %></label>
+          <% }) %>
+        </div>
+      </fieldset>
+      <fieldset class="form-group">
+        <legend>Secondary muscles</legend>
+        <div class="muscle-picks">
+          <% (muscles || []).forEach(function (m) { %>
+            <label><input type="checkbox" name="secondary" value="<%= m.id %>"> <%= m.name %></label>
+          <% }) %>
+        </div>
+      </fieldset>
       <div class="form-group">
-        <label>Primary Muscles (comma separated)</label>
-        <input type="text" name="primaryMuscles" placeholder="e.g. glutes, hamstrings">
+        <label for="pose-key">Animation</label>
+        <select name="poseKey" id="pose-key">
+          <option value="">Match from the name</option>
+          <% (poseKeys || []).forEach(function (k) { %>
+            <option value="<%= k %>"><%= k.replace(/-/g, ' ') %></option>
+          <% }) %>
+        </select>
       </div>
       <div class="form-group">
         <label>Instructions</label>
@@ -275,7 +302,8 @@
         <label>Video URL (optional)</label>
         <input type="text" name="videoUrl" placeholder="https://...">
       </div>
-      <div style="display:flex;gap:10px;margin-top:16px">
+      <label class="muscle-picks" style="margin:8px 0 12px"><input type="checkbox" name="publish" value="1"> Ask to add this to the shared catalogue. An admin reviews it before anyone else gets it.</label>
+      <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">
         <button type="submit" class="btn btn-green" style="flex:1">Save</button>
         <button type="button" onclick="document.getElementById('add-modal').classList.remove('open')" class="btn" style="flex:1">Cancel</button>
       </div>
@@ -291,6 +319,7 @@ const ALL_EXERCISES = <%- JSON.stringify(exercises) %>;
 // the category fallback is a generic stance, which shows a different move than the one named.
 const MARTIAL = ['mma', 'bjj', 'muay_thai'];
 function poseForExercise(e) {
+  if (e.poseKey) return e.poseKey;
   if (typeof PoseMap === 'undefined') return null;
   if (MARTIAL.indexOf(e.category) >= 0) return PoseMap.match(e.name);
   return PoseMap.keyFor(e.name, e.category);
@@ -415,6 +444,7 @@ function appendChunk() {
       <span class="tag ${catClass}">${e.category.replace(/_/g,' ')}</span>
       <span class="tag tag-equip">${equipLabel}</span>
       ${isCustom ? '<span class="tag tag-custom">custom</span>' : ''}
+      ${e.published ? '<span class="tag">shared</span>' : ''}
     </div>
     ${schemaBadges ? `<div class="schema-row">${schemaBadges}</div>` : ''}
     ${(primChips||secChips) ? `<div class="muscle-row">${primChips}${secChips}</div>` : ''}
@@ -445,27 +475,43 @@ function escHtml(s) {
 document.getElementById('add-form').addEventListener('submit', async e => {
   e.preventDefault();
   const fd = new FormData(e.target);
-  const primaryMuscles = (fd.get('primaryMuscles') || '').split(',').map(s => s.trim()).filter(Boolean);
+  const picked = (name) => fd.getAll(name).map(s => String(s));
+  const publish = fd.get('publish') === '1';
   const body = {
     name: fd.get('name'),
     category: fd.get('category'),
     equipment: fd.get('equipment'),
-    primaryMuscles,
+    primaryMuscles: picked('primary'),
+    secondaryMuscles: picked('secondary'),
+    poseKey: fd.get('poseKey') || '',
     instructions: fd.get('instructions') || null,
     videoUrl: fd.get('videoUrl') || null,
+    requestPublication: publish,
   };
+  if (publish && !body.primaryMuscles.length) {
+    await oDialog.alert({ title: 'Pick a muscle', body: 'Choose at least one primary muscle before asking to publish. Nothing is guessed.' });
+    return;
+  }
   try {
     const token = localStorage.getItem('authToken');
-    const headers = { 'Content-Type': 'application/json' };
+    const headers = { 'Content-Type': 'application/json', Accept: 'application/json' };
     if (token) headers['Authorization'] = 'Bearer ' + token;
-    const r = await fetch('/api/workout/exercises', { method:'POST', headers, body: JSON.stringify(body) });
+    const r = await fetch('/library/api/exercises', { method:'POST', headers, body: JSON.stringify(body), credentials: 'same-origin' });
     const data = await r.json();
     if (data.success) {
-      const newEx = { ...data.data, primaryMuscles: body.primaryMuscles, secondaryMuscles: [] };
-      ALL_EXERCISES.unshift(newEx);
+      const newEx = { ...data.data, primaryMuscles: data.data.primaryMuscles || body.primaryMuscles, secondaryMuscles: data.data.secondaryMuscles || body.secondaryMuscles, poseKey: body.poseKey || null };
+      newEx._lname = String(newEx.name || '').toLowerCase();
+      const at = ALL_EXERCISES.findIndex(function (x) { return String(x.name).toLowerCase() === newEx._lname; });
+      if (at >= 0) ALL_EXERCISES[at] = Object.assign(ALL_EXERCISES[at], newEx);
+      else ALL_EXERCISES.unshift(newEx);
       document.getElementById('add-modal').classList.remove('open');
       e.target.reset();
       filterExercises();
+      if (publish && data.publication && data.publication.ok) {
+        await oDialog.alert({ title: 'Sent for review', body: 'It is on your account now. An admin can add it to the shared catalogue.' });
+      } else if (publish && data.publication && data.publication.error) {
+        await oDialog.alert({ title: 'Saved on your account', body: data.publication.error });
+      }
     } else {
       await oDialog.alert({ title: 'Not saved', body: 'Error: ' + data.error });
     }

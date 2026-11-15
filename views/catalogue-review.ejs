@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <%- include('partials/favicon') %>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="<%= asset('/theme.css') %>">
+  <%- include('partials/dialog') %>
+  <style>
+    .rev-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 16px; }
+    .rev-card { max-width: 720px; }
+    .rev-card h3 { margin-bottom: 4px; overflow-wrap: anywhere; }
+    .rev-meta { color: var(--text-dim, #888); font-size: 16px; overflow-wrap: anywhere; }
+    .rev-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px; }
+    .rev-actions input { font-size: 16px; min-height: 44px; flex: 1 1 180px; max-width: 100%; }
+    .rev-actions button { min-height: 44px; }
+  </style>
+</head>
+<body>
+<%- include('partials/nav') %>
+<div class="container" style="padding-top:24px">
+  <h2>Catalogue review</h2>
+  <p style="color:#aaa;font-size:16px;max-width:720px">These are exercises people saved on their own account and asked to share. Approving adds the exercise to the shared catalogue. It does not copy their workout log.</p>
+  <% if (!pending.length) { %><p>Nothing is waiting.</p><% } %>
+  <ul class="rev-list">
+    <% pending.forEach(function (item) { const ex = item.exercise || {}; %>
+      <li class="card rev-card">
+        <h3><%= item.name %></h3>
+        <p class="rev-meta"><%= item.owner %> · <%= ex.category || 'strength' %> · <%= ex.equipment || 'none' %><% if (ex.poseKey) { %> · <%= ex.poseKey %><% } %></p>
+        <p class="rev-meta">Primary: <%= (ex.primaryMuscles || []).join(', ') || 'none' %>. Secondary: <%= (ex.secondaryMuscles || []).join(', ') || 'none' %>.</p>
+        <% if (ex.instructions) { %><p style="overflow-wrap:anywhere"><%= ex.instructions %></p><% } %>
+        <div class="rev-actions">
+          <form method="post" action="/library/review/<%= item.id %>">
+            <input type="hidden" name="decision" value="approve">
+            <button type="submit" class="btn">Add to catalogue</button>
+          </form>
+          <form method="post" action="/library/review/<%= item.id %>" class="rev-actions">
+            <input type="hidden" name="decision" value="reject">
+            <input type="text" name="note" maxlength="500" placeholder="Note to the author, optional" aria-label="Note to the author">
+            <button type="submit" class="btn">Don't add</button>
+          </form>
+        </div>
+      </li>
+    <% }) %>
+  </ul>
+</div>
+</body>
+</html>

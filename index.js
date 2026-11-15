@@ -68,6 +68,7 @@ function getActiveTab(requestPath) {
     if (requestPath.startsWith('/addons')) return 'addons';
     if (requestPath.startsWith('/constraints')) return 'constraints';
     if (requestPath.startsWith('/plan-maker')) return 'plan-maker';
+    if (requestPath.startsWith('/library/review')) return 'review';
     if (requestPath.startsWith('/exercises') || requestPath.startsWith('/library') || requestPath.startsWith('/exercise') || requestPath.startsWith('/workout')) return 'exercises';
     if (requestPath === '/volume' || requestPath.startsWith('/volume/')) return 'body';
     if (requestPath === '/body' || requestPath.startsWith('/body/') || requestPath.startsWith('/body?')) return 'body';
@@ -1415,7 +1416,7 @@ app.delete('/workout/api/templates/:id', requireLogin, async (req, res) => {
 
 // ── Exercise Library ──────────────────────────────────────────────────────────
 
-app.get('/exercises', requireLogin, async (req, res) => {
+async function renderLibrary(req, res, title) {
     const { ExerciseDefinition } = getDatabase(req.user.username);
     const all = await ExerciseDefinition.findAll({ order: [['category','ASC'],['name','ASC']] });
     const exercises = all.map(e => ({
@@ -1423,8 +1424,40 @@ app.get('/exercises', requireLogin, async (req, res) => {
         primaryMuscles:   JSON.parse(e.primaryMuscles   || '[]'),
         secondaryMuscles: JSON.parse(e.secondaryMuscles || '[]'),
     }));
-    res.render('library', { title: 'Exercises', user: req.user, exercises, poseVersion: BUILD });
-});
+    try {
+        const published = await require('./api/catalogue-db').approvedExercises();
+        const have = new Set(exercises.map(e => String(e.name).toLowerCase()));
+        let n = 0;
+        for (const p of published) {
+            if (!p || !p.name || have.has(String(p.name).toLowerCase())) continue;
+            have.add(String(p.name).toLowerCase());
+            n += 1;
+            exercises.push({
+                id: 'published-' + n,
+                name: p.name,
+                category: p.category || 'strength',
+                equipment: p.equipment || 'none',
+                primaryMuscles: p.primaryMuscles || [],
+                secondaryMuscles: p.secondaryMuscles || [],
+                instructions: p.instructions || '',
+                videoUrl: p.videoUrl || '',
+                poseKey: p.poseKey || null,
+                isCustom: false,
+                published: true,
+            });
+        }
+    } catch (e) { console.error('published catalogue read failed:', e.message); }
+    let pendingCount = 0;
+    try {
+        const mine = await require('./api/catalogue-db').forOwner(req.user.username);
+        pendingCount = mine.filter(r => r.status === 'pending').length;
+    } catch { /* the library still renders */ }
+    const muscles = require('./lib/muscles').publicVocabulary().muscles;
+    const poseKeys = require('./public/pose-map').keys();
+    res.render('library', { title, user: req.user, exercises, poseVersion: BUILD, muscles, poseKeys, pendingCount });
+}
+
+app.get('/exercises', requireLogin, (req, res, next) => { renderLibrary(req, res, 'Exercises').catch(next); });
 
 require('./api/body-map')(app, { requireLogin, getDatabase });
 require('./api/volume')(app, { requireLogin, getDatabase });
@@ -1432,16 +1465,9 @@ require('./api/today')(app, { requireLogin, getDatabase });
 require('./api/daily-stretches')(app, { requireLogin, getDatabase });
 require('./api/mobility')(app, { requireLogin, getDatabase });
 
-app.get('/library', requireLogin, async (req, res) => {
-    const { ExerciseDefinition } = getDatabase(req.user.username);
-    const all = await ExerciseDefinition.findAll({ order: [['category','ASC'],['name','ASC']] });
-    const exercises = all.map(e => ({
-        ...e.toJSON(),
-        primaryMuscles:   JSON.parse(e.primaryMuscles   || '[]'),
-        secondaryMuscles: JSON.parse(e.secondaryMuscles || '[]'),
-    }));
-    res.render('library', { title: 'Exercise Library', user: req.user, exercises, poseVersion: BUILD });
-});
+app.get('/library', requireLogin, (req, res, next) => { renderLibrary(req, res, 'Exercise Library').catch(next); });
+
+require('./api/catalogue-review')(app, { requireLogin, getDatabase });
 
 // ── Exercise Plan Maker ───────────────────────────────────────────────────────
 

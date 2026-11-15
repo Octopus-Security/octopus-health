@@ -3,6 +3,8 @@ const express = require('express');
 const getDatabase = require('../../database');
 const { requireUser } = require('../middleware/auth');
 const { detectPR, rebuildPRs, bestPerExercise } = require('../pr-detect');
+const exerciseFields = require('../../lib/exercise-fields');
+const { saveCustom } = require('../../lib/exercise-save');
 
 const router = express.Router();
 router.use(requireUser);
@@ -31,16 +33,15 @@ router.get('/exercises', async (req, res) => {
 
 router.post('/exercises', async (req, res) => {
     try {
-        const { ExerciseDefinition, sequelize } = getDatabase(req.user.username);
-        const { name, category, equipment, primaryMuscles, secondaryMuscles, instructions, videoUrl } = req.body;
-        if (!name || !category || !equipment) return res.status(400).json({ success: false, error: 'name, category, equipment required' });
-        const ex = await ExerciseDefinition.create({
-            name, category, equipment,
-            primaryMuscles:   JSON.stringify(primaryMuscles   || []),
-            secondaryMuscles: JSON.stringify(secondaryMuscles || []),
-            instructions, videoUrl, isCustom: true,
-        });
-        res.status(201).json({ success: true, data: ex });
+        const { ExerciseDefinition } = getDatabase(req.user.username);
+        const clean = exerciseFields.clean(req.body || {}, { requireMuscles: false });
+        if (!clean.ok) return res.status(clean.status).json({ success: false, error: clean.error });
+        const saved = await saveCustom(ExerciseDefinition, clean.exercise);
+        if (!saved.ok) return res.status(saved.status).json({ success: false, error: saved.error });
+        const data = saved.row.toJSON();
+        data.primaryMuscles = clean.exercise.primaryMuscles;
+        data.secondaryMuscles = clean.exercise.secondaryMuscles;
+        res.status(saved.created ? 201 : 200).json({ success: true, data });
     } catch (err) {
         console.error('[health] request failed:', safeError(err)); res.status(500).json({ success: false, error: 'Something went wrong' });
     }

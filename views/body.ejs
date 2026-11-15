@@ -114,7 +114,16 @@
       </div>
     </aside>
   </div>
+
+  <section class="card bm-unassigned" id="bm-unassigned">
+    <h3>Unassigned exercises</h3>
+    <p class="bm-sub" data-unassigned-note>Loading this week's log.</p>
+    <p class="bm-sub">To attach a figure as well, add the exercise under <a href="/library">Exercises</a> and choose a pose. The muscles you pick here are the ones the map uses.</p>
+    <ul class="bm-unassigned-list" data-unassigned-list></ul>
+  </section>
 </div>
+<script type="application/json" id="bm-muscles"><%- JSON.stringify(vocab.muscles).replace(/</g, '\\u003c') %></script>
+<script src="<%= asset('/js/unassigned.js') %>"></script>
 <script src="<%= asset('/stick-figure.js') %>"></script>
 <script src="<%= asset('/pose-map.js') %>"></script>
 <script src="<%= asset('/js/stretch-demo.js') %>"></script>

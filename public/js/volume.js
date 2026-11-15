@@ -119,6 +119,15 @@
       .then(function (x) {
         if (!x.ok || !x.j.success) { $('vol-label').textContent = (x.j && x.j.error) || 'Could not load volume.'; return; }
         report = x.j;
+        if (window.Unassigned) {
+          var muscles = [];
+          try { muscles = JSON.parse((document.getElementById('vol-muscles') || {}).textContent || '[]'); } catch (e) { muscles = []; }
+          window.Unassigned.mount(document.getElementById('vol-unassigned'), {
+            exercises: (report.skipped && report.skipped.exercises) || [],
+            muscles: muscles,
+            onSaved: load,
+          });
+        }
         form.elements.from.value = report.params.from; form.elements.to.value = report.params.to;
         links(query());
         slider.max = String(Math.max(0, report.windows.length - 1));

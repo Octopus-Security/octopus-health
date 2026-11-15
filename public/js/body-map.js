@@ -121,12 +121,19 @@
     else if (c.status === 'under') sentence += 'Short of ' + g.min + '. The primary list is what adds sets.';
     else if (c.status === 'ok') sentence += 'Inside ' + g.min + ' to ' + g.max + '.';
     else if (c.status === 'over') sentence += 'Past ' + g.max + '. More sets are optional. That ceiling is a working assumption.';
+    var n = week.unassigned ? week.unassigned.length : 0;
+    if (n) sentence += ' ' + n + (n === 1 ? ' logged exercise is' : ' logged exercises are') + ' not on the map yet. Assign the muscles below. Nothing is guessed.';
     el.textContent = sentence;
   }
 
   function applyWeek(report) {
     var w = report.windows[report.windows.length - 1];
-    week = { byId: w.muscles, guideline: report.params.guideline, start: w.start, end: w.end };
+    week = { byId: w.muscles, guideline: report.params.guideline, start: w.start, end: w.end, unassigned: (report.skipped && report.skipped.exercises) || [] };
+    if (window.Unassigned) {
+      var muscles = [];
+      try { muscles = JSON.parse((document.getElementById('bm-muscles') || {}).textContent || '[]'); } catch (e) { muscles = []; }
+      window.Unassigned.mount(document.getElementById('bm-unassigned'), { exercises: week.unassigned, muscles: muscles, onSaved: loadWeek });
+    }
     document.querySelectorAll('.bm-part[data-kind="muscle"], .bm-chip[data-kind="muscle"]').forEach(function (el) {
       var c = w.muscles[el.getAttribute('data-id')];
       if (!c || !WEEK_STATUS[c.status]) { el.removeAttribute('data-week'); return; }

@@ -1571,6 +1571,8 @@ const createDatabase = (username, storage) => {
         secondaryMuscles: { type: DataTypes.TEXT,   allowNull: true },  // JSON array
         instructions:     { type: DataTypes.TEXT,   allowNull: true },
         videoUrl:         { type: DataTypes.STRING, allowNull: true },
+        // Optional stick-figure key (public/poses). Null means the name rules choose.
+        poseKey:          { type: DataTypes.STRING, allowNull: true },
         isCustom:         { type: DataTypes.BOOLEAN, defaultValue: false },
     });
 
@@ -1885,6 +1887,29 @@ const createDatabase = (username, storage) => {
                 }))
             );
         }
+        // Exercises an admin has approved. Insert only a name this account
+        // does not already have, so a person's own row is never overwritten.
+        try {
+            const published = await require('./api/catalogue-db').approvedExercises();
+            const have = new Set((await ExerciseDefinition.findAll({ attributes: ['name'], raw: true })).map(e => String(e.name).toLowerCase()));
+            for (const p of published) {
+                if (!p || !p.name || have.has(String(p.name).toLowerCase())) continue;
+                await ExerciseDefinition.create({
+                    name: p.name,
+                    category: p.category || 'strength',
+                    equipment: p.equipment || 'none',
+                    primaryMuscles: JSON.stringify(p.primaryMuscles || []),
+                    secondaryMuscles: JSON.stringify(p.secondaryMuscles || []),
+                    instructions: p.instructions || null,
+                    videoUrl: p.videoUrl || null,
+                    poseKey: p.poseKey || null,
+                    isCustom: false,
+                });
+                have.add(String(p.name).toLowerCase());
+            }
+        } catch (e) {
+            console.error('published catalogue merge failed:', e.message);
+        }
         await refreshSeedContent();
             const routineCount = await Routine.count();
             if (routineCount === 0) {
@@ -2016,6 +2041,9 @@ const createDatabase = (username, storage) => {
             // Coaching (api/coaching.js): a set the owner marked failed, and where it gave out.
             ['WorkoutSets', 'failed',    'TINYINT(1) NOT NULL DEFAULT 0'],
             ['WorkoutSets', 'failPoint', 'VARCHAR(16)'],
+            // A chosen stick figure. New databases get it from the model; this
+            // covers a file created before the column existed. sync() does not alter.
+            [ExerciseDefinition.tableName, 'poseKey', 'VARCHAR(255)'],
         ];
         for (const [table, col, type] of adds) {
             try {
