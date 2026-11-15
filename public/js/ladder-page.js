@@ -17,6 +17,7 @@
   var timer = null;
   var writing = false;
   var selectedBay = null;
+  var hint = '';
   var previewTimer = null;
   var previewSeq = 0;
   var previewParts = [];
@@ -91,6 +92,37 @@
     });
   }
 
+  function paintClose(plan) {
+    var btn = document.getElementById('close-shape');
+    if (!btn) return;
+    var owed = window.LadderPath ? window.LadderPath.remainingTurns(runs) : null;
+    var heading = window.LadderPath ? window.LadderPath.headingOf(runs) : 0;
+    var room = !owed || runs.length + owed.length <= maxRuns();
+    // The gap is the planner's own measurement of how far the last rung sits
+    // from the first, so a shape that turns a full circle but does not meet
+    // still says so rather than claiming to be closed.
+    var gap = plan && typeof plan.endGap === 'number' ? plan.endGap : null;
+    btn.disabled = !owed || !owed.length || !room;
+    var note = '';
+    if (!heading) {
+      note = 'Straight so far, so there is nothing to close.';
+    } else if (owed && owed.length) {
+      var deg = owed.reduce(function (s, t) { return s + Math.abs(t); }, 0);
+      note = 'The path has turned ' + Math.abs(heading % 360) + '°. '
+        + deg + '° more (' + owed.length + (owed.length === 1 ? ' turn' : ' turns')
+        + ') brings it back to the start.'
+        + (room ? '' : ' Too many runs to add them, so delete a bay first.');
+    } else if (!owed) {
+      note = 'Those turns do not add up to a whole circle on the socket grid.';
+    } else if (gap != null && gap > 1) {
+      note = 'The turns add up to a circle, but the ends are '
+        + Math.round(gap) + ' mm apart. Add or delete a bay to make them meet.';
+    } else {
+      note = 'Closed: the last rung meets the first.';
+    }
+    if (!hint) setText('path-note', note);
+  }
+
   function paint(plan) {
     writing = true;
     showFields();
@@ -113,6 +145,7 @@
       opt4.disabled = false;
     }
     document.getElementById('path-text').textContent = pathText();
+    paintClose(plan);
     var counts = plan.counts;
     setText('counts', counts
       ? counts.couplers + ' connectors · ' + counts.pins + ' pins · ' + counts.joiners + ' joiners · ' + counts.rungPieces + ' rung pieces · ' + counts.railPieces + ' rail pieces'
@@ -214,19 +247,55 @@
   function addBay() {
     var last = runs[runs.length - 1];
     if (last.turn) {
-      if (runs.length >= 8) return;
+      if (runs.length >= maxRuns()) {
+        say('That is as many turns as one ladder takes. Delete a bay or start a new shape.');
+        return;
+      }
       runs.push({ squares: 1, turn: 0 });
+      say('');
     } else if (last.squares < 20) {
       last.squares += 1;
+      say('');
     }
   }
 
+  function maxRuns() {
+    return (window.LadderPath && window.LadderPath.MAX_RUNS) || 24;
+  }
+
+  function say(text) {
+    hint = text || '';
+    setText('path-note', hint);
+  }
+
   function turn(deg) {
-    var last = runs[runs.length - 1];
-    if (last.turn) return;
-    if (runs.length >= 8) return;
-    last.turn = deg;
-    runs.push({ squares: 1, turn: 0 });
+    if (!window.LadderPath) return;
+    var next = window.LadderPath.addTurn(runs, deg, 1);
+    if (!next) {
+      if (runs.length >= maxRuns()) {
+        say('That is as many turns as one ladder takes. Delete a bay or start a new shape.');
+      } else {
+        say('Add a bay after the last turn before turning again.');
+      }
+      return;
+    }
+    runs = next;
+    say('');
+  }
+
+  function closeShape() {
+    if (!window.LadderPath) return;
+    var next = window.LadderPath.closeShape(runs);
+    if (!next) {
+      var owed = window.LadderPath.remainingTurns(runs);
+      if (!owed || !owed.length) say('The shape already comes back to its starting direction.');
+      else say('Could not close that shape. Delete a bay or use a gentler turn.');
+      return;
+    }
+    runs = next;
+    selectedBay = null;
+    say('');
+    now();
   }
 
   function undo() {
@@ -251,7 +320,8 @@
   document.getElementById('right-45').addEventListener('click', function () { turn(-45); now(); });
   document.getElementById('left-90').addEventListener('click', function () { turn(90); now(); });
   document.getElementById('right-90').addEventListener('click', function () { turn(-90); now(); });
-  document.getElementById('undo').addEventListener('click', function () { undo(); now(); });
+  document.getElementById('undo').addEventListener('click', function () { undo(); say(''); now(); });
+  document.getElementById('close-shape').addEventListener('click', closeShape);
 
   function bayTotal() {
     return window.LadderPath ? window.LadderPath.expandRuns(runs).length : runs.reduce(function (n, run) {
@@ -308,6 +378,7 @@
     if (!next) return;
     runs = next;
     selectedBay = null;
+    say('');
     now();
   });
 
@@ -429,6 +500,7 @@
   showFields();
   markPresets();
   paintBays();
+  paintClose();
   token = 1;
   fit.dataset.token = '1';
   soonPreview();
@@ -526,6 +598,35 @@
     if (!/^7 bays$/.test(document.getElementById('path-text').textContent.trim())) {
       problems.push('delete ' + document.getElementById('path-text').textContent);
     }
+
+    // The bug this page was fixed for: seven 45° turns were allowed and the
+    // eighth, the one that closes the ring, did nothing and said nothing.
+    await after('zigzag shape', function () { document.querySelector('[data-shape="zigzag"]').click(); });
+    var close = document.getElementById('close-shape');
+    if (close.disabled) problems.push('close was disabled on an open shape');
+    if (!/45°/.test(document.getElementById('path-note').textContent)) {
+      problems.push('close note ' + document.getElementById('path-note').textContent);
+    }
+    await after('close the shape', function () { close.click(); });
+    if (!close.disabled) problems.push('close stayed enabled on a closed shape');
+    if (!/^Closed:/.test(document.getElementById('path-note').textContent)) {
+      problems.push('closed note ' + document.getElementById('path-note').textContent);
+    }
+    if (window.LadderPath) {
+      var owedNow = window.LadderPath.remainingTurns(runs);
+      if (!owedNow || owedNow.length) problems.push('still owed ' + JSON.stringify(owedNow));
+      if (Math.abs(window.LadderPath.headingOf(runs)) % 360 !== 0) {
+        problems.push('heading ' + window.LadderPath.headingOf(runs));
+      }
+    }
+    if (/^$/.test(document.getElementById('fit-line').textContent)) problems.push('closed shape had no plan');
+
+    await after('octagon shape', function () { document.querySelector('[data-shape="octagon"]').click(); });
+    if (!document.getElementById('close-shape').disabled) {
+      problems.push('octagon asked to be closed again');
+    }
+    var turnsShown = (document.getElementById('path-text').textContent.match(/45°/g) || []).length;
+    if (turnsShown !== 8) problems.push('octagon turns ' + turnsShown);
 
     var vw = document.documentElement.clientWidth;
     document.querySelectorAll('.ladder-page button, .ladder-page input, .ladder-page select').forEach(function (el) {

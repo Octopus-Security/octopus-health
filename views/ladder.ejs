@@ -35,6 +35,7 @@
     #fit-line { color: #e8e8e8; font-size: 1.05rem; }
     #notice { color: #e6c36a; }
     #counts, #ports-note, #path-text { color: #8d8d8d; }
+    #path-note { color: #e6c36a; margin: -6px 0 14px; line-height: 1.5; overflow-wrap: anywhere; }
     .ladder-preview { background: #0e0e0e; border: 1px solid #1e1e1e; border-radius: 14px; overflow: hidden; margin-bottom: 16px; max-width: 100%; }
     .ladder-preview svg { width: 100%; height: auto; display: block; }
     .ladder-parts { list-style: none; padding: 0; margin: 0 0 16px; }
@@ -145,6 +146,8 @@
     <button type="button" data-shape="u">U</button>
     <button type="button" data-shape="square">Square</button>
     <button type="button" data-shape="zigzag">Zigzag</button>
+    <button type="button" data-shape="diamond">Diamond</button>
+    <button type="button" data-shape="octagon">Octagon</button>
   </div>
 
   <div class="ladder-path" id="path">
@@ -154,9 +157,11 @@
     <button type="button" id="left-90">Left 90°</button>
     <button type="button" id="right-90">Right 90°</button>
     <button type="button" id="undo">Undo</button>
+    <button type="button" id="close-shape">Close the shape</button>
     <button type="button" id="delete-bay" disabled>Delete selected</button>
   </div>
   <p id="path-text"><%= pathLabel %></p>
+  <p id="path-note" hidden></p>
   <div class="bay-row" id="bays" aria-label="Bays"></div>
 
   <section class="ladder-fit" id="fit" data-token="0" aria-live="polite">

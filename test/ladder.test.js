@@ -146,6 +146,105 @@ test('shape presets are fixed layouts and do not change a one-bay ladder into no
     assert.equal(ladder.shapeRuns('nope'), null);
 });
 
+test('eight 45 degree turns fit in one path, so a ring can close', () => {
+    // The old cap of 8 runs allowed 7 turns, which stops at 315 degrees and
+    // refuses the turn that completes the shape.
+    assert.ok(ladder.MAX_RUNS >= 9, ladder.MAX_RUNS);
+    const runs = [];
+    for (let i = 0; i < 8; i++) runs.push({ squares: 2, turn: 45 });
+    runs.push({ squares: 2, turn: 0 });
+    const plan = ladder.plan({ runs });
+    assert.equal(plan.runs.length, 9);
+    assert.equal(plan.heading, 360);
+    assert.deepEqual(plan.turnsOwed, []);
+    assert.equal(plan.warnings.length, 0, plan.warnings.join('; '));
+});
+
+test('the planner says how much turning is left to close the shape', () => {
+    // A 90 degree path closes as a square, a 45 degree one as an octagon, so
+    // the shape that comes back is regular rather than a mix of both.
+    assert.deepEqual(ladder.remainingTurns([{ squares: 2, turn: 90 }, { squares: 2, turn: 0 }]), [90, 90, 90]);
+    assert.deepEqual(ladder.remainingTurns([{ squares: 2, turn: -45 }, { squares: 2, turn: 0 }]), [-45, -45, -45, -45, -45, -45, -45]);
+    assert.deepEqual(ladder.remainingTurns([{ squares: 4, turn: 0 }]), []);
+    // One 45 left after a run of them: a single turn, which is the case the
+    // old 8 run cap refused.
+    const sevenEighths = [{ squares: 1, turn: 45 }];
+    for (let i = 0; i < 6; i++) sevenEighths.push({ squares: 2, turn: 45 });
+    sevenEighths.push({ squares: 3, turn: 0 });
+    assert.deepEqual(ladder.remainingTurns(sevenEighths), [45]);
+});
+
+test('closing the shape adds the turns the path still owes', () => {
+    const open = [{ squares: 1, turn: 45 }];
+    for (let i = 0; i < 6; i++) open.push({ squares: 2, turn: 45 });
+    open.push({ squares: 3, turn: 0 });
+    assert.equal(ladder.headingOf(open), 315);
+    const closed = ladder.closeShape(open);
+    assert.equal(ladder.headingOf(closed), 360);
+    assert.equal(closed[closed.length - 1].turn, 0);
+    const plan = ladder.plan({ runs: closed });
+    assert.deepEqual(plan.turnsOwed, []);
+    assert.equal(plan.warnings.length, 0, plan.warnings.join('; '));
+    assert.equal(ladder.closeShape([{ squares: 4, turn: 0 }]), null);
+});
+
+test('a turn is refused with a reason, never silently dropped', () => {
+    assert.equal(ladder.addTurn([{ squares: 2, turn: 45 }, { squares: 1, turn: 90 }], 45, 1), null);
+    assert.equal(ladder.addTurn([{ squares: 2, turn: 0 }], 30, 1), null);
+    const next = ladder.addTurn([{ squares: 2, turn: 0 }], 45, 3);
+    assert.deepEqual(next, [{ squares: 2, turn: 45 }, { squares: 3, turn: 0 }]);
+});
+
+test('a corner costs a whole number of bays, so turns stay on the grid', () => {
+    // An off-grid corner lead adds two odd-length segments per turn and
+    // stretches the shape past the squares it is made of.
+    for (const spacing of [150, 190, 250, 400, 800]) {
+        for (const width of [120, 190, 450, 800]) {
+            for (const name of ['octagon', 'diamond']) {
+                const plan = ladder.plan({ spacing, width, runs: ladder.shapeRuns(name) });
+                assert.equal(plan.endGap, 0, name + ' ' + spacing + '/' + width + ' gap ' + plan.endGap);
+            }
+        }
+    }
+    // Every bay is exactly the spacing, corners included.
+    const plan = ladder.plan({ spacing: 400, runs: ladder.shapeRuns('diamond') });
+    const bays = [...plan.svg.matchAll(/class="bay-hit" x1="(-?[\d.]+)" y1="(-?[\d.]+)" x2="(-?[\d.]+)" y2="(-?[\d.]+)"/g)];
+    assert.ok(bays.length > 0);
+    for (const b of bays) {
+        const d = Math.hypot(b[3] - b[1], b[4] - b[2]);
+        assert.ok(Math.abs(d - 400) < 0.6, 'bay ' + d);
+    }
+});
+
+test('a closed shape brings the last rung back to the first', () => {
+    // Turning a full circle is not enough: the first and last runs share one
+    // side of the ring, so an even last run leaves the ends a side apart.
+    for (const name of ['octagon', 'diamond']) {
+        const plan = ladder.plan({ runs: ladder.shapeRuns(name) });
+        assert.equal(plan.endGap, 0, name + ' gap ' + plan.endGap);
+    }
+    const open = [{ squares: 1, turn: 45 }];
+    for (let i = 0; i < 6; i++) open.push({ squares: 2, turn: 45 });
+    open.push({ squares: 2, turn: 0 });
+    const closed = ladder.plan({ runs: ladder.closeShape(open) });
+    assert.equal(closed.endGap, 0, 'closed gap ' + closed.endGap);
+    assert.deepEqual(closed.turnsOwed, []);
+    // A straight ladder is open on purpose, so its ends are far apart.
+    assert.ok(ladder.plan({}).endGap > 100);
+});
+
+test('the closed presets come back to their starting direction', () => {
+    for (const name of ['octagon', 'diamond']) {
+        const runs = ladder.shapeRuns(name);
+        assert.equal(Math.abs(ladder.headingOf(runs)) % 360, 0, name + ' ' + ladder.headingOf(runs));
+        const plan = ladder.plan({ runs });
+        assert.deepEqual(plan.turnsOwed, [], name);
+        assert.equal(plan.warnings.length, 0, name + ' ' + plan.warnings.join('; '));
+    }
+    assert.equal(ladder.SHAPES.octagon.length, 9);
+    assert.equal(ladder.SHAPES.diamond.filter((run) => run.turn === 90).length, 4);
+});
+
 test('the layout drawing marks every bay for a click', () => {
     const plan = ladder.plan({});
     const hits = plan.svg.match(/class="bay-hit"/g) || [];
