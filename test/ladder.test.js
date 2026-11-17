@@ -260,3 +260,96 @@ test('dowel rungs ask for a zip tie and do not add pins', () => {
     assert.equal(plan.counts.pins, 0);
     assert.equal(plan.counts.rungPieces, 0);
 });
+
+// ---- Light parts, and a paracord that goes through ---------------------------
+
+// Hole centres are where the arms put them; the mesh is checked, not the spec.
+function bottomHoleWidths(mesh, spec) {
+    const found = [];
+    const step = Math.PI * 2 / spec.ports;
+    for (const [k, radius] of Array.from({ length: spec.ports * 2 }, (_, i) => [i % spec.ports, i < spec.ports ? spec.cordRH : spec.cupRH])) {
+        const cx = Math.cos(k * step) * radius;
+        const cy = Math.sin(k * step) * radius;
+        const pts = new Map();
+        for (const tri of mesh) {
+            for (const p of tri) {
+                if (Math.abs(p.z) > 0.001) continue;
+                if (Math.abs(Math.hypot(p.x - cx, p.y - cy) - spec.holeRad) < 0.06) pts.set(p.x + ',' + p.y, p);
+            }
+        }
+        if (pts.size < 12) continue;
+        // Narrowest chord through the centre of the polygon: what a cord really has to pass.
+        const list = [...pts.values()];
+        let narrow = Infinity;
+        for (let a = 0; a < 90; a++) {
+            const t = (a / 90) * Math.PI;
+            const proj = list.map((p) => (p.x - cx) * Math.cos(t) + (p.y - cy) * Math.sin(t));
+            narrow = Math.min(narrow, Math.max(...proj) - Math.min(...proj));
+        }
+        found.push(narrow);
+    }
+    return found;
+}
+
+test('the cord holes admit 4 mm paracord, in the printed mesh', () => {
+    for (const input of [{}, { rails: 'cord', rungs: 'cord' }]) {
+        const built = ladder.assemble(input);
+        assert.ok(built.spec.cord === 4);
+        assert.ok(built.spec.holeRad * 2 >= 4.5, 'hole ' + built.spec.holeRad * 2);
+        let seen = 0;
+        for (const m of built.meshes) {
+            const widths = bottomHoleWidths(m.mesh, built.spec);
+            for (const w of widths) {
+                assert.ok(w >= 4.5, m.name + ' hole is only ' + w.toFixed(2) + ' mm wide');
+                seen++;
+            }
+        }
+        assert.ok(seen >= 3, 'no cord holes were found in the meshes: ' + seen);
+        // The cup is wide enough to sit a double overhand knot (about 3 cords across).
+        assert.ok(built.spec.wellR * 2 >= 3 * built.spec.cord, 'cup ' + built.spec.wellR * 2);
+        // The cord lies in a groove at least one cord deep, so it does not stand proud of the part.
+        assert.ok(built.spec.grooveDepth >= built.spec.cord, 'groove ' + built.spec.grooveDepth);
+    }
+});
+
+test('a paracord-and-paracord ladder builds, and says how long to cut each cord', () => {
+    const built = ladder.assemble({ rails: 'cord', rungs: 'cord' });
+    assert.equal(built.meshes.every((m) => m.stats.watertight), true);
+    assert.ok(built.plan.cord.perRailMm > 0 && built.plan.cord.rungCount > 0);
+    assert.match(built.plan.cordLine, /Cut 2 lengths of 4 mm paracord/);
+    const note = ladder.kitZip({ rails: 'cord', rungs: 'cord' }).toString('utf8');
+    assert.match(note, /UP through the hole from underneath/);
+    assert.match(note, /550 cord is about 4 mm/);
+    const mixed = ladder.assemble({});
+    assert.match(mixed.plan.cordLine, /each about \d+ mm \(\d+ ft \d+ in\)/);
+});
+
+test('connectors and bars are thin open shapes, and the whole ladder stays under its mass budget', () => {
+    const built = ladder.assemble({});
+    const plan = built.plan;
+    const bySuffix = (re) => plan.parts.filter((p) => re.test(p.name));
+    // Before: ~89 g per connector (a 97 mm solid disc), ~12.7 g per rung piece, ~1.2 kg all told.
+    for (const row of bySuffix(/^coupler/)) assert.ok(row.grams <= 8, row.name + ' ' + row.grams + ' g');
+    for (const row of bySuffix(/^rung-stick/)) assert.ok(row.grams <= 5.5, row.name + ' ' + row.grams + ' g');
+    for (const row of bySuffix(/^joiner/)) assert.ok(row.grams <= 5.5, row.name + ' ' + row.grams + ' g');
+    for (const row of bySuffix(/^pin/)) assert.ok(row.grams <= 0.5, row.name + ' ' + row.grams + ' g');
+    assert.ok(plan.totalGrams <= 200, 'default ladder ' + plan.totalGrams + ' g');
+    const cordOnly = ladder.assemble({ rails: 'cord', rungs: 'cord' }).plan;
+    assert.ok(cordOnly.totalGrams <= 60, 'paracord ladder ' + cordOnly.totalGrams + ' g');
+    // The kit says what it weighs.
+    assert.match(ladder.kitZip({}).toString('utf8'), /About \d+ g of PETG/);
+    // Every connector is one hub with arms, not a disc: its footprint is well inside the circle.
+    const disc = Math.PI * built.spec.outerR * built.spec.outerR * built.spec.H / 1000 * 1.27;
+    for (const m of built.meshes) assert.ok(m.stats.volume / 1000 * 1.27 < disc * 0.1, m.name);
+});
+
+test('45 degree ladders keep every connector arm apart', () => {
+    const runs = [];
+    for (let i = 0; i < 8; i++) runs.push({ squares: 1, turn: 45 });
+    runs.push({ squares: 1, turn: 0 });
+    for (const input of [{ runs }, { runs, rails: 'cord', rungs: 'cord' }]) {
+        const built = ladder.assemble(input);
+        assert.equal(built.spec.ports, 8);
+        for (const m of built.meshes) assert.equal(m.stats.watertight, true, m.name);
+    }
+});
