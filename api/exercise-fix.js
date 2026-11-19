@@ -142,7 +142,8 @@ async function buildRows(db) {
     const issues = [];
     if (!def) issues.push('not-in-library');
     if (!credited) issues.push('no-muscles');
-    if (!def || !def.sides) issues.push('sides-unset');
+    // A stretch is not counted in volume, so its per-side flag changes nothing: not an issue.
+    if ((!def || !def.sides) && !stretch) issues.push('sides-unset');
     if (tidy.has(name)) issues.push('tidy');
     const src = !credited ? muscleSource(name, defs, published) : null;
     return {
