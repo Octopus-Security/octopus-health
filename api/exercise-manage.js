@@ -134,7 +134,7 @@ async function setsFor(db, nameOrNames) {
   const names = Array.isArray(nameOrNames) ? nameOrNames : [nameOrNames];
   if (!names.length) return [];
   return db.sequelize.query(
-    `SELECT s.id, s.sessionId, ws.date AS date, s.reps, s.weight, s.weightUnit, s.duration, s.failed
+    `SELECT s.id, s.sessionId, ws.date AS date, s.reps, s.weight, s.weightUnit, s.duration, s.failed, s.notes
        FROM WorkoutSets s LEFT JOIN WorkoutSessions ws ON ws.id = s.sessionId
       WHERE s.exerciseName IN (:names)
       ORDER BY ws.date ASC, s.id ASC`,

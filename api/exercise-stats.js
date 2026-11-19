@@ -15,6 +15,7 @@
  * estimated 1RM and the plateau rule.
  */
 
+const SIDES = require('../lib/sides');
 const LB_PER_KG = 2.20462;
 
 // Estimated 1RM = Epley: weight * (1 + reps / 30). Only for 1-12 reps: past about
@@ -48,10 +49,14 @@ function e1rm(weight, reps) {
 }
 
 /** Normalise raw rows ({date, reps, weight, weightUnit, duration, failed}) and drop the unusable. */
-function cleanSets(rows) {
+// `def` (optional) is the exercise's definition. Its per-side flag (lib/sides.js)
+// scales VOLUME only: tm = load moved, rm = reps. Weights and estimated 1RMs stay
+// per side, which is how a unilateral lift is compared over time.
+function cleanSets(rows, def) {
   const out = [];
   for (const r of rows || []) {
     if (!r || !r.date || r.failed) continue;
+    const x = SIDES.multipliers(r, def);
     const w = r.weight != null && Number.isFinite(Number(r.weight)) ? toLbs(Number(r.weight), r.weightUnit) : null;
     out.push({
       date: String(r.date).slice(0, 10),
@@ -59,6 +64,7 @@ function cleanSets(rows) {
       reps: r.reps != null && Number.isFinite(Number(r.reps)) ? Number(r.reps) : null,
       weight: w != null && w > 0 ? w : null,
       duration: r.duration != null && Number.isFinite(Number(r.duration)) ? Number(r.duration) : null,
+      tm: x.tonnage, rm: x.reps,
     });
   }
   return out;
@@ -90,13 +96,13 @@ function sessionSeries(sets, mode) {
       p.topReps = top.reps;
       const est = w.map(x => e1rm(x.weight, x.reps)).filter(v => v != null);
       p.e1rm = est.length ? round1(Math.max(...est)) : null;
-      p.volume = Math.round(w.reduce((a, x) => a + x.weight * (x.reps || 0), 0));
+      p.volume = Math.round(w.reduce((a, x) => a + x.weight * (x.reps || 0) * (x.tm || 1), 0));
       p.metric = p.e1rm;
     } else if (mode === 'reps') {
       const r = ss.filter(x => x.reps != null);
       if (!r.length) continue;
       p.topReps = Math.max(...r.map(x => x.reps));
-      p.volume = r.reduce((a, x) => a + x.reps, 0);
+      p.volume = r.reduce((a, x) => a + x.reps * (x.rm || 1), 0);
       p.metric = p.topReps;
     } else if (mode === 'timed') {
       const d = ss.filter(x => x.duration != null);
@@ -120,7 +126,7 @@ function prs(sets, mode) {
     for (const s of w) { const v = e1rm(s.weight, s.reps); if (v != null && (!best || v > best.value)) best = { value: round1(v), weight: round1(s.weight), reps: s.reps, date: s.date }; }
     out.bestE1rm = best && { ...best, formula: E1RM_FORMULA };
     let vol = null;
-    for (const s of w) { const v = s.weight * (s.reps || 0); if (s.reps && (!vol || v > vol.volume)) vol = { volume: Math.round(v), weight: round1(s.weight), reps: s.reps, date: s.date }; }
+    for (const s of w) { const v = s.weight * (s.reps || 0) * (s.tm || 1); if (s.reps && (!vol || v > vol.volume)) vol = { volume: Math.round(v), weight: round1(s.weight), reps: s.reps, date: s.date }; }
     out.bestVolumeSet = vol;
     out.repPRs = REP_TARGETS.map(n => {
       let hit = null;
@@ -185,13 +191,14 @@ const DISCLAIMER = 'General training information, not medical advice. If somethi
 /**
  * @param {Array} rows  raw set rows for ONE exercise, with the session's date
  */
-function analyse(rows) {
-  const sets = cleanSets(rows);
+function analyse(rows, opts = {}) {
+  const sets = cleanSets(rows, opts.def || null);
   const mode = modeOf(sets);
   const series = sessionSeries(sets, mode);
   const pl = plateau(series);
   return {
     mode, unit: 'lbs', sessions: series.length, series,
+    sides: (opts.def && opts.def.sides) || null,
     prs: prs(sets, mode),
     plateau: pl,
     tips: tipsFor(pl),

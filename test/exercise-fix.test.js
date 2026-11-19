@@ -10,6 +10,7 @@ const path = require('path');
 const SIDES = require('../lib/sides');
 const V = require('../lib/volume');
 const { parseWorkout } = require('../api/workout-parse');
+const S = require('../api/exercise-stats');
 
 let express, ejs, getDatabase;
 try {
@@ -44,6 +45,20 @@ test('per-side suggestions come from the name, or from how the sets were logged'
   assert.strictEqual(SIDES.suggest('Hammer Curl', { total: 6, perSide: 4 }).sides, 'unilateral');
   assert.strictEqual(SIDES.suggest('Hammer Curl', { total: 6, perSide: 1 }), null);
   assert.strictEqual(SIDES.suggest('Alternating Lunges'), null, 'alternating is a choice, not a fact');
+});
+
+test('stats: per-side scales volume only; weights and estimated 1RM stay per side', () => {
+  const rows = [{ date: '2026-11-10', sessionId: 1, reps: 10, weight: 25, weightUnit: 'lbs' }, { date: '2026-11-10', sessionId: 1, reps: 10, weight: 25, weightUnit: 'lbs' }];
+  const plain = S.analyse(rows);
+  const uni = S.analyse(rows, { def: { sides: 'unilateral' } });
+  assert.strictEqual(plain.series[0].volume, 500);
+  assert.strictEqual(uni.series[0].volume, 1000);
+  assert.strictEqual(uni.series[0].e1rm, plain.series[0].e1rm);
+  assert.strictEqual(uni.prs.heaviest.weight, 25);
+  assert.strictEqual(uni.prs.bestVolumeSet.volume, 500);
+  assert.strictEqual(uni.sides, 'unilateral');
+  const bw = S.analyse([{ date: '2026-11-10', sessionId: 1, reps: 12 }], { def: { sides: 'unilateral' } });
+  assert.strictEqual(bw.series[0].volume, 24);
 });
 
 // ---------------------------------------------------------------- parser

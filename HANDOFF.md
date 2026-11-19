@@ -16,8 +16,10 @@ eviction test, whose 10 ms grace window was shorter than opening the cache's han
 seeded account: accept suggestions, per-side, review, save; the Body Map's volume then maps every name but the one
 with no suggestion; figures draw; no sideways scroll at 390px.
 
-**Not verified:** a real account's log (the suggestions were checked against seeded names only); stats pages
-(`api/exercise-stats.js`) do not apply the per-side flag yet, so their volume figures are per side as logged.
+**Stats pages** apply the flag to volume only (session volume, best-volume set, rep totals); weights and estimated
+1RMs stay per side. The detail page says so for a unilateral exercise.
+
+**Not verified:** a real account's log (the suggestions were checked against seeded names only).
 
 
 ## 2026-11-10 — figures and the audit

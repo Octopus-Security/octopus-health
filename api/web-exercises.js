@@ -50,7 +50,15 @@ async function detail(db, name) {
   const shown = dominantSpelling(names, stats);
   const rows = await X.setsFor(db, names);
   if (!rows.length) return null;
-  const a = S.analyse(rows);
+  // The definition's per-side flag scales volume (lib/sides.js); any spelling's definition will do.
+  let def = null;
+  try {
+    const defs = await db.ExerciseDefinition.findAll({ attributes: ['name', 'sides'], raw: true });
+    const want = new Set(names.map(n => String(n).toLowerCase()));
+    def = defs.find(d => want.has(String(d.name).toLowerCase()) && d.sides)
+      || defs.find(d => d.sides && groupKey(d.name) === gk) || null;
+  } catch { /* stats stand without it */ }
+  const a = S.analyse(rows, { def });
   let stored = null;
   try {
     const recs = (await db.PersonalRecord.findAll()).filter(r => groupKey(r.exerciseName) === gk);
