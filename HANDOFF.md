@@ -16,6 +16,10 @@ eviction test, whose 10 ms grace window was shorter than opening the cache's han
 seeded account: accept suggestions, per-side, review, save; the Body Map's volume then maps every name but the one
 with no suggestion; figures draw; no sideways scroll at 390px.
 
+**Catalogue flags:** `SEED_SIDES` in database.js sets the flag on 32 one-sided and 72 two-sided catalogue exercises,
+once per account (`exerciseSeedSidesV1`), only where the row's flag is empty. Lunges often logged as alternating
+totals, Cossack squats and alternating push-ups are left for the owner.
+
 **Stats pages** apply the flag to volume only (session volume, best-volume set, rep totals); weights and estimated
 1RMs stay per side. The detail page says so for a unilateral exercise.
 

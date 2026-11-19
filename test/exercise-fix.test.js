@@ -61,6 +61,14 @@ test('stats: per-side scales volume only; weights and estimated 1RM stay per sid
   assert.strictEqual(bw.series[0].volume, 24);
 });
 
+test('seed per-side list: every name is a real catalogue exercise, none listed twice', () => {
+  const g = require('../database');
+  const names = new Set(g.SEED_EXERCISES.map(e => e.name));
+  const all = [...g.SEED_SIDES.unilateral, ...g.SEED_SIDES.bilateral];
+  for (const n of all) assert.ok(names.has(n), `${n} is not in SEED_EXERCISES`);
+  assert.strictEqual(new Set(all).size, all.length, 'a name is in both lists or twice');
+});
+
 // ---------------------------------------------------------------- parser
 
 test('parser: holds read "30s" as seconds, "3x30 sec" is three timed sets, and more per-side wordings', () => {
@@ -135,7 +143,8 @@ test('the page and the rows: issues and suggestions, nothing written by a GET', 
   const sp = by('Side Planks');
   assert.ok(sp.def && sp.def.name === 'Side Plank', 'plural resolves to the catalogue row');
   assert.ok(!sp.issues.includes('no-muscles'));
-  assert.strictEqual(sp.suggest.sides.sides, 'unilateral');
+  assert.strictEqual(sp.def.sides, 'unilateral', 'the catalogue flag is filled in for a new account');
+  assert.ok(!sp.issues.includes('sides-unset'));
   const pb = by('Paused Dumbbell Bench Press');
   assert.ok(pb.issues.includes('not-in-library') && pb.issues.includes('no-muscles'));
   assert.ok(pb.suggest.muscles, 'a close name with muscles is suggested');
@@ -157,7 +166,7 @@ test('bulk save: preview writes nothing; confirm writes; the Body Map then count
 
   const changes = [
     { name: 'Paused Dumbbell Bench Press', primaryMuscles: ['chest'], secondaryMuscles: ['triceps', 'front_delts'], sides: 'bilateral' },
-    { name: 'Side Planks', sides: 'unilateral', poseKey: '' },
+    { name: 'Side Planks', sides: 'bilateral', poseKey: '' },
   ];
   const prev = await (await fetch(base + '/logs/api/exercises/fix', { method: 'POST', headers: J, body: JSON.stringify({ changes }) })).json();
   assert.ok(prev.ok && prev.preview);
@@ -169,7 +178,9 @@ test('bulk save: preview writes nothing; confirm writes; the Body Map then count
   assert.ok(done.ok); assert.strictEqual(done.saved, 2);
   const made = await db.ExerciseDefinition.findOne({ where: { name: 'Paused Dumbbell Bench Press' } });
   assert.ok(made.isCustom); assert.strictEqual(made.sides, 'bilateral');
-  assert.strictEqual((await db.ExerciseDefinition.findOne({ where: { name: 'Side Plank' } })).sides, 'unilateral');
+  assert.strictEqual((await db.ExerciseDefinition.findOne({ where: { name: 'Side Plank' } })).sides, 'bilateral', 'the owner can override the catalogue flag');
+  await getDatabase(U).ensureSeeded();
+  assert.strictEqual((await db.ExerciseDefinition.findOne({ where: { name: 'Side Plank' } })).sides, 'bilateral', 're-seeding does not undo it');
 
   v = await volume();
   assert.ok(!v.skipped.exercises.map(e => e.name).includes('Paused Dumbbell Bench Press'), 'now on the map');
