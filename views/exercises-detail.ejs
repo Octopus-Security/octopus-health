@@ -26,6 +26,7 @@
       </div>
       <% if (d.spellings && d.spellings.length > 1) { %><p class="ex-sub">Counts every spelling together: <%= d.spellings.join(', ') %>. <a href="/logs/exercises">Review &amp; consolidate</a> to merge them.</p><% } %>
       <p class="ex-sub"><%= d.totalSets %> set<%= d.totalSets === 1 ? '' : 's' %> logged across <%= d.sessions %> session<%= d.sessions === 1 ? '' : 's' %>. Weights are shown in lbs (kg sets are converted). Failed sets are left out of records.</p>
+      <% if (d.sides === 'unilateral') { %><p class="ex-sub">Done one side at a time: weights and records are per side; volume counts both sides. <a href="/logs/exercises/fix?q=<%= encodeURIComponent(d.name) %>&show=all">Change</a></p><% } %>
 
       <% if (d.mode === 'none' || !d.sessions) { %>
         <div class="ex-card"><p class="ex-note">No reps, weight or time on record for this exercise yet, so there is nothing to chart.</p></div>
