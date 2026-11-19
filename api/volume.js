@@ -40,13 +40,21 @@ module.exports = (app, { requireLogin, getDatabase }) => {
       const defs = await ExerciseDefinition.findAll({ raw: true });
       const byId = new Map(defs.map(d => [d.id, d]));
       const byName = new Map(defs.map(d => [String(d.name).toLowerCase(), d]));
+      // Case, punctuation and plurals are one exercise (api/exercise-names.js):
+      // "Bulgarian Split Squats" is "Bulgarian split squat". Exact spelling wins;
+      // this only answers a name that matched nothing. Nothing fuzzier: a near
+      // name is a question for the fixer page, never a guess here.
+      const { canonicalKey } = require('./exercise-names');
+      const byCanon = new Map();
+      for (const d of defs) { const k = canonicalKey(d.name); if (!byCanon.has(k)) byCanon.set(k, d); }
       let published = new Map();
       try { published = await require('./catalogue-db').approvedByName(); } catch { /* this account's own definitions still count */ }
       const credits = (d) => V.creditsFor(d);
       const resolveDef = (s) => {
         const idDef = s.exerciseId != null ? (byId.get(s.exerciseId) || byId.get(Number(s.exerciseId)) || null) : null;
         const key = String(s.exerciseName || '').toLowerCase();
-        return V.pickDef(idDef, byName.get(key) || null, published.get(key) || null, credits);
+        const nameDef = byName.get(key) || byCanon.get(canonicalKey(s.exerciseName)) || null;
+        return V.pickDef(idDef, nameDef, published.get(key) || null, credits);
       };
       const sets = rows.map(r => ({ ...r, date: dateOf.get(r.sessionId) }));
 

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <%- include('partials/favicon') %>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="<%= asset('/theme.css') %>">
+    <%- include('partials/dialog') %>
+    <link rel="stylesheet" href="<%= asset('/exercises.css') %>">
+    <script src="<%= asset('/pose-map.js') %>"></script>
+    <script src="<%= asset('/stick-figure.js') %>" defer></script>
+</head>
+<body>
+    <%- include('partials/nav') %>
+
+    <div class="container ex-page fx-page">
+      <div class="ex-head">
+        <h2>🛠️ Fix exercises</h2>
+        <a href="/logs/exercises" class="btn">← Exercises</a>
+      </div>
+      <p class="ex-sub">Everything that keeps an exercise off the Body Map or counts it wrong, in one list. Tick the rows, use the bar at the bottom to change them all at once, then <strong>Review &amp; save</strong>: you see every change before anything is written. Suggestions are only shown, never applied for you. Changes affect only your own account. To merge two spellings of one lift, use <a href="/logs/exercises">Exercises → Review &amp; consolidate</a>.</p>
+
+      <div class="fx-filters" role="toolbar" aria-label="Show">
+        <button type="button" class="fx-f" data-f="no-muscles" aria-pressed="true">No muscles <span class="fx-n"></span></button>
+        <button type="button" class="fx-f" data-f="sides-unset" aria-pressed="false">Per-side not set <span class="fx-n"></span></button>
+        <button type="button" class="fx-f" data-f="not-in-library" aria-pressed="false">Not in library <span class="fx-n"></span></button>
+        <button type="button" class="fx-f" data-f="tidy" aria-pressed="false">Other spellings <span class="fx-n"></span></button>
+        <button type="button" class="fx-f" data-f="all" aria-pressed="false">Everything <span class="fx-n"></span></button>
+      </div>
+      <div class="fx-tools">
+        <label class="fx-search"><span class="sr-only">Search</span><input type="search" id="fx-q" placeholder="Search names" autocomplete="off"></label>
+        <label class="fx-check"><input type="checkbox" id="fx-logged" checked> Only exercises I have logged</label>
+        <label class="fx-check"><input type="checkbox" id="fx-poses"> Figures view (group by pose)</label>
+        <button type="button" class="mini" id="fx-all">Select all shown</button>
+      </div>
+      <p class="fx-status" id="fx-status" role="status">Loading…</p>
+      <ul class="fx-list" id="fx-list"></ul>
+    </div>
+
+    <div class="fx-bar" id="fx-bar" hidden>
+      <div class="container fx-bar-in">
+        <div class="fx-bar-row" id="fx-bulk" hidden>
+          <strong id="fx-selcount"></strong>
+          <button type="button" class="mini" data-bulk="accept">Accept suggestions</button>
+          <button type="button" class="mini" data-bulk="uni">Each side separately</button>
+          <button type="button" class="mini" data-bulk="bi">Both sides together</button>
+          <button type="button" class="mini" data-bulk="muscles">Set muscles…</button>
+          <label class="fx-inline">Copy muscles from <input list="fx-names" id="fx-copy" placeholder="exercise name"><button type="button" class="mini" data-bulk="copy">Copy</button></label>
+          <label class="fx-inline">Category <select id="fx-cat"><option value="">—</option><% categories.forEach(function (c) { %><option value="<%= c %>"><%= c.replace('_', ' ') %></option><% }) %></select></label>
+          <label class="fx-inline">Figure <select id="fx-pose"><option value="">—</option><option value="__auto">automatic (name rules)</option><% poses.forEach(function (p) { %><option value="<%= p %>"><%= p %></option><% }) %></select></label>
+          <button type="button" class="mini ghost" data-bulk="none">Clear selection</button>
+        </div>
+        <div class="fx-bar-row" id="fx-savebar" hidden>
+          <span id="fx-pending"></span>
+          <button type="button" class="btn" id="fx-review">Review &amp; save</button>
+          <button type="button" class="mini ghost" id="fx-discard">Discard changes</button>
+        </div>
+      </div>
+    </div>
+
+    <datalist id="fx-names"></datalist>
+
+    <dialog class="fx-dialog" id="fx-muscles-dlg" aria-labelledby="fx-md-h">
+      <form method="dialog">
+        <h3 id="fx-md-h">Muscles for the selected exercises</h3>
+        <p class="ex-sub">Primary = the main muscle worked; secondary = helps. This replaces the muscles on every selected row.</p>
+        <div class="fx-mgrid">
+          <% vocab.muscles.forEach(function (m) { %>
+          <div class="fx-mrow"><span><%= m.name %></span>
+            <label><input type="radio" name="m-<%= m.id %>" value=""> –</label>
+            <label><input type="radio" name="m-<%= m.id %>" value="p"> primary</label>
+            <label><input type="radio" name="m-<%= m.id %>" value="s"> secondary</label></div>
+          <% }) %>
+        </div>
+        <div class="fx-dlg-btns"><button value="cancel" class="mini ghost">Cancel</button><button value="ok" class="btn" id="fx-md-ok">Apply to selected</button></div>
+      </form>
+    </dialog>
+
+    <dialog class="fx-dialog" id="fx-review-dlg" aria-labelledby="fx-rv-h">
+      <form method="dialog">
+        <h3 id="fx-rv-h">Review changes</h3>
+        <div id="fx-review-body"></div>
+        <div class="fx-dlg-btns"><button value="cancel" class="mini ghost">Back</button><button value="ok" class="btn" id="fx-save">Save all</button></div>
+      </form>
+    </dialog>
+
+    <script type="application/json" id="fx-vocab"><%- JSON.stringify(vocab.muscles.map(function (m) { return { id: m.id, name: m.name }; })).replace(/</g, '\\u003c') %></script>
+    <script src="<%= asset('/js/exercises-fix.js') %>"></script>
+</body>
+</html>

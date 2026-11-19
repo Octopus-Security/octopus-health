@@ -1,5 +1,25 @@
 # HANDOFF (octopus-health)
 
+## 2026-11-19 — Fix exercises, per-side flag, holds in the quick log
+
+**Built (branch `feat/exercise-fixer`):** `/logs/exercises/fix` (bulk muscles, per-side, category and figure with
+suggestions, preview then confirm, a figures view grouped by pose; linked from Exercises and the Body Map); the
+`ExerciseDefinition.sides` column (additive) and `lib/sides.js`, applied in `lib/volume.js setFacts`; the volume
+route matches a logged name to its library entry across case/punctuation/plurals; the quick-log parser reads timed
+sets ("3x30 sec"), holds ("plank 30s") and more per-side wordings.
+
+**Also fixed:** the two failures that were on main. `no-native-dialogs` (timer and tempo pages fell back to
+`window.alert`/`confirm`; now the themed dialog or nothing, and a delete without a dialog is refused) and the LRU
+eviction test, whose 10 ms grace window was shorter than opening the cache's handles on a slow machine.
+
+**Verified (ran):** `npm test` 786/786 with borrowed node_modules. The page driven in headless Chromium against a
+seeded account: accept suggestions, per-side, review, save; the Body Map's volume then maps every name but the one
+with no suggestion; figures draw; no sideways scroll at 390px.
+
+**Not verified:** a real account's log (the suggestions were checked against seeded names only); stats pages
+(`api/exercise-stats.js`) do not apply the per-side flag yet, so their volume figures are per side as logged.
+
+
 ## 2026-11-10 — figures and the audit
 
 This note is safe to publish: health is a public repo. It does not describe

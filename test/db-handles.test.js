@@ -65,7 +65,9 @@ test('LRU eviction closes the evicted handle after the grace period; the survivo
   const prevMax = process.env.HEALTH_DB_CACHE_MAX, prevDelay = process.env.HEALTH_DB_CLOSE_DELAY_MS;
   // DB_CACHE_MAX is read at load time, so exercise the same path by shrinking the live cache.
   const sub = fs.mkdtempSync(path.join(tmp, 'evict-')); const was = process.env.DATA_DIR; process.env.DATA_DIR = sub;
-  process.env.HEALTH_DB_CLOSE_DELAY_MS = '10';
+  // 300 ms, not 10: opening DB_CACHE_MAX handles below can itself take longer than
+  // 10 ms on a slow laptop, which closed the handle before the in-flight check ran.
+  process.env.HEALTH_DB_CLOSE_DELAY_MS = '300';
   try {
     for (const k of [...cache.keys()]) cache.delete(k);
     const first = getDatabase(`${stamp}_e0`); await first.ensure();
@@ -77,7 +79,7 @@ test('LRU eviction closes the evicted handle after the grace period; the survivo
     assert.ok(!cache.has(first.sequelize.options.storage), 'oldest was evicted');
     assert.strictEqual(closed, false, 'not closed synchronously (an in-flight request keeps working)');
     await first.WeightEntry.count();            // still usable during the grace period
-    await new Promise(r => setTimeout(r, 80));
+    await new Promise(r => setTimeout(r, 450));
     assert.strictEqual(closed, true, 'closed after the grace period');
     assert.strictEqual(getDatabase(`${stamp}_e${getDatabase.DB_CACHE_MAX}`), keep[keep.length - 1], 'newest survives');
     const again = getDatabase(`${stamp}_e0`); await again.ensure();   // evicted account simply gets a fresh handle

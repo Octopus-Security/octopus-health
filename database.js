@@ -1574,6 +1574,11 @@ const createDatabase = (username, storage) => {
         // Optional stick-figure key (public/poses). Null means the name rules choose.
         poseKey:          { type: DataTypes.STRING, allowNull: true },
         isCustom:         { type: DataTypes.BOOLEAN, defaultValue: false },
+        // How the reps are counted (lib/sides.js): 'unilateral' = each side is
+        // done separately and a logged rep count is PER SIDE; 'bilateral' = both
+        // sides together. Null = not set yet. Read at calculation time, so
+        // setting it corrects the exercise's whole history.
+        sides:            { type: DataTypes.STRING, allowNull: true },
     });
 
     // A logged workout session
@@ -2044,6 +2049,8 @@ const createDatabase = (username, storage) => {
             // A chosen stick figure. New databases get it from the model; this
             // covers a file created before the column existed. sync() does not alter.
             [ExerciseDefinition.tableName, 'poseKey', 'VARCHAR(255)'],
+            // Per-side flag (lib/sides.js). Nullable: unset until someone decides.
+            [ExerciseDefinition.tableName, 'sides', 'VARCHAR(16)'],
         ];
         for (const [table, col, type] of adds) {
             try {
