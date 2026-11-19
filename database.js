@@ -1345,6 +1345,40 @@ const SEED_EXERCISE_PLANS = [
 // applied this version skips the whole pass after one UserSettings read.
 // Nothing here inserts, deletes or touches a custom row, a logged set, a PR or a template.
 const SEED_CONTENT_KEY = 'exerciseSeedContent';
+
+// Per-side flag for catalogue exercises (lib/sides.js), curated by hand, not by
+// the name rules: a wrong flag doubles numbers. Left out on purpose: lunges that
+// are often logged as alternating totals (walking, forward, reverse, jumping,
+// lateral), Cossack squats, and alternating push-up variants. The owner decides
+// those on the Fix exercises page. Applied once per account, only to catalogue
+// rows whose flag is still empty (seedSides below), so an owner's choice stands.
+const SEED_SIDES_KEY = 'exerciseSeedSidesV1';
+const SEED_SIDES = {
+  unilateral: [
+    'Dumbbell Single-Arm Row', 'Single-Arm Dumbbell Row', 'Dumbbell Concentration Curl', 'Dumbbell Bulgarian Split Squat',
+    'Bodyweight Bulgarian Split Squat', 'Split Squat', 'Dumbbell Split Squat', 'Dumbbell Suitcase Carry', 'Dumbbell Suitcase Deadlift',
+    'Side Plank', 'Turkish Get-Up', 'Single-Leg RDL (Bodyweight)', 'Single-Arm Push-up', 'Single-Arm Dumbbell Shoulder Press',
+    'Single-Arm Dumbbell Lateral Raise', 'Single-Arm Cable Lateral Raise', 'Single-Arm High Cable Row', 'Single-Leg Squat',
+    'Dumbbell Step-Up', 'Barbell Step-Up', 'Lateral Step-Up', 'Step-Up', 'Single-Leg Glute Bridge', 'Single-Leg Press (Machine)',
+    'Single-Leg Extension (Machine)', 'Single-Leg Calf Raise (Step)',
+    'Supine Shoulder Windmill', 'Side Lunge Adductor Stretch', 'Single-Leg Stand', 'Single-Leg Reach', 'Clamshell', 'Low Lunge with Twist',
+  ],
+  bilateral: [
+    'Barbell Back Squat', 'Barbell Deadlift', 'Barbell Front Squat', 'Barbell Bench Press', 'Barbell Overhead Press', 'Barbell Bent-Over Row',
+    'Romanian Deadlift (RDL)', 'Barbell Hip Thrust', 'Barbell Good Morning', 'Barbell Pendulum Squat', 'Barbell Hack Squat', 'Dumbbell Bench Press',
+    'Dumbbell Romanian Deadlift', 'Lat Pulldown', 'Leg Press', 'Pull-up', 'Chin-up', 'Push-up', 'Diamond Push-up', 'Dip', 'Wide Push-up',
+    'Pike Push-up', 'Push-up Board Wide', 'Push-up Board Narrow', 'Band-Assisted Pull-up', 'Parallette Push-up', 'EZ-Bar Curl', 'Plate Push-up',
+    'Weighted Pull-up', 'Weighted Chin-up', 'Weighted Dip', 'Plyometric Push-up', 'Explosive Pull-up', 'Scapular Pull-up', 'Barbell Z Press',
+    'Barbell Incline Bench Press', 'Barbell Decline Bench Press', 'Barbell Close-Grip Bench Press', 'Barbell Wide-Grip Bench Press',
+    'Smith Machine Bench Press', 'Smith Machine Incline Bench Press', 'Smith Machine Decline Bench Press', 'Knee Push-up',
+    'Knee Push-up (Hands Elevated)', 'Push-up (Feet Elevated)', 'Push-up (Hands Elevated)', 'Resistance Band Push-up', 'Stability Ball Push-up',
+    'Medicine Ball Push-up', 'Dive Bomber Push-up', 'Pike Push-up (Feet Elevated)', 'Handstand Push-up (Wall)', 'Bench Dip (Feet Elevated)',
+    'Assisted Dip (Machine)', 'Barbell Seated Overhead Press', 'Barbell Upright Row', 'Chest-Supported Barbell Row', 'Seated Row (Machine)',
+    'Assisted Pull-up (Machine)', 'Wide-Grip Lat Pulldown', 'Narrow-Grip Lat Pulldown', 'Reverse-Grip Lat Pulldown', 'Resistance Band Lat Pulldown',
+    'EZ-Bar Skull Crusher', 'Barbell Wrist Curl', 'Barbell Shrug', 'Leg Press (45-Degree)', 'Barbell Hang Clean', 'Barbell Push Jerk',
+    'Dumbbell Front Squat (Racked)',
+  ],
+};
 // A seed whose display name had to change (a treatment-sounding name). Logs, records, goals, templates
 // and plans all join on the NAME TEXT, so an existing account's row is renamed only when nothing of
 // that account's refers to the old name; otherwise the row keeps it (and still gets the new cue text),
@@ -1916,6 +1950,7 @@ const createDatabase = (username, storage) => {
             console.error('published catalogue merge failed:', e.message);
         }
         await refreshSeedContent();
+        await seedSides();
             const routineCount = await Routine.count();
             if (routineCount === 0) {
               await Routine.bulkCreate(
@@ -1996,6 +2031,20 @@ const createDatabase = (username, storage) => {
     // Bring existing non-custom seed rows up to the current seed text and video links.
     // Never throws: a failure is logged, the marker is left unset so the next login retries,
     // and the app starts regardless. Each update is idempotent, so a half-finished pass is safe.
+    // Fill the catalogue's per-side flag once (SEED_SIDES); never touches a row whose flag is set, or a custom row.
+    async function seedSides() {
+        try {
+            const mark = await UserSetting.findByPk(SEED_SIDES_KEY);
+            if (mark) return;
+            for (const [sides, names] of Object.entries(SEED_SIDES)) {
+                await ExerciseDefinition.update({ sides }, { where: { name: names, sides: null, isCustom: false } });
+            }
+            await UserSetting.upsert({ key: SEED_SIDES_KEY, value: '1' });
+        } catch (e) {
+            console.error('seed sides failed:', e.message);
+        }
+    }
+
     async function refreshSeedContent() {
         try {
             const mark = await UserSetting.findByPk(SEED_CONTENT_KEY);
@@ -2132,5 +2181,6 @@ module.exports = getDatabase;
 module.exports.SEED_EXERCISES = SEED_EXERCISES;
 module.exports.SEED_CONTENT_VERSION = SEED_CONTENT_VERSION;
 module.exports.SEED_RENAMES = SEED_RENAMES;
+module.exports.SEED_SIDES = SEED_SIDES;
 module.exports.SEED_WORKOUT_TEMPLATES = SEED_WORKOUT_TEMPLATES;
 module.exports.SEED_EXERCISE_PLANS = SEED_EXERCISE_PLANS;
