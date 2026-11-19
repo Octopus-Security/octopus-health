@@ -403,6 +403,7 @@ require('./api/web-plans')(app, { requireLogin, verifyFresh: verifyTokenFresh })
 require('./api/web-log-edit')(app, { requireLogin, getDatabase });
 // Exercises section of the Logs area: list, rename/merge, per-exercise PRs, graph, plateau tips.
 require('./api/web-exercises')(app, { requireLogin, getDatabase });
+require('./api/exercise-fix')(app, { requireLogin, getDatabase });
 
 app.get('/tools', requireLogin, (req, res) => {
     res.render('tools', { title: 'Tools', user: req.user });

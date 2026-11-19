@@ -27,7 +27,7 @@
   var ready = false;
   var busy = false;
   var confirmDelete = function () { return Promise.resolve(true); };
-  var toast = function (msg) { window.alert(msg); };
+  var toast = function (msg) { if (window.oDialog && oDialog.toast) oDialog.toast(msg); else console.info(msg); };
 
   function clamp(n, lo, hi, fallback) {
     var x = Math.round(Number(n));

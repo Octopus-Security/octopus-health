@@ -45,12 +45,17 @@ const DUR_UNIT_RE    = 'secs?|seconds?|mins?|minutes?|hrs?|hours?';
 // Per-limb phrasing, which becomes the note "each side" however it was written.
 // "each hand" was missing, so "10 x 40lb each hand" logged 40 with no note and
 // nothing recorded that it was 40 PER HAND (2026-10-14).
-const SIDE_RE = /\b(?:each|per|ea|both)\s+(?:sides?|hands?|arms?|legs?)\b|\be\/s\b/i;
+// 2026-11-19: also "10/side", "30s a side", and a bare trailing "each"
+// ("3x10 each", "3x10 35lb each": per side or per hand, both the note). A bare
+// "each" counts only as the LAST word, so "each set" is never read as a side.
+const SIDE_RE = /\b(?:each|per|ea|both|a)\s+(?:sides?|hands?|arms?|legs?)\b|\be\/s\b|\/\s*(?:sides?|hands?|arms?|legs?)\b|\beach\s*$/i;
 // "10 x 35lb pair of dumbbells" is 35 in EACH hand — the same fact as "each
 // hand", said with the equipment instead of the limb. 2026-10-15: the words
 // were read as an exercise name, so every set line of an incline press block
 // went unread and the owner was asked to rewrite a workout he wrote correctly.
 const PAIR_RE = /\bpairs?(?:\s+of)?\b/i;
+// Exercises that are held, not repped. Only these read a bare "30s" as seconds.
+const HOLD_RE = /\b(?:planks?|holds?|hangs?|wall sits?|l[- ]?sits?|hollow|isometric|iso|superman|horse stance|static|wall squat)\b/i;
 
 // A snake_case identifier is the agent's own plumbing quoted back, not an
 // exercise. 2026-10-14: a declined approval card was pasted into the chat to
@@ -125,9 +130,28 @@ function parseSets(tail, opts = {}) {
   const note = SIDE_RE.test(s) || PAIR_RE.test(s) ? 'each side' : null;
   s = s.replace(SIDE_RE, ' ').replace(PAIR_RE, ' ');
 
-  // timed set: "30 sec", "2 min" — pulled first so its number is not read as reps
+  // Sets of a timed hold, with the unit written out: "3x30 sec", "2 x 1 min".
+  // Read as N sets of that long. Before 2026-11-19 the duration was pulled out
+  // first and the leftover "3x" became THREE REPS in one 30-second set.
+  // A bare trailing "s" ("3x30s") is seconds only for a HOLD (opts.hold, from
+  // the exercise name): for anything else "30s" can be 30 lb dumbbells, which
+  // is why the refusal below stays.
+  let timedSets = null;
   let duration = null;
-  const dm = s.match(new RegExp(`(\\d+(?:\\.\\d+)?)\\s*(${DUR_UNIT_RE})\\b`, 'i'));
+  const ts = s.match(new RegExp(`(\\d+)\\s*x\\s*(\\d+(?:\\.\\d+)?)\\s*(${DUR_UNIT_RE})\\b`, 'i'))
+    || (opts.hold ? s.match(/(\d+)\s*x\s*(\d+(?:\.\d+)?)(s)\b/i) : null);
+  if (ts) {
+    timedSets = parseInt(ts[1], 10);
+    duration = Math.round(parseFloat(ts[2]) * (DUR_SEC[ts[3].toLowerCase()] || 1));
+    s = s.replace(ts[0], ' ');
+  } else if (opts.hold) {
+    // "side plank 30s": a hold's "30s" is thirty seconds, not thirty reps.
+    const hs = s.match(/(\d+(?:\.\d+)?)s\b/i);
+    if (hs) { duration = Math.round(parseFloat(hs[1])); s = s.replace(hs[0], ' '); }
+  }
+
+  // timed set: "30 sec", "2 min" — pulled first so its number is not read as reps
+  const dm = duration == null ? s.match(new RegExp(`(\\d+(?:\\.\\d+)?)\\s*(${DUR_UNIT_RE})\\b`, 'i')) : null;
   if (dm) { duration = Math.round(parseFloat(dm[1]) * (DUR_SEC[dm[2].toLowerCase()] || 1)); s = s.replace(dm[0], ' '); }
 
   // explicit weight: "20lbs", "20 kg", "@135"
@@ -146,7 +170,8 @@ function parseSets(tail, opts = {}) {
 
   // sets x reps ("3x10"), else the first bare number is the rep count
   let count = 1, reps = null, explicitSets = false;
-  const nx = s.match(/(\d+(?:\.\d+)?)\s*x\s*(\d+)/i);
+  if (timedSets != null) { count = timedSets; explicitSets = true; }
+  const nx = timedSets != null ? null : s.match(/(\d+(?:\.\d+)?)\s*x\s*(\d+)/i);
   if (nx) {
     const a = parseFloat(nx[1]), b = parseInt(nx[2], 10);
     if (opts.oneSet && weight == null) {
@@ -167,7 +192,7 @@ function parseSets(tail, opts = {}) {
     else { count = Math.round(a); reps = b; explicitSets = weight != null; }
     s = s.replace(nx[0], ' ');
   }
-  else {
+  else if (timedSets == null) {
     const r = s.match(/(\d+)/);
     if (r) { reps = parseInt(r[1], 10); s = s.replace(r[0], ' '); }
   }
@@ -306,11 +331,11 @@ function parseClause(clause, bar = { weight: 45, unit: 'lbs' }) {
   } else if (leadReps != null && !tail.trim()) {
     sets = [{ reps: leadReps, weight: null, weightUnit: null, duration: null, note }];
   } else if (leadReps != null) {
-    const ts = parseSets(tail);
+    const ts = parseSets(tail, { hold: HOLD_RE.test(name) });
     sets = ts.length ? ts.map(x => ({ ...x, reps: x.reps == null ? leadReps : x.reps, note: x.note || note }))
                      : [{ reps: leadReps, weight: null, weightUnit: null, duration: null, note }];
   } else {
-    sets = parseSets(tail).map(x => ({ ...x, note: x.note || note }));
+    sets = parseSets(tail, { hold: HOLD_RE.test(name) }).map(x => ({ ...x, note: x.note || note }));
   }
   if (!sets.length) return null;
 

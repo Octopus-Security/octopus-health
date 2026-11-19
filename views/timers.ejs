@@ -939,9 +939,9 @@ function timerField(id) { return document.getElementById(id).value; }
 function timerSet(id, value) { document.getElementById(id).value = value; }
 if (window.TimerPresets) {
   TimerPresets.configure({
-    toast: function (msg) { if (window.oDialog && oDialog.toast) oDialog.toast(msg); else window.alert(msg); },
+    toast: function (msg) { if (window.oDialog && oDialog.toast) oDialog.toast(msg); else console.info(msg); },
     confirmDelete: function (name) {
-      if (!window.oDialog || !oDialog.confirm) return Promise.resolve(window.confirm('Delete ' + name + '?'));
+      if (!window.oDialog || !oDialog.confirm) return Promise.resolve(false); // no themed dialog loaded: never delete unasked
       return oDialog.confirm({ title: 'Delete this timer?', body: name, confirmLabel: 'Delete', danger: true });
     },
   });

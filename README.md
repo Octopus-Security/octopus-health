@@ -263,3 +263,25 @@ operation (`api/exercise-manage.js`, `moveExercise`): every set under the old na
 is recorded so later logs of the old spelling land on the new name. Without `confirm: true` it only previews. Nothing is deleted; repeating it moves 0.
 `/logs/exercises/detail?name=` shows records, a chart.js graph and the plateau check (`api/exercise-stats.js`): stalled = the best estimated 1RM
 (Epley, 1-12 reps) of the last 4 sessions is not at least 1% above every earlier session, over at least 14 days, with at least 5 sessions.
+
+### Fix exercises (`/logs/exercises/fix`)
+
+One list of everything that keeps an exercise off the Body Map or counts it wrong: no muscles, a name only the log knows,
+the per-side flag not set, or another spelling of the same lift. Each row shows a suggestion (muscles from the exercise
+with the same movement, preferring the same equipment; per-side from the name or from how the sets were logged; the
+figure the name rules pick), never applied on its own. Tick rows and use the bottom bar: accept suggestions, set per-side,
+set or copy muscles, category, figure. **Review & save** shows every change from the server first; `confirm: true` writes.
+"Figures view" groups exercises under their stick figure to review poses. `api/exercise-fix.js`,
+`GET/POST /logs/api/exercises/fix`. A name that fits two different exercises equally (e.g. "BB Rows": bent-over or upright)
+gets no suggestion.
+
+**Per side** (`ExerciseDefinition.sides`, `lib/sides.js`): `unilateral` means a logged count is per side, so reps, hold
+seconds and tonnage count both sides; `bilateral` means both together, where a set note "each side" still means the load
+was per hand (tonnage doubles, reps do not). A set stays one hard set either way. Read when volume is computed, so setting
+the flag corrects that exercise's whole history.
+
+**Name matching on the Body Map:** a logged name now also matches its library entry when only case, punctuation or plurals
+differ ("Side Planks" → "Side Plank"), the rule `api/exercise-names.js` already states. Nothing fuzzier happens at read time.
+
+**Quick log:** "3x30 sec" is three 30-second sets (it was one set of 3 reps); for a hold (plank, hang, wall sit, L-sit...)
+"30s" and "3x30s" are seconds. "10/side", "30s a side" and a trailing "each" ("3x10 each") are the "each side" note.

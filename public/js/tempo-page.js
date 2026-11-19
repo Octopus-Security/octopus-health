@@ -14,7 +14,7 @@
     opts = opts || {};
     var speak = opts.speak || function () {};
     var bell = opts.bell || function () {};
-    var toast = opts.toast || function (msg) { window.alert(msg); };
+    var toast = opts.toast || function (msg) { if (window.oDialog && oDialog.toast) oDialog.toast(msg); else console.info(msg); };
     var confirmDelete = opts.confirmDelete || function () { return Promise.resolve(true); };
 
     var saved = [];
