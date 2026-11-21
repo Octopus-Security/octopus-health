@@ -22,6 +22,7 @@ const FALLBACK = [
 ];
 
 const IMPLEMENT = [
+  { key: "mismatch:Iso Shoulder Press", finding: "2026-11-21", reason: "a machine press has no figure of its own yet; it borrows the barbell overhead press until one is drawn" },
 ];
 
 const ALIAS = [

@@ -32,6 +32,7 @@ const { CATEGORIES } = require('../lib/exercise-fields');
 const PoseMap = require('../public/pose-map');
 const X = require('./exercise-manage');
 const { canonicalKey, baseKey } = require('./exercise-names');
+const { makeResolver } = require('../lib/exercise-resolve');
 
 const POSE_KEYS = new Set(PoseMap.keys());
 const MAX_CHANGES = 500;
@@ -125,6 +126,12 @@ async function buildRows(db) {
   let published = new Map();
   try { published = await require('./catalogue-db').approvedByName(); } catch { /* own definitions still work */ }
   const idx = indexDefs(defs);
+  // The shared resolver (lib/exercise-resolve.js) gives the alias-aware answer the Body Map uses, so a
+  // suggestion for "Bench Press" comes from Barbell Bench Press. It only feeds SUGGESTIONS: the row's own
+  // `def` stays the exact match, because saving here edits that row and must never edit an aliased one.
+  let aliases = new Map();
+  try { if (db.ExerciseAlias) aliases = new Map((await db.ExerciseAlias.findAll({ raw: true })).map(a => [a.key, a.name])); } catch { /* none */ }
+  const resolveName = makeResolver(defs, { published, aliases });
   const tidy = new Set();
   for (const g of review.groups || []) for (const s of g.spellings || []) tidy.add(s.name);
   for (const sg of review.suggestions || []) for (const g of sg.groups || []) for (const n of g.names || []) tidy.add(n);
@@ -145,7 +152,11 @@ async function buildRows(db) {
     // A stretch is not counted in volume, so its per-side flag changes nothing: not an issue.
     if ((!def || !def.sides) && !stretch) issues.push('sides-unset');
     if (tidy.has(name)) issues.push('tidy');
-    const src = !credited ? muscleSource(name, defs, published) : null;
+    let src = !credited ? muscleSource(name, defs, published) : null;
+    if (!credited && !src) {
+      const r = resolveName(name);
+      if (r && list(r.primaryMuscles).length && r.category !== 'recovery') src = { from: r.name, why: 'a known alias', def: r };
+    }
     return {
       name,
       logged: !!log, sets: log ? log.sets : 0, last: log ? log.last : null,

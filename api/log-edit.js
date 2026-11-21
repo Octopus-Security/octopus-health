@@ -175,6 +175,12 @@ async function addSet(db, sessionId, body = {}) {
   const err = applySetFields(fields, body);
   if (err) return bad(err);
   if (!fields.exerciseName) return bad('exerciseName is required');
+  // 2026-11-21: an add_set with only a name stored an empty set (reps "—", weight BW) in the live log.
+  // A set carries reps, a load, or a time (duration, seconds); bodyweight reps and timed holds each have
+  // one of those. With none, there is nothing to record, so refuse rather than write a blank row.
+  if (fields.reps == null && fields.weight == null && fields.duration == null) {
+    return bad('a set needs reps, a weight or a duration — none was given, so nothing was added');
+  }
 
   const sets = await db.WorkoutSet.findAll({ where: { sessionId: s.id } });
   const same = sets.filter(x => x.exerciseName.toLowerCase() === fields.exerciseName.toLowerCase());

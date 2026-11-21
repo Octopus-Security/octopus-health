@@ -611,27 +611,8 @@ function parseWorkout(text) {
 // Loose match: case/space/hyphen-insensitive, trailing-plural-insensitive, and
 // EXACT after normalising — never a substring, so "row" does not swallow
 // "Inverted Row". Returns { id, name } (canonical) or null.
-function normKey(s) {
-  return String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '').replace(/s$/, '');
-}
-// Shorthand → canonical library name. Consulted only AFTER the exact-normalised
-// match fails, and only resolves when the library really holds the canonical
-// exercise, so an alias can never invent a link. Keys are run through normKey() below (so 'bss' is stored as 'bs').
-// Deliberately no substring matching ("row" must not grab "Inverted Row").
-const RAW_ALIASES = {
-  bench: 'Barbell Bench Press', flatbench: 'Barbell Bench Press', bp: 'Barbell Bench Press',
-  ohp: 'Barbell Overhead Press',
-  dl: 'Barbell Deadlift', deads: 'Barbell Deadlift',
-  rdl: 'Romanian Deadlift (RDL)',
-  bss: 'Dumbbell Bulgarian Split Squat',
-  bike: 'Assault Bike — Steady State', cycling: 'Assault Bike — Steady State',
-  pullup: 'Pull-up', chinup: 'Chin-up',
-  // renamed in the seed (database.js SEED_RENAMES): the old name still resolves
-  'lumbar decompression hang': 'Relaxed Dead Hang',
-};
-
-const EXERCISE_ALIASES = {};
-for (const k of Object.keys(RAW_ALIASES)) EXERCISE_ALIASES[normKey(k)] = RAW_ALIASES[k];
+// normKey and the alias table live in lib/exercise-aliases.js, shared with the muscle resolver.
+const { normKey, EXERCISE_ALIASES } = require('../lib/exercise-aliases');
 
 function matchExercise(name, library) {
   if (!name || !Array.isArray(library)) return null;
