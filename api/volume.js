@@ -38,24 +38,19 @@ module.exports = (app, { requireLogin, getDatabase }) => {
       const dateOf = new Map(sessions.map(s => [s.id, s.date]));
       const rows = dateOf.size ? await WorkoutSet.findAll({ where: { sessionId: [...dateOf.keys()] }, raw: true }) : [];
       const defs = await ExerciseDefinition.findAll({ raw: true });
-      const byId = new Map(defs.map(d => [d.id, d]));
-      const byName = new Map(defs.map(d => [String(d.name).toLowerCase(), d]));
-      // Case, punctuation and plurals are one exercise (api/exercise-names.js):
-      // "Bulgarian Split Squats" is "Bulgarian split squat". Exact spelling wins;
-      // this only answers a name that matched nothing. Nothing fuzzier: a near
-      // name is a question for the fixer page, never a guess here.
-      const { canonicalKey } = require('./exercise-names');
-      const byCanon = new Map();
-      for (const d of defs) { const k = canonicalKey(d.name); if (!byCanon.has(k)) byCanon.set(k, d); }
+      // Name -> definition: exact, spelling variants, this account's remembered
+      // answers, the shared alias table, then a conservative unique-match fallback
+      // (lib/exercise-resolve.js). Nothing fuzzier: a near name is a question for
+      // the fixer page, never a guess here.
       let published = new Map();
       try { published = await require('./catalogue-db').approvedByName(); } catch { /* this account's own definitions still count */ }
-      const credits = (d) => V.creditsFor(d);
-      const resolveDef = (s) => {
-        const idDef = s.exerciseId != null ? (byId.get(s.exerciseId) || byId.get(Number(s.exerciseId)) || null) : null;
-        const key = String(s.exerciseName || '').toLowerCase();
-        const nameDef = byName.get(key) || byCanon.get(canonicalKey(s.exerciseName)) || null;
-        return V.pickDef(idDef, nameDef, published.get(key) || null, credits);
-      };
+      let aliases = new Map();
+      try {
+        const { ExerciseAlias } = getDatabase(req.user.username);
+        if (ExerciseAlias) aliases = new Map((await ExerciseAlias.findAll({ raw: true })).map(a => [a.key, a.name]));
+      } catch { /* no remembered answers is fine */ }
+      const resolveName = require('../lib/exercise-resolve').makeResolver(defs, { published, aliases });
+      const resolveDef = (s) => resolveName(s.exerciseName, s.exerciseId);
       const sets = rows.map(r => ({ ...r, date: dateOf.get(r.sessionId) }));
 
       const report = V.compute(sets, resolveDef, p);

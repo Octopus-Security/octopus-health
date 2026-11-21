@@ -98,6 +98,16 @@ test('deleting a set renumbers the rest of that exercise', { skip }, async () =>
   assert.deepStrictEqual(rest.map(s => [s.setNumber, s.weight]), [[1, 50], [2, 90]]);
 });
 
+test('adding a set with no reps, weight or duration is refused; reps-only and timed holds pass', { skip }, async () => {
+  const { user, sessionId, db } = await seed('emptyset');
+  const before = await db.WorkoutSet.count({ where: { sessionId } });
+  const empty = await svc(user, 'POST', `/sessions/${sessionId}/sets`, { exerciseName: 'Pull-up' });
+  assert.strictEqual(empty.status, 400, JSON.stringify(empty.body));
+  assert.strictEqual(await db.WorkoutSet.count({ where: { sessionId } }), before);
+  assert.strictEqual((await svc(user, 'POST', `/sessions/${sessionId}/sets`, { exerciseName: 'Pull-up', reps: 8 })).status, 200);
+  assert.strictEqual((await svc(user, 'POST', `/sessions/${sessionId}/sets`, { exerciseName: 'Plank', duration: 60 })).status, 200);
+});
+
 test('adding a set: same exercise joins it, a new one goes on the end', { skip }, async () => {
   const { user, sessionId, db } = await seed('addset');
   await svc(user, 'POST', `/sessions/${sessionId}/sets`, { exerciseName: 'bench press', reps: 8, weight: 100 });
