@@ -1707,6 +1707,14 @@ const createDatabase = (username, storage) => {
         name: { type: DataTypes.STRING, allowNull: false },
     });
 
+    // Added 2026-11-21: "these two are NOT the same exercise" (api/exercise-distinct.js). A sorted pair of
+    // exercise-names.js groupKey() values, so a dismissed merge suggestion stays dismissed. Additive:
+    // sync() creates the table and its unique index if missing; nothing is altered or dropped.
+    const ExerciseDistinct = sequelize.define('ExerciseDistinct', {
+        a: { type: DataTypes.STRING, allowNull: false },
+        b: { type: DataTypes.STRING, allowNull: false },
+    }, { tableName: 'ExerciseDistincts', indexes: [{ unique: true, fields: ['a', 'b'] }] });
+
     // Personal records — best performance per exercise over time
     const PersonalRecord = sequelize.define('PersonalRecord', {
         exerciseName: { type: DataTypes.STRING,  allowNull: false },
@@ -2092,6 +2100,7 @@ const createDatabase = (username, storage) => {
     // be added by hand. ADD COLUMN is safe in SQLite; we swallow "duplicate column".
     async function migrate() {
         // New tables: create-if-missing only (never alters or drops anything).
+        try { await ExerciseDistinct.sync(); } catch (e) { console.error('migrate: ExerciseDistincts failed:', e.message); }
         try { await GoalAddon.sync(); } catch (e) { console.error('migrate: GoalAddons failed:', e.message); }
         const adds = [
             ['Goals', 'title',        'VARCHAR(255)'],
@@ -2164,6 +2173,7 @@ const createDatabase = (username, storage) => {
         WorkoutSet,
         SessionTitle,
         ExerciseAlias,
+        ExerciseDistinct,
         TrainingPlan,
         TrainingPlanAssignment,
         WorkoutTemplate,

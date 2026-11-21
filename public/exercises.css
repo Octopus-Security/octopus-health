@@ -145,3 +145,9 @@ body.fx-has-bar .fx-page { padding-bottom: 260px; }
   .fx-row, .fx-grid .fx-row { grid-template-columns: 36px 64px minmax(0, 1fr); }
   .fx-fig, .fx-grid .fx-fig { width: 64px; height: 64px; }
 }
+
+/* Not the same: dismiss a suggestion, and the Restore list (44px targets) */
+.rv-dismiss, .rv-diff, .rv-dismissed .rv-go { min-height: 44px; margin-top: 8px; }
+.rv-dismissed { margin: 12px 0; }
+.rv-dismissed summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; color: #aaa; }
+.rv-dis { background: #0d0d0d; border: 1px solid #2a2a2a; border-radius: 10px; padding: 12px 14px; margin-bottom: 10px; }

@@ -22,6 +22,8 @@
 const { QueryTypes } = require('sequelize');
 const { canonicalKey, groupKey, movementKey, dominantSpelling, variantSig, variantsDiffer } = require('./exercise-names');
 
+const D = require('./exercise-distinct');
+
 const bad = (error, status = 400) => ({ ok: false, status, error });
 
 /** Per spelling: sets, sessions, last date. The usage that decides which spelling is dominant. */
@@ -112,13 +114,24 @@ async function reviewExercises(db) {
     byMovement.get(mk).push(g);
   }
   const suggestions = [];
-  for (const [mk, gs] of byMovement) {
+  const dismissed = await D.loadDistinct(db);
+  for (const [mk, gsAll] of byMovement) {
+    // Pairs the person marked "not the same" are not suggested again (api/exercise-distinct.js).
+    const gs = D.survivors(gsAll, dismissed);
     if (gs.length < 2 || !mk.split('|')[0]) continue;
     // Never across iso / single-arm: the movement key carries the signature, and this re-checks it.
     if (new Set(gs.map(g => variantSig(g.dominant))).size > 1) continue;
     suggestions.push({ movement: mk.split('|')[0], groups: gs.map(g => ({ key: g.key, name: g.dominant, names: g.spellings.map(x => x.name), sets: g.sets, last: g.last })) });
   }
-  return { groups: groups.filter(g => g.spellings.length > 1), all: groups, suggestions };
+  // The dismissed pairs whose two exercises are both still in the log, named for the Restore list.
+  const nameOf = new Map(groups.map(g => [g.key, g.dominant]));
+  const dismissedPairs = [];
+  for (const k of dismissed) {
+    const [a, b] = k.split('\u0000');
+    if (nameOf.has(a) && nameOf.has(b)) dismissedPairs.push({ a, b, aName: nameOf.get(a), bName: nameOf.get(b) });
+  }
+  dismissedPairs.sort((x, y) => (x.aName + x.bName).localeCompare(y.aName + y.bName));
+  return { groups: groups.filter(g => g.spellings.length > 1), all: groups, suggestions, dismissed: dismissedPairs };
 }
 
 /** The dominant EXISTING spelling of the exercise `name` is a spelling of, or null if none is logged. */

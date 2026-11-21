@@ -19,6 +19,7 @@ const { safeError } = require('../lib/safeguards');
  */
 
 const X = require('./exercise-manage');
+const D = require('./exercise-distinct');
 const S = require('./exercise-stats');
 const { bestPerExercise } = require('./pr-detect');
 const { groupKey, dominantSpelling } = require('./exercise-names');
@@ -111,6 +112,11 @@ module.exports = function mountExercises(app, { requireLogin, getDatabase }) {
   // Merge only the chosen names into one: preview, then confirm. Unchosen names are untouched.
   app.post('/logs/api/exercises/merge-selected', requireLogin, sameOriginJson,
     api((db, req) => X.mergeSelected(db, (req.body || {}).from, (req.body || {}).to, { confirm: (req.body || {}).confirm === true })));
+  // "Not the same": hide a merge suggestion for these pairs (and bring it back). Pairs of group keys; no set is touched.
+  app.post('/logs/api/exercises/distinct', requireLogin, sameOriginJson,
+    api(async (db, req) => { const c = D.cleanPairs((req.body || {}).pairs); return c.error ? { ok: false, error: c.error } : D.dismiss(db, c.pairs); }));
+  app.post('/logs/api/exercises/distinct/restore', requireLogin, sameOriginJson,
+    api(async (db, req) => { const c = D.cleanPairs((req.body || {}).pairs); return c.error ? { ok: false, error: c.error } : D.restore(db, c.pairs); }));
   // Delete every set logged under one exact name: preview (writes nothing), then confirm.
   app.post('/logs/api/exercises/delete', requireLogin, sameOriginJson,
     api((db, req) => X.deleteExercise(db, (req.body || {}).name,
