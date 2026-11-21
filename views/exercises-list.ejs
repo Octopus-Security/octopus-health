@@ -57,24 +57,40 @@
         <% } else { %>
         <ul class="rv-list" id="rv-suggest">
           <% review.suggestions.forEach(function (sg, si) { %>
-          <li class="rv-card" data-sug="<%= si %>">
+          <li class="rv-card" data-sug="<%= si %>" data-keys="<%= JSON.stringify(sg.groups.map(function (g) { return g.key; })) %>">
             <div class="rv-title"><%= sg.movement %></div>
             <ul class="rv-sp">
               <% sg.groups.forEach(function (gr, gi) { %>
-              <li data-row data-names="<%= JSON.stringify(gr.names) %>" data-keep="<%= gr.name %>">
+              <li data-row data-names="<%= JSON.stringify(gr.names) %>" data-keep="<%= gr.name %>" data-key="<%= gr.key %>">
                 <div class="rv-pair">
                   <label class="rv-pick rv-inc"><input type="checkbox" class="rv-include" aria-label="Include <%= gr.name %>"<%= gi === 0 ? ' disabled' : '' %>><span class="rv-lab">Include</span></label>
                   <label class="rv-pick rv-kp"><input type="radio" name="skeep-<%= si %>" value="<%= gr.name %>"<%= gi === 0 ? ' checked' : '' %>><span class="rv-lab">Keep</span></label>
                 </div>
                 <span class="rv-name"><%= gr.name %></span>
                 <div class="ex-meta"><%= gr.sets %> set<%= gr.sets === 1 ? '' : 's' %><% if (gr.last) { %> · last <%= gr.last %><% } %></div>
+                <% if (sg.groups.length > 2) { %><button type="button" class="mini rv-diff" data-act="different">This one is different</button><% } %>
               </li>
               <% }) %>
             </ul>
             <button type="button" class="mini rv-go" data-act="merge-sel" disabled>Merge selected</button>
+            <button type="button" class="mini rv-go rv-dismiss" data-act="not-same">Not the same — dismiss</button>
           </li>
           <% }) %>
         </ul>
+        <% } %>
+        <% if (review.dismissed && review.dismissed.length) { %>
+        <details class="rv-dismissed" id="rv-dismissed">
+          <summary>Dismissed (<%= review.dismissed.length %>) — show</summary>
+          <p class="ex-sub">You marked these pairs as different exercises, so they are not suggested. Restore one to see it again.</p>
+          <ul class="rv-list">
+            <% review.dismissed.forEach(function (d) { %>
+            <li class="rv-dis" data-pair="<%= JSON.stringify([d.a, d.b]) %>">
+              <span class="rv-name"><%= d.aName %> ≠ <%= d.bName %></span>
+              <button type="button" class="mini rv-go" data-act="restore">Restore</button>
+            </li>
+            <% }) %>
+          </ul>
+        </details>
         <% } %>
       </section>
 

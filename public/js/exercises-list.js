@@ -129,6 +129,23 @@
       });
     });
   }
+  // "Not the same": hide the suggestion for these pairs (nothing merges, no set changes). `only` = one name that
+  // differs from the rest of the card; null = every name in the card differs from every other.
+  function notSame(card, only) {
+    var keys = JSON.parse(card.getAttribute('data-keys') || '[]'), pairs = [];
+    for (var i = 0; i < keys.length; i++) for (var j = i + 1; j < keys.length; j++) {
+      if (!only || keys[i] === only || keys[j] === only) pairs.push([keys[i], keys[j]]);
+    }
+    if (!pairs.length) return null;
+    return api('/logs/api/exercises/distinct', { pairs: pairs }).then(function (r) {
+      return r.ok ? location.reload() : oDialog.alert({ title: 'Failed', body: r.error || 'Failed.' });
+    });
+  }
+  function restorePair(item) {
+    return api('/logs/api/exercises/distinct/restore', { pairs: [JSON.parse(item.getAttribute('data-pair'))] }).then(function (r) {
+      return r.ok ? location.reload() : oDialog.alert({ title: 'Failed', body: r.error || 'Failed.' });
+    });
+  }
   var review = document.getElementById('review');
   if (review) {
     Array.prototype.forEach.call(review.querySelectorAll('.rv-card'), refreshCard);
@@ -144,6 +161,12 @@
     review.addEventListener('click', function (ev) {
       var btn = ev.target.closest('button[data-act=merge-sel]');
       if (btn && !btn.disabled) mergeSelected(btn.closest('.rv-card'));
+      var nb = ev.target.closest('button[data-act=not-same]');
+      if (nb) notSame(nb.closest('.rv-card'), null);
+      var db2 = ev.target.closest('button[data-act=different]');
+      if (db2) notSame(db2.closest('.rv-card'), db2.closest('li[data-row]').getAttribute('data-key'));
+      var rb = ev.target.closest('button[data-act=restore]');
+      if (rb) restorePair(rb.closest('.rv-dis'));
     });
   }
 
