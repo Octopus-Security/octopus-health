@@ -5,7 +5,7 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 
 "how": `rule` = a name rule matched; `category fallback` = no rule, the category figure is shown; `null rule -> category fallback` = a rule says "no figure yet" but the category figure is still shown; `none (martial: no figure)` = the card says "No diagram yet".
 
-584 library exercises, 182 mobility items.
+585 library exercises, 182 mobility items.
 
 | source | id | name | category | figure | how |
 |---|---|---|---|---|---|
@@ -558,6 +558,7 @@ A change to `public/pose-map.js`, a category fallback or an exercise name shows 
 | library | Barbell Clean | Barbell Clean | strength | hang-clean | rule |
 | library | Single-Arm Cable Tricep Extension | Single-Arm Cable Tricep Extension | strength | pushdown | rule |
 | library | Reverse Pec Deck | Reverse Pec Deck | strength | chest-fly | rule |
+| library | Machine Pulldown to Thighs (Muscle-up Drill) | Machine Pulldown to Thighs (Muscle-up Drill) | strength | lat-pulldown | rule |
 | library | Barbell Push Jerk | Barbell Push Jerk | strength | overhead-press | rule |
 | library | Standing Broad Jump | Standing Broad Jump | conditioning | broad-jump | rule |
 | library | Tuck Jump | Tuck Jump | conditioning | tuck-jump | rule |

@@ -19,7 +19,9 @@ const resolve = (name, opts) => { const r = makeResolver(defs(), opts)(name); re
 const EXPECTED = {
   'Bench Press': 'Barbell Bench Press',
   'Bicep Curls': 'Dumbbell Bicep Curl',
-  'Lat pull down bar to thighs': null,           // owner is sending a picture first: stays unassigned
+  'Lat pull down bar to thighs': 'Machine Pulldown to Thighs (Muscle-up Drill)',
+  'Lat pulldown to thighs': 'Machine Pulldown to Thighs (Muscle-up Drill)',
+  'Lat Pulldown': 'Lat Pulldown',            // guard: the plain exercise is not captured by the drill alias
   'Iso Leg Press': 'Iso Leg Press',
   'Iso Shoulder Press': 'Iso Shoulder Press',
   'Single Leg Curl': 'Single-Leg Curl (Machine)',
@@ -42,7 +44,7 @@ for (const [asked, want] of Object.entries(EXPECTED)) {
 
 test('every new seed row carries muscles that are drawn on the body map', { skip }, () => {
   const M = require('../lib/muscles');
-  for (const n of ['Iso Leg Press', 'Iso Shoulder Press', 'Iso Chest Press', 'Iso Row', 'Hack Squat (Machine)', 'Single-Leg Curl (Machine)', 'Barbell Clean', 'Single-Arm Cable Tricep Extension', 'Reverse Pec Deck']) {
+  for (const n of ['Iso Leg Press', 'Iso Shoulder Press', 'Iso Chest Press', 'Iso Row', 'Hack Squat (Machine)', 'Single-Leg Curl (Machine)', 'Barbell Clean', 'Single-Arm Cable Tricep Extension', 'Reverse Pec Deck', 'Machine Pulldown to Thighs (Muscle-up Drill)']) {
     const d = defs().find(x => x.name === n);
     assert.ok(d, n);
     const got = M.normalize(d.primaryMuscles).muscles;
